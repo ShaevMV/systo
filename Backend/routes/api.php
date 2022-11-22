@@ -17,3 +17,10 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::prefix('v1/festival')->group(static function (): void {
+    Route::get('/orderingTickets', [\App\Http\Controllers\Festival\OrderingTicketsController::class, 'getInfoForOrder']);
+    Route::get('/findPromoCode/{promoCode}', [\App\Http\Controllers\Festival\OrderingTicketsController::class, 'findPromoCode']);
+
+    Route::post('/ticketsOrder/create', [\App\Http\Controllers\TicketsOrder\OrderTickets::class, 'create']);
+});

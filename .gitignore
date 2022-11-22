@@ -1,2 +1,3 @@
 Docker/mysql/db/
 Docker/redis/data
+.idea/*

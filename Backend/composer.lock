@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ccbd816a07b206f971042295b899d1ba",
+    "content-hash": "e3e591748ba964353e2bd31924b80565",
     "packages": [
         {
             "name": "brick/math",
@@ -896,6 +896,62 @@
                 }
             ],
             "time": "2022-08-28T14:45:39+00:00"
+        },
+        {
+            "name": "lambdish/phunctional",
+            "version": "v2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Lambdish/phunctional.git",
+                "reference": "ed3482e7da134d886789abb33c6df22a5d2f271c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Lambdish/phunctional/zipball/ed3482e7da134d886789abb33c6df22a5d2f271c",
+                "reference": "ed3482e7da134d886789abb33c6df22a5d2f271c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^0.11.16",
+                "phpunit/phpunit": "^8.4"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "src/_bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eloi Poch"
+                },
+                {
+                    "name": "Jorge Ávila"
+                },
+                {
+                    "name": "Rafa Gómez"
+                }
+            ],
+            "description": "λ PHP functional library",
+            "keywords": [
+                "functional",
+                "generator",
+                "lambda",
+                "library",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/Lambdish/phunctional/issues",
+                "source": "https://github.com/Lambdish/phunctional/tree/v2.1.0"
+            },
+            "time": "2020-09-18T07:22:08+00:00"
         },
         {
             "name": "laravel/framework",
@@ -3614,6 +3670,91 @@
                 }
             ],
             "time": "2022-08-29T06:49:22+00:00"
+        },
+        {
+            "name": "symfony/messenger",
+            "version": "v6.0.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/messenger.git",
+                "reference": "785fafdd18bbad1a262a07b2b451225e7e1b47e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/785fafdd18bbad1a262a07b2b451225e7e1b47e3",
+                "reference": "785fafdd18bbad1a262a07b2b451225e7e1b47e3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.2",
+                "psr/log": "^1|^2|^3"
+            },
+            "conflict": {
+                "symfony/event-dispatcher": "<5.4",
+                "symfony/framework-bundle": "<5.4",
+                "symfony/http-kernel": "<5.4",
+                "symfony/serializer": "<5.4"
+            },
+            "require-dev": {
+                "psr/cache": "^1.0|^2.0|^3.0",
+                "symfony/console": "^5.4|^6.0",
+                "symfony/dependency-injection": "^5.4|^6.0",
+                "symfony/event-dispatcher": "^5.4|^6.0",
+                "symfony/http-kernel": "^5.4|^6.0",
+                "symfony/process": "^5.4|^6.0",
+                "symfony/property-access": "^5.4|^6.0",
+                "symfony/routing": "^5.4|^6.0",
+                "symfony/serializer": "^5.4|^6.0",
+                "symfony/service-contracts": "^1.1|^2|^3",
+                "symfony/stopwatch": "^5.4|^6.0",
+                "symfony/validator": "^5.4|^6.0"
+            },
+            "suggest": {
+                "enqueue/messenger-adapter": "For using the php-enqueue library as a transport."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Messenger\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Samuel Roze",
+                    "email": "samuel.roze@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Helps applications send and receive messages to/from other applications or via message queues",
+            "homepage": "https://symfony.com",
+            "support": {
+                "source": "https://github.com/symfony/messenger/tree/v6.0.14"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-10-10T09:34:08+00:00"
         },
         {
             "name": "symfony/mime",

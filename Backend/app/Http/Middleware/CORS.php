@@ -40,7 +40,7 @@ class CORS
         $this->allowCredentials = true;
         $this->maxAge = 600;
         $this->exposeHeaders = [];
-        $this->allowOrigins = ['http://localhost:8080'];
+        $this->allowOrigins = ['http://localhost:8081'];
     }
 
     public function handle(Request $request, Closure $next)
@@ -63,8 +63,8 @@ class CORS
                 $response->header($value, $request->header($key));
             }
         }
-        $response->header('Access-Control-Max-Age', $this->maxAge);
-        $response->header('Access-Control-Allow-Credentials', $this->allowCredentials);
+        //$response->header('Access-Control-Max-Age', $this->maxAge);
+        $response->header('Access-Control-Allow-Credentials', 'true');
         $response->header('Access-Control-Expose-Headers', implode(', ', $this->exposeHeaders));
         return $response;
     }

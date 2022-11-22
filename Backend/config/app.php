@@ -185,7 +185,7 @@ return [
         /*
          * Package Service Providers...
          */
-
+        App\Providers\Tickets\TicketsProvider::class,
         /*
          * Application Service Providers...
          */

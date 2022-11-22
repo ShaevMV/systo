@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+console.log(process.env.VUE_APP_BACKEND_ENDPOINT);
+
 axios.defaults.baseURL = process.env.VUE_APP_BACKEND_ENDPOINT
 axios.defaults.withCredentials = true
 
@@ -29,7 +31,7 @@ export const setSelectTicketType = (context, payload) => {
 };
 
 export const checkPromoCode = (context, payload) => {
-    let promise = axios.get('/api/v1/festival/findPromoCode/'+payload);
+    let promise = axios.get('/api/v1/festival/findPromoCode/' + payload);
     promise.then(function (response) {
         context.commit('setValuePromoCode', response.data);
     })

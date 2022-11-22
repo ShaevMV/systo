@@ -13,6 +13,7 @@ class ExampleTest extends TestCase
      */
     public function test_that_true_is_true()
     {
+        $a = 4;
         $this->assertTrue(true);
     }
 }
