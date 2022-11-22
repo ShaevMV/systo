@@ -11,15 +11,15 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 final class AccountDto extends AbstractionEntity
 {
     protected Uuid $id;
-    protected string $password;
+    protected ?string $password;
 
     public function __construct(
         protected string $email,
-        string $password,
+        ?string $password = null,
         protected ?string $name = null,
         ?Uuid $id = null,
     ) {
-        $this->password = Hash::make($password);
+        $this->password = is_null($password) ? null : Hash::make($password);
         $this->id = $id ?? Uuid::random();
     }
 
@@ -29,7 +29,7 @@ final class AccountDto extends AbstractionEntity
 
         return new self(
             $data['email'],
-            $data['password'],
+            $data['password'] ?? null,
             $data['name'] ?? null,
             $id
         );

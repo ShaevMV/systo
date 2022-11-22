@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace App\Http\Controllers\TicketsOrder;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateOrderTickets;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
@@ -22,11 +24,15 @@ class OrderTickets extends Controller
     /**
      * @throws Throwable
      */
-    public function create(): array
+    public function create(CreateOrderTickets $createOrderTickets): array
     {
-        dd(123);
+        $a = 4;
 
-        $userId = $this->accountApplication->creatingOrGetId($request->input('email'));
+        $userId = $this->accountApplication->creatingOrGetId($createOrderTickets->email);
+
+        return [];
+
+
 
         $orderTicketDto = OrderTicketDto::fromState($request->toArray());
 

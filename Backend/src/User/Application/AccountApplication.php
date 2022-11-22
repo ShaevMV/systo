@@ -14,7 +14,9 @@ use Tickets\User\Application\Create\CreatingNewAccountCommand;
 use Tickets\User\Application\Create\CreatingNewAccountCommandHandler;
 use Tickets\User\Application\Find\AccountFindQuery;
 use Tickets\User\Application\Find\AccountFindQueryHandler;
+use Tickets\User\Domain\Account;
 use Tickets\User\Response\IdAccountResponse;
+use Illuminate\Support\Facades\Bus;
 
 final class AccountApplication
 {
@@ -46,17 +48,27 @@ final class AccountApplication
             return $id;
         }
 
-        $password = Str::random(8);
-        $this->commandBus->dispatch(new CreatingNewAccountCommand(
-            $email,
-            $password
-        ));
+       $this->createNewAccount($email);
 
         if(is_null($id = $this->getIdUserByEmail($email))) {
             throw new DomainException('Не получилось получить данные о созданом пользователе ' . $email);
         }
 
         return $id;
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    private function createNewAccount(string $email): void
+    {
+        $password = Str::random(8);
+
+        $this->commandBus->dispatch(new CreatingNewAccountCommand(
+            $email,
+            $password
+        ));
     }
 
     public function getIdUserByEmail(string $email): ?Uuid

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Shared\Domain\Aggregate;
 
-use Tickets\Shared\Domain\Bus\Event\DomainEvent;
+use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 
 abstract class AggregateRoot
 {

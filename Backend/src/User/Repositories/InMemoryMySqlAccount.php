@@ -35,7 +35,7 @@ final class InMemoryMySqlAccount implements AccountInterface
 
     public function findAccountByEmail(string $email): ?AccountDto
     {
-        if($findAccount = $this->model::whereEmail($email)->get()->toArray()) {
+        if($findAccount = $this->model::whereEmail($email)->first()?->toArray()) {
             return AccountDto::fromState(
                 $findAccount
             );

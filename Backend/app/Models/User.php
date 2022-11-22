@@ -46,6 +46,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User wherePassword($value)
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
+ * @method static bool create(array $toArray)
  * @mixin Eloquent
  */
 class User extends Authenticatable
