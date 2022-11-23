@@ -24,7 +24,7 @@ return new class extends Migration {
             $table->string('ticket_type_id');
             $table->foreign('ticket_type_id')->references('id')->on('ticket_type');
 
-            $table->string('promo_code');
+            $table->string('promo_code')->nullable()->default(null);
 
             $table->string('types_of_payment_id');
             $table->foreign('types_of_payment_id')->references('id')->on('types_of_payment');

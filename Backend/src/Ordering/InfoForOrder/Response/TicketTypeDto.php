@@ -34,4 +34,9 @@ final class TicketTypeDto extends AbstractionEntity implements Response
     {
         return $this->price;
     }
+
+    public function getGroupLimit(): ?int
+    {
+        return $this->groupLimit;
+    }
 }

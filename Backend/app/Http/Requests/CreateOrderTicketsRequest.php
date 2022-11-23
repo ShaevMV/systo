@@ -3,14 +3,13 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 
 /**
  * @property string|null $email
  * @property string $date
- * @property string|null $guests
- * @property string|null $promoCode
+ * @property array $guests
+ * @property string|null $promo_code
  * @property string $ticket_type_id
  * @property string $types_of_payment_id
  */

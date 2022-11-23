@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\CreateOrder;
+namespace Tests\Unit\Ordering\OrderTicket\Application\Create;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
@@ -8,7 +8,6 @@ use Tests\TestCase;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class CreateOrderTest extends TestCase
 {

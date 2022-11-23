@@ -16,6 +16,11 @@ class GetPriceByTicketTypeQueryHandler
 
     public function __invoke(GetPriceByTicketTypeQuery $query): PriceByTicketTypeResponse
     {
-        return new PriceByTicketTypeResponse($this->ticketType->getById($query->getUuid())->getPrice());
+        $ticketType = $this->ticketType->getById($query->getUuid());
+
+        return new PriceByTicketTypeResponse(
+            $ticketType->getPrice(),
+            $ticketType->getGroupLimit() > 0
+        );
     }
 }

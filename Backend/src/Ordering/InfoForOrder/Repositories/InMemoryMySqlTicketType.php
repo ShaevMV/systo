@@ -9,7 +9,7 @@ use DomainException;
 use Tickets\Ordering\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-final class InMemoryMySqlTicketType implements TicketTypeInterface
+class InMemoryMySqlTicketType implements TicketTypeInterface
 {
     public function __construct(
         private TicketTypes $model,
