@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Tickets\Shared\Domain\ValueObject;
 
 use InvalidArgumentException;
+use Tickets\Shared\Domain\Entity\EntityDataInterface;
 
-final class Status
+final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
     public const PAID = 'paid';
@@ -32,5 +33,15 @@ final class Status
         if (!array_key_exists($name, self::STATUS_LIST)) {
             throw new InvalidArgumentException(sprintf('<%s> does not allow the value <%s>.', self::class, $name));
         }
+    }
+
+    public function __toString(): string
+    {
+        return $this->name;
+    }
+
+    public function toJson(): string
+    {
+        return $this->name;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Models\Tickets\Ordering;
 
@@ -16,7 +16,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @property mixed $guests
  * @property string $user_id
  * @property string $ticket_type_id
- * @property string $promo_code_id
+ * @property string $promo_code
  * @property string $types_of_payment_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -31,6 +31,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket whereTypesOfPaymentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|OrderTicket whereUserId($value)
+ * @method static create(array $toArray)
  * @mixin \Eloquent
  */
 final class OrderTicket extends Model
@@ -38,4 +39,8 @@ final class OrderTicket extends Model
     use HasFactory, HasUuid;
 
     protected $table = 'order_tickets';
+
+    protected $fillable = [
+        'id', 'guests', 'user_id', 'ticket_type_id', 'promo_code', 'types_of_payment_id', 'price', 'discount', 'status'
+    ];
 }

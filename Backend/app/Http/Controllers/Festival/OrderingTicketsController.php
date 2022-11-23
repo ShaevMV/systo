@@ -27,6 +27,6 @@ class OrderingTicketsController extends Controller
 
     public function findPromoCode(string $promoCode): array
     {
-        return $this->isCorrectPromoCode->findPromoCode($promoCode)?->toArray();
+        return $this->isCorrectPromoCode->findPromoCode($promoCode)?->toArray() ?? [];
     }
 }

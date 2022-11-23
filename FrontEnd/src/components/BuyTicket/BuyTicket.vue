@@ -362,11 +362,11 @@ export default {
     orderTicket: function () {
       this.goToOrderTicket({
         'email': this.email,
-        'typeTicket': this.getSelectTicketTypeId,
+        'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
-        'promoCode': this.promoCode,
+        'promo_code': this.promoCode,
         'date': this.date,
-        'typesOfPayment': this.selectTypesOfPayment,
+        'types_of_payment_id': this.selectTypesOfPayment,
       })
     },
     /**

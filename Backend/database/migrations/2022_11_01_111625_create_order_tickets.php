@@ -3,9 +3,9 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Tickets\Shared\Domain\ValueObject\Status;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -24,11 +24,16 @@ return new class extends Migration
             $table->string('ticket_type_id');
             $table->foreign('ticket_type_id')->references('id')->on('ticket_type');
 
-            $table->string('promo_code_id');
-            $table->foreign('promo_code_id')->references('id')->on('promo_code');
+            $table->string('promo_code');
 
             $table->string('types_of_payment_id');
             $table->foreign('types_of_payment_id')->references('id')->on('types_of_payment');
+
+            $table->float('price')->default(0);
+            $table->float('discount')->default(0);
+
+            $table->string('status')->nullable(false)->default(Status::NEW);
+
             $table->timestamps();
         });
     }

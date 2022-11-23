@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tickets\Ordering\InfoForOrder\Repositories;
 
 use App\Models\Tickets\Ordering\InfoForOrder\Models\TicketTypes;
+use DomainException;
 use Tickets\Ordering\InfoForOrder\Response\TicketTypeDto;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 
 final class InMemoryMySqlTicketType implements TicketTypeInterface
 {
@@ -22,5 +24,14 @@ final class InMemoryMySqlTicketType implements TicketTypeInterface
         }
 
         return $result;
+    }
+
+    public function getById(Uuid $uuid): TicketTypeDto
+    {
+        if (is_null($ticketType = $this->model->whereId($uuid->value())->first())) {
+            throw new DomainException('Не найденн тип билета по id '.$uuid->value());
+        }
+
+        return TicketTypeDto::fromState($ticketType->toArray());
     }
 }

@@ -5,22 +5,17 @@ declare(strict_types=1);
 namespace Tickets\User\Application\Create;
 
 use Tickets\Shared\Domain\Bus\Command\Command;
+use Tickets\User\Dto\AccountDto;
 
 final class CreatingNewAccountCommand implements Command
 {
     public function __construct(
-        private string $email,
-        private string $password,
+        private AccountDto $accountDto,
     ) {
     }
 
-    public function getEmail(): string
+    public function getAccountDto(): AccountDto
     {
-        return $this->email;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
+        return $this->accountDto;
     }
 }

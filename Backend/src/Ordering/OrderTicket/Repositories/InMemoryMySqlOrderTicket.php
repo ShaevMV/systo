@@ -24,6 +24,7 @@ final class InMemoryMySqlOrderTicket implements OrderTicketInterface
     public function create(OrderTicketDto $orderTicketDto): bool
     {
         DB::beginTransaction();
+        $data = $orderTicketDto->toArray();
         try {
             $this->model::create($orderTicketDto->toArray());
             DB::commit();

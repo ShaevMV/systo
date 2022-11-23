@@ -26,9 +26,9 @@ final class OrderTicket extends AggregateRoot
     /**
      * @throws Exception
      */
-    public static function fromState(array $data): self
+    public static function create(array $data): self
     {
-        new self(
+        return new self(
             new Uuid($data['id']),
             $data['guests'],
             $data['email'],

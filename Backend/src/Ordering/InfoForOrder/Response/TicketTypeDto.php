@@ -29,4 +29,9 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             $groupLimit
         );
     }
+
+    public function getPrice(): float
+    {
+        return $this->price;
+    }
 }

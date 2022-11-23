@@ -15,6 +15,7 @@ use Tickets\User\Application\Create\CreatingNewAccountCommandHandler;
 use Tickets\User\Application\Find\AccountFindQuery;
 use Tickets\User\Application\Find\AccountFindQueryHandler;
 use Tickets\User\Domain\Account;
+use Tickets\User\Dto\AccountDto;
 use Tickets\User\Response\IdAccountResponse;
 use Illuminate\Support\Facades\Bus;
 
@@ -26,6 +27,7 @@ final class AccountApplication
     public function __construct(
         CreatingNewAccountCommandHandler $accountCommandHandler,
         AccountFindQueryHandler $accountFindQueryHandler,
+        private Bus $bus
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -40,7 +42,7 @@ final class AccountApplication
     /**
      * @throws Throwable
      */
-    public function creatingOrGetId(
+    public function creatingOrGetAccount(
         string $email
     ): Uuid
     {
@@ -64,11 +66,24 @@ final class AccountApplication
     private function createNewAccount(string $email): void
     {
         $password = Str::random(8);
-
-        $this->commandBus->dispatch(new CreatingNewAccountCommand(
+        $accountDto = new AccountDto(
             $email,
             $password
+        );
+
+        $account = Account::creatingNewAccount(
+            $accountDto->getId(),
+            $email,
+            $password
+        );
+
+        $this->commandBus->dispatch(new CreatingNewAccountCommand(
+            $accountDto
         ));
+
+        $this->bus::chain($account->pullDomainEvents())
+            ->dispatch();
+
     }
 
     public function getIdUserByEmail(string $email): ?Uuid

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 
 
 /**
@@ -10,10 +11,10 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $date
  * @property string|null $guests
  * @property string|null $promoCode
- * @property string $typeTicket
- * @property string $typesOfPayment
+ * @property string $ticket_type_id
+ * @property string $types_of_payment_id
  */
-class CreateOrderTickets extends FormRequest
+class CreateOrderTicketsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

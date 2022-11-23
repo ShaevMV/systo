@@ -25,4 +25,9 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             $data['discount'],
         );
     }
+
+    public function getDiscount(): float
+    {
+        return $this->discount;
+    }
 }
