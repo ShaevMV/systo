@@ -21,6 +21,7 @@ class PriceService
     {
         $priceByType = $this->getPriceByTicketType->getPrice($ticketTypeId);
         $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
+
         return new PriceDto(
             $totalPrice,
             $this->isCorrectPromoCode->findPromoCode($promoCode)?->getDiscount() ?? 0.00

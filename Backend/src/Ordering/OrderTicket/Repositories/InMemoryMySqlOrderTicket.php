@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 
-final class InMemoryMySqlOrderTicket implements OrderTicketInterface
+class InMemoryMySqlOrderTicket implements OrderTicketInterface
 {
     public function __construct(
         private OrderTicket $model,
@@ -24,7 +24,6 @@ final class InMemoryMySqlOrderTicket implements OrderTicketInterface
     public function create(OrderTicketDto $orderTicketDto): bool
     {
         DB::beginTransaction();
-        $data = $orderTicketDto->toArray();
         try {
             $this->model::create($orderTicketDto->toArray());
             DB::commit();

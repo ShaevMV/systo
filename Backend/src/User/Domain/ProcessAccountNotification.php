@@ -20,9 +20,7 @@ class ProcessAccountNotification implements ShouldQueue, DomainEvent
     public function __construct(
         private string $email,
         private string $password
-    )
-    {
-
+    ){
     }
 
     public function handle(): void

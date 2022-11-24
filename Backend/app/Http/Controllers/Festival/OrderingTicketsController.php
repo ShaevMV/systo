@@ -17,10 +17,7 @@ class OrderingTicketsController extends Controller
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function getInfoForOrder(Request $request): array
+    public function getInfoForOrder(): array
     {
         return $this->allInfoForOrderingTicketsSearcher->getInfo()->toArray();
     }

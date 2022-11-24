@@ -2,20 +2,37 @@
 
 namespace Tests\Unit\Ordering\OrderTicket\Application\Create;
 
+use Mockery\ExpectationInterface;
+use Mockery\MockInterface;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
+use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicket;
 use Tickets\Shared\Domain\ValueObject\Status;
 
 class CreateOrderTest extends TestCase
 {
     private CreateOrder $createOrder;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->mock(InMemoryMySqlOrderTicket::class, static function (MockInterface $mock) {
+            /** @var ExpectationInterface $method */
+            $method = $mock->shouldReceive('create');
+
+            $method->andReturn(true);
+        });
+
         /** @var CreateOrder $createOrder */
         $createOrder = $this->app->get(CreateOrder::class);
         $this->createOrder = $createOrder;
@@ -37,11 +54,13 @@ class CreateOrderTest extends TestCase
             'promo_code' => 'Systo',
             'types_of_payment_id' => "02c5a0cb-e94a-44bb-b1e7-fbc3e3118f76",
             'price' => 1000,
-            'discount' => 0.00,
+            'discount' => 100.00,
             'status' => Status::NEW
         ]);
 
-        $this->createOrder->creating($orderTicketDto);
+        $this->createOrder->creating($orderTicketDto, 'testTest');
+
+        self::assertTrue(true);
     }
 }
 
