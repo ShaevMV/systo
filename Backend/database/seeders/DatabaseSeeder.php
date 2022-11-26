@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
         private TypeTicketsSeeder $typeTicketsSeeder,
         private TypesOfPaymentSeeder $typesOfPaymentSeeder,
         private PromoCodSeeder $promoCodSeeder,
+        private UserSeeder $userSeeder,
     ){
     }
 
@@ -24,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->typeTicketsSeeder->run();
         $this->typesOfPaymentSeeder->run();
         $this->promoCodSeeder->run();
+        $this->userSeeder->run();
     }
 }
