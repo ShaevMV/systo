@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,6 +15,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Tickets\Shared\Infrastructure\Models\HasUuid;
 
 
@@ -46,10 +46,9 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User wherePassword($value)
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
- * @method static bool create(array $toArray)
- * @mixin Eloquent
+ * @method static Builder|User create(array $toArray)
  */
-class User extends Authenticatable
+class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasUuid;
 
@@ -82,4 +81,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
 }

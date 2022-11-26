@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Application\Create;
+namespace Tickets\User\Domain;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;

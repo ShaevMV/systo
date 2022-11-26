@@ -112,6 +112,11 @@
       <path value="$PROJECT_DIR$/Backend/vendor/psy/psysh" />
       <path value="$PROJECT_DIR$/Backend/vendor/psr/container" />
       <path value="$PROJECT_DIR$/Backend/vendor/psr/simple-cache" />
+      <path value="$PROJECT_DIR$/Backend/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/Backend/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/Backend/vendor/stella-maris/clock" />
+      <path value="$PROJECT_DIR$/Backend/vendor/namshi/jose" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-open-source-saver/jwt-auth" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

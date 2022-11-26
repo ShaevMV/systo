@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tickets\User\Domain;
 
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\User\Application\Create\ProcessAccountNotification;
+
 
 class Account extends AggregateRoot
 {
@@ -22,7 +24,7 @@ class Account extends AggregateRoot
         ?string $name = null,
     ): self {
         $self = new self($uuid, $email, $name);
-        $self->record(new ProcessAccountNotification($email,$password));
+        $self->record(new ProcessAccountNotification($email, $password));
 
         return $self;
     }

@@ -51,13 +51,13 @@ class OrderTickets extends Controller
             $this->createOrder->creating($orderTicketDto, $createOrderTicketsRequest->email);
 
             return response()->json([
-                'success' => 'true',
+                'success' => true,
                 'massage' => '',
             ]);
 
         } catch (Throwable $exception) {
             return response()->json([
-                'success' => 'true',
+                'success' => false,
                 'massage' => $exception->getMessage(),
             ]);
         }
