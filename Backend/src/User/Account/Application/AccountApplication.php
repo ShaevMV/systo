@@ -2,22 +2,22 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Application;
+namespace Tickets\User\Account\Application;
 
 use DomainException;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
-use Tickets\User\Application\Create\CreatingNewAccountCommand;
-use Tickets\User\Application\Create\CreatingNewAccountCommandHandler;
-use Tickets\User\Application\Find\AccountFindQuery;
-use Tickets\User\Application\Find\AccountFindQueryHandler;
-use Tickets\User\Domain\Account;
-use Tickets\User\Dto\AccountDto;
-use Tickets\User\Response\IdAccountResponse;
-use Illuminate\Support\Facades\Bus;
+use Tickets\User\Account\Application\Create\CreatingNewAccountCommand;
+use Tickets\User\Account\Application\Create\CreatingNewAccountCommandHandler;
+use Tickets\User\Account\Application\Find\AccountFindQuery;
+use Tickets\User\Account\Application\Find\AccountFindQueryHandler;
+use Tickets\User\Account\Domain\Account;
+use Tickets\User\Account\Dto\AccountDto;
+use Tickets\User\Account\Response\IdAccountResponse;
 
 final class AccountApplication
 {

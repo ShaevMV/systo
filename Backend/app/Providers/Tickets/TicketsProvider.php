@@ -12,8 +12,8 @@ use Tickets\Ordering\InfoForOrder\Repositories\TicketTypeInterface;
 use Tickets\Ordering\InfoForOrder\Repositories\TypesOfPaymentInterface;
 use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicket;
 use Tickets\Ordering\OrderTicket\Repositories\OrderTicketInterface;
-use Tickets\User\Repositories\AccountInterface;
-use Tickets\User\Repositories\InMemoryMySqlAccount;
+use Tickets\User\Account\Repositories\AccountInterface;
+use Tickets\User\Account\Repositories\InMemoryMySqlAccount;
 
 class TicketsProvider extends ServiceProvider
 {

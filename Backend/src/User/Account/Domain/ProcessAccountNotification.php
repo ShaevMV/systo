@@ -2,10 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Domain;
+namespace Tickets\User\Account\Domain;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;

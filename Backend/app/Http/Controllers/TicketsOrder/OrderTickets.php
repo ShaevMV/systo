@@ -7,13 +7,15 @@ namespace App\Http\Controllers\TicketsOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicketsList\ToGetList;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Ordering\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\User\Application\AccountApplication;
+use Tickets\User\Account\Application\AccountApplication;
 
 class OrderTickets extends Controller
 {
@@ -21,6 +23,7 @@ class OrderTickets extends Controller
         private CreateOrder $createOrder,
         private AccountApplication $accountApplication,
         private PriceService $priceService,
+        private ToGetList $toGetList,
     ) {
     }
 
@@ -63,4 +66,11 @@ class OrderTickets extends Controller
         }
     }
 
+    public function getList(): array
+    {
+        /** @var string $id */
+        $id = Auth::id();
+
+        return $this->toGetList->byUser(new Uuid($id))->toArray();
+    }
 }

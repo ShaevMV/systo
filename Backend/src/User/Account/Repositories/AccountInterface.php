@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Repositories;
+namespace Tickets\User\Account\Repositories;
 
-use Tickets\User\Dto\AccountDto;
+use Tickets\User\Account\Dto\AccountDto;
 
 interface AccountInterface
 {

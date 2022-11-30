@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\User\Domain;
+namespace Tickets\User\Account\Domain;
 
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -40,5 +40,10 @@ class Account extends AggregateRoot
     public function getId(): Uuid
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
     }
 }

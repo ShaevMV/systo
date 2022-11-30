@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Application\Create;
+namespace Tickets\User\Account\Application\Create;
 
-use Tickets\User\Repositories\AccountInterface;
+use Tickets\User\Account\Repositories\AccountInterface;
 
 final class CreatingNewAccountCommandHandler
 {

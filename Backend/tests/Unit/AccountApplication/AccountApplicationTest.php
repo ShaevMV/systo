@@ -5,7 +5,7 @@ namespace Tests\Unit\AccountApplication;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
-use Tickets\User\Application\AccountApplication;
+use Tickets\User\Account\Application\AccountApplication;
 
 class AccountApplicationTest extends TestCase
 {

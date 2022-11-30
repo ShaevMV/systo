@@ -33,6 +33,7 @@ return new class extends Migration {
             $table->float('discount')->default(0);
 
             $table->string('status')->nullable(false)->default(Status::NEW);
+            $table->dateTime('date')->nullable(false);
 
             $table->timestamps();
         });

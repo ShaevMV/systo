@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\User\Application\Find;
+namespace Tickets\User\Account\Application\Find;
 
-use Tickets\User\Repositories\AccountInterface;
-use Tickets\User\Response\IdAccountResponse;
+use Tickets\User\Account\Repositories\AccountInterface;
+use Tickets\User\Account\Response\IdAccountResponse;
 
 final class AccountFindQueryHandler
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Repositories;
+namespace Tickets\User\Account\Repositories;
 
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-use Tickets\User\Dto\AccountDto;
+use Tickets\User\Account\Dto\AccountDto;
 
 final class InMemoryMySqlAccount implements AccountInterface
 {

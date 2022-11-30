@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\User\Application\Create;
+namespace Tickets\User\Account\Application\Create;
 
 use Tickets\Shared\Domain\Bus\Command\Command;
-use Tickets\User\Dto\AccountDto;
+use Tickets\User\Account\Dto\AccountDto;
 
 final class CreatingNewAccountCommand implements Command
 {

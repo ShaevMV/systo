@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Response;
+namespace Tickets\User\Account\Response;
 
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\ValueObject\Uuid;

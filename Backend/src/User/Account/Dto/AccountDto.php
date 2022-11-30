@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\User\Dto;
+namespace Tickets\User\Account\Dto;
 
-use Hash;
+use Illuminate\Support\Facades\Hash;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 

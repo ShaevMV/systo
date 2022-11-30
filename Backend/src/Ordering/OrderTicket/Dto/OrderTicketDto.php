@@ -25,6 +25,7 @@ final class OrderTicketDto extends AbstractionEntity
         protected float $discount,
         protected Status $status,
         ?Uuid $id = null,
+        protected ?string $name = null,
     ) {
         $this->id = $id ?? Uuid::random();
     }
@@ -38,7 +39,7 @@ final class OrderTicketDto extends AbstractionEntity
 
         return new self(
             new Uuid($data['user_id']),
-            Json::encode($data['guests']),
+            is_array($data['guests']) ? Json::encode($data['guests']) : $data['guests'],
             new Uuid($data['ticket_type_id']),
             $data['promo_code'] ?? null,
             $data['date'],
@@ -46,7 +47,8 @@ final class OrderTicketDto extends AbstractionEntity
             $data['price'],
             $data['discount'],
             new Status($data['status']),
-            $id
+            $id,
+            $data['name'] ?? null,
         );
     }
 }
