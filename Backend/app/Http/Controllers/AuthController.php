@@ -89,6 +89,7 @@ class AuthController extends Controller
             'authorisation' => [
                 'token' => Auth::refresh(),
                 'type' => 'bearer',
+                'lifetime' => time() + (30*60),
             ]
         ]);
     }
