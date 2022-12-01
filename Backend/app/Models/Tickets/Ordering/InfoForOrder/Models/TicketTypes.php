@@ -28,6 +28,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketTypes whereName($value)
  * @method static Builder|TicketTypes wherePrice($value)
  * @method static Builder|TicketTypes whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class TicketTypes extends Model
 {

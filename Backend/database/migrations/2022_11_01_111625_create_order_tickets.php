@@ -18,10 +18,10 @@ return new class extends Migration {
             $table->json('guests');
 
 
-            $table->string('user_id');
+            $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
 
-            $table->string('ticket_type_id');
+            $table->uuid('ticket_type_id');
             $table->foreign('ticket_type_id')->references('id')->on('ticket_type');
 
             $table->string('promo_code')->nullable()->default(null);

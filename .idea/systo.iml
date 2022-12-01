@@ -14,6 +14,15 @@
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/stella-maris/clock" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/namshi/jose" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/php-open-source-saver/jwt-auth" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/barryvdh/laravel-ide-helper" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/barryvdh/reflection-docblock" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/phpdocumentor/reflection-common" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/phpdocumentor/type-resolver" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/deprecations" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/dbal" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/event-manager" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/psr/cache" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

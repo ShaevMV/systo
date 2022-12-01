@@ -34,6 +34,16 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicket whereUpdatedAt($value)
  * @method static Builder|OrderTicket whereUserId($value)
  * @method static create(array $toArray)
+ * @property float $price
+ * @property float $discount
+ * @property string $status
+ * @property string $date
+ * @method static Builder|OrderTicket whereDate($value)
+ * @method static Builder|OrderTicket whereDiscount($value)
+ * @method static Builder|OrderTicket wherePrice($value)
+ * @method static Builder|OrderTicket wherePromoCode($value)
+ * @method static Builder|OrderTicket whereStatus($value)
+ * @mixin \Eloquent
  */
 final class OrderTicket extends Model
 {
