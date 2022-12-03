@@ -66,7 +66,7 @@ class OrderTickets extends Controller
         }
     }
 
-    public function getList(): array
+    public function getUserList(): array
     {
         /** @var string $id */
         $id = Auth::id();

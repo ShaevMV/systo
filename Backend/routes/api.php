@@ -28,7 +28,8 @@ Route::prefix('v1/festival')->group(static function (): void {
         [OrderingTicketsController::class, 'findPromoCode']);
 
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);
-    Route::get('/ticketsOrder/getList', [OrderTickets::class, 'getList'])->middleware('auth:api');
+    Route::get('/ticketsOrder/getUserList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
+    Route::get('/ticketsOrder/getList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
 });
 
 
