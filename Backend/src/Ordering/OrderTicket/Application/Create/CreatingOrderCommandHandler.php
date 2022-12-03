@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Tickets\Ordering\OrderTicket\Application\Create;
 
-use Tickets\Ordering\OrderTicket\Repositories\OrderTicketInterface;
+use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 
 final class CreatingOrderCommandHandler
 {
     public function __construct(
-        private OrderTicketInterface $orderTicket
+        private OrderTicketRepositoryInterface $orderTicket
     ){
     }
 

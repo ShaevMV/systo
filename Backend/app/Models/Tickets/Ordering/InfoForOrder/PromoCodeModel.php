@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Tickets\Ordering\InfoForOrder\Models;
+namespace App\Models\Tickets\Ordering\InfoForOrder;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,17 +19,17 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @property float $discount
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @method static Builder|PromoCode newModelQuery()
- * @method static Builder|PromoCode newQuery()
- * @method static Builder|PromoCode query()
- * @method static Builder|PromoCode whereCreatedAt($value)
- * @method static Builder|PromoCode whereDiscount($value)
- * @method static Builder|PromoCode whereId($value)
- * @method static Builder|PromoCode whereName($value)
- * @method static Builder|PromoCode whereUpdatedAt($value)
+ * @method static Builder|PromoCodeModel newModelQuery()
+ * @method static Builder|PromoCodeModel newQuery()
+ * @method static Builder|PromoCodeModel query()
+ * @method static Builder|PromoCodeModel whereCreatedAt($value)
+ * @method static Builder|PromoCodeModel whereDiscount($value)
+ * @method static Builder|PromoCodeModel whereId($value)
+ * @method static Builder|PromoCodeModel whereName($value)
+ * @method static Builder|PromoCodeModel whereUpdatedAt($value)
  * @mixin Eloquent
  */
-class PromoCode extends Model
+class PromoCodeModel extends Model
 {
     use HasFactory, HasUuid;
 

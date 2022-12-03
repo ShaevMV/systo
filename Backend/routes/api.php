@@ -29,7 +29,8 @@ Route::prefix('v1/festival')->group(static function (): void {
 
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);
     Route::get('/ticketsOrder/getUserList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
-    Route::get('/ticketsOrder/getList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
+
+    Route::get('/ticketsOrder/getItem/{id}', [OrderTickets::class, 'getOrderItem']);
 });
 
 

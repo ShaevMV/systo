@@ -10,7 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicketsList\ToGetList;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\GetOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Ordering\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -23,11 +23,13 @@ class OrderTickets extends Controller
         private CreateOrder $createOrder,
         private AccountApplication $accountApplication,
         private PriceService $priceService,
-        private ToGetList $toGetList,
+        private GetOrder $getOrder,
     ) {
     }
 
     /**
+     * Создать заказ
+     *
      * @throws Throwable
      */
     public function create(CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
@@ -66,11 +68,27 @@ class OrderTickets extends Controller
         }
     }
 
+    /**
+     * Получить список заказов от пользователя
+     *
+     * @return array
+     */
     public function getUserList(): array
     {
         /** @var string $id */
         $id = Auth::id();
 
-        return $this->toGetList->byUser(new Uuid($id))->toArray();
+        return $this->getOrder->listByUser(new Uuid($id))->toArray();
+    }
+
+    /**
+     * Получить определённый заказ
+     *
+     * @param  string  $id
+     * @return array
+     */
+    public function getOrderItem(string $id): array
+    {
+        return $this->getOrder->getItemById(new Uuid($id))->toArray();
     }
 }

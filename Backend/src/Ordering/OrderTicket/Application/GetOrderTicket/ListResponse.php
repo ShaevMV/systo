@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicketsList;
+namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
 
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Shared\Domain\Bus\Query\Response;

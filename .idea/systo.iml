@@ -23,6 +23,7 @@
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/event-manager" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/doctrine/cache" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/psr/cache" />
+      <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/psr/clock" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

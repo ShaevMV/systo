@@ -10,8 +10,8 @@ use Tickets\Ordering\InfoForOrder\Repositories\InMemoryMySqlTypesOfPayment;
 use Tickets\Ordering\InfoForOrder\Repositories\PromoCodeInterface;
 use Tickets\Ordering\InfoForOrder\Repositories\TicketTypeInterface;
 use Tickets\Ordering\InfoForOrder\Repositories\TypesOfPaymentInterface;
-use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicket;
-use Tickets\Ordering\OrderTicket\Repositories\OrderTicketInterface;
+use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
+use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\User\Account\Repositories\AccountInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlAccount;
 
@@ -28,6 +28,6 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(TypesOfPaymentInterface::class, InMemoryMySqlTypesOfPayment::class);
         $this->app->bind(PromoCodeInterface::class, InMemoryMySqlPromoCode::class);
         $this->app->bind(AccountInterface::class, InMemoryMySqlAccount::class);
-        $this->app->bind(OrderTicketInterface::class, InMemoryMySqlOrderTicket::class);
+        $this->app->bind(OrderTicketRepositoryInterface::class, InMemoryMySqlOrderTicketRepository::class);
     }
 }

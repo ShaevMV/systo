@@ -1,24 +1,25 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Ordering\OrderTicket\Repositories;
 
-use App\Models\Tickets\Ordering\CommentOrderTicket;
-use App\Models\Tickets\Ordering\InfoForOrder\Models\TicketTypes;
-use App\Models\Tickets\Ordering\OrderTicket;
+use App\Models\Tickets\Ordering\CommentOrderTicketModel;
+use App\Models\Tickets\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Tickets\Ordering\OrderTicketModel;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use JsonException;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class InMemoryMySqlOrderTicket implements OrderTicketInterface
+class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
 {
     public function __construct(
-        private OrderTicket $model,
-    ){
+        private OrderTicketModel $model,
+    ) {
     }
 
 
@@ -43,30 +44,48 @@ class InMemoryMySqlOrderTicket implements OrderTicketInterface
      *
      * @return OrderTicketDto[]
      *
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function getUserList(Uuid $userId): array
     {
-        $result = [];
-        $lastComment = CommentOrderTicket::select('comment')
+        $lastComment = CommentOrderTicketModel::select('comment')
             ->whereColumn('order_tickets_id', $this->model::TABLE.'.id')
             ->latest()
             ->limit(1)
             ->getQuery();
 
         $rawData = $this->model::whereUserId($userId->value())
-            ->leftJoin(TicketTypes::TABLE, $this->model::TABLE.'.ticket_type_id','=',TicketTypes::TABLE.'.id')
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE.'.id')
             ->select([
                 $this->model::TABLE.'.*',
-                TicketTypes::TABLE.'.name',
+                TicketTypesModel::TABLE.'.name',
             ])
             ->selectSub($lastComment, 'last_comment')
             ->get()
             ->toArray();
+
+        $result = [];
         foreach ($rawData as $datum) {
             $result[] = OrderTicketItem::fromState($datum);
         }
 
         return $result;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function findOrder(Uuid $uuid): ?OrderTicketItem
+    {
+        $rawData = $this->model::whereId($uuid->value())
+            ->with('comments')
+            ->with('ticketType')
+            ->with('typeOfPayment')
+            ->first()
+            ?->toArray();
+
+        return $rawData !== null ? OrderTicketItem::fromItemOrderState($rawData) : null;
     }
 }

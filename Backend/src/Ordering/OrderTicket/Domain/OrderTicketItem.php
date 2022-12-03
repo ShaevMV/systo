@@ -6,6 +6,7 @@ namespace Tickets\Ordering\OrderTicket\Domain;
 
 use Carbon\Carbon;
 use JsonException;
+use Tickets\Ordering\OrderTicket\ValueObject\CommentForOrder;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -13,17 +14,23 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class OrderTicketItem extends AbstractionEntity implements Response
 {
+    protected float $totalPrice = 0.00;
+
     public function __construct(
         protected Uuid $id,
         protected string $name,
         protected float $price,
+        protected float $discount,
         protected int $count,
         protected Status $status,
         protected Carbon $dateBuy,
         protected Carbon $dateCreate,
         protected ?string $lastComment = null,
         protected ?string $linkToTicket = null,
+        protected ?string $typeOfPayment = null,
+        protected ?array $comment = null,
     ) {
+        $this->totalPrice = $price - $discount;
     }
 
     /**
@@ -31,11 +38,11 @@ class OrderTicketItem extends AbstractionEntity implements Response
      */
     public static function fromState(array $data): self
     {
-        $price = $data['price'] - $data['discount'];
         return new self(
             new Uuid($data['id']),
             $data['name'],
-            (float) $price,
+            (float) $data['price'],
+            (float) $data['discount'],
             count(json_decode($data['guests'], false, 512, JSON_THROW_ON_ERROR)),
             new Status($data['status']),
             new Carbon($data['date']),
@@ -45,4 +52,32 @@ class OrderTicketItem extends AbstractionEntity implements Response
         );
     }
 
+    /**
+     * @throws JsonException
+     */public static function fromItemOrderState(array $data): self
+    {
+        /** @var CommentForOrder[] $comments */
+        $comments = [];
+        foreach ($data['comments'] as $comment) {
+            $comments[] = CommentForOrder::fromState($comment);
+        }
+        $data['name'] = $data['ticket_type']['name'];
+        $data['last_comment'] = count($comments) > 0 ? (string)end($comments)?->getComment() : null;
+
+        return self::fromState($data)
+            ->setComment(empty($comments) ? null : $comments)
+            ->setTypeOfPayment($data['type_of_payment']['name']);
+    }
+
+    public function setTypeOfPayment(?string $typeOfPayment): OrderTicketItem
+    {
+        $this->typeOfPayment = $typeOfPayment;
+        return $this;
+    }
+
+    public function setComment(?array $comment): OrderTicketItem
+    {
+        $this->comment = $comment;
+        return $this;
+    }
 }

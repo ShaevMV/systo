@@ -11,7 +11,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
-use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicket;
+use Tickets\Ordering\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Shared\Domain\ValueObject\Status;
 
 class CreateOrderTest extends TestCase
@@ -26,7 +26,7 @@ class CreateOrderTest extends TestCase
     {
         parent::setUp();
 
-        $this->mock(InMemoryMySqlOrderTicket::class, static function (MockInterface $mock) {
+        $this->mock(InMemoryMySqlOrderTicketRepository::class, static function (MockInterface $mock) {
             /** @var ExpectationInterface $method */
             $method = $mock->shouldReceive('create');
 

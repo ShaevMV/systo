@@ -126,6 +126,7 @@
       <path value="$PROJECT_DIR$/Backend/vendor/doctrine/event-manager" />
       <path value="$PROJECT_DIR$/Backend/vendor/doctrine/cache" />
       <path value="$PROJECT_DIR$/Backend/vendor/psr/cache" />
+      <path value="$PROJECT_DIR$/Backend/vendor/psr/clock" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

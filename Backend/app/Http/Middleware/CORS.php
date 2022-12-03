@@ -13,19 +13,19 @@ class CORS
     /**
      * @var bool
      */
-    private $allowCredentials;
+    private bool $allowCredentials;
     /**
      * @var int
      */
-    private $maxAge;
+    private int $maxAge;
     /**
      * @var string[]
      */
-    private $exposeHeaders;
+    private array $exposeHeaders;
     /**
      * @var string[]
      */
-    private $headers  = [
+    private array $headers  = [
         'origin' => 'Access-Control-Allow-Origin',
         'Access-Control-Request-Headers' => 'Access-Control-Allow-Headers',
         'Access-Control-Request-Method' => 'Access-Control-Allow-Methods'
@@ -33,14 +33,14 @@ class CORS
     /**
      * @var string[]
      */
-    private $allowOrigins;
+    private array $allowOrigins;
 
     public function __construct()
     {
         $this->allowCredentials = true;
         $this->maxAge = 600;
         $this->exposeHeaders = [];
-        $this->allowOrigins = ['http://localhost:8081'];
+        $this->allowOrigins = ['http://localhost:8081','http://api.tickets.loc'];
     }
 
     public function handle(Request $request, Closure $next)

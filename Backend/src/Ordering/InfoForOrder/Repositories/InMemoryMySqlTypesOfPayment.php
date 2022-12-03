@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Tickets\Ordering\InfoForOrder\Repositories;
 
-use App\Models\Tickets\Ordering\InfoForOrder\Models\TypesOfPayment;
+use App\Models\Tickets\Ordering\InfoForOrder\TypesOfPaymentModel;
 use Tickets\Ordering\InfoForOrder\Response\TypesOfPaymentDto;
 
 class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface
 {
     public function __construct(
-        private TypesOfPayment $model
+        private TypesOfPaymentModel $model
     ) {
     }
 

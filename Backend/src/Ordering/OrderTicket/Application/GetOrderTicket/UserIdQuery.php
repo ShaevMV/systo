@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicketsList;
+namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class OrdersQuery implements Query
+class UserIdQuery implements Query
 {
     public function __construct(
         private Uuid $userId

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ordering\InfoForOrder\Repositories;
 
-use App\Models\Tickets\Ordering\InfoForOrder\Models\TicketTypes;
+use App\Models\Tickets\Ordering\InfoForOrder\TicketTypesModel;
 use DomainException;
 use Tickets\Ordering\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -12,7 +12,7 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class InMemoryMySqlTicketType implements TicketTypeInterface
 {
     public function __construct(
-        private TicketTypes $model,
+        private TicketTypesModel $model,
     ) {
     }
 
