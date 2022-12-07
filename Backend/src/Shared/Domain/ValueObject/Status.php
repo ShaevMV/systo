@@ -44,4 +44,9 @@ final class Status implements EntityDataInterface
     {
         return $this->name;
     }
+
+    public function getHumanStatus(): string
+    {
+        return self::STATUS_LIST[$this->name];
+    }
 }

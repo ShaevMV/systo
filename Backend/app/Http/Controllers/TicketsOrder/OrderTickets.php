@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use JsonException;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\GetOrder;
@@ -86,6 +87,7 @@ class OrderTickets extends Controller
      *
      * @param  string  $id
      * @return array
+     * @throws JsonException
      */
     public function getOrderItem(string $id): array
     {

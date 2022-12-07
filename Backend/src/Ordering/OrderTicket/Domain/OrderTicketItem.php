@@ -15,13 +15,15 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class OrderTicketItem extends AbstractionEntity implements Response
 {
     protected float $totalPrice = 0.00;
+    protected int $count;
+    protected string $humanStatus;
 
     public function __construct(
         protected Uuid $id,
         protected string $name,
         protected float $price,
         protected float $discount,
-        protected int $count,
+        protected array $guests,
         protected Status $status,
         protected Carbon $dateBuy,
         protected Carbon $dateCreate,
@@ -31,6 +33,8 @@ class OrderTicketItem extends AbstractionEntity implements Response
         protected ?array $comment = null,
     ) {
         $this->totalPrice = $price - $discount;
+        $this->count = count($this->guests);
+        $this->humanStatus = $this->status->getHumanStatus();
     }
 
     /**
@@ -43,7 +47,7 @@ class OrderTicketItem extends AbstractionEntity implements Response
             $data['name'],
             (float) $data['price'],
             (float) $data['discount'],
-            count(json_decode($data['guests'], false, 512, JSON_THROW_ON_ERROR)),
+            json_decode($data['guests'], false, 512, JSON_THROW_ON_ERROR),
             new Status($data['status']),
             new Carbon($data['date']),
             new Carbon($data['created_at']),

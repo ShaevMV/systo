@@ -24,6 +24,12 @@ class GetOrder
         ]);
     }
 
+    /**
+     * Вывести список заказов у пользователя
+     *
+     * @param  Uuid  $userId
+     * @return OrderTicketList
+     */
     public function listByUser(Uuid $userId): OrderTicketList
     {
         /** @var ListResponse $listItem */
@@ -32,6 +38,12 @@ class GetOrder
         return new OrderTicketList($listItem->getOrderList());
     }
 
+    /**
+     * Высети конкретный заказ
+     *
+     * @param  Uuid  $uuid
+     * @return OrderTicketItem
+     */
     public function getItemById(Uuid $uuid): OrderTicketItem
     {
         /** @var OrderTicketItem $result */
