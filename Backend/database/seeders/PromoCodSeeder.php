@@ -9,6 +9,10 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PromoCodSeeder extends Seeder
 {
+    public const ID_FOR_SYSTO = '2ecd9108-12c0-4ef1-9095-917442673a3c';
+    public const NAME_FOR_SYSTO = 'Systo';
+    public const DISCOUNT_FOR_SYSTO = 100;
+
     /**
      * Run the database seeds.
      *
@@ -17,9 +21,9 @@ class PromoCodSeeder extends Seeder
     public function run()
     {
         DB::table('promo_code')->insert([
-            'id' => Uuid::random()->value(),
-            'name' => 'Systo',
-            'discount' => 100
+            'id' => self::ID_FOR_SYSTO,
+            'name' => self::NAME_FOR_SYSTO,
+            'discount' => self::DISCOUNT_FOR_SYSTO
         ]);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use JsonException;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,13 +12,16 @@ class DatabaseSeeder extends Seeder
         private TypesOfPaymentSeeder $typesOfPaymentSeeder,
         private PromoCodSeeder $promoCodSeeder,
         private UserSeeder $userSeeder,
-    ){
+        private OrderSeeder $orderSeeder,
+        private CommentSeeder $commentSeeder,
+    ) {
     }
 
     /**
      * Seed the application's database.
      *
      * @return void
+     * @throws JsonException
      */
     public function run(): void
     {
@@ -26,5 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->typesOfPaymentSeeder->run();
         $this->promoCodSeeder->run();
         $this->userSeeder->run();
+        $this->orderSeeder->run();
+        $this->commentSeeder->run();
     }
 }
