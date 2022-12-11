@@ -33,7 +33,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|CommentOrderTicketModel whereUpdatedAt($value)
  * @method static Builder|CommentOrderTicketModel whereUserId($value)
  * @mixin Eloquent
- * @property-read \App\Models\Tickets\Ordering\OrderTicketModel|null $order
+ * @property-read OrderTicketModel|null $order
  */
 final class CommentOrderTicketModel extends Model
 {

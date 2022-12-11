@@ -6,10 +6,10 @@ namespace App\Http\Controllers\TicketsOrder;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateCommentForOrderRequest;
+use Auth;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\AddComment\AddComment;
-use Tickets\Ordering\OrderTicket\Application\AddComment\AddCommentCommand;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class Comment extends Controller
@@ -26,7 +26,7 @@ class Comment extends Controller
     {
         $this->addComment->send(
             new Uuid($commentForOrderRequest->orderId),
-            new Uuid(\Auth::id()),
+            new Uuid(Auth::id()),
             $commentForOrderRequest->message,
         );
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Ordering\OrderTicket\Domain;
 
 use Carbon\Carbon;
+use Exception;
 use JsonException;
 use Tickets\Ordering\OrderTicket\ValueObject\CommentForOrder;
 use Tickets\Shared\Domain\Bus\Query\Response;
@@ -40,6 +41,7 @@ class OrderTicketItem extends AbstractionEntity implements Response
 
     /**
      * @throws JsonException
+     * @throws Exception
      */
     public static function fromState(array $data): self
     {
@@ -71,7 +73,7 @@ class OrderTicketItem extends AbstractionEntity implements Response
         $data['last_comment'] = count($comments) > 0 ? (string)end($comments)?->getComment() : null;
 
         return self::fromState($data)
-            ->setComment(empty($comments) ? null : $comments)
+            ->setComment(empty($comments) ? [] : $comments)
             ->setTypeOfPayment($data['type_of_payment']['name']);
     }
 

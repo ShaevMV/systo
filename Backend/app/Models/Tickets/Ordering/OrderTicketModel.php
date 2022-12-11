@@ -6,7 +6,9 @@ namespace App\Models\Tickets\Ordering;
 
 use App\Models\Tickets\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Tickets\Ordering\InfoForOrder\TypesOfPaymentModel;
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -47,8 +49,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel wherePrice($value)
  * @method static Builder|OrderTicketModel wherePromoCode($value)
  * @method static Builder|OrderTicketModel whereStatus($value)
- * @mixin \Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tickets\Ordering\CommentOrderTicketModel[] $comments
+ * @mixin Eloquent
+ * @property-read Collection|CommentOrderTicketModel[] $comments
  * @property-read int|null $comments_count
  * @property-read TicketTypesModel $ticketType
  * @property-read TypesOfPaymentModel $typeOfPayment
