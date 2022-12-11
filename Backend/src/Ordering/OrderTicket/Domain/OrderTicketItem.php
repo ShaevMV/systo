@@ -20,6 +20,7 @@ class OrderTicketItem extends AbstractionEntity implements Response
 
     public function __construct(
         protected Uuid $id,
+        protected Uuid $userId,
         protected string $name,
         protected float $price,
         protected float $discount,
@@ -44,6 +45,7 @@ class OrderTicketItem extends AbstractionEntity implements Response
     {
         return new self(
             new Uuid($data['id']),
+            new Uuid($data['user_id']),
             $data['name'],
             (float) $data['price'],
             (float) $data['discount'],
@@ -83,5 +85,10 @@ class OrderTicketItem extends AbstractionEntity implements Response
     {
         $this->comment = $comment;
         return $this;
+    }
+
+    public function getUserId(): Uuid
+    {
+        return $this->userId;
     }
 }

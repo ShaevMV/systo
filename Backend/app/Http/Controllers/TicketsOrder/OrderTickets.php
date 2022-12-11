@@ -71,26 +71,31 @@ class OrderTickets extends Controller
 
     /**
      * Получить список заказов от пользователя
-     *
-     * @return array
      */
-    public function getUserList(): array
+    public function getUserList(): JsonResponse
     {
         /** @var string $id */
         $id = Auth::id();
 
-        return $this->getOrder->listByUser(new Uuid($id))->toArray();
+        return response()->json($this->getOrder->listByUser(new Uuid($id))->toArray());
     }
 
     /**
      * Получить определённый заказ
      *
-     * @param  string  $id
-     * @return array
      * @throws JsonException
      */
-    public function getOrderItem(string $id): array
+    public function getOrderItem(string $id): JsonResponse
     {
-        return $this->getOrder->getItemById(new Uuid($id))->toArray();
+        $orderItem = $this->getOrder->getItemById(new Uuid($id));
+
+        if (is_null($orderItem) ||
+            !$orderItem->getUserId()->equals(new Uuid(Auth::id()))) {
+            return response()->json([
+                'errors' => ['error' => 'Заказ не найден']
+            ], 404);
+        }
+
+        return response()->json($orderItem->toArray());
     }
 }

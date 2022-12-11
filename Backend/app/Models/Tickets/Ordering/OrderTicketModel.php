@@ -48,6 +48,10 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel wherePromoCode($value)
  * @method static Builder|OrderTicketModel whereStatus($value)
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Tickets\Ordering\CommentOrderTicketModel[] $comments
+ * @property-read int|null $comments_count
+ * @property-read TicketTypesModel $ticketType
+ * @property-read TypesOfPaymentModel $typeOfPayment
  */
 final class OrderTicketModel extends Model
 {

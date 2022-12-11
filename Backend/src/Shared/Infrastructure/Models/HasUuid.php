@@ -13,7 +13,7 @@ trait HasUuid
      *
      * @return bool
      */
-    public function getIncrementing()
+    public function getIncrementing(): bool
     {
         return false;
     }
@@ -23,14 +23,14 @@ trait HasUuid
      *
      * @return string
      */
-    public function getKeyType()
+    public function getKeyType(): string
     {
         return 'string';
     }
 
-    public static function booted()
+    public static function booted(): void
     {
-        static::creating(function (Model $model) {
+        static::creating(static function (Model $model) {
             // Set attribute for new model's primary key (ID) to an uuid.
             $model->setAttribute($model->getKeyName(), Uuid::random());
         });

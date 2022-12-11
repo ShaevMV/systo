@@ -13,7 +13,7 @@ class OrderItemQueryHandler implements QueryHandler
     ){
     }
 
-    public function __invoke(OrderIdQuery $query): OrderTicketItem
+    public function __invoke(OrderIdQuery $query): ?OrderTicketItem
     {
         return $this->orderTicketRepository->findOrder($query->getOrderId());
     }

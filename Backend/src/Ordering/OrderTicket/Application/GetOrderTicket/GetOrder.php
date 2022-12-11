@@ -42,11 +42,11 @@ class GetOrder
      * Высети конкретный заказ
      *
      * @param  Uuid  $uuid
-     * @return OrderTicketItem
+     * @return OrderTicketItem|null
      */
-    public function getItemById(Uuid $uuid): OrderTicketItem
+    public function getItemById(Uuid $uuid): ?OrderTicketItem
     {
-        /** @var OrderTicketItem $result */
+        /** @var OrderTicketItem|null $result */
         $result = $this->queryBus->ask(new OrderIdQuery($uuid));
 
         return $result;

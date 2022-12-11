@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
@@ -23,25 +25,11 @@ class AuthController extends Controller
         ]);
         $credentials = $request->only('email', 'password');
 
-        $token = Auth::attempt($credentials);
-        if (!$token) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ], 401);
+        if (! $token = auth()->attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
 
-        $user = Auth::user();
-        return response()->json([
-            'status' => 'success',
-            'user' => $user,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'lifetime' => time() + (30*60),
-            ]
-        ]);
-
+        return $this->respondWithToken($token);
     }
 
     public function register(Request $request): JsonResponse
@@ -60,36 +48,41 @@ class AuthController extends Controller
 
         $token = Auth::login($user);
 
-        return response()->json([
-            'status' => 'success',
-            'message' => 'User created successfully',
-            'user' => $user,
-            'authorisation' => [
-                'token' => $token,
-                'type' => 'bearer',
-                'lifetime' => time() + (30*60),
-            ]
-        ]);
+        return $this->respondWithToken($token);
     }
 
     public function logout(): JsonResponse
     {
-        Auth::logout();
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Successfully logged out',
-        ]);
+        auth()->logout();
+
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
+    /**
+     * @return JsonResponse
+     */
     public function refresh(): JsonResponse
     {
+        return $this->respondWithToken(auth()->refresh());
+    }
+
+    /**
+     * Get the token array structure.
+     *
+     * @param  string $token
+     *
+     * @return JsonResponse
+     */
+    protected function respondWithToken(string $token): JsonResponse
+    {
+
         return response()->json([
             'status' => 'success',
-            'user' => Auth::user(),
+            'user' => auth()->user(),
             'authorisation' => [
-                'token' => Auth::refresh(),
+                'token' => $token,
                 'type' => 'bearer',
-                'lifetime' => time() + (30*60),
+                'lifetime' => time() + (auth()->factory()->getTTL() * 60),
             ]
         ]);
     }

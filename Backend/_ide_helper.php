@@ -4,7 +4,7 @@
 
 /**
  * A helper file for Laravel, to provide autocomplete information to your IDE
- * Generated for Laravel 9.35.1.
+ * Generated for Laravel 9.42.2.
  *
  * This file should not be included in your code, only analyzed by your IDE!
  *
@@ -1685,6 +1685,17 @@
         {            //Method inherited from \Illuminate\Foundation\Console\Kernel         
                         /** @var \App\Console\Kernel $instance */
                         $instance->bootstrap();
+        }
+                    /**
+         * Bootstrap the application without booting service providers.
+         *
+         * @return void 
+         * @static 
+         */ 
+        public static function bootstrapWithoutBootingProviders()
+        {            //Method inherited from \Illuminate\Foundation\Console\Kernel         
+                        /** @var \App\Console\Kernel $instance */
+                        $instance->bootstrapWithoutBootingProviders();
         }
                     /**
          * Set the Artisan application instance.
@@ -9145,7 +9156,7 @@
      *
      * @method static mixed reset(array $credentials, \Closure $callback)
      * @method static string sendResetLink(array $credentials, \Closure $callback = null)
-     * @method static \Illuminate\Contracts\Auth\CanResetPassword getUser(array $credentials)
+     * @method static \Illuminate\Contracts\Auth\CanResetPassword|null getUser(array $credentials)
      * @method static string createToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
      * @method static void deleteToken(\Illuminate\Contracts\Auth\CanResetPassword $user)
      * @method static bool tokenExists(\Illuminate\Contracts\Auth\CanResetPassword $user, string $token)
@@ -11965,6 +11976,20 @@
                         return $instance->missing($key);
         }
                     /**
+         * Apply the callback if the request is missing the given input item key.
+         *
+         * @param string $key
+         * @param callable $callback
+         * @param callable|null $default
+         * @return $this|mixed 
+         * @static 
+         */ 
+        public static function whenMissing($key, $callback, $default = null)
+        {
+                        /** @var \Illuminate\Http\Request $instance */
+                        return $instance->whenMissing($key, $callback, $default);
+        }
+                    /**
          * Get the keys for all of the input and files.
          *
          * @return array 
@@ -12621,6 +12646,7 @@
      * @method static \Illuminate\Routing\RouteRegistrar scopeBindings()
      * @method static \Illuminate\Routing\RouteRegistrar where(array $where)
      * @method static \Illuminate\Routing\RouteRegistrar withoutMiddleware(array|string $middleware)
+     * @method static \Illuminate\Routing\RouteRegistrar withoutScopedBindings()
      * @see \Illuminate\Routing\Router
      */ 
         class Route {
@@ -12839,17 +12865,71 @@
                         return $instance->apiResource($name, $controller, $options);
         }
                     /**
+         * Register an array of singleton resource controllers.
+         *
+         * @param array $singletons
+         * @param array $options
+         * @return void 
+         * @static 
+         */ 
+        public static function singletons($singletons, $options = [])
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        $instance->singletons($singletons, $options);
+        }
+                    /**
+         * Route a singleton resource to a controller.
+         *
+         * @param string $name
+         * @param string $controller
+         * @param array $options
+         * @return \Illuminate\Routing\PendingSingletonResourceRegistration 
+         * @static 
+         */ 
+        public static function singleton($name, $controller, $options = [])
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        return $instance->singleton($name, $controller, $options);
+        }
+                    /**
+         * Register an array of API singleton resource controllers.
+         *
+         * @param array $singletons
+         * @param array $options
+         * @return void 
+         * @static 
+         */ 
+        public static function apiSingletons($singletons, $options = [])
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        $instance->apiSingletons($singletons, $options);
+        }
+                    /**
+         * Route an API singleton resource to a controller.
+         *
+         * @param string $name
+         * @param string $controller
+         * @param array $options
+         * @return \Illuminate\Routing\PendingSingletonResourceRegistration 
+         * @static 
+         */ 
+        public static function apiSingleton($name, $controller, $options = [])
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        return $instance->apiSingleton($name, $controller, $options);
+        }
+                    /**
          * Create a route group with shared attributes.
          *
          * @param array $attributes
          * @param \Closure|array|string $routes
-         * @return void 
+         * @return \Illuminate\Routing\Router 
          * @static 
          */ 
         public static function group($attributes, $routes)
         {
                         /** @var \Illuminate\Routing\Router $instance */
-                        $instance->group($attributes, $routes);
+                        return $instance->group($attributes, $routes);
         }
                     /**
          * Merge the given array with the last group stack.
@@ -13118,6 +13198,19 @@
         {
                         /** @var \Illuminate\Routing\Router $instance */
                         return $instance->pushMiddlewareToGroup($group, $middleware);
+        }
+                    /**
+         * Remove the given middleware from the specified group.
+         *
+         * @param string $group
+         * @param string $middleware
+         * @return \Illuminate\Routing\Router 
+         * @static 
+         */ 
+        public static function removeMiddlewareFromGroup($group, $middleware)
+        {
+                        /** @var \Illuminate\Routing\Router $instance */
+                        return $instance->removeMiddlewareFromGroup($group, $middleware);
         }
                     /**
          * Flush the router's middleware groups.
@@ -14500,6 +14593,18 @@
                         return $instance->getHandler();
         }
                     /**
+         * Set the underlying session handler implementation.
+         *
+         * @param \SessionHandlerInterface $handler
+         * @return void 
+         * @static 
+         */ 
+        public static function setHandler($handler)
+        {
+                        /** @var \Illuminate\Session\Store $instance */
+                        $instance->setHandler($handler);
+        }
+                    /**
          * Determine if the session handler needs a request.
          *
          * @return bool 
@@ -15029,6 +15134,18 @@
         {
                         /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
                         return $instance->size($path);
+        }
+                    /**
+         * Get the checksum for a file.
+         *
+         * @return string|false 
+         * @throws UnableToProvideChecksum
+         * @static 
+         */ 
+        public static function checksum($path, $options = [])
+        {
+                        /** @var \Illuminate\Filesystem\FilesystemAdapter $instance */
+                        return $instance->checksum($path, $options);
         }
                     /**
          * Get the mime-type of a given file.
@@ -16637,6 +16754,65 @@
                         $instance->callCreator($view);
         }
                     /**
+         * Start injecting content into a fragment.
+         *
+         * @param string $fragment
+         * @return void 
+         * @static 
+         */ 
+        public static function startFragment($fragment)
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        $instance->startFragment($fragment);
+        }
+                    /**
+         * Stop injecting content into a fragment.
+         *
+         * @return string 
+         * @throws \InvalidArgumentException
+         * @static 
+         */ 
+        public static function stopFragment()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->stopFragment();
+        }
+                    /**
+         * Get the contents of a fragment.
+         *
+         * @param string $name
+         * @param string|null $default
+         * @return mixed 
+         * @static 
+         */ 
+        public static function getFragment($name, $default = null)
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->getFragment($name, $default);
+        }
+                    /**
+         * Get the entire array of rendered fragments.
+         *
+         * @return array 
+         * @static 
+         */ 
+        public static function getFragments()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        return $instance->getFragments();
+        }
+                    /**
+         * Flush all of the fragments.
+         *
+         * @return void 
+         * @static 
+         */ 
+        public static function flushFragments()
+        {
+                        /** @var \Illuminate\View\Factory $instance */
+                        $instance->flushFragments();
+        }
+                    /**
          * Start injecting content into a section.
          *
          * @param string $section
@@ -16943,6 +17119,17 @@
      */ 
         class Vite {
                     /**
+         * Get the preloaded assets.
+         *
+         * @var array
+         * @static 
+         */ 
+        public static function preloadedAssets()
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->preloadedAssets();
+        }
+                    /**
          * Get the Content Security Policy nonce applied to all generated tags.
          *
          * @return string|null 
@@ -16988,6 +17175,18 @@
         {
                         /** @var \Illuminate\Foundation\Vite $instance */
                         return $instance->withEntryPoints($entryPoints);
+        }
+                    /**
+         * Set the filename for the manifest file.
+         *
+         * @param string $filename
+         * @return \Illuminate\Foundation\Vite 
+         * @static 
+         */ 
+        public static function useManifestFilename($filename)
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->useManifestFilename($filename);
         }
                     /**
          * Get the Vite "hot" file path.
@@ -17049,6 +17248,18 @@
                         return $instance->useStyleTagAttributes($attributes);
         }
                     /**
+         * Use the given callback to resolve attributes for preload tags.
+         *
+         * @param \Illuminate\Foundation\(callable(string,  string, ?array, ?array): array)|array  $attributes
+         * @return \Illuminate\Foundation\Vite 
+         * @static 
+         */ 
+        public static function usePreloadTagAttributes($attributes)
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->usePreloadTagAttributes($attributes);
+        }
+                    /**
          * Generate React refresh runtime script.
          *
          * @return \Illuminate\Support\HtmlString|void 
@@ -17082,6 +17293,17 @@
         {
                         /** @var \Illuminate\Foundation\Vite $instance */
                         return $instance->manifestHash($buildDirectory);
+        }
+                    /**
+         * Determine if the HMR server is running.
+         *
+         * @return bool 
+         * @static 
+         */ 
+        public static function isRunningHot()
+        {
+                        /** @var \Illuminate\Foundation\Vite $instance */
+                        return $instance->isRunningHot();
         }
                     /**
          * Get the Vite tag content as a string of HTML.
@@ -19791,7 +20013,7 @@ namespace  {
                 /**
              * Set the table which the query is targeting.
              *
-             * @param \Closure|\Illuminate\Database\Query\Builder|string $table
+             * @param \Closure|\Illuminate\Database\Query\Builder|\Illuminate\Database\Eloquent\Builder|string $table
              * @param string|null $as
              * @return \Illuminate\Database\Query\Builder 
              * @static 
@@ -21302,6 +21524,20 @@ namespace  {
             {
                                 /** @var \Illuminate\Database\Query\Builder $instance */
                                 return $instance->toSql();
+            }
+             
+                /**
+             * Get a single expression value from the first result of a query.
+             *
+             * @param string $expression
+             * @param array $bindings
+             * @return mixed 
+             * @static 
+             */ 
+            public static function rawValue($expression, $bindings = [])
+            {
+                                /** @var \Illuminate\Database\Query\Builder $instance */
+                                return $instance->rawValue($expression, $bindings);
             }
              
                 /**
