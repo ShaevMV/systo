@@ -2,8 +2,9 @@
   <div class="container">
     <div class="row">
       <soft-alert
-          textReturn="Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
-              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации"
+          v-if="showResult"
+          :textReturn="returnText"
+          :color="success ? 'success' : 'warning'"
       />
       <div class="col-lg-7 mx-auto">
         <div class="card mt-2 mx-auto p-4 bg-light">
@@ -226,7 +227,6 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
-import $ from "jquery"
 import SoftAlert from "@/components/SoftAlert.vue";
 
 export default {
@@ -241,6 +241,9 @@ export default {
       date: null,
       idBuy: null,
       confirm: false,
+      returnText: null,
+      success: null,
+      showResult: false,
     }
   },
   computed: {
@@ -361,6 +364,7 @@ export default {
      */
     orderTicket: function () {
       let self = this;
+      self.showResult = false;
       this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
@@ -368,9 +372,15 @@ export default {
         'promo_code': this.promoCode,
         'date': this.date,
         'types_of_payment_id': this.selectTypesOfPayment,
-        'callback': function () {
-          self.clearData();
-          console.log($('exampleModal'));
+        'callback': function (success, textResult) {
+          console.log(success)
+          console.log(textResult)
+          if (success) {
+            self.clearData();
+          }
+          self.success = success;
+          self.returnText = textResult;
+          self.showResult = true;
         }
       })
     },
