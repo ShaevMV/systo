@@ -5,23 +5,52 @@
   >
     <ul class="navbar-nav">
       <li class="nav-item">
-        <sidenav-collapse navText="Dashboard" :to="{ name: 'Dashboard' }">
+        <sidenav-collapse navText="Оргвзнос" :to="{ name: 'Profile' }">
           <template #icon>
-            <shop />
+            <credit-card />
           </template>
         </sidenav-collapse>
       </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Tables" :to="{ name: 'Tables' }">
+      <li class="nav-item" v-if="isAuth">
+        <sidenav-collapse navText="Мои оргвзносы" :to="{ name: 'Tables' }">
           <template #icon>
             <office />
           </template>
         </sidenav-collapse>
       </li>
+      <li class="nav-item" v-if="!isAuth">
+        <sidenav-collapse navText="Sign In" :to="{ name: 'Sign In' }">
+          <template #icon>
+            <document />
+          </template>
+        </sidenav-collapse>
+      </li>
+      <li class="nav-item" v-if="!isAuth">
+        <sidenav-collapse navText="Sign Up" :to="{ name: 'Sign Up' }">
+          <template #icon>
+            <spaceship />
+          </template>
+        </sidenav-collapse>
+      </li>
+      <li class="nav-item" >
+        <spaceship />
+        <a class="nav-link" @click="logOut" href="javascript:void(0);">
+          Выйти
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <sidenav-collapse navText="Dashboard" :to="{ name: 'Dashboard' }">
+          <template #icon>
+            <customer-support />
+          </template>
+        </sidenav-collapse>
+      </li>
+
       <li class="nav-item">
         <sidenav-collapse navText="Billing" :to="{ name: 'Billing' }">
           <template #icon>
-            <credit-card />
+            <shop />
           </template>
         </sidenav-collapse>
       </li>
@@ -51,27 +80,8 @@
           PAGES
         </h6>
       </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Profile" :to="{ name: 'Profile' }">
-          <template #icon>
-            <customer-support />
-          </template>
-        </sidenav-collapse>
-      </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Sign In" :to="{ name: 'Sign In' }">
-          <template #icon>
-            <document />
-          </template>
-        </sidenav-collapse>
-      </li>
-      <li class="nav-item">
-        <sidenav-collapse navText="Sign Up" :to="{ name: 'Sign Up' }">
-          <template #icon>
-            <spaceship />
-          </template>
-        </sidenav-collapse>
-      </li>
+
+
     </ul>
   </div>
   <div class="pt-3 mx-3 mt-3 sidenav-footer">
@@ -92,6 +102,8 @@
   </div>
 </template>
 <script>
+import {mapActions, mapGetters} from 'vuex';
+
 import SidenavCollapse from "./SidenavCollapse.vue";
 import SidenavCard from "./SidenavCard.vue";
 import Shop from "../../components/Icon/Shop.vue";
@@ -127,11 +139,20 @@ export default {
     Spaceship,
     Settings,
   },
+  computed: {
+    ...mapGetters('appUser', [
+      'isAuth',
+    ]),
+  },
   methods: {
     getRoute() {
       const routeArr = this.$route.path.split("/");
       return routeArr[1];
     },
+
+    ...mapActions('appUser', [
+      'logOut'
+    ]),
   },
 };
 </script>

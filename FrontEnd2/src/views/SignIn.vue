@@ -13,54 +13,57 @@
                   <p class="mb-0">Enter your email and password to sign in</p>
                 </div>
                 <div class="card-body">
-                  <form role="form" class="text-start">
                     <label>Email</label>
-                    <soft-input
-                      id="email"
-                      type="email"
-                      placeholder="Email"
-                      name="email"
-                    />
+                    <input id="email"
+                           type="email"
+                           class="form-control form-control-default"
+                           name="email"
+                           v-model="email"
+                           placeholder="Email"
+                           required>
+                    <small class="form-text text-muted"> {{ getError('email') }}</small>
                     <label>Password</label>
-                    <soft-input
-                      id="password"
-                      type="password"
-                      placeholder="Password"
-                      name="password"
-                    />
-                    <soft-switch id="rememberMe" name="rememberMe" checked>
-                      Remember me
-                    </soft-switch>
+                    <input id="password"
+                           type="password"
+                           class="form-control form-control-default"
+                           name="password"
+                           v-model="password"
+                           placeholder="password"
+                           required>
                     <div class="text-center">
                       <soft-button
-                        class="my-4 mb-2"
-                        variant="gradient"
-                        color="success"
-                        full-width
-                        >Sign in
+                          class="my-4 mb-2"
+                          variant="gradient"
+                          color="success"
+                          full-width
+                          @click="auth"
+                      >Sign in
                       </soft-button>
                     </div>
-                  </form>
+                    <small class="form-text text-muted"> {{ getError('main') }}</small>
+
                 </div>
                 <div class="px-1 pt-0 text-center card-footer px-lg-2">
                   <p class="mx-auto mb-4 text-sm">
                     Don't have an account?
                     <router-link
-                      :to="{ name: 'Sign Up' }"
-                      class="text-success text-gradient font-weight-bold"
-                      >Sign up</router-link
+                        :to="{ name: 'Sign Up' }"
+                        class="text-success text-gradient font-weight-bold"
+                    >Sign up
+                    </router-link
                     >
                   </p>
+
                 </div>
               </div>
             </div>
             <div class="col-md-6">
               <div
-                class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8"
+                  class="top-0 oblique position-absolute h-100 d-md-block d-none me-n8"
               >
                 <div
-                  class="bg-cover oblique-image position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6"
-                  :style="{
+                    class="bg-cover oblique-image position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6"
+                    :style="{
                     backgroundImage:
                       'url(' +
                       require('@/assets/img/curved-images/curved9.jpg') +
@@ -74,24 +77,21 @@
       </div>
     </section>
   </main>
-  <app-footer />
+  <app-footer/>
 </template>
 
 <script>
 import {mapActions, mapGetters} from 'vuex';
 
 import AppFooter from "@/examples/PageLayout/Footer.vue";
-import SoftInput from "@/components/SoftInput.vue";
-import SoftSwitch from "@/components/SoftSwitch.vue";
 import SoftButton from "@/components/SoftButton.vue";
+
 const body = document.getElementsByTagName("body")[0];
 
 export default {
   name: "SignIn",
   components: {
     AppFooter,
-    SoftInput,
-    SoftSwitch,
     SoftButton,
   },
   data() {
@@ -111,7 +111,6 @@ export default {
     ]),
     auth: function () {
       let self = this;
-
       this.toLogin({
         'email': this.email,
         'password': this.password,
@@ -120,7 +119,7 @@ export default {
           if (url !== null) {
             location.href = url;
           } else {
-            location.reload();
+            location.href = '/';
           }
         }
       })
