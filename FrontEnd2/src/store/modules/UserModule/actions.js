@@ -49,6 +49,11 @@ export const tokenRefresh = (context) => {
 };
 
 
+export const isCorrectRole = (context, payload) => {
+    console.log(payload);
+    return axios.post('/api/isCorrectRole', payload);
+};
+
 export const logOut = (context) => {
     context.commit('removeToken');
     location.reload();

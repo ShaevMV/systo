@@ -25,7 +25,7 @@ class AuthController extends Controller
         ]);
         $credentials = $request->only('email', 'password');
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (! $token = auth()->attempt($credentials, true)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -75,7 +75,6 @@ class AuthController extends Controller
      */
     protected function respondWithToken(string $token): JsonResponse
     {
-
         return response()->json([
             'status' => 'success',
             'user' => auth()->user(),
@@ -85,5 +84,32 @@ class AuthController extends Controller
                 'lifetime' => time() + (auth()->factory()->getTTL() * 60),
             ]
         ]);
+    }
+
+    public function isCorrectRole(Request $request): JsonResponse
+    {
+        $roles = $request->only('role')['role'];
+
+        /** @var User $user */
+        $user = auth()->user();
+        $isCorrect = true;
+        foreach ($roles as $role) {
+
+            $params = 'is_'.$role;
+            if(!$user->$params) {
+                $isCorrect = false;
+                break;
+            }
+        }
+
+        if(!$isCorrect) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        return response()->json([
+            'status' => 'success',
+        ]);
+
+
     }
 }

@@ -12,7 +12,7 @@
         </sidenav-collapse>
       </li>
       <li class="nav-item" v-if="isAuth">
-        <sidenav-collapse navText="Мои оргвзносы" :to="{ name: 'Tables' }">
+        <sidenav-collapse navText="Мои оргвзносы" :to="{ name: 'Orders' }">
           <template #icon>
             <office />
           </template>
