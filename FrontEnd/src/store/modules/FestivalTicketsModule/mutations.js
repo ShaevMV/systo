@@ -1,3 +1,7 @@
+export const setError = (state, payload) => {
+    state.dataError = payload;
+};
+
 /**
  * Запись данные о видах оплаты
  *

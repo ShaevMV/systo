@@ -13,10 +13,11 @@ use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommand;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommandHandler;
-use Tickets\User\Account\Application\Find\AccountFindQuery;
-use Tickets\User\Account\Application\Find\AccountFindQueryHandler;
+use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQuery;
+use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQueryHandler;
 use Tickets\User\Account\Domain\Account;
 use Tickets\User\Account\Dto\AccountDto;
+use Tickets\User\Account\Dto\UserInfoDto;
 use Tickets\User\Account\Response\IdAccountResponse;
 
 final class AccountApplication
@@ -26,7 +27,7 @@ final class AccountApplication
 
     public function __construct(
         CreatingNewAccountCommandHandler $accountCommandHandler,
-        AccountFindQueryHandler $accountFindQueryHandler,
+        AccountFindByEmailQueryHandler $accountFindQueryHandler,
         private Bus $bus
     )
     {
@@ -35,30 +36,29 @@ final class AccountApplication
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
-            AccountFindQuery::class => $accountFindQueryHandler
+            AccountFindByEmailQuery::class => $accountFindQueryHandler
         ]);
     }
 
     /**
      * @throws Throwable
      */
-    public function creatingOrGetAccount(
+    public function creatingOrGetAccountId(
         string $email
     ): Uuid
     {
-        if($id = $this->getIdUserByEmail($email)) {
-            return $id;
+        if($userInfoDto = $this->getUserByEmail($email)) {
+            return $userInfoDto->getId();
         }
 
        $this->createNewAccount($email);
 
-        if(is_null($id = $this->getIdUserByEmail($email))) {
+        if(is_null($userInfoDto = $this->getUserByEmail($email))) {
             throw new DomainException('Не получилось получить данные о созданом пользователе ' . $email);
         }
 
-        return $id;
+        return $userInfoDto->getId();
     }
-
 
     /**
      * @throws Throwable
@@ -86,11 +86,11 @@ final class AccountApplication
 
     }
 
-    public function getIdUserByEmail(string $email): ?Uuid
+    public function getUserByEmail(string $email): ?UserInfoDto
     {
-        /** @var IdAccountResponse|null $idAccountResponse */
-        $idAccountResponse = $this->queryBus->ask(new AccountFindQuery($email));
+        /** @var  UserInfoDto|null $resul */
+        $resul = $this->queryBus->ask(new AccountFindByEmailQuery($email));
 
-        return $idAccountResponse?->id;
+        return $resul;
     }
 }

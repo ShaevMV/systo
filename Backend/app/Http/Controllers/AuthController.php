@@ -9,11 +9,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Spatie\FlareClient\Http\Exceptions\NotFound;
+use Tickets\Shared\Domain\Assert;
+use Tickets\User\Account\Application\AccountApplication;
 
 class AuthController extends Controller
 {
-    public function __construct()
-    {
+    public function __construct(
+        private AccountApplication $accountApplication
+    ){
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -75,9 +79,12 @@ class AuthController extends Controller
      */
     protected function respondWithToken(string $token): JsonResponse
     {
+        /** @var User $user */
+        $user = auth()->user();
+
         return response()->json([
             'status' => 'success',
-            'user' => auth()->user(),
+            'user' => $this->accountApplication->getUserByEmail($user->email)?->toArray(),
             'authorisation' => [
                 'token' => $token,
                 'type' => 'bearer',
@@ -92,11 +99,13 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = auth()->user();
+        if(is_null($userInfoDto = $this->accountApplication->getUserByEmail($user->email))){
+            throw new \DomainException('Пользователь не найден');
+        }
+
         $isCorrect = true;
         foreach ($roles as $role) {
-
-            $params = 'is_'.$role;
-            if(!$user->$params) {
+            if(!$userInfoDto->isRole($role)) {
                 $isCorrect = false;
                 break;
             }

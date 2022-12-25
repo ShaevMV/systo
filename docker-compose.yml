@@ -52,7 +52,7 @@ services:
         - "8081:8080"
     container_name: node-solarSysto
     volumes:
-      - ./FrontEnd2:/var/app
+      - ./FrontEnd:/var/app
     command: tail -f /dev/null
     user: node
     networks:

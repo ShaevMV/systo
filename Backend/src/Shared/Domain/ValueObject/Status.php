@@ -12,7 +12,7 @@ final class Status implements EntityDataInterface
     public const NEW = 'new';
     public const PAID = 'paid';
     public const CANCEL = 'cancel';
-    public const DIFFICULTIES_AROSE = 'Difficulties arose';
+    public const DIFFICULTIES_AROSE = 'difficulties_arose';
 
 
     private const STATUS_LIST = [

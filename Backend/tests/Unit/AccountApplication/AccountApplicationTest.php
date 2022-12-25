@@ -27,6 +27,6 @@ class AccountApplicationTest extends TestCase
     public function test_it_create_new_account(): void
     {
         self::assertNotEmpty($this->accountApplication
-            ->creatingOrGetAccount('shaevMV3@gmail.com'));
+            ->creatingOrGetAccountId('shaevMV3@gmail.com'));
     }
 }

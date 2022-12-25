@@ -5,8 +5,14 @@ import * as mutations from './mutations';
 export default {
     namespaced: true,
     state: {
-        userToken: null,
-        userInfo: {},
+        userToken: localStorage.getItem('user.token') || null,
+        userTimeLifeForToken: localStorage.getItem('user.token.lifetime') || null,
+        userInfo: {
+            'id': localStorage.getItem('user.id') || null,
+            'email': localStorage.getItem('user.email') || null,
+            'admin': localStorage.getItem('user.isAdmin') || false,
+        },
+        dataError: [],
     },
     getters,
     actions,

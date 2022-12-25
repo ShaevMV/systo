@@ -8,8 +8,15 @@ export default {
         typesOfPayment: [],
         selectTypeOfPayment: null,
         ticketType: [],
-        selectTicketType: null,
-        promoCode: null,
+        selectTicketType: {
+            id: null,
+            groupLimit: null,
+        },
+        promoCode: {
+            discount: null,
+            name: null,
+        },
+        dataError: [],
     },
     getters,
     actions,

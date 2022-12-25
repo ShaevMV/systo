@@ -1,10 +1,5 @@
 import axios from 'axios';
 
-console.log(process.env.VUE_APP_BACKEND_ENDPOINT);
-
-axios.defaults.baseURL = process.env.VUE_APP_BACKEND_ENDPOINT
-axios.defaults.withCredentials = true
-
 /**
  * Загрузить список способов оплаты и типов билета
  *
@@ -30,26 +25,34 @@ export const setSelectTicketType = (context, payload) => {
     context.commit('setSelectTicketType', select);
 };
 
-export const checkPromoCode = (context, payload) => {
-    let promise = axios.get('/api/v1/festival/findPromoCode/' + payload);
-    promise.then(function (response) {
-        context.commit('setValuePromoCode', response.data);
-    })
-};
-
-
 /**
- * Отправить данные на создание билета
+ * Проверить промо код
  *
  * @param context
  * @param payload
  */
-export const goToOrderTicket = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/ticketsOrder/create', payload);
-    promise.then(function () {
-        context.dispatch('loadExpertsList');
-        payload.callback();
-    }).catch(function (error) {
-        context.commit('setError', error.response.data.errors, {root: true});
+export const checkPromoCode = (context, payload) => {
+    if (payload !== null && payload.length > 2) {
+        let promise = axios.get('/api/v1/festival/findPromoCode/' + payload);
+        promise.then(function (response) {
+            let result = typeof response.data === 'object' ? response.data : {
+                'name': payload,
+                'discount': null,
+            };
+            console.log(result);
+            context.commit('setValuePromoCode', result);
+        })
+    }
+};
+
+/**
+ * Очистить данные о промо коде
+ *
+ * @param context
+ */
+export const clearPromoCode = (context) => {
+    context.commit('setValuePromoCode', {
+        discount: null,
+        name: null,
     });
-}
+};

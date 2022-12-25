@@ -47,7 +47,7 @@ class OrderTickets extends Controller
                 array_merge(
                     $createOrderTicketsRequest->toArray(),
                     [
-                        'user_id' => $this->accountApplication->creatingOrGetAccount($createOrderTicketsRequest->email)->value(),
+                        'user_id' => $this->accountApplication->creatingOrGetAccountId($createOrderTicketsRequest->email)->value(),
                         'price' => $priceDto->getTotalPrice(),
                         'discount' => $priceDto->getDiscount(),
                         'status' => Status::NEW,

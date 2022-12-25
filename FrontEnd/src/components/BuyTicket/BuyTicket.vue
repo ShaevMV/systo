@@ -1,5 +1,32 @@
 <template>
   <div class="container">
+    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
+            data-target="#exampleModal">
+      Launch demo modal
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты!
+              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации
+              </span>
+            </button>
+          </div>
+          <div class="modal-body">
+            ...
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class=" text-center mt-5 ">
 
       <h1>Форма подтверждения оргвзноса</h1>
@@ -116,13 +143,12 @@
                                  placeholder="Промокод"
                                  aria-label="Промокод"
                                  v-model="promoCode"
+                                 v-bind:readonly="getDiscountByPromoCode > 0"
                                  aria-describedby="basic-addon1">
-                          <div class="input-group-prepend">
-                            <span class="input-group-text btn"
-                                  @click="sendPromoCode()">✓
-                            </span>
-                          </div>
                         </div>
+                        <small class="form-text text-muted" v-show="getDiscountByPromoCode > 0">
+                          Ваш промо код принят, ваша скидка составит {{ getDiscountByPromoCode }} ₽
+                        </small>
                       </div>
                     </div>
                   </div>
@@ -225,9 +251,28 @@
 
       </div>
       <!-- /.row-->
-
+      <div class="modal" tabindex="-1" role="dialog" id="myModal">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Modal title</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <p>Modal body text goes here.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary">Save changes</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
 </template>
 
 <script>
@@ -239,9 +284,8 @@ export default {
     return {
       selectTypesOfPayment: null,
       guests: [],
-      newGuest: '',
+      newGuest: null,
       email: null,
-      promoCode: null,
       date: null,
       idBuy: null,
       confirm: false,
@@ -251,13 +295,16 @@ export default {
     ...mapGetters('appFestivalTickets', [
       'getTypesOfPayment',
       'getTicketType',
+      'isAllowedGuest',
       'getSelectTicketType',
       'getSelectTicketTypeId',
       'getSelectTicketTypeLimit',
-      'getDiscountByPromoCode'
+      'getDiscountByPromoCode',
+      'getPromoCodeName',
     ]),
     ...mapGetters('appUser', [
       'isAuth',
+      'getEmail',
     ]),
     /**
      * Проверка на ведение всех данных
@@ -288,6 +335,14 @@ export default {
             this.setSelectTicketType(oldId);
           }
         }
+      },
+    },
+    promoCode: {
+      get: function () {
+        return this.getPromoCodeName;
+      },
+      set: function (newValue) {
+        this.checkPromoCode(newValue);
       },
     },
     /**
@@ -322,23 +377,16 @@ export default {
       }
       return false;
     },
-    /**
-     * Проверка на соответсвие условием группавого типа билета
-     * @returns {boolean}
-     */
-    isAllowedGuest: function () {
-      if (this.getSelectTicketType !== null) {
-        return this.getSelectTicketTypeLimit === null || this.getSelectTicketTypeLimit >= this.countGuests
-      }
-      return false;
-    }
   },
   methods: {
     ...mapActions('appFestivalTickets', [
       'loadDataForOrderingTickets',
       'setSelectTicketType',
-      'goToOrderTicket',
-      'checkPromoCode'
+      'checkPromoCode',
+      'clearPromoCode'
+    ]),
+    ...mapActions('appOrder', [
+      'goToCreateOrderTicket',
     ]),
     /**
      * Добавить нового гостя
@@ -360,26 +408,38 @@ export default {
      * Заказать билет
      */
     orderTicket: function () {
-      this.goToOrderTicket({
+      let self = this;
+      this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
         'promo_code': this.promoCode,
         'date': this.date,
         'types_of_payment_id': this.selectTypesOfPayment,
+        'callback': function () {
+          self.clearData();
+          document.getElementById('modalOpenBtn').click();
+        }
       })
     },
     /**
-     * Отправить промо код
+     * Очистить данные
      */
-    sendPromoCode: function () {
-      if (this.promoCode !== null) {
-        this.checkPromoCode(this.promoCode);
-      }
-    }
+    clearData: function () {
+      this.selectTypesOfPayment = null;
+      this.guests = [];
+      this.newGuest = '';
+      this.email = this.getEmail;
+      this.promoCode = null;
+      this.date = null;
+      this.idBuy = null;
+      this.confirm = false;
+      this.clearPromoCode();
+    },
   },
   async created() {
     await this.loadDataForOrderingTickets();
+    this.email = this.getEmail;
   },
 }
 </script>
@@ -396,20 +456,6 @@ h1 {
 
 label {
   color: #333;
-}
-
-.btn-send {
-  font-weight: 300;
-  text-transform: uppercase;
-  letter-spacing: 0.2em;
-  width: 80%;
-  margin-left: 3px;
-}
-
-.help-block.with-errors {
-  color: #ff5050;
-  margin-top: 5px;
-
 }
 
 .card {
