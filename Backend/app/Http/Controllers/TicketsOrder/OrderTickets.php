@@ -72,13 +72,22 @@ class OrderTickets extends Controller
 
     /**
      * Получить список заказов от пользователя
+     * @throws JsonException
      */
     public function getUserList(): JsonResponse
     {
         /** @var string $id */
         $id = Auth::id();
 
-        return response()->json($this->getOrder->listByUser(new Uuid($id))->toArray());
+        return response()->json(
+            [
+                'list' => $this->getOrder->listByUser(new Uuid($id))?->toArray() ?? []
+            ]);
+    }
+
+    public function getList(): JsonResponse
+    {
+
     }
 
     /**

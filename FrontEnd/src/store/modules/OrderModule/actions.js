@@ -33,6 +33,21 @@ export const getOrderListForUser = (context) => {
 }
 
 /**
+ * Получить список заказов пользователя
+ *
+ * @param context
+ */
+export const getOrderListForAdmin = (context) => {
+    let promise = axios.get('/api/v1/festival/ticketsOrder/getList');
+    promise.then(function (response) {
+        context.commit('setOrderUserList', response.data.list);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}
+
+/**
  * Загрузить заказ
  *
  * @param context

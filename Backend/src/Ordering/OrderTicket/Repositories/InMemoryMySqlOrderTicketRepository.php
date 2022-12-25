@@ -7,12 +7,15 @@ namespace Tickets\Ordering\OrderTicket\Repositories;
 use App\Models\Tickets\Ordering\CommentOrderTicketModel;
 use App\Models\Tickets\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Tickets\Ordering\OrderTicketModel;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
+use Tickets\Shared\Domain\Criteria\Filter;
+use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
@@ -87,5 +90,37 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ?->toArray();
 
         return $rawData !== null ? OrderTicketItem::fromItemOrderState($rawData) : null;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function getList(Filters $filters): array
+    {
+        $builder = $this->model->leftJoin(
+            User::TABLE, $this->model::TABLE.'.user_id',
+            '=',
+            User::TABLE.'.id');
+
+        /** @var Filter $filter */
+        foreach ($filters as $filter) {
+            if (null !== $filter->value()->value()) {
+                $builder = $builder->where(
+                    $filter->field()->value(),
+                    $filter->operator()->value(),
+                    $filter->value()->value()
+                );
+            }
+        }
+        $rawData = $builder->get()
+            ->toArray();
+
+        $result = [];
+
+        foreach ($rawData as $datum) {
+            $result[] = OrderTicketItem::fromState($datum);
+        }
+
+        return $result;
     }
 }

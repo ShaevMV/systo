@@ -56,6 +56,8 @@ class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable, HasUuid;
 
+    public const TABLE = 'users';
+
     /**
      * The attributes that are mass assignable.
      *

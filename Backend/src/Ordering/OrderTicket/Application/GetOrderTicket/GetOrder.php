@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
 
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderFilterQuery;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderListFilterQueryHandler;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderIdQuery;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderItemQueryHandler;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderListQueryHandler;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\UserIdQuery;
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketList;
 use Tickets\Shared\Domain\Bus\Query\QueryBus;
@@ -17,10 +23,12 @@ class GetOrder
     public function __construct(
         OrderListQueryHandler $handler,
         OrderItemQueryHandler $itemQueryHandler,
+        OrderListFilterQueryHandler $filterQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             UserIdQuery::class => $handler,
             OrderIdQuery::class => $itemQueryHandler,
+            OrderFilterQuery::class => $filterQueryHandler,
         ]);
     }
 
@@ -28,14 +36,28 @@ class GetOrder
      * Вывести список заказов у пользователя
      *
      * @param  Uuid  $userId
-     * @return OrderTicketList
+     * @return ListResponse|null
      */
-    public function listByUser(Uuid $userId): OrderTicketList
+    public function listByUser(Uuid $userId): ?ListResponse
     {
-        /** @var ListResponse $listItem */
+        /** @var null|ListResponse $listItem */
         $listItem = $this->queryBus->ask(new UserIdQuery($userId));
 
-        return new OrderTicketList($listItem->getOrderList());
+        return $listItem;
+    }
+
+    /**
+     * Вывести список заказов по фильтру
+     *
+     * @param  OrderFilterQuery  $filterQuery
+     * @return ListResponse|null
+     */
+    public function listByFilter(OrderFilterQuery $filterQuery): ?ListResponse
+    {
+        /** @var null|ListResponse $listItem */
+        $listItem = $this->queryBus->ask($filterQuery);
+
+        return $listItem;
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ordering\OrderTicket\Domain;
 
+use JsonException;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 
 class OrderTicketList extends AggregateRoot
@@ -16,6 +17,9 @@ class OrderTicketList extends AggregateRoot
     ) {
     }
 
+    /**
+     * @throws JsonException
+     */
     public function toArray(): array
     {
         $result = [];
@@ -24,8 +28,6 @@ class OrderTicketList extends AggregateRoot
             $result[] = $item->toArray();
         }
 
-        return [
-            'list' => $result
-        ];
+        return $result;
     }
 }

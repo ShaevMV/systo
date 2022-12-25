@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
+namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser;
 
 use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;

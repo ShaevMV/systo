@@ -1,6 +1,6 @@
 <template>
   <filter-order/>
-  <order-list is-admin="true"/>
+  <order-list :is-admin="true"/>
 </template>
 
 <script>
@@ -9,7 +9,11 @@ import FilterOrder from "@/components/Order/FilterOrder.vue";
 
 export default {
   name: "OrderListForAdmin",
-  components: {FilterOrder, OrderList}
+  components: {FilterOrder, OrderList},
+  beforeRouteEnter: (to, from, next) => {
+    window.store.dispatch('appOrder/getOrderListForUser');
+    next();
+  },
 }
 </script>
 

@@ -15,8 +15,18 @@ class ListResponse implements Response
     ) {
     }
 
-    public function getOrderList(): array
+
+    /**
+     * @throws \JsonException
+     */
+    public function toArray(): array
     {
-        return $this->orderList;
+        $result = [];
+
+        foreach ($this->orderList as $item) {
+            $result[] = $item->toArray();
+        }
+
+        return $result;
     }
 }

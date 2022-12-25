@@ -10,11 +10,11 @@ use InvalidArgumentException;
 /**
  * @method static FilterOperator gt()
  * @method static FilterOperator lt()
- * @method static FilterOperator like()
  */
 final class FilterOperator extends Enum
 {
     public const EQUAL        = '=';
+    public const LIKE         = 'LIKE';
     public const NOT_EQUAL    = '!=';
     public const GT           = '>';
     public const LT           = '<';
@@ -30,5 +30,10 @@ final class FilterOperator extends Enum
     protected function throwExceptionForInvalidValue($value): void
     {
         throw new InvalidArgumentException(sprintf('The filter <%s> is invalid', $value));
+    }
+
+    public function like(string $value): string
+    {
+        return str_replace("{value}", $value, self::LIKE);
     }
 }

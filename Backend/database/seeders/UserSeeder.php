@@ -11,7 +11,8 @@ class UserSeeder extends Seeder
 {
     public const ID_FOR_ADMIN_UUID = 'b9df62af-252a-4890-afd7-73c2a356c259';
     public const ID_FOR_USER_UUID = 'b9df62af-252a-4890-afd7-73c2a356c260';
-
+    public const EMAIL_USER = 'user@user.ru';
+    public const EMAIL_ADMIN = 'admin@admin.ru';
 
     /**
      * Run the database seeds.
@@ -23,7 +24,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'id' => self::ID_FOR_ADMIN_UUID,
             'name' => 'admin',
-            'email' => 'admin@admin.ru',
+            'email' => self::EMAIL_ADMIN,
             'password' => Hash::make('password'),
             'is_admin' => true,
         ]);
@@ -31,9 +32,9 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'id' => self::ID_FOR_USER_UUID,
             'name' => 'user',
-            'email' => 'user@user.ru',
+            'email' => self::EMAIL_USER,
             'password' => Hash::make('password'),
-            'is_admin' => true,
+            'is_admin' => false,
         ]);
     }
 }

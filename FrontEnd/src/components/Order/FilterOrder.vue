@@ -95,12 +95,6 @@ export default {
     ...mapGetters('appFestivalTickets', [
       'getTypesOfPayment',
       'getTicketType',
-      'isAllowedGuest',
-      'getSelectTicketType',
-      'getSelectTicketTypeId',
-      'getSelectTicketTypeLimit',
-      'getDiscountByPromoCode',
-      'getPromoCodeName',
     ]),
   },
   methods: {
@@ -113,7 +107,6 @@ export default {
     }
   },
   async created() {
-    console.log(1231);
     await this.loadDataForOrderingTickets();
   },
 }
