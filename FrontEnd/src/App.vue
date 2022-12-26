@@ -233,9 +233,7 @@
     <MenuView/>
   </aside>
   <main id="main" class="main">
-    <div class="pagetitle">
-      <router-view/>
-    </div>
+    <router-view/>
   </main>
 </template>
 

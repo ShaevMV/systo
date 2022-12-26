@@ -33,6 +33,8 @@ class OrderTicketItem extends AbstractionEntity implements Response
         protected ?string $linkToTicket = null,
         protected ?string $typeOfPayment = null,
         protected ?array $comment = null,
+        protected ?string $email = null,
+        protected ?string $promoCode = null,
     ) {
         $this->totalPrice = $price - $discount;
         $this->count = count($this->guests);
@@ -57,6 +59,10 @@ class OrderTicketItem extends AbstractionEntity implements Response
             new Carbon($data['created_at']),
             $data['last_comment'] ?? null,
             $data['linkToTicket'] ?? null,
+            $data['types_of_payment_name'] ?? null,
+            [],
+            $data['email'] ?? null,
+            $data['promo_code'] ?? null,
         );
     }
 

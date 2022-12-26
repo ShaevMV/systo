@@ -42,4 +42,18 @@ class OrderFilterQuery implements Query
     {
         return null !== $this->promoCode ? '%'.$this->promoCode.'%' : null;
     }
+
+    public static function fromState(array $data): self
+    {
+        $typeOrder = $data['typeOrder'] ?? null;
+        $typesOfPayment = $data['typesOfPayment'] ?? null;
+
+        return new self(
+            (null !== $typeOrder) ? new Uuid($data['typeOrder']) : null,
+            (null !== $typesOfPayment) ? new Uuid($data['typesOfPayment']) : null,
+            $data['email'] ?? null,
+            $data['status'] ?? null,
+            $data['promoCode'] ?? null,
+        );
+    }
 }

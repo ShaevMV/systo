@@ -6,9 +6,11 @@ namespace Tickets\Ordering\OrderTicket\Repositories;
 
 use App\Models\Tickets\Ordering\CommentOrderTicketModel;
 use App\Models\Tickets\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Tickets\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Tickets\Ordering\OrderTicketModel;
 use App\Models\User;
 use Exception;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Throwable;
@@ -51,12 +53,6 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getUserList(Uuid $userId): array
     {
-        $lastComment = CommentOrderTicketModel::select('comment')
-            ->whereColumn('order_tickets_id', $this->model::TABLE.'.id')
-            ->latest()
-            ->limit(1)
-            ->getQuery();
-
         $rawData = $this->model::whereUserId($userId->value())
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
                 '=',
@@ -65,7 +61,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE.'.*',
                 TicketTypesModel::TABLE.'.name',
             ])
-            ->selectSub($lastComment, 'last_comment')
+            ->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->get()
             ->toArray();
 
@@ -75,6 +71,15 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
 
         return $result;
+    }
+
+    private function getSubQueryLastComment(): Builder
+    {
+        return CommentOrderTicketModel::select('comment')
+            ->whereColumn('order_tickets_id', $this->model::TABLE.'.id')
+            ->latest()
+            ->limit(1)
+            ->getQuery();
     }
 
     /**
@@ -97,10 +102,23 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getList(Filters $filters): array
     {
-        $builder = $this->model->leftJoin(
+       $builder = $this->model->leftJoin(
             User::TABLE, $this->model::TABLE.'.user_id',
             '=',
-            User::TABLE.'.id');
+            User::TABLE.'.id')
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE.'.id')
+           ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
+               '=',
+               TypesOfPaymentModel::TABLE.'.id')
+            ->select([
+                $this->model::TABLE.'.*',
+                TicketTypesModel::TABLE.'.name',
+                User::TABLE.'.email',
+                TypesOfPaymentModel::TABLE.'.name as types_of_payment_name'
+            ])
+           ->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
         /** @var Filter $filter */
         foreach ($filters as $filter) {

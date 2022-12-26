@@ -6,8 +6,7 @@ namespace Tickets\Ordering\OrderTicket\Domain;
 
 use DateTime;
 use Exception;
-use Nette\Utils\Json;
-use Tickets\Ordering\OrderTicket\Domain\ProcessUserNotificationNewOrderTicket;
+use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -18,7 +17,7 @@ final class OrderTicket extends AggregateRoot
         protected Uuid $id,
         protected array $guests,
         protected DateTime $date,
-        protected string $idBuy,
+        protected Uuid $idBuy,
         protected Status $status,
         protected ?string $promoCod = null,
     ) {
@@ -27,18 +26,18 @@ final class OrderTicket extends AggregateRoot
     /**
      * @throws Exception
      */
-    public static function create(array $data, string $email): self
+    public static function createFromOrderTicketDto(OrderTicketDto $orderTicketDto, string $email): self
     {
         $result = new self(
-            new Uuid($data['id']),
-            Json::decode($data['guests']),
-            new DateTime($data['date']),
-            $data['types_of_payment_id'],
-            new Status($data['status'] ?? Status::NEW),
-            $data['promo_code'] ?? null
+            $orderTicketDto->getId(),
+            $orderTicketDto->getGuestsToArray(),
+            $orderTicketDto->getDate(),
+            $orderTicketDto->getTypesOfPaymentId(),
+            $orderTicketDto->getStatus(),
+            $orderTicketDto->getPromoCode()
         );
 
-        $result->record(new ProcessUserNotificationNewOrderTicket($email));
+        $result->record(new ProcessUserNotificationNewOrderTicket($email,$orderTicketDto->getId()));
 
         return $result;
     }

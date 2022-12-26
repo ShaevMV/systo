@@ -10,7 +10,7 @@
           <select class="form-select"
                   v-model="typeOrder"
                   id="validationDefault01">
-            <option disabled value="null">Выберите тип оргвзноса</option>
+            <option value="null">Выберите тип оргвзноса</option>
             <option v-for="(typeTickets) in getTicketType"
                     v-bind:key="typeTickets.id"
                     v-bind:value="typeTickets.id">{{ typeTickets.name }} /
@@ -50,7 +50,7 @@
           <select class="form-select"
                   v-model="status"
                   id="validationDefault01">
-            <option disabled value="null">Выберите статус заказа</option>
+            <option value="null">Выберите статус заказа</option>
             <option value="new">Новый</option>
             <option value="paid">Оплаченный</option>
             <option value="cancel">Отменёный</option>
@@ -66,10 +66,17 @@
                  class="form-control"
                  id="validationDefault03">
         </div>
-        <div class="col-12">
+        <div class="col-6">
           <button class="btn btn-primary"
                   @click="sendFilter"
-                  type="submit">Применить фильтр</button>
+                  type="submit">Применить фильтр
+          </button>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-primary"
+                  @click="clearFilter"
+                  type="submit">Сбросить фильтр
+          </button>
         </div>
       </div>
 
@@ -101,9 +108,28 @@ export default {
     ...mapActions('appFestivalTickets', [
       'loadDataForOrderingTickets',
     ]),
-
+    ...mapActions('appOrder', [
+      'getOrderListForAdmin',
+    ]),
+    /**
+     * Отправить данные для фильтра
+     */
     sendFilter: function () {
-
+      this.getOrderListForAdmin({
+        'typeOrder': this.typeOrder,
+        'email': this.email,
+        'status': this.status,
+        'promoCode': this.promoCode,
+        'typesOfPayment': this.typesOfPayment,
+      });
+    },
+    clearFilter: function () {
+      this.typeOrder = null;
+      this.email = null;
+      this.status = null;
+      this.promoCode = null;
+      this.typesOfPayment = null;
+      this.getOrderListForAdmin();
     }
   },
   async created() {

@@ -11,6 +11,7 @@
           <th scope="col">Название</th>
           <th scope="col">Стоимость</th>
           <th scope="col">Кол-во билетов</th>
+          <th scope="col" v-if="isAdmin">Промо код</th>
           <th scope="col">Способ покупки билета</th>
           <th scope="col">Дата покупики билета</th>
           <th scope="col">Статус</th>
@@ -25,12 +26,12 @@
                 active-class="active"
                 :to="{ name: 'orderItems', params: { id: itemOrder.id }}">{{ index + 1 }}
             </router-link>
-
           </th>
-          <td>{{ itemOrder.name }}</td>
           <td v-if="isAdmin">{{ itemOrder.email }}</td>
+          <td>{{ itemOrder.name }}</td>
           <td>{{ itemOrder.price }}</td>
           <td>{{ itemOrder.count }}</td>
+          <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
           <td>{{ itemOrder.typeOfPayment }}</td>
           <td>{{ itemOrder.dateBuy }}</td>
           <td>{{ itemOrder.humanStatus }}</td>

@@ -6,11 +6,13 @@ namespace App\Http\Controllers\TicketsOrder;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
+use App\Http\Requests\FilterForTicketOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use JsonException;
 use Throwable;
 use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
+use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderFilterQuery;
 use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\GetOrder;
 use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
 use Tickets\Ordering\OrderTicket\Service\PriceService;
@@ -85,9 +87,17 @@ class OrderTickets extends Controller
             ]);
     }
 
-    public function getList(): JsonResponse
+    /**
+     * @throws JsonException
+     */
+    public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
-
+        return response()->json(
+            [
+                'list' => $this->getOrder->listByFilter(
+                    OrderFilterQuery::fromState($filterForTicketOrder->toArray())
+                    )?->toArray() ?? []
+            ]);
     }
 
     /**

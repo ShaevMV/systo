@@ -7,7 +7,7 @@ export default {
     state: {
         dataError: [],
         orderList: [],
-        orderItem: {
+        orderItem: [{
             name: null,
             count: 0,
             guests: [],
@@ -17,7 +17,8 @@ export default {
             humanStatus: null,
             dateBuy: null,
             comment: [],
-        },
+            email: null,
+        }],
     },
     getters,
     actions,

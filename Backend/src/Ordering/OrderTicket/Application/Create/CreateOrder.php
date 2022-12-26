@@ -28,7 +28,7 @@ final class CreateOrder
      */
     public function creating(OrderTicketDto $orderTicketDto, string $buyersMail): void
     {
-        $orderTicket = OrderTicket::create($orderTicketDto->toArray(), $buyersMail);
+        $orderTicket = OrderTicket::createFromOrderTicketDto($orderTicketDto, $buyersMail);
 
         $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
 

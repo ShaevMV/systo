@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ordering\OrderTicket\Dto;
 
+use DateTime;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
@@ -19,7 +20,7 @@ final class OrderTicketDto extends AbstractionEntity
         protected string $guests,
         protected Uuid $ticket_type_id,
         protected ?string $promo_code,
-        protected string $date,
+        protected DateTime $date,
         protected Uuid $types_of_payment_id,
         protected float $price,
         protected float $discount,
@@ -32,6 +33,7 @@ final class OrderTicketDto extends AbstractionEntity
 
     /**
      * @throws JsonException
+     * @throws \Exception
      */
     public static function fromState(array $data): self
     {
@@ -42,7 +44,7 @@ final class OrderTicketDto extends AbstractionEntity
             is_array($data['guests']) ? Json::encode($data['guests']) : $data['guests'],
             new Uuid($data['ticket_type_id']),
             $data['promo_code'] ?? null,
-            $data['date'],
+            new DateTime($data['date']),
             new Uuid($data['types_of_payment_id']),
             $data['price'],
             $data['discount'],
@@ -50,5 +52,38 @@ final class OrderTicketDto extends AbstractionEntity
             $id,
             $data['name'] ?? null,
         );
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
+
+    /**
+     * @throws \JsonException
+     */
+    public function getGuestsToArray(): array
+    {
+        return json_decode($this->guests, false, 512, JSON_THROW_ON_ERROR);
+    }
+
+    public function getDate(): DateTime
+    {
+        return $this->date;
+    }
+
+    public function getTypesOfPaymentId(): Uuid
+    {
+        return $this->types_of_payment_id;
+    }
+
+    public function getStatus(): Status
+    {
+        return $this->status;
+    }
+
+    public function getPromoCode(): ?string
+    {
+        return $this->promo_code;
     }
 }

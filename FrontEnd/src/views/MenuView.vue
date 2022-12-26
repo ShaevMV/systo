@@ -15,7 +15,7 @@
           :to="{ name: 'Orders' }">Мои заказы
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin">
+    <li class="nav-item" v-if="isAdmin && isAuth">
       <router-link
           class="nav-link"
           active-class="active"

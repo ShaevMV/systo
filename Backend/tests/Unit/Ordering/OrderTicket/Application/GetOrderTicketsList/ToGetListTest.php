@@ -35,7 +35,6 @@ class ToGetListTest extends TestCase
     public function test_is_correct_list(): void
     {
         $result = $this->toGetList->listByUser(new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'));
-        $a = $result->toArray();
         self::assertNotEmpty($result);
     }
 
