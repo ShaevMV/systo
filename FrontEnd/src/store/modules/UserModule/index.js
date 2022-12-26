@@ -10,7 +10,7 @@ export default {
         userInfo: {
             'id': localStorage.getItem('user.id') || null,
             'email': localStorage.getItem('user.email') || null,
-            'admin': localStorage.getItem('user.isAdmin') || false,
+            'admin': localStorage.getItem('user.isAdmin') === 'true' || false,
         },
         dataError: [],
     },

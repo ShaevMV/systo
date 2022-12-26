@@ -11,8 +11,8 @@
           <th scope="col">Название</th>
           <th scope="col">Стоимость</th>
           <th scope="col">Кол-во билетов</th>
-          <th scope="col" v-if="isAdmin">Промо код</th>
-          <th scope="col">Способ покупки билета</th>
+          <th scope="col">Промо код</th>
+          <th scope="col" v-if="isAdmin">Способ покупки билета</th>
           <th scope="col">Дата покупики билета</th>
           <th scope="col">Статус</th>
           <th scope="col">Комментарий</th>
@@ -31,8 +31,8 @@
           <td>{{ itemOrder.name }}</td>
           <td>{{ itemOrder.price }}</td>
           <td>{{ itemOrder.count }}</td>
-          <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
-          <td>{{ itemOrder.typeOfPayment }}</td>
+          <td>{{ itemOrder.promoCode }}</td>
+          <td v-if="isAdmin">{{ itemOrder.typeOfPayment }}</td>
           <td>{{ itemOrder.dateBuy }}</td>
           <td>{{ itemOrder.humanStatus }}</td>
           <td>{{ itemOrder.lastComment }}</td>

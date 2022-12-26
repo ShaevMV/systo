@@ -1,6 +1,5 @@
 <template>
   <ul class="sidebar-nav" id="sidebar-nav">
-
     <li class="nav-item">
       <router-link
           class="nav-link"

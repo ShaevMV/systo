@@ -43,7 +43,6 @@ const routes = [
         component: OrderItemView,
         meta: {
             'requiresAuth': true,
-            'role': ['all'],
         }
     },
     {
