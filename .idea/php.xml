@@ -136,6 +136,15 @@
       <path value="$PROJECT_DIR$/Backend/vendor/doctrine/cache" />
       <path value="$PROJECT_DIR$/Backend/vendor/psr/cache" />
       <path value="$PROJECT_DIR$/Backend/vendor/psr/clock" />
+      <path value="$PROJECT_DIR$/Backend/vendor/dasprid/enum" />
+      <path value="$PROJECT_DIR$/Backend/vendor/bacon/bacon-qr-code" />
+      <path value="$PROJECT_DIR$/Backend/vendor/endroid/qr-code" />
+      <path value="$PROJECT_DIR$/Backend/vendor/masterminds/html5" />
+      <path value="$PROJECT_DIR$/Backend/vendor/dompdf/dompdf" />
+      <path value="$PROJECT_DIR$/Backend/vendor/sabberworm/php-css-parser" />
+      <path value="$PROJECT_DIR$/Backend/vendor/barryvdh/laravel-dompdf" />
+      <path value="$PROJECT_DIR$/Backend/vendor/phenx/php-svg-lib" />
+      <path value="$PROJECT_DIR$/Backend/vendor/phenx/php-font-lib" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
