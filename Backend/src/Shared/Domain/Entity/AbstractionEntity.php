@@ -36,7 +36,7 @@ abstract class AbstractionEntity implements EntityInterface
                 foreach ($value as $keyInValue => $item) {
                     if ($item instanceof EntityInterface) {
                         $array[$key][$keyInValue] = $item->toArray();
-                    } elseif($item instanceof EntityDataInterface) {
+                    } elseif ($item instanceof EntityDataInterface) {
                         $array[$key][$keyInValue] = json_decode($item->toJson(), false, 512, JSON_THROW_ON_ERROR);
                     } else {
                         $array[$key][$keyInValue] = $item;
