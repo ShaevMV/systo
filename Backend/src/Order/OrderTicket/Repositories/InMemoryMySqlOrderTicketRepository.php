@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketItemDto;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForList;
 use Tickets\Shared\Domain\Criteria\Filter;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -46,8 +48,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     /**
      * @param  Uuid  $userId
      *
-     * @return OrderTicketDto[]
-     *
+     * @return OrderTicketItemForList[]
      * @throws JsonException
      */
     public function getUserList(Uuid $userId): array
@@ -60,10 +61,15 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 '=',
                 User::TABLE.'.id'
             )
+            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
+                '=',
+                TypesOfPaymentModel::TABLE.'.id'
+            )
             ->select([
                 $this->model::TABLE.'.*',
                 User::TABLE.'.email',
                 TicketTypesModel::TABLE.'.name',
+                TypesOfPaymentModel::TABLE.'.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->get()
@@ -71,7 +77,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $result = [];
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketDto::fromState($datum);
+            $result[] = OrderTicketItemForList::fromState($datum);
         }
 
         return $result;
@@ -109,7 +115,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
-     * @return OrderTicketDto[]
+     * @return OrderTicketItemForList[]
      * @throws JsonException
      */
     public function getList(Filters $filters): array
@@ -124,12 +130,12 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
                '=',
                TypesOfPaymentModel::TABLE.'.id')
-            ->select([
-                $this->model::TABLE.'.*',
-                TicketTypesModel::TABLE.'.name',
-                User::TABLE.'.email',
-                TypesOfPaymentModel::TABLE.'.name as types_of_payment_name'
-            ])
+           ->select([
+               $this->model::TABLE.'.*',
+               User::TABLE.'.email',
+               TicketTypesModel::TABLE.'.name',
+               TypesOfPaymentModel::TABLE.'.name as payment_name'
+           ])
            ->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
         /** @var Filter $filter */
@@ -148,7 +154,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         $result = [];
 
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketDto::fromState($datum);
+            $result[] = OrderTicketItemForList::fromState($datum);
         }
 
         return $result;

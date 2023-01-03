@@ -23,7 +23,7 @@ abstract class AbstractionEntity implements EntityInterface
 
     /**
      * Вывести сущность в виде массива
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function toArray(): array
     {
@@ -37,7 +37,7 @@ abstract class AbstractionEntity implements EntityInterface
                     if ($item instanceof EntityInterface) {
                         $array[$key][$keyInValue] = $item->toArray();
                     } elseif ($item instanceof EntityDataInterface) {
-                        $array[$key][$keyInValue] = json_decode($item->toJson(), false, 512, JSON_THROW_ON_ERROR);
+                        $array[$key][$keyInValue] = Json::decode($item->toJson(), 1);
                     } else {
                         $array[$key][$keyInValue] = $item;
                     }

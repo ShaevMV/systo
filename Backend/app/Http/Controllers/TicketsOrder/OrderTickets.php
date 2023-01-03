@@ -9,13 +9,11 @@ use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Bus;
-use JsonException;
+use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
-use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -116,7 +114,9 @@ class OrderTickets extends Controller
         $orderItem = $this->getOrder->getItemById(new Uuid($id));
 
         if (is_null($orderItem) ||
-            !$orderItem->getUserId()->equals(new Uuid(Auth::id()))) {
+            (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
+            && !Auth::user()->is_admin)
+        ) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']
             ], 404);

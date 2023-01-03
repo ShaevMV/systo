@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Order\OrderTicket\Service;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Mockery\ExpectationInterface;
 use Mockery\MockInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -16,6 +17,8 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PriceServiceTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private PriceService $priceService;
 
     /**

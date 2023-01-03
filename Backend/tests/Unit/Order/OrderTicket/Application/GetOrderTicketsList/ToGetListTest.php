@@ -7,6 +7,7 @@ use Database\Seeders\PromoCodSeeder;
 use Database\Seeders\TypesOfPaymentSeeder;
 use Database\Seeders\TypeTicketsSeeder;
 use Database\Seeders\UserSeeder;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -18,6 +19,8 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class ToGetListTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private GetOrder $toGetList;
 
     /**
@@ -64,7 +67,7 @@ class ToGetListTest extends TestCase
 
         $result = $this->toGetList->listByFilter(
             new OrderFilterQuery(
-                new Uuid('222abc1c-fc8e-4a1d-a4b0-d345cafacf55'),
+                Uuid::random(),
             )
         );
 

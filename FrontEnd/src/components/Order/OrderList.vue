@@ -32,7 +32,7 @@
           <td>{{ itemOrder.price }}</td>
           <td>{{ itemOrder.count }}</td>
           <td>{{ itemOrder.promoCode }}</td>
-          <td v-if="isAdmin">{{ itemOrder.typeOfPayment }}</td>
+          <td v-if="isAdmin">{{ itemOrder.typeOfPaymentName }}</td>
           <td>{{ itemOrder.dateBuy }}</td>
           <td>{{ itemOrder.humanStatus }}</td>
           <td>{{ itemOrder.lastComment }}</td>

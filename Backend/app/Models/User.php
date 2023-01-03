@@ -49,7 +49,7 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User whereUpdatedAt($value)
  * @method static Builder|User create(array $toArray)
  * @mixin Eloquent
- * @property int $is_admin
+ * @property bool $is_admin
  * @method static Builder|User whereIsAdmin($value)
  */
 class User extends Authenticatable implements JWTSubject

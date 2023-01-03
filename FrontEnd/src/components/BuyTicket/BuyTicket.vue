@@ -13,13 +13,11 @@
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты!
-              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации
+              <span aria-hidden="true">
               </span>
             </button>
           </div>
-          <div class="modal-body">
-            ...
+          <div class="modal-body" v-html="massage">
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -289,6 +287,7 @@ export default {
       date: null,
       idBuy: null,
       confirm: false,
+      massage: null,
     }
   },
   computed: {
@@ -416,8 +415,11 @@ export default {
         'promo_code': this.promoCode,
         'date': this.date,
         'types_of_payment_id': this.selectTypesOfPayment,
-        'callback': function () {
-          self.clearData();
+        'callback': function (result, massage) {
+          if (result) {
+            self.clearData();
+          }
+          self.massage = massage;
           document.getElementById('modalOpenBtn').click();
         }
       })

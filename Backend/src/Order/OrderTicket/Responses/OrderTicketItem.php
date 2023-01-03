@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Domain;
+namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
-use Exception;
-use JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\ValueObject\CommentForOrder;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketItemDto;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\Entity\EntityInterface;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -88,5 +85,4 @@ class OrderTicketItem extends AbstractionEntity implements Response
     {
         return $this->id;
     }
-
 }

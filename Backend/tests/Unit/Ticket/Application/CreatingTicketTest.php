@@ -3,6 +3,7 @@
 namespace Tests\Unit\Ticket\Application;
 
 use Database\Seeders\OrderSeeder;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
@@ -11,6 +12,8 @@ use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketApplication;
 
 class CreatingTicketTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private CreateTicketApplication $createTicketApplication;
 
     /**

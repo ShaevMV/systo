@@ -6,6 +6,7 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
 
 use Tickets\Order\OrderTicket\Application\GetOrderList\ListResponse;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItem;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 
 class OrderListQueryHandler implements QueryHandler
@@ -17,8 +18,9 @@ class OrderListQueryHandler implements QueryHandler
 
     public function __invoke(UserIdQuery $query): ?ListResponse
     {
-        $orderTicketItem = $this->orderTicket->getUserList($query->getUserId());
+        $orderTicketItemForList = $this->orderTicket->getUserList($query->getUserId());
 
-        return count($orderTicketItem) > 0 ? new ListResponse($orderTicketItem) : null;
+
+        return count($orderTicketItemForList) > 0 ? new ListResponse($orderTicketItemForList) : null;
     }
 }
