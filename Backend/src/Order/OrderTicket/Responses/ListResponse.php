@@ -1,18 +1,17 @@
 <?php
 
-namespace Tickets\Order\OrderTicket\Application\GetOrderList;
+namespace Tickets\Order\OrderTicket\Responses;
 
 use Nette\Utils\JsonException;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemForList;
 use Tickets\Shared\Domain\Bus\Query\Response;
 
 class ListResponse implements Response
 {
     /**
-     * @param  OrderTicketItemForList[]  $orderList
+     * @param  OrderTicketItemForListResponse[]  $orderList
      */
     public function __construct(
-        private array $orderList
+        private array $orderList = []
     ) {
     }
 
@@ -28,5 +27,10 @@ class ListResponse implements Response
         }
 
         return $result;
+    }
+
+    public function getOrderList(): array
+    {
+        return $this->orderList;
     }
 }

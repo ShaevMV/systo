@@ -67,4 +67,9 @@ final class Status implements EntityDataInterface
     {
         return isset(self::ROLE_CHANCE_STATUS[$this->name][(string)$nextStatus]);
     }
+
+    public function isPaid(): bool
+    {
+        return $this->name === self::PAID;
+    }
 }

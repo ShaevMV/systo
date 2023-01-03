@@ -5,8 +5,7 @@ declare(strict_types = 1);
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketItemDto;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemForList;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -24,7 +23,7 @@ interface OrderTicketRepositoryInterface
      * Получить список заказов у пользователя
      *
      * @param  Uuid  $userId
-     * @return OrderTicketItemForList[]
+     * @return OrderTicketItemForListResponse[]
      */
     public function getUserList(Uuid $userId): array;
 
@@ -40,11 +39,7 @@ interface OrderTicketRepositoryInterface
      * Получить список заказов по фильтру
      *
      * @param  Filters  $filters
-     * @return OrderTicketItemForList[]
+     * @return OrderTicketItemForListResponse[]
      */
     public function getList(Filters $filters): array;
-
-
-    public function getTotal(Filters $filters): array;
-
 }

@@ -9,15 +9,13 @@ use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
-use Database\Seeders\OrderSeeder;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketItemDto;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemForList;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Shared\Domain\Criteria\Filter;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -48,7 +46,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     /**
      * @param  Uuid  $userId
      *
-     * @return OrderTicketItemForList[]
+     * @return OrderTicketItemForListResponse[]
      * @throws JsonException
      */
     public function getUserList(Uuid $userId): array
@@ -77,7 +75,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $result = [];
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketItemForList::fromState($datum);
+            $result[] = OrderTicketItemForListResponse::fromState($datum);
         }
 
         return $result;
@@ -115,7 +113,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
-     * @return OrderTicketItemForList[]
+     * @return OrderTicketItemForListResponse[]
      * @throws JsonException
      */
     public function getList(Filters $filters): array
@@ -154,14 +152,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         $result = [];
 
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketItemForList::fromState($datum);
+            $result[] = OrderTicketItemForListResponse::fromState($datum);
         }
 
         return $result;
-    }
-
-    public function getTotal(Filters $filters): array
-    {
-        // TODO: Implement getTotal() method.
     }
 }

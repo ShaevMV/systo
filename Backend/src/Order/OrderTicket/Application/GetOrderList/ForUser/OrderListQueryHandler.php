@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
 
-use Tickets\Order\OrderTicket\Application\GetOrderList\ListResponse;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItem;
+use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 
 class OrderListQueryHandler implements QueryHandler

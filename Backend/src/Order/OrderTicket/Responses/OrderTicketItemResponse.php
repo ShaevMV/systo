@@ -6,13 +6,12 @@ namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketItemDto;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class OrderTicketItem extends AbstractionEntity implements Response
+class OrderTicketItemResponse extends AbstractionEntity implements Response
 {
     protected float $totalPrice = 0.00;
     protected int $count;
@@ -59,13 +58,13 @@ class OrderTicketItem extends AbstractionEntity implements Response
         );
     }
 
-    public function setTypeOfPayment(?string $typeOfPayment): OrderTicketItem
+    public function setTypeOfPayment(?string $typeOfPayment): OrderTicketItemResponse
     {
         $this->typeOfPayment = $typeOfPayment;
         return $this;
     }
 
-    public function setComment(?array $comment): OrderTicketItem
+    public function setComment(?array $comment): OrderTicketItemResponse
     {
         $this->comment = $comment;
         return $this;

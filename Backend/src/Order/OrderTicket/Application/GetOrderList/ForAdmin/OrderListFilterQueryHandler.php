@@ -4,8 +4,8 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
-use Tickets\Order\OrderTicket\Application\GetOrderList\ListResponse;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 use Tickets\Shared\Domain\Criteria\FilterOperator;
 use Tickets\Shared\Domain\Criteria\Filters;

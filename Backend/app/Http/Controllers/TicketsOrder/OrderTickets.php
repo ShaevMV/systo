@@ -14,7 +14,9 @@ use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -27,6 +29,7 @@ class OrderTickets extends Controller
         private AccountApplication $accountApplication,
         private PriceService $priceService,
         private GetOrder $getOrder,
+        private TotalNumber $totalNumber,
     ) {
     }
 
@@ -96,11 +99,14 @@ class OrderTickets extends Controller
      */
     public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
+        $listResponse =  $this->getOrder->listByFilter(
+            OrderFilterQuery::fromState($filterForTicketOrder->toArray())
+        ) ?? new ListResponse();
+
         return response()->json(
             [
-                'list' => $this->getOrder->listByFilter(
-                    OrderFilterQuery::fromState($filterForTicketOrder->toArray())
-                    )?->toArray() ?? []
+                'list' => $listResponse->toArray(),
+                'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray()
             ]);
     }
 

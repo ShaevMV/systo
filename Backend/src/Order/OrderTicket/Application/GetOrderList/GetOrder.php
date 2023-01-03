@@ -10,7 +10,8 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\UserIdQuery;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItem;
+use Tickets\Order\OrderTicket\Responses\ListResponse;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 use Tickets\Shared\Domain\Bus\Query\QueryBus;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
@@ -63,11 +64,11 @@ class GetOrder
      * Высети конкретный заказ
      *
      * @param  Uuid  $uuid
-     * @return OrderTicketItem|null
+     * @return OrderTicketItemResponse|null
      */
-    public function getItemById(Uuid $uuid): ?OrderTicketItem
+    public function getItemById(Uuid $uuid): ?OrderTicketItemResponse
     {
-        /** @var OrderTicketItem|null $result */
+        /** @var OrderTicketItemResponse|null $result */
         $result = $this->queryBus->ask(new OrderIdQuery($uuid));
 
         return $result;
