@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\InfoForOrder\Repositories;
+namespace Tickets\Order\InfoForOrder\Repositories;
 
-use Tickets\Ordering\InfoForOrder\Response\PromoCodeDto;
+use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
 
 interface PromoCodeInterface
 {

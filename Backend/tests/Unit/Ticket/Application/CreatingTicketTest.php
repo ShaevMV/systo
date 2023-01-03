@@ -30,11 +30,13 @@ class CreatingTicketTest extends TestCase
      */
     public function test_in_create_pdf():void
     {
-        $this->createTicketApplication->createList(
+        $tickets = $this->createTicketApplication->createList(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             [
                 'test'
             ]
         );
+        self::assertNotEmpty($tickets);
+        self::assertCount(1,$tickets);
     }
 }

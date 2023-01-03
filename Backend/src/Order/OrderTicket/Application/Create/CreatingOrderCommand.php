@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Application\Create;
+namespace Tickets\Order\OrderTicket\Application\Create;
 
-use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Bus\Command\Command;
 
 final class CreatingOrderCommand implements Command
@@ -18,5 +18,4 @@ final class CreatingOrderCommand implements Command
     {
         return $this->orderTicketDto;
     }
-
 }

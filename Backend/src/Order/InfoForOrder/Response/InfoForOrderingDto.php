@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\InfoForOrder\Response;
+namespace Tickets\Order\InfoForOrder\Response;
 
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
-use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
 
 class ChanceStatusCommandHandler implements CommandHandler

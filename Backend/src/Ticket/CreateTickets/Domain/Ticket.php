@@ -28,7 +28,7 @@ class Ticket extends AggregateRoot
     {
         $result = new self($orderId, $quest);
 
-        $result->record(new ProcessCreatindQRCode($result->aggregateId));
+        $result->record(new ProcessCreatingQRCode($result->aggregateId));
 
         return $result;
     }

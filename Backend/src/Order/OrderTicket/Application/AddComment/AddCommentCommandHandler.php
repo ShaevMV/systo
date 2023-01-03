@@ -1,9 +1,9 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\AddComment;
+namespace Tickets\Order\OrderTicket\Application\AddComment;
 
-use Tickets\Ordering\OrderTicket\Dto\CommentDto;
-use Tickets\Ordering\OrderTicket\Repositories\CommentRepositoryInterface;
+use Tickets\Order\OrderTicket\Dto\CommentDto;
+use Tickets\Order\OrderTicket\Repositories\CommentRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
 
 class AddCommentCommandHandler implements CommandHandler

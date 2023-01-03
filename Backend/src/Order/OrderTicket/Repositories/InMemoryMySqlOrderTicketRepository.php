@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Repositories;
+namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
+use Database\Seeders\OrderSeeder;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
-use JsonException;
+use Nette\Utils\JsonException;
 use Throwable;
-use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
-use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Criteria\Filter;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -27,7 +27,6 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     ) {
     }
 
-
     /**
      * @throws Throwable
      */
@@ -35,7 +34,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     {
         DB::beginTransaction();
         try {
-            $this->model::create($orderTicketDto->toArray());
+            $this->model::insert($orderTicketDto->toArray());
             DB::commit();
             return true;
         } catch (Exception $exception) {
@@ -57,8 +56,13 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
                 '=',
                 TicketTypesModel::TABLE.'.id')
+            ->leftJoin(User::TABLE, $this->model::TABLE.'.user_id',
+                '=',
+                User::TABLE.'.id'
+            )
             ->select([
                 $this->model::TABLE.'.*',
+                User::TABLE.'.email',
                 TicketTypesModel::TABLE.'.name',
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
@@ -67,7 +71,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $result = [];
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketItem::fromState($datum);
+            $result[] = OrderTicketDto::fromState($datum);
         }
 
         return $result;
@@ -90,24 +94,27 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     /**
      * @throws JsonException
      */
-    public function findOrder(Uuid $uuid): ?OrderTicketItem
+    public function findOrder(Uuid $uuid): ?OrderTicketDto
     {
         $rawData = $this->model::whereId($uuid->value())
+            ->with('users')
             ->with('comments')
             ->with('ticketType')
             ->with('typeOfPayment')
             ->first()
             ?->toArray();
+        $rawData['email'] = $rawData['users']['email'];
 
-        return $rawData !== null ? OrderTicketItem::fromItemOrderState($rawData) : null;
+        return $rawData !== null ? OrderTicketDto::fromState($rawData) : null;
     }
 
     /**
+     * @return OrderTicketDto[]
      * @throws JsonException
      */
     public function getList(Filters $filters): array
     {
-       $builder = $this->model->leftJoin(
+       $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE.'.user_id',
             '=',
             User::TABLE.'.id')
@@ -141,7 +148,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         $result = [];
 
         foreach ($rawData as $datum) {
-            $result[] = OrderTicketItem::fromState($datum);
+            $result[] = OrderTicketDto::fromState($datum);
         }
 
         return $result;

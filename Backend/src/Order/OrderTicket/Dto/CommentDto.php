@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Dto;
+namespace Tickets\Order\OrderTicket\Dto;
 
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\Entity\EntityInterface;

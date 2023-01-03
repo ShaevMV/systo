@@ -9,13 +9,15 @@ use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Bus;
 use JsonException;
 use Throwable;
-use Tickets\Ordering\OrderTicket\Application\Create\CreateOrder;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderFilterQuery;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\GetOrder;
-use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
-use Tickets\Ordering\OrderTicket\Service\PriceService;
+use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Domain\OrderTicket;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\User\Account\Application\AccountApplication;
@@ -38,25 +40,29 @@ class OrderTickets extends Controller
     public function create(CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
     {
         try {
+            // Создание или получение пользователя по email
+            $userId = $this->accountApplication->creatingOrGetAccountId($createOrderTicketsRequest->email)->value();
+
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
                 new Uuid($createOrderTicketsRequest->ticket_type_id),
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
+
             // Создание заказа
             $orderTicketDto = OrderTicketDto::fromState(
                 array_merge(
                     $createOrderTicketsRequest->toArray(),
+                    $priceDto->toArray(),
                     [
-                        'user_id' => $this->accountApplication->creatingOrGetAccountId($createOrderTicketsRequest->email)->value(),
-                        'price' => $priceDto->getTotalPrice(),
-                        'discount' => $priceDto->getDiscount(),
+                        'user_id' => $userId,
                         'status' => Status::NEW,
                     ]
                 )
             );
-            $this->createOrder->creating($orderTicketDto, $createOrderTicketsRequest->email);
+
+            $this->createOrder->createAndSave($orderTicketDto);
 
             return response()->json([
                 'success' => true,

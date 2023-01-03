@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\GetInfoForOrder;
+namespace Tickets\Order\InfoForOrder\Application\GetInfoForOrder;
 
-use Tickets\Ordering\InfoForOrder\Response\InfoForOrderingDto;
+use Tickets\Order\InfoForOrder\Response\InfoForOrderingDto;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class AllInfoForOrderingTicketsSearcher

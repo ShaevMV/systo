@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\InfoForOrder\Application\GetPriceByTicketType;
+namespace Tickets\Order\InfoForOrder\Application\GetPriceByTicketType;
 
 use Tickets\Shared\Domain\Bus\Query\Response;
 

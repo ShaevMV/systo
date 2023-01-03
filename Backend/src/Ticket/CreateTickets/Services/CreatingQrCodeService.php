@@ -2,6 +2,7 @@
 
 namespace Tickets\Ticket\CreateTickets\Services;
 
+use Endroid\QrCode\Label\Font\OpenSans;
 use PDF;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -10,7 +11,6 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
-use Endroid\QrCode\Label\Font\NotoSans;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -28,8 +28,8 @@ class CreatingQrCodeService
             ->margin(10)
             ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
             ->logoPath(__DIR__.'/assets/logo.png')
-            ->labelText('This is not LSD!!!')
-            ->labelFont(new NotoSans(20))
+            ->labelText('Welcome to Solar Systo 2023') //TODO: Автомотизировать
+            ->labelFont(new OpenSans(16))
             ->labelAlignment(new LabelAlignmentCenter())
             ->validateResult(false)
             ->build();

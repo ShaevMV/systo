@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\ValueObject;
+namespace Tickets\Order\OrderTicket\ValueObject;
 
 use Carbon\Carbon;
 use JsonException;

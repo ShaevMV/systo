@@ -16,18 +16,19 @@ class CreateTicketApplication
     public function __construct(
         CreateTicketCommandHandler $commandHandler,
         private Bus $bus
-    ){
+    ) {
         $this->commandBus = new InMemorySymfonyCommandBus([
             CreateTicketCommand::class => $commandHandler
         ]);
     }
 
     /**
+     * @return Ticket[]
      * @throws Throwable
      */
-    public function createList(Uuid $orderId, array $guests): void
+    public function createList(Uuid $orderId, array $guests): array
     {
-        $r = 5;
+        $tickets = [];
         foreach ($guests as $guest) {
             $ticket = Ticket::newTicket($orderId, $guest);
 
@@ -41,6 +42,9 @@ class CreateTicketApplication
 
             $this->bus::chain($ticket->pullDomainEvents())
                 ->dispatch();
+            $tickets[] = $ticket;
         }
+
+        return $tickets;
     }
 }

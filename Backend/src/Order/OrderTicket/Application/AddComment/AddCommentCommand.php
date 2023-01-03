@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\AddComment;
+namespace Tickets\Order\OrderTicket\Application\AddComment;
 
 use Tickets\Shared\Domain\Bus\Command\Command;
 use Tickets\Shared\Domain\ValueObject\Uuid;

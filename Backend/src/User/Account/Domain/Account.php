@@ -28,14 +28,6 @@ class Account extends AggregateRoot
         return $self;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
     public function getId(): Uuid
     {
         return $this->id;
@@ -44,5 +36,13 @@ class Account extends AggregateRoot
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\SearchPromoCode;
+namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
 
-use Tickets\Ordering\InfoForOrder\Response\PromoCodeDto;
+use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class IsCorrectPromoCode

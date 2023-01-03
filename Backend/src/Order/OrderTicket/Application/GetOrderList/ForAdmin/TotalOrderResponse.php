@@ -2,10 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin;
+namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Tickets\Shared\Domain\Entity\EntityInterface;
 
 class TotalOrderResponse extends AbstractionEntity implements Response
 {
@@ -20,8 +21,12 @@ class TotalOrderResponse extends AbstractionEntity implements Response
 
     public function __construct(
         protected int $totalCount = 0,
-        protected int $total
     )
     {
+    }
+
+    public static function fromState(array $data): self
+    {
+        // TODO: Implement fromState() method.
     }
 }

@@ -9,7 +9,7 @@ use App\Http\Requests\CreateCommentForOrderRequest;
 use Auth;
 use Illuminate\Http\JsonResponse;
 use Throwable;
-use Tickets\Ordering\OrderTicket\Application\AddComment\AddComment;
+use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class Comment extends Controller

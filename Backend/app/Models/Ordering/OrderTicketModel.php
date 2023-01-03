@@ -6,6 +6,7 @@ namespace App\Models\Ordering;
 
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\User;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -69,6 +70,11 @@ final class OrderTicketModel extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(CommentOrderTicketModel::class, 'order_tickets_id');
+    }
+
+    public function users(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function ticketType(): BelongsTo

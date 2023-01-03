@@ -1,17 +1,17 @@
 <?php
 
-namespace Tests\Unit\Ordering\OrderTicket\Service;
+namespace Tests\Unit\Order\OrderTicket\Service;
 
 use Mockery\ExpectationInterface;
 use Mockery\MockInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
-use Tickets\Ordering\InfoForOrder\Repositories\InMemoryMySqlPromoCode;
-use Tickets\Ordering\InfoForOrder\Repositories\InMemoryMySqlTicketType;
-use Tickets\Ordering\InfoForOrder\Response\PromoCodeDto;
-use Tickets\Ordering\InfoForOrder\Response\TicketTypeDto;
-use Tickets\Ordering\OrderTicket\Service\PriceService;
+use Tickets\Order\InfoForOrder\Repositories\InMemoryMySqlPromoCode;
+use Tickets\Order\InfoForOrder\Repositories\InMemoryMySqlTicketType;
+use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
+use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
+use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PriceServiceTest extends TestCase
@@ -58,7 +58,8 @@ class PriceServiceTest extends TestCase
     public function test_in_correct_get_priceDto(): void
     {
         $result = $this->priceService->getPriceDto(Uuid::random(), 2, 'Systo');
-        self::assertEquals(2000, $result->getTotalPrice());
+        self::assertEquals(2000, $result->getPrice());
+        self::assertEquals(1900, $result->getTotalPrice());
         self::assertEquals(100.0, $result->getDiscount());
     }
 }

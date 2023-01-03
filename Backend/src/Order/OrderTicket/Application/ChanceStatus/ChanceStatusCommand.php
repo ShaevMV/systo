@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;

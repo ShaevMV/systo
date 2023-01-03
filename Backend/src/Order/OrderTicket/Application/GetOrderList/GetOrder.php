@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
+namespace Tickets\Order\OrderTicket\Application\GetOrderList;
 
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderFilterQuery;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderListFilterQueryHandler;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderIdQuery;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderItemQueryHandler;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\OrderListQueryHandler;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser\UserIdQuery;
-use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
-use Tickets\Ordering\OrderTicket\Domain\OrderTicketList;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderListFilterQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\UserIdQuery;
+use Tickets\Order\OrderTicket\Domain\OrderTicketItem;
 use Tickets\Shared\Domain\Bus\Query\QueryBus;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;

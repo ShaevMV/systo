@@ -4,10 +4,6 @@ namespace Tickets\Shared\Domain\Entity;
 
 interface EntityInterface
 {
-    /**
-     * Создания сущности из массива
-     */
-    public static function fromState(array $data): self;
 
     /**
      * Преобразовать значения сущности в массив

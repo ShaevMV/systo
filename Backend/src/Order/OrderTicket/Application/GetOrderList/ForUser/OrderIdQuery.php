@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser;
+namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 use Tickets\Shared\Domain\ValueObject\Uuid;

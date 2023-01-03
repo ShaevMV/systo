@@ -2,10 +2,10 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\SearchPromoCode;
+namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
 
-use Tickets\Ordering\InfoForOrder\Repositories\PromoCodeInterface;
-use Tickets\Ordering\InfoForOrder\Response\PromoCodeDto;
+use Tickets\Order\InfoForOrder\Repositories\PromoCodeInterface;
+use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 
 final class PromoCodeQueryHandler implements QueryHandler

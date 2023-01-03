@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\ChancheStatus\Domain;
+namespace Tickets\Order\ChancheStatus\Domain;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

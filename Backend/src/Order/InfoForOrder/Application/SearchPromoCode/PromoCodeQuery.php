@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\InfoForOrder\Application\SearchPromoCode;
+namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 

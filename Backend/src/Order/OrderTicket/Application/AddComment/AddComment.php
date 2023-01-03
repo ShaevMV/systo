@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Application\AddComment;
+namespace Tickets\Order\OrderTicket\Application\AddComment;
 
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;

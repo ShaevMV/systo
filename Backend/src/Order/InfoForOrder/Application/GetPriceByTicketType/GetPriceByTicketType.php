@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\GetPriceByTicketType;
+namespace Tickets\Order\InfoForOrder\Application\GetPriceByTicketType;
 
-use Tickets\Ordering\InfoForOrder\Application\GetInfoForOrder\GetAllInfoForOrderQuery;
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetAllInfoForOrderQuery;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 

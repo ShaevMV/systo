@@ -1,22 +1,24 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForUser;
+declare(strict_types=1);
 
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ListResponse;
-use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
+
+use Tickets\Order\OrderTicket\Application\GetOrderList\ListResponse;
+use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 
 class OrderListQueryHandler implements QueryHandler
 {
     public function __construct(
         private OrderTicketRepositoryInterface $orderTicket
-    ){
+    ) {
     }
 
     public function __invoke(UserIdQuery $query): ?ListResponse
     {
         $orderTicketItem = $this->orderTicket->getUserList($query->getUserId());
 
-        return count($orderTicketItem)>0 ? new ListResponse($orderTicketItem) : null;
+        return count($orderTicketItem) > 0 ? new ListResponse($orderTicketItem) : null;
     }
 }

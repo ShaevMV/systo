@@ -12,7 +12,6 @@ use Throwable;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketApplication;
-use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
 class ProcessCreateTicket implements ShouldQueue, DomainEvent
 {

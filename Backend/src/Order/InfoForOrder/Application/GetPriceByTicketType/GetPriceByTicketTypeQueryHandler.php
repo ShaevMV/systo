@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\GetPriceByTicketType;
+namespace Tickets\Order\InfoForOrder\Application\GetPriceByTicketType;
 
-use Tickets\Ordering\InfoForOrder\Application\GetInfoForOrder\GetAllInfoForOrderQuery;
-use Tickets\Ordering\InfoForOrder\Repositories\TicketTypeInterface;
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetAllInfoForOrderQuery;
+use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterface;
 
 class GetPriceByTicketTypeQueryHandler
 {

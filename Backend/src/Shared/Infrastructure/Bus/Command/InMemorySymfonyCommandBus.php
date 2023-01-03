@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Shared\Infrastructure\Bus\Command;
 
+use Throwable;
 use Tickets\Shared\Domain\Bus\Command\Command;
 use Tickets\Shared\Domain\Bus\Command\CommandBus;
 use Tickets\Shared\Infrastructure\Bus\CallableFirstParameterExtractor;
@@ -28,6 +29,9 @@ final class InMemorySymfonyCommandBus implements CommandBus
         );
     }
 
+    /**
+     * @throws Throwable
+     */
     public function dispatch(Command $command): void
     {
         try {

@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests\Unit\Ordering\OrderTicket\Application\GetOrderTicketsList;
+namespace Tests\Unit\Order\OrderTicket\Application\GetOrderTicketsList;
 
+use Database\Seeders\OrderSeeder;
 use Database\Seeders\PromoCodSeeder;
 use Database\Seeders\TypesOfPaymentSeeder;
 use Database\Seeders\TypeTicketsSeeder;
@@ -10,8 +11,8 @@ use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\ForAdmin\OrderFilterQuery;
-use Tickets\Ordering\OrderTicket\Application\GetOrderTicket\GetOrder;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -34,13 +35,13 @@ class ToGetListTest extends TestCase
 
     public function test_is_correct_list(): void
     {
-        $result = $this->toGetList->listByUser(new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'));
+        $result = $this->toGetList->listByUser(new Uuid(UserSeeder::ID_FOR_USER_UUID));
         self::assertNotEmpty($result);
     }
 
     public function test_is_correct_find(): void
     {
-        $result = $this->toGetList->getItemById(new Uuid('aa0f70cd-f1ae-4d23-b18d-bd2dca659d12'));
+        $result = $this->toGetList->getItemById(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertNotEmpty($result);
     }
 

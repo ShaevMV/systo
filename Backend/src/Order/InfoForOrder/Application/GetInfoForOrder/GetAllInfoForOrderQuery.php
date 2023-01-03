@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\InfoForOrder\Application\GetInfoForOrder;
+namespace Tickets\Order\InfoForOrder\Application\GetInfoForOrder;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 

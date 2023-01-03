@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Tickets\Ordering\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
-use Tickets\Ordering\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
+use Tickets\Order\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
 
 class OrderingTicketsController extends Controller
 {

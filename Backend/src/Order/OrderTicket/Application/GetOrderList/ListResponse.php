@@ -1,14 +1,14 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Application\GetOrderTicket;
+namespace Tickets\Order\OrderTicket\Application\GetOrderList;
 
-use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Bus\Query\Response;
 
 class ListResponse implements Response
 {
     /**
-     * @param  OrderTicketItem[]  $orderList
+     * @param  OrderTicketDto[]  $orderList
      */
     public function __construct(
         private array $orderList

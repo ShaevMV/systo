@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Repositories;
+namespace Tickets\Order\OrderTicket\Repositories;
 
-use Tickets\Ordering\OrderTicket\Dto\CommentDto;
+use Tickets\Order\OrderTicket\Dto\CommentDto;
 
 interface CommentRepositoryInterface
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Service;
+namespace Tickets\Order\OrderTicket\Service;
 
-use Tickets\Ordering\InfoForOrder\Application\GetPriceByTicketType\GetPriceByTicketType;
-use Tickets\Ordering\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
-use Tickets\Ordering\OrderTicket\Dto\PriceDto;
+use Tickets\Order\InfoForOrder\Application\GetPriceByTicketType\GetPriceByTicketType;
+use Tickets\Order\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PriceService

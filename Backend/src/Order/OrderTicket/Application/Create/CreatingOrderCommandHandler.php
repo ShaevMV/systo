@@ -2,9 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Application\Create;
+namespace Tickets\Order\OrderTicket\Application\Create;
 
-use Tickets\Ordering\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 
 final class CreatingOrderCommandHandler
 {

@@ -2,62 +2,81 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Domain;
+namespace Tickets\Order\OrderTicket\Domain;
 
-use DateTime;
 use Exception;
-use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
+use JsonException;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 final class OrderTicket extends AggregateRoot
 {
+    private Uuid $id;
+
     public function __construct(
-        protected Uuid $id,
-        protected array $guests,
-        protected DateTime $date,
-        protected Uuid $idBuy,
-        protected Status $status,
-        protected ?string $promoCod = null,
+        ?Uuid $id,
+        protected OrderTicketDto $orderTicketDto,
     ) {
+        $this->id = !is_null($id) ? $id : Uuid::random();
+        $this->orderTicketDto->setId($this->id);
+
     }
+
+    /**
+     * @throws JsonException
+     */
+    private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
+    {
+        return new self(
+            $orderTicketDto->getId(),
+            $orderTicketDto,
+        );
+    }
+
 
     /**
      * @throws Exception
      */
-    public static function createFromOrderTicketDto(OrderTicketDto $orderTicketDto, string $email): self
+    public static function create(OrderTicketDto $orderTicketDto): self
     {
-        $result = new self(
-            $orderTicketDto->getId(),
-            $orderTicketDto->getGuestsToArray(),
-            $orderTicketDto->getDate(),
-            $orderTicketDto->getTypesOfPaymentId(),
-            $orderTicketDto->getStatus(),
-            $orderTicketDto->getPromoCode()
-        );
+        $result = self::fromOrderTicketDto($orderTicketDto);
 
-        $result->record(new ProcessUserNotificationNewOrderTicket($email,$orderTicketDto->getId()));
+        $result->record(new ProcessUserNotificationNewOrderTicket(
+                $orderTicketDto->getId(),
+                $orderTicketDto->getUserId(),
+                $orderTicketDto->getEmail(),
+            )
+        );
 
         return $result;
     }
 
-    public static function recoverFromState(array $data): self
+    /**
+     * @throws JsonException
+     */
+    public static function toPaid(OrderTicketDto $orderTicketDto): self
     {
+        $result = self::fromOrderTicketDto($orderTicketDto);
 
+        $result->record(new ProcessUserNotificationNewOrderTicket(
+                $orderTicketDto->getId(),
+                $orderTicketDto->getUserId(),
+                $orderTicketDto->getEmail(),
+            )
+        );
+
+        return $result;
     }
 
-
-    public function chanceStatus(Status $nextStatus): self
+    public function getId(): Uuid
     {
-        if(!$this->status->isCorrectNextStatus($nextStatus)) {
-            throw new \DomainException('Не корректный статус!!!');
-        }
-
-        $this->status = $nextStatus;
-
-        $this->record(new ProcessUserNotificationNewOrderTicket($email,$orderTicketDto->getId()));
-
-        return $this;
+        return $this->id;
     }
+
+    public function getDto(): OrderTicketDto
+    {
+        return $this->orderTicketDto;
+    }
+
 }

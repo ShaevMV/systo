@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Ordering\ChancheStatus\Application\ToPaid;
+namespace Tickets\Order\ChancheStatus\Application\ToPaid;
 
 use Tickets\Shared\Domain\Bus\Command\Command;
 use Tickets\Shared\Domain\ValueObject\Uuid;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Tickets\Ordering\OrderTicket\Repositories;
+namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Ordering\CommentOrderTicketModel;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-use Tickets\Ordering\OrderTicket\Dto\CommentDto;
+use Tickets\Order\OrderTicket\Dto\CommentDto;
 
 class InMemoryMySqlCommentRepository implements CommentRepositoryInterface
 {

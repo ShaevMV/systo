@@ -2,11 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Ordering\OrderTicket\Repositories;
+namespace Tickets\Order\OrderTicket\Repositories;
 
-use Tickets\Ordering\OrderTicket\Domain\OrderTicketItem;
-use Tickets\Ordering\OrderTicket\Dto\OrderTicketDto;
-use Tickets\Shared\Domain\Criteria\Filter;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -24,7 +22,7 @@ interface OrderTicketRepositoryInterface
      * Получить список заказов у пользователя
      *
      * @param  Uuid  $userId
-     * @return OrderTicketItem[]
+     * @return OrderTicketDto[]
      */
     public function getUserList(Uuid $userId): array;
 
@@ -32,15 +30,15 @@ interface OrderTicketRepositoryInterface
      * Поиск заказа по id
      *
      * @param  Uuid  $uuid
-     * @return OrderTicketItem|null
+     * @return OrderTicketDto|null
      */
-    public function findOrder(Uuid $uuid): ?OrderTicketItem;
+    public function findOrder(Uuid $uuid): ?OrderTicketDto;
 
     /**
      * Получить список заказов по фильтру
      *
      * @param  Filters  $filters
-     * @return OrderTicketItem[]
+     * @return OrderTicketDto[]
      */
     public function getList(Filters $filters): array;
 

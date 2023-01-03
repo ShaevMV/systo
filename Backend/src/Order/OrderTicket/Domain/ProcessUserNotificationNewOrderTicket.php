@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ordering\OrderTicket\Domain;
+namespace Tickets\Order\OrderTicket\Domain;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -19,8 +19,9 @@ class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
+        private Uuid $orderId,
+        private Uuid $userId,
         private string $email,
-        private Uuid $id,
     ) {
     }
 
