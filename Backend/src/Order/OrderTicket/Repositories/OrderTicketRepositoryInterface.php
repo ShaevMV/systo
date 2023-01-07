@@ -7,6 +7,7 @@ namespace Tickets\Order\OrderTicket\Repositories;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Shared\Domain\Criteria\Filters;
+use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 interface OrderTicketRepositoryInterface
@@ -42,4 +43,6 @@ interface OrderTicketRepositoryInterface
      * @return OrderTicketItemForListResponse[]
      */
     public function getList(Filters $filters): array;
+
+    public function chanceStatus(Uuid $orderId, Status $newStatus): bool;
 }

@@ -24,7 +24,7 @@ class Ticket extends AggregateRoot
         }
     }
 
-    public static function newTicket(Uuid $orderId, string $quest, ): self
+    public static function newTicket(Uuid $orderId, string $quest): self
     {
         $result = new self($orderId, $quest);
 

@@ -30,10 +30,14 @@ Route::prefix('v1/festival')->group(static function (): void {
 
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);
     Route::get('/ticketsOrder/getUserList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
-    Route::post('/ticketsOrder/getList', [OrderTickets::class, 'getList'])->middleware('auth:api')->middleware('admin');
+    Route::post('/ticketsOrder/getList', [OrderTickets::class, 'getList'])->middleware('auth:api')
+        ->middleware('admin');
 
     Route::get('/ticketsOrder/getItem/{id}', [OrderTickets::class, 'getOrderItem'])->middleware('auth:api');
     Route::post('/ticketsOrder/sendComment', [Comment::class, 'addComment'])->middleware('auth:api');
+
+    Route::post('/ticketsOrder/toBuy/{id}',
+        [OrderTickets::class, 'toBuy'])->middleware('auth:api')->middleware('admin');
 });
 
 

@@ -6,6 +6,7 @@ namespace Tickets\Shared\Domain\ValueObject;
 
 use InvalidArgumentException;
 use Tickets\Shared\Domain\Entity\EntityDataInterface;
+
 final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
@@ -55,6 +56,7 @@ final class Status implements EntityDataInterface
 
     public function toJson(): string
     {
+        $result = $this->name;
         return $this->name;
     }
 
@@ -65,7 +67,22 @@ final class Status implements EntityDataInterface
 
     public function isCorrectNextStatus(Status $nextStatus): bool
     {
-        return isset(self::ROLE_CHANCE_STATUS[$this->name][(string)$nextStatus]);
+        $strNextStatus = (string) $nextStatus;
+        $role = self::ROLE_CHANCE_STATUS[$this->name];
+        $result = in_array($strNextStatus, $role, true);
+
+        return in_array($strNextStatus, $role, true);
+    }
+
+    public function getListNextStatus(): array
+    {
+        $result = [];
+
+        foreach (self::ROLE_CHANCE_STATUS[$this->name] as $status) {
+            $result[$status] = (new self($status))->getHumanStatus();
+        }
+
+        return $result;
     }
 
     public function isPaid(): bool

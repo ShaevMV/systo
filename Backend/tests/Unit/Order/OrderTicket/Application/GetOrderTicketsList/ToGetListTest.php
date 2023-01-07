@@ -39,6 +39,7 @@ class ToGetListTest extends TestCase
     public function test_is_correct_list(): void
     {
         $result = $this->toGetList->listByUser(new Uuid(UserSeeder::ID_FOR_USER_UUID));
+        $array = $result->toArray();
         self::assertNotEmpty($result);
     }
 
@@ -50,6 +51,7 @@ class ToGetListTest extends TestCase
 
     /**
      * @throws JsonException
+     * @throws \Nette\Utils\JsonException
      */
     public function test_is_filter(): void
     {

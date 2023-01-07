@@ -15,3 +15,7 @@ export const addCommentByOrderItem = (state, payload) => {
     state.orderItem.comment.push(payload);
 };
 
+export const chanceStatus = (state, payload) => {
+    state.orderList.find(item => item.id === payload.id).humanStatus = payload.humanStatus;
+    state.orderList.find(item => item.id === payload.id).status = payload.status;
+};

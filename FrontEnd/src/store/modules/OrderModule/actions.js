@@ -75,7 +75,6 @@ export const loadOrderItem = (context, payload) => {
  * @param payload
  */
 export const sendCommentByOrder = (context, payload) => {
-    console.log(payload);
     let promise = axios.post('/api/v1/festival/ticketsOrder/sendComment/', payload);
     promise.then(function (response) {
         context.commit('addCommentByOrderItem', {
@@ -89,3 +88,18 @@ export const sendCommentByOrder = (context, payload) => {
         context.commit('setError', error.response.data.errors);
     });
 };
+
+export const sendToBuy = (context, payload) => {
+    let promise = axios.post('/api/v1/festival/ticketsOrder/toBuy/' + payload);
+    promise.then(function (response) {
+        context.commit('chanceStatus', {
+            'id': payload,
+            'humanStatus': response.data.humanStatus,
+            'status': response.data.status
+        })
+        console.log(response)
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}

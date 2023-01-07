@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
 use Throwable;
+use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
@@ -30,6 +31,7 @@ class OrderTickets extends Controller
         private PriceService $priceService,
         private GetOrder $getOrder,
         private TotalNumber $totalNumber,
+        private ChanceStatus $chanceStatus,
     ) {
     }
 
@@ -99,7 +101,7 @@ class OrderTickets extends Controller
      */
     public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
-        $listResponse =  $this->getOrder->listByFilter(
+        $listResponse = $this->getOrder->listByFilter(
             OrderFilterQuery::fromState($filterForTicketOrder->toArray())
         ) ?? new ListResponse();
 
@@ -121,7 +123,7 @@ class OrderTickets extends Controller
 
         if (is_null($orderItem) ||
             (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
-            && !Auth::user()->is_admin)
+                && !Auth::user()->is_admin)
         ) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']
@@ -129,5 +131,30 @@ class OrderTickets extends Controller
         }
 
         return response()->json($orderItem->toArray());
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function toBuy(string $id): JsonResponse
+    {
+        try {
+            $status = new Status(Status::PAID);
+            $this->chanceStatus->chance(
+                new Uuid($id),
+                $status
+            );
+
+            return response()->json([
+                'success' => true,
+                'humanStatus' => $status->getHumanStatus(),
+                'status' => Status::PAID,
+            ]);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'massage' => $throwable->getMessage()
+            ], 422);
+        }
     }
 }

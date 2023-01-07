@@ -68,6 +68,7 @@ router.beforeEach((to, from, next) => {
         let token = (localStorage['user.token'] !== undefined && localStorage['user.token'] !== '' && localStorage['user.token'] !== null);
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {
+                console.log(213);
                 next({
                     path: '/login',
                     query: {

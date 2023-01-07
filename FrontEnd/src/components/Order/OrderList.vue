@@ -16,6 +16,7 @@
           <th scope="col">Дата покупики билета</th>
           <th scope="col">Статус</th>
           <th scope="col">Комментарий</th>
+          <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -36,6 +37,19 @@
           <td>{{ itemOrder.dateBuy }}</td>
           <td>{{ itemOrder.humanStatus }}</td>
           <td>{{ itemOrder.lastComment }}</td>
+          <td>
+            <div class="btn-group" v-if="isAdmin">
+              <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                      aria-expanded="false">
+                ...
+              </button>
+              <div class="dropdown-menu">
+                <span class="dropdown-item"
+                      v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
+                      @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+              </div>
+            </div>
+          </td>
         </tr>
         </tbody>
       </table>
@@ -44,7 +58,7 @@
 </template>
 
 <script>
-import {mapGetters} from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "OrderList",
@@ -59,6 +73,16 @@ export default {
       'getOrderList'
     ]),
   },
+  methods: {
+    ...mapActions('appOrder', [
+      'sendToBuy'
+    ]),
+    chanceStatus(status, id) {
+      if (status === 'paid') {
+        this.sendToBuy(id);
+      }
+    }
+  }
 }
 </script>
 

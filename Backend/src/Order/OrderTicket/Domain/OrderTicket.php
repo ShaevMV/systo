@@ -9,6 +9,7 @@ use JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
 final class OrderTicket extends AggregateRoot
 {
@@ -58,6 +59,12 @@ final class OrderTicket extends AggregateRoot
     public static function toPaid(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $orderTicketDto->getGuests(),
+            $orderTicketDto->getEmail(),
+        ));
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
                 $orderTicketDto->getId(),

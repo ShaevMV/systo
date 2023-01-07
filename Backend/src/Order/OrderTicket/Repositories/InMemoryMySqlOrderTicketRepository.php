@@ -18,6 +18,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Shared\Domain\Criteria\Filter;
 use Tickets\Shared\Domain\Criteria\Filters;
+use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
@@ -156,5 +157,24 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
 
         return $result;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function chanceStatus(Uuid $orderId, Status $newStatus): bool
+    {
+        DB::beginTransaction();
+        try {
+            $order = $this->model::find($orderId->value());
+            $order->status = (string) $newStatus;
+            $order->save();
+            DB::commit();
+
+            return true;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
     }
 }

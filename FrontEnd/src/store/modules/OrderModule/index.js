@@ -19,6 +19,7 @@ export default {
             dateBuy: null,
             email: null,
             lastComment: null,
+            listCorrectNextStatus: [],
         },
     },
     getters,

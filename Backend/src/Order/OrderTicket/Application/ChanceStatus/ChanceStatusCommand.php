@@ -2,14 +2,15 @@
 
 namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
+use Tickets\Shared\Domain\Bus\Command\Command;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class ChanceStatusCommand
+class ChanceStatusCommand implements Command
 {
     public function __construct(
-        private Status $nextStatus,
         private Uuid $orderId,
+        private Status $nextStatus,
     ){
     }
 

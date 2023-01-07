@@ -28,6 +28,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected string $typeOfPaymentName,
         protected Status $status,
         protected Carbon $dateBuy,
+        protected array $listCorrectNextStatus,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
     ) {
@@ -45,7 +46,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         foreach ($guestsRaw as $guest) {
             $guests[] = GuestsDto::fromState($guest);
         }
-
+        $status = new Status($data['status']);
         return new self(
             new Uuid($data['id']),
             $data['email'],
@@ -53,8 +54,9 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             (float) $data['price'] - (float) $data['discount'],
             $guests,
             $data['payment_name'],
-            new Status($data['status']),
+            $status,
             new Carbon($data['date']),
+            $status->getListNextStatus(),
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
         );
