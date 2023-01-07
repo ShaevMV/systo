@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('number');
             $table->string('name');
             $table->string('status')->default('new');
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

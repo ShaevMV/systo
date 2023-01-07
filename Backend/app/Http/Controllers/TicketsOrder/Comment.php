@@ -33,6 +33,6 @@ class Comment extends Controller
         return response()->json([
             'success' => true,
             'created_at' => date("Y-m-d H:i:s")
-        ], 200);
+        ]);
     }
 }

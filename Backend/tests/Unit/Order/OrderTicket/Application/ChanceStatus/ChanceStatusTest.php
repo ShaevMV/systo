@@ -34,8 +34,40 @@ class ChanceStatusTest extends TestCase
     public function test_is_correct_chance_status_to_buy(): void
     {
         $this->chanceStatus->chance(
-            new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
+            new Uuid('5f78e8aa-b869-4733-ade8-8b5343306cf7'),
             new Status(Status::PAID)
         );
+
+        self::assertTrue(true);
     }
+
+
+
+    /**
+     * @throws Throwable
+     */
+    public function test_is_correct_chance_status_to_difficulties_arose(): void
+    {
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
+            new Status(Status::DIFFICULTIES_AROSE),
+            'Что то пошло не так'
+        );
+
+        self::assertTrue(true);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function test_is_correct_chance_status_to_cancel(): void
+    {
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
+            new Status(Status::CANCEL)
+        );
+
+        self::assertTrue(true);
+    }
+
 }

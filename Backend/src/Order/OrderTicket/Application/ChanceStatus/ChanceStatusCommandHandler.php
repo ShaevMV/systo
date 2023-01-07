@@ -34,11 +34,25 @@ class ChanceStatusCommandHandler implements CommandHandler
             нельзя перевести в статус ".$command->getNextStatus()->getHumanStatus());
         }
 
+
         if ($command->getNextStatus()->isPaid()) {
             $orderTicket = OrderTicket::toPaid($orderTicketDto);
             $list = $orderTicket->pullDomainEvents();
             $this->bus::chain($list)->dispatch();
         }
+
+        if ($command->getNextStatus()->isCancel()) {
+            $orderTicket = OrderTicket::toCancel($orderTicketDto);
+            $list = $orderTicket->pullDomainEvents();
+            $this->bus::chain($list)->dispatch();
+        }
+
+        if ($command->getNextStatus()->isdDifficultiesArose()) {
+            $orderTicket = OrderTicket::toDifficultiesArose($orderTicketDto);
+            $list = $orderTicket->pullDomainEvents();
+            $this->bus::chain($list)->dispatch();
+        }
+
 
         $this->orderTicketRepository->chanceStatus(
             $command->getOrderId(),

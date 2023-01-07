@@ -38,15 +38,23 @@
           <td>{{ itemOrder.humanStatus }}</td>
           <td>{{ itemOrder.lastComment }}</td>
           <td>
-            <div class="btn-group" v-if="isAdmin">
+            <div class="btn-group">
               <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                       aria-expanded="false">
                 ...
               </button>
-              <div class="dropdown-menu">
-                <span class="dropdown-item"
+              <div class="dropdown-menu" v-if="isAdmin">
+                <span class="dropdown-item btn-link"
+                      role="button"
                       v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
                       @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+              </div>
+              <div class="dropdown-menu" v-else>
+                <span class="dropdown-item btn-link"
+                      :class="{ disabled : itemOrder.status !== 'paid'}"
+                      :aria-disabled=" itemOrder.status !== 'paid' "
+                      role="button"
+                      @click="downloadTicket(itemOrder.id)">Скачать PDF</span>
               </div>
             </div>
           </td>
@@ -75,12 +83,26 @@ export default {
   },
   methods: {
     ...mapActions('appOrder', [
-      'sendToBuy'
+      'sendToChanceStatus',
+      'getUrlForPdf'
     ]),
+    /**
+     * Сменить статус
+     * @param status
+     * @param id
+     */
     chanceStatus(status, id) {
-      if (status === 'paid') {
-        this.sendToBuy(id);
-      }
+      this.sendToChanceStatus({
+        'id': id,
+        'status': status
+      });
+    },
+    /**
+     * Скачать билеты
+     * @param id
+     */
+    downloadTicket(id) {
+      this.getUrlForPdf(id);
     }
   }
 }

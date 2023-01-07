@@ -9,6 +9,7 @@ use JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
 final class OrderTicket extends AggregateRoot
@@ -66,9 +67,48 @@ final class OrderTicket extends AggregateRoot
             $orderTicketDto->getEmail(),
         ));
 
-        $result->record(new ProcessUserNotificationNewOrderTicket(
+        $result->record(new ProcessUserNotificationOrderPaid(
                 $orderTicketDto->getId(),
-                $orderTicketDto->getUserId(),
+                $orderTicketDto->getEmail(),
+            )
+        );
+
+        return $result;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function toCancel(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCancelTicket(
+            $result->id,
+        ));
+
+        $result->record(new ProcessUserNotificationOrderCancel(
+                $orderTicketDto->getId(),
+                $orderTicketDto->getEmail(),
+            )
+        );
+
+        return $result;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public static function toDifficultiesArose(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCancelTicket(
+            $result->id,
+        ));
+
+        $result->record(new ProcessUserNotificationOrderCancel(
+                $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
             )
         );

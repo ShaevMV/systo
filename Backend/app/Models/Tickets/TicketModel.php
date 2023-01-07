@@ -6,6 +6,9 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Tickets\Shared\Infrastructure\Models\HasUuid;
 
 /**
  * App\Models\Tickets\TicketModel
@@ -19,8 +22,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $number
  * @property string $name
  * @property string $status
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  * @method static Builder|TicketModel whereCreatedAt($value)
  * @method static Builder|TicketModel whereId($value)
  * @method static Builder|TicketModel whereName($value)
@@ -31,7 +34,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class TicketModel extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, HasUuid;
 
     public const TABLE = 'tickets';
     protected $table = self::TABLE;
@@ -40,6 +43,4 @@ class TicketModel extends Model
     protected $fillable = [
         'id', 'order_ticket_id', 'number', 'name', 'status'
     ];
-
-
 }

@@ -20,6 +20,9 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
     ) {
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function handle(
         CreatingQrCodeService $codeInPdfService,
     ): void
@@ -28,6 +31,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
             $qrCode = $codeInPdfService->createQrCode($this->ticketId);
             $codeInPdfService->createPdf($qrCode, $this->ticketId);
         } catch (\Throwable $throwable) {
+            \Log::error($throwable->getMessage());
             throw $throwable;
         }
     }

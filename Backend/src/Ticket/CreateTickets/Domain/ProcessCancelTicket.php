@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Domain;
 
@@ -13,15 +13,13 @@ use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
-class ProcessCreateTicket implements ShouldQueue, DomainEvent
+class ProcessCancelTicket implements ShouldQueue, DomainEvent
 {
     use Dispatchable, InteractsWithQueue, Queueable;
 
     public function __construct(
         private Uuid $orderId,
-        private array $quests,
-        private string $email
-    ){
+    ) {
     }
 
     /**
@@ -29,8 +27,7 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
      */
     public function handle(
         TicketApplication $application
-    ): void
-    {
-        $application->createList($this->orderId, $this->quests);
+    ): void {
+        $application->cancelTicket($this->orderId);
     }
 }

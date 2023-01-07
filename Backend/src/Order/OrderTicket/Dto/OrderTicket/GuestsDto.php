@@ -33,4 +33,9 @@ final class GuestsDto implements EntityDataInterface
         $r = Json::encode(['value'=>$this->value]);
         return Json::encode(['value'=>$this->value]);
     }
+
+    public function getValue(): string
+    {
+        return $this->value;
+    }
 }

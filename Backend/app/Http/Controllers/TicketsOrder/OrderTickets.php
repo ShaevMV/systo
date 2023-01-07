@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
 use Throwable;
@@ -21,6 +22,8 @@ use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Application\TicketApplication;
+use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
 use Tickets\User\Account\Application\AccountApplication;
 
 class OrderTickets extends Controller
@@ -32,6 +35,7 @@ class OrderTickets extends Controller
         private GetOrder $getOrder,
         private TotalNumber $totalNumber,
         private ChanceStatus $chanceStatus,
+        private TicketApplication $ticketApplication,
     ) {
     }
 
@@ -134,12 +138,14 @@ class OrderTickets extends Controller
     }
 
     /**
+     * Сменить статус заказа
+     *
      * @throws Throwable
      */
-    public function toBuy(string $id): JsonResponse
+    public function toChanceStatus(string $id, Request $request): JsonResponse
     {
         try {
-            $status = new Status(Status::PAID);
+            $status = new Status($request->get('status'));
             $this->chanceStatus->chance(
                 new Uuid($id),
                 $status
@@ -147,8 +153,34 @@ class OrderTickets extends Controller
 
             return response()->json([
                 'success' => true,
-                'humanStatus' => $status->getHumanStatus(),
-                'status' => Status::PAID,
+                'status' => [
+                    'name' => $request->get('status'),
+                    'humanStatus' => $status->getHumanStatus(),
+                    'listCorrectNextStatus' => $status->getListNextStatus(),
+                ]
+            ]);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'massage' => $throwable->getMessage()
+            ], 422);
+        }
+    }
+
+    /**
+     * Получить список билетов в PDF
+     *
+     * @param  string  $id
+     * @return JsonResponse
+     */
+    public function getUrlListForPdf(string $id): JsonResponse
+    {
+        try {
+            $urlsTicketPdfResponse = $this->ticketApplication->getPdfList(new Uuid($id));
+
+            return response()->json([
+                'success' => true,
+                'listUrl' => $urlsTicketPdfResponse->getUrls()
             ]);
         } catch (Throwable $throwable) {
             return response()->json([

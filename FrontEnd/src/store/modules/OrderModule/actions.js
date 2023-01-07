@@ -89,13 +89,35 @@ export const sendCommentByOrder = (context, payload) => {
     });
 };
 
-export const sendToBuy = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/ticketsOrder/toBuy/' + payload);
+/**
+ * Сменить статус у заказа
+ *
+ * @param context
+ * @param payload
+ */
+export const sendToChanceStatus = (context, payload) => {
+    let promise = axios.post('/api/v1/festival/ticketsOrder/toChanceStatus/' + payload.id, {
+        'status': payload.status
+    });
     promise.then(function (response) {
         context.commit('chanceStatus', {
-            'id': payload,
-            'humanStatus': response.data.humanStatus,
-            'status': response.data.status
+            'id': payload.id,
+            'humanStatus': response.data.status.humanStatus,
+            'status': response.data.status.name,
+            'listCorrectNextStatus': response.data.status.listCorrectNextStatus,
+        })
+        console.log(response)
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}
+
+export const getUrlForPdf = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/ticketsOrder/getTicketPdf/' + payload);
+    promise.then(function (response) {
+        response.data.listUrl.forEach(function (item) {
+            window.open(item)
         })
         console.log(response)
     }).catch(function (error) {
