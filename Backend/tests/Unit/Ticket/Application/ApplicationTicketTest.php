@@ -14,7 +14,7 @@ use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ApplicationTicketTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     private TicketApplication $TicketApplication;
 
@@ -50,5 +50,6 @@ class ApplicationTicketTest extends TestCase
         $tickets = $this->TicketApplication->getPdfList(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER)
         );
+        $f = 5;
     }
 }

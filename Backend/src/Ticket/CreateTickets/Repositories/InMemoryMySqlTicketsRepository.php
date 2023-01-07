@@ -26,7 +26,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     {
         DB::beginTransaction();
         try {
-            $this->model::create($ticketDto->toArray());
+            $this->model::insert($ticketDto->toArray());
             DB::commit();
             return true;
         } catch (\Exception $exception) {
