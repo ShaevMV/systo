@@ -38,3 +38,12 @@ export const getComment = state => {
     return state.orderItem.comment;
 };
 
+/**
+ * Вывести данные об общем колве заказов
+ *
+ * @param state
+ * @returns {{totalAmount: number, totalCountToPaid: number, totalCount: number}}
+ */
+export const getTotalNumber = state => {
+    return state.totalNumber;
+};

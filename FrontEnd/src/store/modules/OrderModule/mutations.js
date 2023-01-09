@@ -7,6 +7,10 @@ export const setOrderUserList = (state, payload) => {
     state.orderList = payload;
 };
 
+export const setTotalNumber = (state, payload) => {
+    state.totalNumber = payload;
+};
+
 export const setOrderItem = (state, payload) => {
     state.orderItem = payload;
 };

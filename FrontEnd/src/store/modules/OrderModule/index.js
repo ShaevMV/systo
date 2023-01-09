@@ -7,6 +7,11 @@ export default {
     state: {
         dataError: [],
         orderList: [],
+        totalNumber: {
+            totalAmount: 0,
+            totalCount: 0,
+            totalCountToPaid: 0,
+        },
         orderItem: {
             name: null,
             count: 0,

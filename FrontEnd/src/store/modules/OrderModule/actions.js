@@ -43,6 +43,7 @@ export const getOrderListForAdmin = (context, payload) => {
     let promise = axios.post('/api/v1/festival/ticketsOrder/getList', payload);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
+        context.commit('setTotalNumber', response.data.totalNumber);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);

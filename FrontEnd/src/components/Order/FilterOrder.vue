@@ -10,7 +10,7 @@
           <select class="form-select"
                   v-model="typeOrder"
                   id="validationDefault01">
-            <option value="null">Выберите тип оргвзноса</option>
+            <option value=null>Выберите тип оргвзноса</option>
             <option v-for="(typeTickets) in getTicketType"
                     v-bind:key="typeTickets.id"
                     v-bind:value="typeTickets.id">{{ typeTickets.name }} /
@@ -24,7 +24,7 @@
           <select class="form-select"
                   v-model="typesOfPayment"
                   id="validationDefault01">
-            <option disabled value="null">Выберите способ покупки билета</option>
+            <option value=null>Выберите способ покупки билета</option>
             <option v-for="(typesOfPayment) in getTypesOfPayment"
                     v-bind:key="typesOfPayment.id"
                     v-bind:value="typesOfPayment.id">{{ typesOfPayment.name }}
@@ -50,7 +50,7 @@
           <select class="form-select"
                   v-model="status"
                   id="validationDefault01">
-            <option value="null">Выберите статус заказа</option>
+            <option value=null>Выберите статус заказа</option>
             <option value="new">Новый</option>
             <option value="paid">Оплаченный</option>
             <option value="cancel">Отменёный</option>
