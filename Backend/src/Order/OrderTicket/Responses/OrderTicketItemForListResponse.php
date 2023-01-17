@@ -29,6 +29,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected Status $status,
         protected Carbon $dateBuy,
         protected array $listCorrectNextStatus,
+        protected string $idBuy,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
     ) {
@@ -57,6 +58,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $status,
             new Carbon($data['date']),
             $status->getListNextStatus(),
+            $data['id_buy'],
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
         );

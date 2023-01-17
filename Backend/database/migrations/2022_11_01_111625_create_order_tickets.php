@@ -16,7 +16,10 @@ return new class extends Migration {
         Schema::create('order_tickets', static function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->json('guests');
+            $table->string('guests')->nullable(false);
 
+            $table->uuid('festival_id');
+            $table->foreign('festival_id')->references('id')->on('festivals');
 
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users');
@@ -25,6 +28,7 @@ return new class extends Migration {
             $table->foreign('ticket_type_id')->references('id')->on('ticket_type');
 
             $table->string('promo_code')->nullable()->default(null);
+            $table->string('id_buy')->nullable(false);
 
             $table->string('types_of_payment_id');
             $table->foreign('types_of_payment_id')->references('id')->on('types_of_payment');

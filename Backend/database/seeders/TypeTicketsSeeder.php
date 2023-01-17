@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -24,17 +25,23 @@ class TypeTicketsSeeder extends Seeder
             'id' => self::ID_FOR_FIRST_WAVE,
             'name' => 'Первая волна',
             'price' => self::PRICE_FOR_FIRST_WAVE,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
         DB::table('ticket_type')->insert([
             'id' => self::ID_FOR_REGIONS,
             'name' => 'Для регионов',
-            'price' => '900'
+            'price' => '900',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
         DB::table('ticket_type')->insert([
             'id' => self::ID_FOR_LOVE,
             'name' => 'ЗА ЛЮБОВЬ',
             'price' => '1700',
-            'groupLimit' => 2
+            'groupLimit' => 2,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

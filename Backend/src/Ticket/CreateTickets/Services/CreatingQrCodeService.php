@@ -3,10 +3,9 @@
 namespace Tickets\Ticket\CreateTickets\Services;
 
 use Endroid\QrCode\Label\Font\OpenSans;
-use PDF;
+use Pdf;
 use Endroid\QrCode\Writer\Result\ResultInterface;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -35,10 +34,11 @@ class CreatingQrCodeService
             ->build();
     }
 
-    public function createPdf(ResultInterface $qrCode, Uuid $ticketId): void
+    public function createPdf(ResultInterface $qrCode, Uuid $ticketId, string $name): void
     {
-        $pdf = PDF::loadView('pdf', [
-            'url' => $qrCode->getDataUri()
+        $pdf = Pdf::loadView('pdf', [
+            'url' => $qrCode->getDataUri(),
+            'name' => $name,
         ]);
 
         $pdf->save(storage_path("app/public/tickets/{$ticketId->value()}.pdf"));

@@ -114,7 +114,7 @@
                         <label for="form_need">Тип оргвзноса: *</label>
                         <select id="form_need"
                                 name="need"
-                                class="form-control"
+                                class="form-select"
                                 required="required"
                                 v-model="selectTypeTicket"
                                 data-error="Please specify your need.">
@@ -327,9 +327,10 @@ export default {
       },
       set: function (newValue) {
         let oldId = this.getSelectTicketTypeId;
+
         this.setSelectTicketType(newValue);
         if (this.getSelectTicketType !== null) {
-          if (!this.isAllowedGuest) {
+          if (!this.isAllowedGuest(this.guests.length)) {
             alert('Привышен лимин по данному типу доступна только ' + this.getSelectTicketTypeLimit);
             this.setSelectTicketType(oldId);
           }

@@ -13,14 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comment', static function (Blueprint $table) {
+        Schema::create('festivals', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id');
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->uuid('order_tickets_id');
-            $table->foreign('order_tickets_id')->references('id')->on('order_tickets');
-            $table->text('comment');
-            $table->boolean('is_checkin')->default(false);
+            $table->year('year');
+            $table->boolean('active')->default(false);
+
             $table->timestamps();
         });
     }
@@ -32,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comment');
+        Schema::dropIfExists('festivals');
     }
 };

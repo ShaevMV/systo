@@ -22,6 +22,7 @@ export default {
             typeOfPaymentName: null,
             humanStatus: null,
             dateBuy: null,
+            idBuy: null,
             email: null,
             lastComment: null,
             listCorrectNextStatus: [],

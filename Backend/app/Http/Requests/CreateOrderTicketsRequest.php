@@ -8,6 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property string|null $email
  * @property string $date
+ * @property string $id_buy
  * @property array $guests
  * @property string|null $promo_code
  * @property string $ticket_type_id
@@ -20,7 +21,7 @@ class CreateOrderTicketsRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -30,7 +31,7 @@ class CreateOrderTicketsRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             //

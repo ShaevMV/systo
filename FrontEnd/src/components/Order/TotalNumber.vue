@@ -3,13 +3,13 @@
     <div class="card-body">
       <h5 class="card-title">Отчёт о билетах</h5>
       <p>
-      <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
+        <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
       </p>
       <p>
-      <b>На сумму:</b><span> {{ getTotalAmount }} </span>
+        <b>На сумму:</b><span> {{ getTotalAmount }} </span>
       </p>
       <p>
-        <b>Всего билетов:</b><span> {{ getTotalCount }} </span>
+        <b>Всего заказов:</b><span> {{ getTotalCount }} </span>
       </p>
     </div>
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
 use Carbon\Carbon;
+use Database\Seeders\FestivalSeeder;
+use Exception;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\ValueObject\CommentForOrder;
@@ -17,6 +19,7 @@ final class OrderTicketDto extends AbstractionEntity implements Response
 {
     protected Carbon $created_at;
     protected Carbon $updated_at;
+    protected Uuid $festival_id;
 
     public function __construct(
         protected Uuid $user_id,
@@ -25,6 +28,7 @@ final class OrderTicketDto extends AbstractionEntity implements Response
         protected Carbon $date,
         private PriceDto $price,
         protected Status $status,
+        protected string $id_buy,
         protected Uuid $types_of_payment_id,
         protected Uuid $ticket_type_id,
         protected ?string $promo_code = null,
@@ -36,13 +40,14 @@ final class OrderTicketDto extends AbstractionEntity implements Response
         private ?TypesOfPaymentDto $type_of_payment = null,
         private array $commentForOrder = [],
     ) {
+        $this->festival_id = new Uuid(FestivalSeeder::ID_FOR_2023_FESTIVAL);
         $this->created_at = $created_at ?? new Carbon();
         $this->updated_at = $updated_at ?? new Carbon();
     }
 
     /**
      * @throws JsonException
-     * @throws \Exception
+     * @throws Exception
      */
     public static function fromState(array $data): self
     {
@@ -61,7 +66,7 @@ final class OrderTicketDto extends AbstractionEntity implements Response
 
         $comments = [];
         foreach ($data['comments'] ?? [] as $comment) {
-            $comments[]= CommentForOrder::fromState($comment);
+            $comments[] = CommentForOrder::fromState($comment);
         }
 
         return new self(
@@ -71,6 +76,7 @@ final class OrderTicketDto extends AbstractionEntity implements Response
             new Carbon($data['date']),
             PriceDto::fromState($data),
             new Status($data['status']),
+            $data['id_buy'],
             new Uuid($data['types_of_payment_id']),
             new Uuid($data['ticket_type_id']),
             $data['promo_code'] ?? null,

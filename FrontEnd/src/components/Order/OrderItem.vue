@@ -1,6 +1,7 @@
 <template>
-  <div class="card">
-    <div class="card-body">
+  <div>
+    <div class="card">
+      <div class="card-body">
         <h5 class="card-title">Заказ от {{ getDateBuy }}</h5>
         <table class="table table-hover">
           <thead>
@@ -26,15 +27,21 @@
           </tr>
           </tbody>
         </table>
+      </div>
     </div>
+    <order-button
+        :id="getId"
+        :status="getStatus"/>
   </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
+import OrderButton from "@/components/Order/OrderButton.vue";
 
 export default {
   name: "OrderItem",
+  components: {OrderButton},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
@@ -84,8 +91,14 @@ export default {
     getHumanStatus: function () {
       return this.getOrderItem.humanStatus;
     },
+    getStatus: function () {
+      return this.getOrderItem.status;
+    },
     getDateBuy: function () {
       return this.getOrderItem.dateBuy;
+    },
+    getId: function () {
+      return this.getOrderItem.id;
     }
   },
 }

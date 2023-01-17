@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -28,13 +29,17 @@ class OrderSeeder extends Seeder
                     'value' => 'test',
                 ]
             ], JSON_THROW_ON_ERROR),
+            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+            'id_buy' => '2312',
             'user_id' => UserSeeder::ID_FOR_USER_UUID,
             'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
             'promo_code' => PromoCodSeeder::NAME_FOR_SYSTO,
             'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
             'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
             'discount' => PromoCodSeeder::DISCOUNT_FOR_SYSTO,
-            'date' => '2022-12-16 18:24:00'
+            'date' => '2022-12-16 18:24:00',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
 
         DB::table('order_tickets')->insert([
@@ -44,11 +49,15 @@ class OrderSeeder extends Seeder
                     'value' => 'test',
                 ]
             ], JSON_THROW_ON_ERROR),
+            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+            'id_buy' => '2312',
             'user_id' => UserSeeder::ID_FOR_USER_UUID,
             'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
             'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
             'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
-            'date' => '2022-12-16 18:24:00'
+            'date' => '2022-12-16 18:24:00',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

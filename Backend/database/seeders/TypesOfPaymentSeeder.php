@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -23,14 +24,20 @@ class TypesOfPaymentSeeder extends Seeder
         DB::table('types_of_payment')->insert([
             'id' => self::ID_FOR_SBER_BANK,
             'name' => 'Карта Сбербанка 4276 5501 0313 4998',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
         DB::table('types_of_payment')->insert([
             'id' => self::ID_FOR_QIWI,
             'name' => 'Qiwi money 9789830301',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
         DB::table('types_of_payment')->insert([
             'id' => self::ID_FOR_YANDEX,
             'name' => 'ЮMoney (Яндекс.Деньги) 410012835840761',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

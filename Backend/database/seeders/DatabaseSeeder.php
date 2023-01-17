@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         private UserSeeder $userSeeder,
         private OrderSeeder $orderSeeder,
         private CommentSeeder $commentSeeder,
+        private FestivalSeeder $festivalSeeder,
     ) {
     }
 
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->festivalSeeder->run();
         $this->typeTicketsSeeder->run();
         $this->typesOfPaymentSeeder->run();
         $this->promoCodSeeder->run();

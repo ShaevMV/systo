@@ -119,23 +119,23 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getList(Filters $filters): array
     {
-       $builder = $this->model::leftJoin(
+        $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE.'.user_id',
             '=',
             User::TABLE.'.id')
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
                 '=',
                 TicketTypesModel::TABLE.'.id')
-           ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
-               '=',
-               TypesOfPaymentModel::TABLE.'.id')
-           ->select([
-               $this->model::TABLE.'.*',
-               User::TABLE.'.email',
-               TicketTypesModel::TABLE.'.name',
-               TypesOfPaymentModel::TABLE.'.name as payment_name'
-           ])
-           ->selectSub($this->getSubQueryLastComment(), 'last_comment');
+            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
+                '=',
+                TypesOfPaymentModel::TABLE.'.id')
+            ->select([
+                $this->model::TABLE.'.*',
+                User::TABLE.'.email',
+                TicketTypesModel::TABLE.'.name',
+                TypesOfPaymentModel::TABLE.'.name as payment_name'
+            ])
+            ->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
         /** @var Filter $filter */
         foreach ($filters as $filter) {

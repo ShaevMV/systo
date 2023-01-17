@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -27,6 +28,8 @@ class UserSeeder extends Seeder
             'email' => self::EMAIL_ADMIN,
             'password' => Hash::make('password'),
             'is_admin' => true,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
 
         DB::table('users')->insert([
@@ -35,6 +38,8 @@ class UserSeeder extends Seeder
             'email' => self::EMAIL_USER,
             'password' => Hash::make('password'),
             'is_admin' => false,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

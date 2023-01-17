@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +26,8 @@ class CommentSeeder extends Seeder
             'user_id' => UserSeeder::ID_FOR_USER_UUID,
             'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
             'comment' => 'Test request',
-            'created_at' => date("Y-m-d H:i:s"),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
 
         DB::table('comment')->insert([
@@ -33,7 +35,8 @@ class CommentSeeder extends Seeder
             'user_id' => UserSeeder::ID_FOR_ADMIN_UUID,
             'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
             'comment' => 'Test response',
-            'created_at' => date("Y-m-d H:i:s"),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

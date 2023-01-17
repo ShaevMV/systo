@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,9 @@ class PromoCodSeeder extends Seeder
         DB::table('promo_code')->insert([
             'id' => self::ID_FOR_SYSTO,
             'name' => self::NAME_FOR_SYSTO,
-            'discount' => self::DISCOUNT_FOR_SYSTO
+            'discount' => self::DISCOUNT_FOR_SYSTO,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
         ]);
     }
 }

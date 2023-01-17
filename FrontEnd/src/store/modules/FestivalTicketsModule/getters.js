@@ -90,6 +90,6 @@ export const getPromoCodeName = state => {
 /**
  * Проверка на соответсвие условием группавого типа билета
  */
-export const isAllowedGuest = state => count => {
-    return state.selectTicketType.groupLimit === null || this.getSelectTicketTypeLimit >= count;
+export const isAllowedGuest = (state,getters) => count => {
+    return state.selectTicketType.groupLimit === null || getters.getSelectTicketTypeLimit >= count;
 };

@@ -12,7 +12,8 @@
           <th scope="col">Стоимость</th>
           <th scope="col">Кол-во билетов</th>
           <th scope="col">Промо код</th>
-          <th scope="col" v-if="isAdmin">Способ покупки билета</th>
+          <th scope="col">Способ покупки билета</th>
+          <th scope="col">Информация о платеже</th>
           <th scope="col">Дата покупики билета</th>
           <th scope="col">Статус</th>
           <th scope="col">Комментарий</th>
@@ -20,41 +21,33 @@
         </tr>
         </thead>
         <tbody>
-        <tr v-for="(itemOrder,index) in getOrderList" v-bind:key="index">
+        <tr v-for="(itemOrder,index) in getOrderList"
+            v-bind:key="index"
+            @click="goItemOrder(itemOrder.id)">
           <th scope="row">
-            <router-link
-                class="nav-link"
-                active-class="active"
-                :to="{ name: 'orderItems', params: { id: itemOrder.id }}">{{ index + 1 }}
-            </router-link>
+            {{ index + 1 }}
           </th>
           <td v-if="isAdmin">{{ itemOrder.email }}</td>
           <td>{{ itemOrder.name }}</td>
           <td>{{ itemOrder.price }}</td>
           <td>{{ itemOrder.count }}</td>
           <td>{{ itemOrder.promoCode }}</td>
-          <td v-if="isAdmin">{{ itemOrder.typeOfPaymentName }}</td>
+          <td>{{ itemOrder.typeOfPaymentName }}</td>
+          <td>{{ itemOrder.idBuy }}</td>
           <td>{{ itemOrder.dateBuy }}</td>
           <td>{{ itemOrder.humanStatus }}</td>
           <td>{{ itemOrder.lastComment }}</td>
           <td>
-            <div class="btn-group">
+            <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
               <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                       aria-expanded="false">
                 ...
               </button>
-              <div class="dropdown-menu" v-if="isAdmin">
+              <div class="dropdown-menu">
                 <span class="dropdown-item btn-link"
                       role="button"
                       v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
                       @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
-              </div>
-              <div class="dropdown-menu" v-else>
-                <span class="dropdown-item btn-link"
-                      :class="{ disabled : itemOrder.status !== 'paid'}"
-                      :aria-disabled=" itemOrder.status !== 'paid' "
-                      role="button"
-                      @click="downloadTicket(itemOrder.id)">Скачать PDF</span>
               </div>
             </div>
           </td>
@@ -76,16 +69,20 @@ export default {
       default: false,
     }
   },
-  computed: {
+    computed: {
     ...mapGetters('appOrder', [
       'getOrderList'
     ]),
   },
   methods: {
     ...mapActions('appOrder', [
-      'sendToChanceStatus',
-      'getUrlForPdf'
+      'sendToChanceStatus'
     ]),
+    goItemOrder(idOrderItem) {
+      if(!this.isAdmin) {
+        this.$router.push({ name: 'orderItems', params: { id: idOrderItem }});
+      }
+    },
     /**
      * Сменить статус
      * @param status
@@ -97,13 +94,7 @@ export default {
         'status': status
       });
     },
-    /**
-     * Скачать билеты
-     * @param id
-     */
-    downloadTicket(id) {
-      this.getUrlForPdf(id);
-    }
+
   }
 }
 </script>

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tickets', static function (Blueprint $table) {
-            $table->uuid('id');
+            $table->uuid('id')->primary();
 
             $table->uuid('order_ticket_id');
             $table->foreign('order_ticket_id')->references('id')->on('order_tickets');

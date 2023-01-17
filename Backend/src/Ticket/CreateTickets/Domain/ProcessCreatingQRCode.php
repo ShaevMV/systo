@@ -17,6 +17,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
 
     public function __construct(
         private Uuid $ticketId,
+        private string $name,
     ) {
     }
 
@@ -29,7 +30,11 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
     {
         try {
             $qrCode = $codeInPdfService->createQrCode($this->ticketId);
-            $codeInPdfService->createPdf($qrCode, $this->ticketId);
+            $codeInPdfService->createPdf(
+                $qrCode,
+                $this->ticketId,
+                $this->name,
+            );
         } catch (\Throwable $throwable) {
             \Log::error($throwable->getMessage());
             throw $throwable;
