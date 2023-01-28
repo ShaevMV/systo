@@ -4,7 +4,7 @@ install
 
   git clone https://github.com/ShaevMV/systo.git
   
-  cd systo
+  cd systo/Backend
   
   mv .env.example .env
   
