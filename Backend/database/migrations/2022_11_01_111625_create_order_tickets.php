@@ -15,8 +15,7 @@ return new class extends Migration {
     {
         Schema::create('order_tickets', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->json('guests');
-            $table->string('guests')->nullable(false);
+            $table->json('guests')->nullable(false);
 
             $table->uuid('festival_id');
             $table->foreign('festival_id')->references('id')->on('festivals');
