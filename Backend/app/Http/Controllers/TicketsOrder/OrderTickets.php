@@ -7,24 +7,28 @@ namespace App\Http\Controllers\TicketsOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
+use Database\Seeders\FestivalSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
 use Throwable;
+use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
-use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
 use Tickets\User\Account\Application\AccountApplication;
+use Tickets\User\Account\Dto\AccountDto;
 
 class OrderTickets extends Controller
 {
@@ -36,6 +40,7 @@ class OrderTickets extends Controller
         private TotalNumber $totalNumber,
         private ChanceStatus $chanceStatus,
         private TicketApplication $ticketApplication,
+        private AddComment $addComment,
     ) {
     }
 
@@ -48,7 +53,9 @@ class OrderTickets extends Controller
     {
         try {
             // Создание или получение пользователя по email
-            $userId = $this->accountApplication->creatingOrGetAccountId($createOrderTicketsRequest->email)->value();
+            $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
+                AccountDto::fromState($createOrderTicketsRequest->toArray())
+            )->value());
 
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
@@ -56,20 +63,23 @@ class OrderTickets extends Controller
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
-
-            // Создание заказа
+            $data = $createOrderTicketsRequest->toArray();
+            $data['festival_id'] = FestivalSeeder::ID_FOR_2023_FESTIVAL;
             $orderTicketDto = OrderTicketDto::fromState(
-                array_merge(
-                    $createOrderTicketsRequest->toArray(),
-                    $priceDto->toArray(),
-                    [
-                        'user_id' => $userId,
-                        'status' => Status::NEW,
-                    ]
-                )
+                $data,
+                $userId,
+                $priceDto,
             );
 
             $this->createOrder->createAndSave($orderTicketDto);
+            // Добавления комментария
+            if($createOrderTicketsRequest->comment) {
+                $this->addComment->send(
+                    $orderTicketDto->getId(),
+                    $userId,
+                    $createOrderTicketsRequest->comment
+                );
+            }
 
             return response()->json([
                 'success' => true,

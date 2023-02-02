@@ -9,13 +9,16 @@ use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Throwable;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 use Tickets\Shared\Domain\Criteria\Filter;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -35,7 +38,13 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     {
         DB::beginTransaction();
         try {
-            $this->model::insert($orderTicketDto->toArray());
+            $this->model->insert(
+                array_merge($orderTicketDto->toArray(),
+                    [
+                        'created_at' => (string) (new Carbon()),
+                        'updated_at' => (string) (new Carbon()),
+                    ]
+                ));
             DB::commit();
             return true;
         } catch (Exception $exception) {
@@ -83,7 +92,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
-     * Добавить поздзапрос на последний коментарий
+     * Добавить поздзапрос на последний комментарий
      *
      * @return Builder
      */
@@ -96,21 +105,19 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->getQuery();
     }
 
-    /**
-     * @throws JsonException
-     */
     public function findOrder(Uuid $uuid): ?OrderTicketDto
     {
         $rawData = $this->model::whereId($uuid->value())
             ->with('users')
-            ->with('comments')
-            ->with('ticketType')
-            ->with('typeOfPayment')
             ->first()
             ?->toArray();
         $rawData['email'] = $rawData['users']['email'];
 
-        return $rawData !== null ? OrderTicketDto::fromState($rawData) : null;
+        return $rawData !== null ? OrderTicketDto::fromState(
+            $rawData,
+            new Uuid($rawData['users']['id']),
+            new PriceDto($rawData['price'], $rawData['discount'])
+        ) : null;
     }
 
     /**
@@ -176,5 +183,18 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             DB::rollBack();
             throw $exception;
         }
+    }
+
+    public function getItem(Uuid $uuid): ?OrderTicketItemResponse
+    {
+        $rawData = $this->model::whereId($uuid->value())
+            ->with('users')
+            ->with('comments')
+            ->with('ticketType')
+            ->with('typeOfPayment')
+            ->first()
+            ?->toArray();
+
+        return is_null($rawData) ? null :OrderTicketItemResponse::fromState($rawData);
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\InfoForOrder\Application\GetPriceByTicketType;
+namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
 use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterface;
 use Tickets\Order\InfoForOrder\Response\PriceByTicketTypeResponse;

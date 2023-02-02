@@ -8,6 +8,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Throwable;
 use Tickets\User\Account\Application\AccountApplication;
+use Tickets\User\Account\Dto\AccountDto;
 
 class AccountApplicationTest extends TestCase
 {
@@ -33,7 +34,17 @@ class AccountApplicationTest extends TestCase
      */
     public function test_it_create_new_account(): void
     {
-        self::assertNotEmpty($this->accountApplication
-            ->creatingOrGetAccountId('shaevMV3@gmail.com'));
+        $accountDto = AccountDto::fromState([
+            'email' => 'email@test.ru',
+            'phone' => '+79516486456',
+            'city' => 'SPB'
+        ]);
+
+        $idAfterCreate = $this->accountApplication
+            ->creatingOrGetAccountId(
+                $accountDto
+            );
+
+        self::assertTrue($accountDto->getId()->equals($idAfterCreate));
     }
 }

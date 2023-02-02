@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Nette\Utils\Json;
+use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -27,34 +28,33 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         protected Status $status,
         protected Carbon $dateBuy,
         protected Carbon $dateCreate,
-        protected ?string $lastComment = null,
-        protected ?string $typeOfPayment = null,
-        protected ?array $comment = null,
-        protected ?string $email = null,
+        protected string $typeOfPayment,
+        protected string $email,
         protected ?string $promoCode = null,
+
     ) {
         $this->totalPrice = $price - $discount;
         $this->count = count($this->guests);
         $this->humanStatus = $this->status->getHumanStatus();
     }
 
-    public static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
+    public static function fromState(array $data): self
     {
+        $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
+
         return new self(
-            $orderTicketDto->getId(),
-            $orderTicketDto->getUserId(),
-            $orderTicketDto->getName(),
-            $orderTicketDto->getPrice()->getPrice(),
-            $orderTicketDto->getPrice()->getDiscount(),
-            $orderTicketDto->getGuests(),
-            $orderTicketDto->getStatus(),
-            $orderTicketDto->getDateBuy(),
-            $orderTicketDto->getDateCreate(),
-            $orderTicketDto->getLastComment(),
-            $orderTicketDto->getTypesOfPaymentName(),
-            $orderTicketDto->getCommentForOrder(),
-            $orderTicketDto->getEmail(),
-            $orderTicketDto->getPromoCode(),
+            new Uuid($data['id']),
+            new Uuid($data['user_id']),
+            $data['ticket_type']['name'],
+            $data['price'],
+            $data['discount'],
+            $guests,
+            new Status($data['status']),
+            new Carbon($data['date']),
+            new Carbon($data['created_at']),
+            $data['type_of_payment']['name'],
+            $data['users']['email'],
+            $data['promo_code']
         );
     }
 

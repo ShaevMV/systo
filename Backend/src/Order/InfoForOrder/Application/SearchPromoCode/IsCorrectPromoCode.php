@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
 
 use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class IsCorrectPromoCode
@@ -19,14 +20,16 @@ final class IsCorrectPromoCode
         ]);
     }
 
-    public function findPromoCode(?string $name): ?PromoCodeDto
+    public function findPromoCode(?string $name): PromoCodeDto
     {
         if (is_null($name)) {
-            return null;
+            return new PromoCodeDto();
         }
 
-        /** @var PromoCodeDto|null $result */
-        $result = $this->queryBus->ask(new PromoCodeQuery($name));
+        /** @var PromoCodeDto $result */
+        $result = $this->queryBus->ask(
+            new PromoCodeQuery($name)
+        );
 
         return $result;
     }

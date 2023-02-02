@@ -11,11 +11,17 @@ final class CreatingNewAccountCommand implements Command
 {
     public function __construct(
         private AccountDto $accountDto,
+        private string $password,
     ) {
     }
 
     public function getAccountDto(): AccountDto
     {
         return $this->accountDto;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
     }
 }

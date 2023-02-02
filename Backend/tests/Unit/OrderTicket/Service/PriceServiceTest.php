@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Order\OrderTicket\Service;
+namespace Tests\Unit\OrderTicket\Service;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Mockery\ExpectationInterface;
@@ -60,7 +60,10 @@ class PriceServiceTest extends TestCase
 
     public function test_in_correct_get_priceDto(): void
     {
-        $result = $this->priceService->getPriceDto(Uuid::random(), 2, 'Systo');
+        $result = $this->priceService->getPriceDto(
+            Uuid::random(),
+            2,
+            'Systo');
         self::assertEquals(2000, $result->getPrice());
         self::assertEquals(1900, $result->getTotalPrice());
         self::assertEquals(100.0, $result->getDiscount());

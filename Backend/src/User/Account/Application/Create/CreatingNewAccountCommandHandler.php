@@ -16,6 +16,9 @@ final class CreatingNewAccountCommandHandler implements CommandHandler
 
     public function __invoke(CreatingNewAccountCommand $command): void
     {
-        $this->account->create($command->getAccountDto());
+        $this->account->create(
+            $command->getAccountDto(),
+            $command->getPassword(),
+        );
     }
 }

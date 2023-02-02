@@ -6,6 +6,7 @@ namespace Tickets\User\Account\Repositories;
 
 use App\Models\User;
 use Exception;
+use Hash;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -22,11 +23,19 @@ final class InMemoryMySqlAccount implements AccountInterface
     /**
      * @throws Throwable
      */
-    public function create(AccountDto $accountDto): bool
+    public function create(
+        AccountDto $accountDto,
+        string $password
+    ): bool
     {
         DB::beginTransaction();
         try {
-            $this->model::create($accountDto->toArray());
+            $this->model::create(
+                array_merge(
+                    $accountDto->toArray(),
+                    ['password' => Hash::make($password)]
+                )
+            );
             DB::commit();
             return true;
         } catch (Exception $exception) {

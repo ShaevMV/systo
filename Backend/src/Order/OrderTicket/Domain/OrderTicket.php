@@ -4,49 +4,66 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
-use Exception;
-use JsonException;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Nette\Utils\JsonException;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
+use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
+
 final class OrderTicket extends AggregateRoot
 {
-    private Uuid $id;
-
+    /**
+     * @param  Ticket[]  $ticket
+     */
     public function __construct(
-        ?Uuid $id,
-        protected OrderTicketDto $orderTicketDto,
+        protected Uuid $festival_id,
+        protected Uuid $user_id,
+        protected Uuid $types_of_payment_id,
+        protected PriceDto $price,
+        protected Status $status,
+        protected array $ticket,
+        protected Uuid $id,
+        protected ?string $promo_code = null,
     ) {
-        $this->id = !is_null($id) ? $id : Uuid::random();
-        $this->orderTicketDto->setId($this->id);
-
     }
 
-    /**
-     * @throws JsonException
-     */
+
+
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
     {
+        $tickets = [];
+        foreach ($orderTicketDto->getTicket() as $guest) {
+            $tickets[] = Ticket::fromState($guest);
+        }
+
+        if (0 === count($tickets)) {
+            throw new \DomainException('В заказе нет билетов');
+        }
+
         return new self(
+            $orderTicketDto->getFestivalId(),
+            $orderTicketDto->getUserId(),
+            $orderTicketDto->getTypesOfPaymentId(),
+            $orderTicketDto->getPriceDto(),
+            $orderTicketDto->getStatus(),
+            $tickets,
             $orderTicketDto->getId(),
-            $orderTicketDto,
+            $orderTicketDto->getPromoCode(),
         );
     }
 
 
-    /**
-     * @throws Exception
-     */
-    public static function create(OrderTicketDto $orderTicketDto): self
-    {
+    public static function create(
+        OrderTicketDto $orderTicketDto,
+    ): self {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
-                $orderTicketDto->getId(),
-                $orderTicketDto->getUserId(),
+                $result->getId(),
+                $result->user_id,
                 $orderTicketDto->getEmail(),
             )
         );
@@ -63,12 +80,12 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $orderTicketDto->getGuests(),
+            $result->getTicket(),
             $orderTicketDto->getEmail(),
         ));
 
         $result->record(new ProcessUserNotificationOrderPaid(
-                $orderTicketDto->getId(),
+                $result->getId(),
                 $orderTicketDto->getEmail(),
             )
         );
@@ -121,9 +138,12 @@ final class OrderTicket extends AggregateRoot
         return $this->id;
     }
 
-    public function getDto(): OrderTicketDto
+    /**
+     * @return Ticket[]
+     */
+    public function getTicket(): array
     {
-        return $this->orderTicketDto;
+        return $this->ticket;
     }
 
 }

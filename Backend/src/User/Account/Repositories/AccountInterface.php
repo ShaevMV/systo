@@ -10,7 +10,7 @@ use Tickets\User\Account\Dto\UserInfoDto;
 
 interface AccountInterface
 {
-    public function create(AccountDto $accountDto): bool;
+    public function create(AccountDto $accountDto, string $password): bool;
     public function findAccountByEmail(string $email): ?UserInfoDto;
 
     public function findAccountById(Uuid $id): ?UserInfoDto;

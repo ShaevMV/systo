@@ -1,9 +1,8 @@
 <?php
+declare(strict_types=1);
 
-namespace Tests\Unit\Order\OrderTicket\Application\Create;
+namespace Tests\Unit\OrderTicket\Application\Create;
 
-use Database\Seeders\TypesOfPaymentSeeder;
-use Database\Seeders\TypeTicketsSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nette\Utils\Json;
@@ -13,9 +12,9 @@ use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
-use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class CreateOrderTest extends TestCase
@@ -42,14 +41,17 @@ class CreateOrderTest extends TestCase
         $this->orderRepository = $orderRepository;
     }
 
-
     /**
      * @dataProvider dataProvider
-     * @throws \Exception
+     * @throws \Throwable
+     * @throws JsonException
      */
     public function test_it_create(OrderTicketDto $orderTicketDto): void
     {
-        $orderTicket = OrderTicket::create($orderTicketDto);
+        $orderTicket = OrderTicket::create(
+            $orderTicketDto
+        );
+
         $events = $orderTicket->pullDomainEvents();
         self::assertCount(1, $events);
     }
@@ -62,7 +64,7 @@ class CreateOrderTest extends TestCase
     public function test_it_save_order(OrderTicketDto $orderTicketDto): void
     {
         self::assertTrue($this->createOrder->createAndSave($orderTicketDto));
-        $findOrder = $this->orderRepository->findOrder($orderTicketDto->getId())->toArray();
+
         self::assertEquals(
             $this->orderRepository->findOrder($orderTicketDto->getId())->toArray(),
             $orderTicketDto->toArray()
@@ -75,29 +77,28 @@ class CreateOrderTest extends TestCase
      */
     public function dataProvider(): array
     {
-        $orderTicketsDto = OrderTicketDto::fromState([
-            'id' => Uuid::random()->value(),
-            'user_id' => UserSeeder::ID_FOR_USER_UUID,
-            'date' => "2022-11-17T22:38",
-            'email' => 'jadiyasss@gmail.com',
-            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-            'guests' => Json::encode([
-                [
-                    'value' => 'test'
-                ],
-                [
-                    'value' => 'test'
-                ],
-            ]),
-            'promo_code' => 'Systo',
-            'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_QIWI,
-            'price' => 1000,
-            'discount' => 100.00,
-            'status' => Status::NEW
-        ]);
+        $request = Json::decode(
+            '{
+            "festival_id":"9d679bcf-b438-4ddb-ac04-023fa9bff4b2",
+            "email":"admin@admin.ru",
+            "ticket_type_id":"222abc0c-fc8e-4a1d-a4b0-d345cafacf95",
+            "guests":[{"value":"321"},{"value":"321321"}],
+            "promo_code":"Systo",
+            "id_buy":"321",
+            "date":"2023-02-10T17:02",
+            "types_of_payment_id":"3fcded69-4aef-4c4a-a041-52c91e5afd63"
+            }
+        ', 1);
+        $orderTicketDto = OrderTicketDto::fromState(
+            $request,
+            new Uuid(UserSeeder::ID_FOR_USER_UUID),
+            new PriceDto(1000,
+                count($request['guests']) * 100
+            ),
+        );
 
         return [
-            [$orderTicketsDto]
+            [$orderTicketDto]
         ];
     }
 }
