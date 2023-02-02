@@ -5,7 +5,6 @@
       Launch demo modal
     </button>
 
-    <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -25,17 +24,12 @@
         </div>
       </div>
     </div>
-    <div class=" text-center mt-5 ">
-
-      <h1>Форма подтверждения оргвзноса</h1>
-      <small class="form-text text-muted">
-        После того как Вы внесете оргвзнос одним из электронных способов оплаты и заполните эту форму - <br>
-        в течение 2-3 дней на ваш e-mail придет подтверждение и ваш QR-cod для входа на фестиваль.
-      </small>
-
+    <div class="text-center title-block">
+      <h1>Форма подтверждения добровольного оргвзноса</h1>
+      <small class="form-text text-muted">на создание туристического слёта Солар Систо 2023 с 18 по 22 мая</small>
     </div>
     <div class="row ">
-      <div class="col-lg-7 mx-auto">
+      <div class="col-lg-10 mx-auto">
         <div class="card mt-2 mx-auto p-4 bg-light">
           <div class="card-body bg-light">
 

@@ -1,20 +1,18 @@
 <template>
   <div class="container">
     <div class="row ">
-      <div class="col-lg-7 mx-auto">
-        <div class="card mt-2 mx-auto p-4 bg-light">
-          <div class="card-body bg-light">
+      <div class="col-lg-10 mx-auto">
+        <div class="card mt-2 mx-auto p-4">
+          <div class="card-body">
 
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="controls">
 
-                  <!--                  Email и password-->
                   <div class="row">
-                    <!--                  Email -->
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label for="form_email">login *</label>
+                        <label for="form_email" class="required">Ваш логин</label>
                         <input id="form_email"
                                type="email"
                                name="email"
@@ -26,10 +24,9 @@
                         <small class="form-text text-muted"> {{ getError('email') }}</small>
                       </div>
                     </div>
-                    <!--                  password: *-->
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label for="form_password">password *</label>
+                        <label for="form_password" class="required">Ваш пароль</label>
                         <input id="form_password"
                                type="password"
                                name="email"
