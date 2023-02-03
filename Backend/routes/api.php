@@ -25,7 +25,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('v1/festival')->group(static function (): void {
     Route::get('/orderingTickets',
         [OrderingTicketsController::class, 'getInfoForOrder']);
-    Route::get('/findPromoCode/{promoCode}',
+    Route::post('/findPromoCode/{promoCode}',
         [OrderingTicketsController::class, 'findPromoCode']);
 
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);

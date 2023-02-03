@@ -15,6 +15,7 @@ export default {
         promoCode: {
             discount: null,
             name: null,
+            success: false,
         },
         dataError: [],
     },

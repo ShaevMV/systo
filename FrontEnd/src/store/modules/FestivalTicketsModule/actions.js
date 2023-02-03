@@ -32,17 +32,17 @@ export const setSelectTicketType = (context, payload) => {
  * @param payload
  */
 export const checkPromoCode = (context, payload) => {
-    if (payload !== null && payload.length > 2) {
-        let promise = axios.get('/api/v1/festival/findPromoCode/' + payload);
-        promise.then(function (response) {
-            let result = typeof response.data === 'object' ? response.data : {
-                'name': payload,
-                'discount': null,
-            };
-            console.log(result);
-            context.commit('setValuePromoCode', result);
-        })
-    }
+    let promise = axios.post('/api/v1/festival/findPromoCode/' + payload.promoCode, {
+        typeOrder: payload.typeOrder
+    });
+
+    promise.then(function (response) {
+        if (payload.callback !== undefined) {
+            payload.callback(response.data.massage);
+        }
+
+        context.commit('setValuePromoCode', response.data);
+    })
 };
 
 /**
@@ -52,6 +52,7 @@ export const checkPromoCode = (context, payload) => {
  */
 export const clearPromoCode = (context) => {
     context.commit('setValuePromoCode', {
+        success: false,
         discount: null,
         name: null,
     });

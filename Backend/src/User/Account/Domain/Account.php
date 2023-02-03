@@ -4,26 +4,40 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Domain;
 
+use Illuminate\Support\Str;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\User\Account\Dto\AccountDto;
 
 class Account extends AggregateRoot
 {
     public function __construct(
         private Uuid $id,
         private string $email,
+        private string $phone,
+        private string $city,
         private ?string $name = null,
     ) {
     }
 
     public static function creatingNewAccount(
         Uuid $uuid,
-        string $email,
+        AccountDto $accountDto,
         string $password,
-        ?string $name = null,
     ): self {
-        $self = new self($uuid, $email, $name);
-        $self->record(new ProcessAccountNotification($email, $password));
+        $self = new self(
+            $uuid,
+            $accountDto->getEmail(),
+            $accountDto->getPhone(),
+            $accountDto->getCity()
+        );
+
+
+        $self->record(new ProcessAccountNotification(
+                $accountDto->getEmail(),
+                $password,
+            )
+        );
 
         return $self;
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Order\InfoForOrder\Application\GetPriceByTicketType;
+namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 use Tickets\Shared\Domain\ValueObject\Uuid;

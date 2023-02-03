@@ -145,6 +145,7 @@
       <path value="$PROJECT_DIR$/Backend/vendor/barryvdh/laravel-dompdf" />
       <path value="$PROJECT_DIR$/Backend/vendor/phenx/php-svg-lib" />
       <path value="$PROJECT_DIR$/Backend/vendor/phenx/php-font-lib" />
+      <path value="$PROJECT_DIR$/Backend/vendor/worksome/request-factories" />
     </include_path>
   </component>
   <component name="PhpInterpreters">

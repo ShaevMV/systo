@@ -15,8 +15,6 @@ class OrderItemQueryHandler implements QueryHandler
 
     public function __invoke(OrderIdQuery $query): ?OrderTicketItemResponse
     {
-        $orderTicketDto = $this->orderTicketRepository->findOrder($query->getOrderId());
-
-        return is_null($orderTicketDto) ? null : OrderTicketItemResponse::fromOrderTicketDto($orderTicketDto);
+        return $this->orderTicketRepository->getItem($query->getOrderId());
     }
 }

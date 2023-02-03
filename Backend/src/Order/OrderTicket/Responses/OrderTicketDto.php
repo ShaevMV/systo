@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
+namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
 use Database\Seeders\FestivalSeeder;
 use Exception;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\TicketTypeDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\TypesOfPaymentDto;
 use Tickets\Order\OrderTicket\ValueObject\CommentForOrder;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
@@ -201,5 +205,10 @@ final class OrderTicketDto extends AbstractionEntity implements Response
     {
         $this->id = $id;
         return $this;
+    }
+
+    public function getFestivalId(): Uuid
+    {
+        return $this->festival_id;
     }
 }

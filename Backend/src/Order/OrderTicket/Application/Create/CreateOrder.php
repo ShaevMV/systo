@@ -7,7 +7,7 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 use Bus;
 use Throwable;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 
 final class CreateOrder
@@ -26,8 +26,9 @@ final class CreateOrder
     /**
      * @throws Throwable
      */
-    public function createAndSave(OrderTicketDto $orderTicketDto): bool
-    {
+    public function createAndSave(
+        OrderTicketDto $orderTicketDto,
+    ): bool {
         $orderTicket = OrderTicket::create($orderTicketDto);
 
         $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));

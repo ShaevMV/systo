@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\User\Account\Application;
 
@@ -29,8 +29,7 @@ final class AccountApplication
         CreatingNewAccountCommandHandler $accountCommandHandler,
         AccountFindByEmailQueryHandler $accountFindQueryHandler,
         private Bus $bus
-    )
-    {
+    ) {
         $this->commandBus = new InMemorySymfonyCommandBus([
             CreatingNewAccountCommand::class => $accountCommandHandler
         ]);
@@ -44,41 +43,35 @@ final class AccountApplication
      * @throws Throwable
      */
     public function creatingOrGetAccountId(
-        string $email
-    ): Uuid
-    {
-        if($userInfoDto = $this->getUserByEmail($email)) {
+        AccountDto $accountDto,
+    ): Uuid {
+        if ($userInfoDto = $this->getUserByEmail($accountDto->getEmail())) {
             return $userInfoDto->getId();
         }
 
-       $this->createNewAccount($email);
+        $this->createNewAccount(
+            $accountDto,
+        );
 
-        if(is_null($userInfoDto = $this->getUserByEmail($email))) {
-            throw new DomainException('Не получилось получить данные о созданом пользователе ' . $email);
-        }
-
-        return $userInfoDto->getId();
+        return $accountDto->getId();
     }
 
     /**
      * @throws Throwable
      */
-    private function createNewAccount(string $email): void
-    {
+    private function createNewAccount(
+        AccountDto $accountDto,
+    ): void {
         $password = Str::random(8);
-        $accountDto = new AccountDto(
-            $email,
-            $password
-        );
-
         $account = Account::creatingNewAccount(
             $accountDto->getId(),
-            $email,
+            $accountDto,
             $password
         );
 
         $this->commandBus->dispatch(new CreatingNewAccountCommand(
-            $accountDto
+            $accountDto,
+            $password
         ));
 
         $this->bus::chain($account->pullDomainEvents())

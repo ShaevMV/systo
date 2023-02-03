@@ -1,19 +1,24 @@
 <?php
 
-namespace Tests\Unit\Order\OrderTicket\Application\ChanceStatus;
+namespace Tests\Unit\OrderTicket\Application\ChanceStatus;
 
 use Database\Seeders\OrderSeeder;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
+use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class ChanceStatusTest extends TestCase
 {
+    use DatabaseTransactions;
+
     private ChanceStatus $chanceStatus;
+    private InMemoryMySqlOrderTicketRepository $repositoryOrder;
 
     /**
      * @throws ContainerExceptionInterface
@@ -26,6 +31,9 @@ class ChanceStatusTest extends TestCase
         /** @var ChanceStatus $chanceStatus */
         $chanceStatus = $this->app->get(ChanceStatus::class);
         $this->chanceStatus = $chanceStatus;
+        /** @var InMemoryMySqlOrderTicketRepository $repositoryOrder */
+        $repositoryOrder = $this->app->get(InMemoryMySqlOrderTicketRepository::class);
+        $this->repositoryOrder = $repositoryOrder;
     }
 
     /**
@@ -34,11 +42,11 @@ class ChanceStatusTest extends TestCase
     public function test_is_correct_chance_status_to_buy(): void
     {
         $this->chanceStatus->chance(
-            new Uuid('5f78e8aa-b869-4733-ade8-8b5343306cf7'),
+            new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::PAID)
         );
-
-        self::assertTrue(true);
+        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isPaid());
     }
 
 
@@ -51,10 +59,9 @@ class ChanceStatusTest extends TestCase
         $this->chanceStatus->chance(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::DIFFICULTIES_AROSE),
-            'Что то пошло не так'
         );
-
-        self::assertTrue(true);
+        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isdDifficultiesArose());
     }
 
     /**
@@ -66,8 +73,8 @@ class ChanceStatusTest extends TestCase
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::CANCEL)
         );
-
-        self::assertTrue(true);
+        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isCancel());
     }
 
 }

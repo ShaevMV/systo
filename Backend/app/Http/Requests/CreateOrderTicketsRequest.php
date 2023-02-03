@@ -9,6 +9,9 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string|null $email
  * @property string $date
  * @property string $id_buy
+ * @property string $phone
+ * @property string $city
+ * @property string|null $comment
  * @property array $guests
  * @property string|null $promo_code
  * @property string $ticket_type_id

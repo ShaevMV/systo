@@ -6,6 +6,7 @@ namespace Tickets\Ticket\CreateTickets\Application;
 
 use Illuminate\Support\Facades\Bus;
 use Throwable;
+use Tickets\Order\OrderTicket\Domain\Ticket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
@@ -16,7 +17,6 @@ use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommand;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommandHandler;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQuery;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQueryHandler;
-use Tickets\Ticket\CreateTickets\Domain\Ticket;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
 
@@ -43,7 +43,7 @@ class TicketApplication
     }
 
     /**
-     * @param  GuestsDto[]  $guests
+     * @param  Ticket[]  $guests
      *
      * @return Ticket[]
      * @throws Throwable
@@ -52,12 +52,12 @@ class TicketApplication
     {
         $tickets = [];
         foreach ($guests as $guest) {
-            $ticket = Ticket::newTicket($orderId, $guest->getValue());
+            $ticket = Ticket::createTicket($guest->getName());
 
             $this->commandBus->dispatch(new CreateTicketCommand(
                 new TicketDto(
                     $orderId,
-                    $guest->getValue(),
+                    $guest->getName(),
                     $ticket->getAggregateId()
                 )
             ));

@@ -5,6 +5,7 @@
       Launch demo modal
     </button>
 
+
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -52,14 +53,14 @@
                                  placeholder="Введите Имя и Фамилию гостя"
                                  aria-label="Введите Имя и Фамилию гостя"
                                  v-model="newGuest"
+                                 :disabled="!isAllowedNewGuest"
                                  aria-describedby="basic-addon1">
                           <div class="input-group-prepend">
-                            <button class="input-group-text btn"
-                                    :disabled="!isAllowedNewGuest"
-                                    value=""
+                              <span class="input-group-text btn"
                                     @click="addGuest()"
-                                    id="basic-addon1">+
-                            </button>
+                                    id="basic-addon1">
+                                <i class="bi bi-person-plus"></i>
+                              </span>
                           </div>
                         </div>
                       </div>
@@ -106,6 +107,20 @@
 
                       </div>
                     </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="form_phone">Phone *</label>
+                        <input id="form_phone"
+                               type="email"
+                               name="phone"
+                               class="form-control"
+                               placeholder="Please enter your phone *"
+                               required="required"
+                               v-model="phone"
+                               data-error="Valid phone is required.">
+
+                      </div>
+                    </div>
                     <!--                  Тип оргвзноса: *-->
                     <div class="col-md-6">
                       <div class="form-group">
@@ -139,11 +154,13 @@
                                  placeholder="Промокод"
                                  aria-label="Промокод"
                                  v-model="promoCode"
-                                 v-bind:readonly="getDiscountByPromoCode > 0"
                                  aria-describedby="basic-addon1">
+                          <span class="input-group-text"
+                                @click="sendPromoCode"
+                                id="basic-addon1"><i class="bi bi-check"></i></span>
                         </div>
-                        <small class="form-text text-muted" v-show="getDiscountByPromoCode > 0">
-                          Ваш промо код принят, ваша скидка составит {{ getDiscountByPromoCode }} ₽
+                        <small class="form-text text-muted" v-show="massageForPromoCode!==null">
+                           {{ massageForPromoCode }}
                         </small>
                       </div>
                     </div>
@@ -181,11 +198,18 @@
                     <div class="col-md-12">
                       <div class="form-group">
                         <label for="idBuy">Идентификатор платежа:</label>
-                        <textarea class="form-control" v-model="idBuy" id="idBuy" rows="3"></textarea>
+                        <input class="form-control" v-model="idBuy" id="idBuy">
                         <small class="form-text text-muted">
                           При переводах на Сбербанк напишите сюда последние 4 цифры карты, с которой вы сделали перевод
                           <b>(сюда же вписываем ID или номер "живого билета" с весны для скидки)</b>
                         </small>
+                      </div>
+
+                    </div>
+                    <div class="col-md-12">
+                      <div class="form-group">
+                        <label for="idBuy">Комментарий к заказу:</label>
+                        <textarea class="form-control" v-model="comment" id="idBuy"></textarea>
                       </div>
 
                     </div>
@@ -283,9 +307,13 @@ export default {
       newGuest: null,
       email: null,
       date: null,
+      phone: null,
       idBuy: null,
       confirm: false,
       massage: null,
+      promoCode: null,
+      massageForPromoCode: null,
+      comment: null,
     }
   },
   computed: {
@@ -314,6 +342,7 @@ export default {
           this.date !== null &&
           this.confirm === true &&
           this.idBuy !== null &&
+          this.phone !== null &&
           (this.isAuth || this.email)
     },
     /**
@@ -333,14 +362,6 @@ export default {
             this.setSelectTicketType(oldId);
           }
         }
-      },
-    },
-    promoCode: {
-      get: function () {
-        return this.getPromoCodeName;
-      },
-      set: function (newValue) {
-        this.checkPromoCode(newValue);
       },
     },
     /**
@@ -387,6 +408,19 @@ export default {
       'goToCreateOrderTicket',
     ]),
     /**
+     * Отправить промо код
+     */
+    sendPromoCode: function () {
+      let self = this;
+      this.checkPromoCode({
+        promoCode: this.promoCode,
+        typeOrder: this.getSelectTicketTypeId,
+        callback: function (massage) {
+          self.massageForPromoCode = massage;
+        }
+      });
+    },
+    /**
      * Добавить нового гостя
      */
     addGuest: function () {
@@ -413,6 +447,9 @@ export default {
         'guests': this.guests,
         'promo_code': this.promoCode,
         'date': this.date,
+        'id_buy': this.idBuy,
+        'phone': this.phone,
+        'comment': this.comment,
         'types_of_payment_id': this.selectTypesOfPayment,
         'callback': function (result, massage) {
           if (result) {
@@ -433,7 +470,10 @@ export default {
       this.email = this.getEmail;
       this.promoCode = null;
       this.date = null;
+      this.massageForPromoCode = null;
       this.idBuy = null;
+      this.phone = null;
+      this.comment= null;
       this.confirm = false;
       this.clearPromoCode();
     },

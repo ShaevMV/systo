@@ -40,5 +40,6 @@ export const setSelectTicketType = (state, payload) => {
  * @param payload
  */
 export const setValuePromoCode = (state, payload) => {
+    console.log(payload);
     state.promoCode = payload;
 };
