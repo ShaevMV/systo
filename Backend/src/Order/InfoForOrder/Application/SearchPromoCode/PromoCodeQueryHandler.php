@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
 
@@ -18,6 +18,6 @@ final class PromoCodeQueryHandler implements QueryHandler
 
     public function __invoke(PromoCodeQuery $query): PromoCodeDto
     {
-        return $this->promoCod->find($query->getName());
+        return $this->promoCod->find($query->getName()) ?? new PromoCodeDto();
     }
 }
