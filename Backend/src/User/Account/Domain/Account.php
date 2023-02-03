@@ -52,11 +52,18 @@ class Account extends AggregateRoot
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+
+    public function getCity(): string
+    {
+        return $this->city;
     }
 }

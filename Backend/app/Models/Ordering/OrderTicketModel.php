@@ -64,7 +64,7 @@ final class OrderTicketModel extends Model
 
     protected $fillable = [
         'id', 'guests', 'user_id', 'ticket_type_id', 'promo_code', 'types_of_payment_id', 'price', 'discount', 'status',
-        'date'
+        'date', 'phone',
     ];
 
     public function comments(): HasMany

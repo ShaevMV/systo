@@ -28,6 +28,7 @@ return new class extends Migration {
 
             $table->string('promo_code')->nullable()->default(null);
             $table->string('id_buy')->nullable(false);
+            $table->string('phone')->nullable(false);
 
             $table->string('types_of_payment_id');
             $table->foreign('types_of_payment_id')->references('id')->on('types_of_payment');

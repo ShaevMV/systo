@@ -13,6 +13,8 @@ final class UserInfoDto extends AbstractionEntity implements Response
     public function __construct(
         protected Uuid $id,
         protected string $email,
+        protected string $city,
+        protected string $phone,
         protected bool $admin,
         protected ?string $name = null,
     ) {
@@ -23,6 +25,8 @@ final class UserInfoDto extends AbstractionEntity implements Response
         return new self(
             new Uuid($data['id']),
             $data['email'],
+            $data['city'],
+            $data['phone'],
             (bool) $data['is_admin'],
             $data['name'] ?? null
         );

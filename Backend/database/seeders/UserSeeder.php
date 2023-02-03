@@ -25,6 +25,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'id' => self::ID_FOR_ADMIN_UUID,
             'name' => 'admin',
+            'phone' => '+999999999',
+            'city' => 'spb',
             'email' => self::EMAIL_ADMIN,
             'password' => Hash::make('password'),
             'is_admin' => true,
@@ -35,6 +37,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'id' => self::ID_FOR_USER_UUID,
             'name' => 'user',
+            'phone' => '+999999999',
+            'city' => 'spb',
             'email' => self::EMAIL_USER,
             'password' => Hash::make('password'),
             'is_admin' => false,

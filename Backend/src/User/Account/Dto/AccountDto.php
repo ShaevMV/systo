@@ -15,7 +15,7 @@ final class AccountDto extends AbstractionEntity
         protected string $email,
         protected string $phone,
         protected string $city,
-        protected bool $isAdmin = false,
+        protected bool $is_admin = false,
     ) {
     }
 
@@ -49,7 +49,7 @@ final class AccountDto extends AbstractionEntity
 
     public function isAdmin(): bool
     {
-        return $this->isAdmin;
+        return $this->is_admin;
     }
 
     public function getEmail(): string

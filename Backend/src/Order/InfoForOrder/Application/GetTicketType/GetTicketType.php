@@ -24,9 +24,9 @@ final class GetTicketType
         ]);
     }
 
-    public function getPrice(Uuid $ticketsTypeId): TicketTypeDto
+    public function getPrice(Uuid $ticketsTypeId): PriceByTicketTypeResponse
     {
-        /** @var TicketTypeDto $result */
+        /** @var PriceByTicketTypeResponse $result */
         $result = $this->queryBus->ask(new GetPriceByTicketTypeQuery($ticketsTypeId));
 
         return $result;

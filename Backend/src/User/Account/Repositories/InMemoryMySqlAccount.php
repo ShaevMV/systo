@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Repositories;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Hash;
 use Illuminate\Support\Facades\DB;
@@ -30,10 +31,14 @@ final class InMemoryMySqlAccount implements AccountInterface
     {
         DB::beginTransaction();
         try {
-            $this->model::create(
+            $this->model::insert(
                 array_merge(
                     $accountDto->toArray(),
-                    ['password' => Hash::make($password)]
+                    ['password' => Hash::make($password)],
+                    [
+                        'created_at' => (string) (new Carbon()),
+                        'updated_at' => (string) (new Carbon()),
+                    ]
                 )
             );
             DB::commit();

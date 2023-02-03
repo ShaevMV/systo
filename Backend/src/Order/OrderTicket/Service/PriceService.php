@@ -20,7 +20,7 @@ class PriceService
     public function getPriceDto(Uuid $ticketTypeId, int $count, ?string $promoCode = null): PriceDto
     {
         $priceByType = $this->getPriceByTicketType->getPrice($ticketTypeId);
-        $totalPrice = $priceByType->getPrice() * ($priceByType->getGroupLimit() ? 1 : $count);
+        $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
 
         return new PriceDto(
             $totalPrice,

@@ -308,6 +308,7 @@ export default {
       email: null,
       date: null,
       phone: null,
+      city: null,
       idBuy: null,
       confirm: false,
       massage: null,
@@ -448,6 +449,7 @@ export default {
         'promo_code': this.promoCode,
         'date': this.date,
         'id_buy': this.idBuy,
+        'city': this.city,
         'phone': this.phone,
         'comment': this.comment,
         'types_of_payment_id': this.selectTypesOfPayment,
@@ -472,6 +474,7 @@ export default {
       this.date = null;
       this.massageForPromoCode = null;
       this.idBuy = null;
+      this.city = null;
       this.phone = null;
       this.comment= null;
       this.confirm = false;
