@@ -1,11 +1,14 @@
 <template>
   <div class="row">
-    <UserOrderList/>
+    <div class="container">
+      <UserOrderList/>
+    </div>
   </div>
 </template>
 
 <script>
 import UserOrderList from "@/components/Order/OrderList.vue";
+
 export default {
   name: "OrderView",
   components: {UserOrderList},

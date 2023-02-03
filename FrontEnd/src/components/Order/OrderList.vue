@@ -1,59 +1,68 @@
 <template>
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title" v-if="!isAdmin">Мои заказы</h5>
-      <h5 class="card-title" v-else> Заказы пользователя </h5>
-      <table class="table table-hover">
-        <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col" v-if="isAdmin">Email</th>
-          <th scope="col">Название</th>
-          <th scope="col">Стоимость</th>
-          <th scope="col">Кол-во билетов</th>
-          <th scope="col">Промо код</th>
-          <th scope="col">Способ покупки билета</th>
-          <th scope="col">Информация о платеже</th>
-          <th scope="col">Дата покупики билета</th>
-          <th scope="col">Статус</th>
-          <th scope="col">Комментарий</th>
-          <th scope="col"></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr v-for="(itemOrder,index) in getOrderList"
-            v-bind:key="index"
-            @click="goItemOrder(itemOrder.id)">
-          <th scope="row">
-            {{ index + 1 }}
-          </th>
-          <td v-if="isAdmin">{{ itemOrder.email }}</td>
-          <td>{{ itemOrder.name }}</td>
-          <td>{{ itemOrder.price }}</td>
-          <td>{{ itemOrder.count }}</td>
-          <td>{{ itemOrder.promoCode }}</td>
-          <td>{{ itemOrder.typeOfPaymentName }}</td>
-          <td>{{ itemOrder.idBuy }}</td>
-          <td>{{ itemOrder.dateBuy }}</td>
-          <td>{{ itemOrder.humanStatus }}</td>
-          <td>{{ itemOrder.lastComment }}</td>
-          <td>
-            <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
-              <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                      aria-expanded="false">
-                ...
-              </button>
-              <div class="dropdown-menu">
+  <div class="title-block text-center">
+    <h1 class="card-title" v-if="!isAdmin">Мои Оргвзносы</h1>
+    <h1 class="card-title" v-else> Заказы пользователя </h1>
+  </div>
+  <div class="row">
+    <div class="col-lg-10 mx-auto">
+      <div class="card">
+        <div class="card-body">
+          <p>На этой странице ты можешь просмотреть все свои заказы на регистрацию оргвзносов.<br>
+            Чтобы увидеть подробную информацию и сами электронные билеты с qr-кодом кликни на строчку с заказом</p>
+          <table class="table table-hover">
+            <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col" v-if="isAdmin">Email</th>
+              <th scope="col">Тип оргвзноса</th>
+              <th scope="col">Стоимость</th>
+              <th scope="col">Кол-во</th>
+              <th scope="col">Промо код</th>
+              <th scope="col">Способ покупки билета</th>
+              <th scope="col">Информация о платеже</th>
+              <th scope="col">Дата покупики билета</th>
+              <th scope="col">Статус</th>
+              <th scope="col">Комментарий</th>
+              <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(itemOrder,index) in getOrderList"
+                v-bind:key="index"
+                @click="goItemOrder(itemOrder.id)">
+              <th scope="row">
+                {{ index + 1 }}
+              </th>
+              <td v-if="isAdmin">{{ itemOrder.email }}</td>
+              <td>{{ itemOrder.name }}</td>
+              <td>{{ itemOrder.price }}</td>
+              <td>{{ itemOrder.count }}</td>
+              <td>{{ itemOrder.promoCode }}</td>
+              <td>{{ itemOrder.typeOfPaymentName }}</td>
+              <td>{{ itemOrder.idBuy }}</td>
+              <td>{{ itemOrder.dateBuy }}</td>
+              <td>{{ itemOrder.humanStatus }}</td>
+              <td>{{ itemOrder.lastComment }}</td>
+              <td>
+                <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
+                  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                    ...
+                  </button>
+                  <div class="dropdown-menu">
                 <span class="dropdown-item btn-link"
                       role="button"
                       v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
                       @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
-              </div>
-            </div>
-          </td>
-        </tr>
-        </tbody>
-      </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -69,7 +78,7 @@ export default {
       default: false,
     }
   },
-    computed: {
+  computed: {
     ...mapGetters('appOrder', [
       'getOrderList'
     ]),
@@ -79,8 +88,8 @@ export default {
       'sendToChanceStatus'
     ]),
     goItemOrder(idOrderItem) {
-      if(!this.isAdmin) {
-        this.$router.push({ name: 'orderItems', params: { id: idOrderItem }});
+      if (!this.isAdmin) {
+        this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
       }
     },
     /**

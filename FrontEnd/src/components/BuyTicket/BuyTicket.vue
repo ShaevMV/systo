@@ -30,14 +30,18 @@
     </div>
     <div class="row ">
       <div class="col-lg-10 mx-auto">
-        <div class="card mt-2 mx-auto p-4 bg-light">
-          <div class="card-body bg-light">
-
+        <div class="card mt-2 mx-auto">
+          <div class="card-body">
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="controls">
                   <!--                  Добавить гостя-->
                   <div class="row">
+
+                    <div class="pp1">
+                      <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе аккаунт:
+                    </div>
+
                     <div class="col-md-12">
                       <div class="form-group">
                         <label for="newGuest">Имя и Фамилию гостя *</label>
