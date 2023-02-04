@@ -13,7 +13,7 @@
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
               Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку <router-link
-                  to="/login"><b>Зарегистрироваться</b>
+                  to="/registration"><b>Зарегистрироваться</b>
               </router-link></p>
             <div class="container">
               <div id="contact-form" role="form">
