@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Password;
 use Spatie\FlareClient\Http\Exceptions\NotFound;
 use Tickets\Shared\Domain\Assert;
 use Tickets\User\Account\Application\AccountApplication;
@@ -17,7 +18,7 @@ class AuthController extends Controller
 {
     public function __construct(
         private AccountApplication $accountApplication
-    ){
+    ) {
         $this->middleware('auth:api', ['except' => ['login', 'register']]);
     }
 
@@ -29,7 +30,7 @@ class AuthController extends Controller
         ]);
         $credentials = $request->only('email', 'password');
 
-        if (! $token = auth()->attempt($credentials, true)) {
+        if (!$token = auth()->attempt($credentials, true)) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -40,13 +41,17 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'phone' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|confirmed|string|min:6',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'city' => $request->city,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
 
@@ -73,7 +78,7 @@ class AuthController extends Controller
     /**
      * Get the token array structure.
      *
-     * @param  string $token
+     * @param  string  $token
      *
      * @return JsonResponse
      */
@@ -99,26 +104,41 @@ class AuthController extends Controller
 
         /** @var User $user */
         $user = auth()->user();
-        if(is_null($userInfoDto = $this->accountApplication->getUserByEmail($user->email))){
+        if (is_null($userInfoDto = $this->accountApplication->getUserByEmail($user->email))) {
             throw new \DomainException('Пользователь не найден');
         }
 
         $isCorrect = true;
         foreach ($roles as $role) {
-            if(!$userInfoDto->isRole($role)) {
+            if (!$userInfoDto->isRole($role)) {
                 $isCorrect = false;
                 break;
             }
         }
 
-        if(!$isCorrect) {
+        if (!$isCorrect) {
             return response()->json(['error' => 'Forbidden'], 403);
         }
 
         return response()->json([
             'status' => 'success',
         ]);
+    }
 
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate(['email' => 'required|email']);
 
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+        $success = $status === Password::RESET_LINK_SENT;
+
+        return response()->json([
+            'success' => $success,
+            'status' => $success
+                ? back()->with(['status' => __($status)])
+                : back()->withErrors(['email' => __($status)])
+        ]);
     }
 }

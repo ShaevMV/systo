@@ -5,6 +5,7 @@ import OrderView from "../views/order/OrderView";
 import AdminDashboard from "../views/admin/AdminDashboard";
 import OrderItemView from "@/views/order/OrderItemView";
 import OrderListForAdmin from "@/views/order/OrderListForAdmin.vue";
+import RegView from "@/views/auth/RegView.vue";
 
 const routes = [
     {
@@ -16,6 +17,22 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/registration',
+        name: 'registration',
+        component: RegView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/forgotPassword',
+        name: 'registration',
+        component: RegView,
         meta: {
             'guest': true
         }
@@ -68,7 +85,6 @@ router.beforeEach((to, from, next) => {
         let token = (localStorage['user.token'] !== undefined && localStorage['user.token'] !== '' && localStorage['user.token'] !== null);
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {
-                console.log(213);
                 next({
                     path: '/login',
                     query: {

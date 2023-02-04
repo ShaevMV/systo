@@ -12,12 +12,12 @@ use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 final class PromoCodeQueryHandler implements QueryHandler
 {
     public function __construct(
-        private PromoCodeInterface $promoCod
+        private PromoCodeInterface $promoCode
     ) {
     }
 
     public function __invoke(PromoCodeQuery $query): PromoCodeDto
     {
-        return $this->promoCod->find($query->getName()) ?? new PromoCodeDto();
+        return $this->promoCode->find($query->getName()) ?? new PromoCodeDto();
     }
 }

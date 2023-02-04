@@ -27,6 +27,36 @@ export const toLogin = (context, payload) => {
         }
     });
 };
+/**
+ *
+ * @param context
+ * @param payload
+ */
+export const toRegistration = (context, payload) => {
+    let promise = axios.post('/api/register', payload);
+    promise.then(async function (response) {
+        if (response.data.status === 'success') {
+            context.commit('setToken', response.data.authorisation);
+            context.commit('setUserInfo', response.data.user);
+            payload.callback();
+        }
+    }).catch(function (error) {
+        context.commit('setError', error.response.data.errors);
+    });
+};
+
+export const toForgotPassword = (context, payload) => {
+    let promise = axios.post('/api/forgot-password', {
+        email: payload.email
+    });
+    promise.then(async function (response) {
+        if (response.data.status === 'success') {
+            payload.callback();
+        }
+    }).catch(function (error) {
+        context.commit('setError', error.response.data.errors);
+    });
+}
 
 /**
  * Пересобрать токен

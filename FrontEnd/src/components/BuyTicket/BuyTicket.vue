@@ -246,7 +246,7 @@
 
                     </div>
                     <div class="col-md-6">
-                      <h4 class="my-lg-2 font-weight-normal">{{ getDiscountByPromoCode }} <small class="text-muted">/
+                      <h4 class="my-lg-2 font-weight-normal">{{ getDiscountByPromoCode * countGuests}} <small class="text-muted">/
                         руб.</small></h4>
                     </div>
 
