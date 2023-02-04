@@ -16,14 +16,14 @@
             <router-link
                     class="nav-link"
                     active-class="active"
-                    :to="{ name: 'Orders' }">Мои заказы
+                    :to="{ name: 'Orders' }">Мои оргвзносы
             </router-link>
         </li>
         <li class="nav-item" v-if="isAdmin && isAuth">
             <router-link
                     class="nav-link"
                     active-class="active"
-                    :to="{ name: 'AllOrders' }">Все заказы
+                    :to="{ name: 'AllOrders' }">Все оргвзносы
             </router-link>
         </li>
         <li class="nav-item" v-if="!isAuth">

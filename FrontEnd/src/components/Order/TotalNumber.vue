@@ -1,20 +1,22 @@
 <template>
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Отчёт о билетах</h5>
-      <p>
-        <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
-      </p>
-      <p>
-        <b>На сумму:</b><span> {{ getTotalAmount }} </span>
-      </p>
-      <p>
-        <b>Всего заказов:</b><span> {{ getTotalCount }} </span>
-      </p>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Отчёт о билетах</h5>
+          <p>
+            <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
+          </p>
+          <p>
+            <b>На сумму:</b><span> {{ getTotalAmount }} </span>
+          </p>
+          <p>
+            <b>Всего заказов:</b><span> {{ getTotalCount }} </span>
+          </p>
+        </div>
+      </div>
     </div>
-
-  </div><!-- End Default Card -->
-
+  </div>
 </template>
 
 <script>

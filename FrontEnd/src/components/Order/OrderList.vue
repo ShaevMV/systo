@@ -4,7 +4,7 @@
     <h1 class="card-title" v-else> Заказы пользователя </h1>
   </div>
   <div class="row">
-    <div class="col-lg-10 mx-auto">
+    <div class="col-lg-12 mx-auto">
       <div class="card">
         <div class="card-body">
           <p>На этой странице ты можешь просмотреть все свои заказы на регистрацию оргвзносов.<br>
@@ -18,9 +18,9 @@
               <th scope="col">Стоимость</th>
               <th scope="col">Кол-во</th>
               <th scope="col">Промо код</th>
-              <th scope="col">Способ покупки билета</th>
+              <th scope="col">Метод <span>перевода</span></th>
               <th scope="col">Информация о платеже</th>
-              <th scope="col">Дата покупики билета</th>
+              <th scope="col">Дата <span>внесения средств</span></th>
               <th scope="col">Статус</th>
               <th scope="col">Комментарий</th>
               <th scope="col"></th>

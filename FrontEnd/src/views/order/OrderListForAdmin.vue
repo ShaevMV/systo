@@ -1,14 +1,9 @@
 <template>
   <section class="section">
-    <div class="row">
-    <div class="col-lg-12">
       <filter-order/>
       <total-number/>
       <order-list :is-admin="true"/>
-    </div>
-    </div>
   </section>
-
 </template>
 
 <script>

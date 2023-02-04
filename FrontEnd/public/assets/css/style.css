@@ -1430,17 +1430,30 @@ label.required::after{
     display: block;
     width: 100%;
     padding: .375rem .75rem;
-    -webkit-appearance: none;
-    -moz-appearance: none;
     appearance: none;
 }
 
-.form-control:focus {
+.form-select{
+    border: none;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    background-color: var(--c-lightgrey);
+    font-size: 16px;
+    height: 50px;
+    outline: none;
+    transition: var(--transition);
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    /*appearance: none;*/
+}
+
+.form-control:focus, .form-select:focus {
     background-color: var(--c-grey);
     outline: 0;
 }
 
-#main .col-lg-10{
+#main .col-lg-10, #main .col-lg-12{
     background-color: #fff;
     border-radius: var(--radius);
 }
@@ -1500,6 +1513,14 @@ label.required::after{
 
 #prana a:hover{
     text-decoration: none;
+}
+
+
+#main .card th{
+    font-weight: normal;
+    font-size: 15px;
+    color: #333333;
+    opacity: 0.5;
 }
 
 .hidder{
