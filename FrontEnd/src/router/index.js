@@ -31,7 +31,7 @@ const routes = [
     },
     {
         path: '/forgotPassword',
-        name: 'registration',
+        name: 'forgotPassword',
         component: RegView,
         meta: {
             'guest': true
