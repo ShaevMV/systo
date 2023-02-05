@@ -51,6 +51,10 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @mixin Eloquent
  * @property bool $is_admin
  * @method static Builder|User whereIsAdmin($value)
+ * @property string|null $phone
+ * @property string|null $city
+ * @method static Builder|User whereCity($value)
+ * @method static Builder|User wherePhone($value)
  */
 class User extends Authenticatable implements JWTSubject
 {

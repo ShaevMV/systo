@@ -31,6 +31,11 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketModel whereOrderTicketId($value)
  * @method static Builder|TicketModel whereStatus($value)
  * @method static Builder|TicketModel whereUpdatedAt($value)
+ * @property Carbon|null $deleted_at
+ * @method static \Illuminate\Database\Query\Builder|TicketModel onlyTrashed()
+ * @method static Builder|TicketModel whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|TicketModel withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|TicketModel withoutTrashed()
  */
 class TicketModel extends Model
 {

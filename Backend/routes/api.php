@@ -51,5 +51,6 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
     Route::post('forgot-password', 'forgotPassword');
+    Route::post('resetPassword', 'resetPassword');
     Route::post('isCorrectRole', 'isCorrectRole');
 });

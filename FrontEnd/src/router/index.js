@@ -6,6 +6,9 @@ import AdminDashboard from "../views/admin/AdminDashboard";
 import OrderItemView from "@/views/order/OrderItemView";
 import OrderListForAdmin from "@/views/order/OrderListForAdmin.vue";
 import RegView from "@/views/auth/RegView.vue";
+import Error404 from "@/views/error/Error404.vue";
+import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
+import ResetPassword from "@/components/Auth/ResetPassword.vue";
 
 const routes = [
     {
@@ -32,7 +35,15 @@ const routes = [
     {
         path: '/forgotPassword',
         name: 'forgotPassword',
-        component: RegView,
+        component: ForgotPasswordView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/resetPassword/:token',
+        name: 'resetPassword',
+        component: ResetPassword,
         meta: {
             'guest': true
         }
@@ -62,6 +73,7 @@ const routes = [
             'requiresAuth': true,
         }
     },
+
     {
         path: '/admin',
         name: 'adminDashboard',
@@ -70,7 +82,11 @@ const routes = [
             'requiresAuth': true,
             'role': ['admin']
         }
-    }
+    },
+    {
+        path: '/:pathMatch(.*)*',
+        component: Error404,
+    },
 ]
 
 const router = createRouter({
@@ -95,8 +111,7 @@ router.beforeEach((to, from, next) => {
                 if(to.matched.some(record => record.meta.role)) {
                     window.store.dispatch('appUser/isCorrectRole',{
                         'role':to.meta.role
-                    }).then(function (r){
-                        console.log(r)
+                    }).then(function (){
                         next();
                     })
                 } else {
@@ -104,7 +119,6 @@ router.beforeEach((to, from, next) => {
                 }
             }
         } else if (to.matched.some(record => record.meta.guest)) {
-
             if (!token) {
                 next();
             } else {

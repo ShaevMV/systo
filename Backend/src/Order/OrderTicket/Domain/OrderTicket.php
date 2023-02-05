@@ -30,8 +30,6 @@ final class OrderTicket extends AggregateRoot
     ) {
     }
 
-
-
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
     {
         $tickets = [];

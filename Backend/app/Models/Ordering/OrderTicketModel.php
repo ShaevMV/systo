@@ -54,6 +54,13 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @property-read int|null $comments_count
  * @property-read TicketTypesModel $ticketType
  * @property-read TypesOfPaymentModel $typeOfPayment
+ * @property string $festival_id
+ * @property string $id_buy
+ * @property string $phone
+ * @property-read User $users
+ * @method static Builder|OrderTicketModel whereFestivalId($value)
+ * @method static Builder|OrderTicketModel whereIdBuy($value)
+ * @method static Builder|OrderTicketModel wherePhone($value)
  */
 final class OrderTicketModel extends Model
 {

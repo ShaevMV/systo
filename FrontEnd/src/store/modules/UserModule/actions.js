@@ -27,7 +27,9 @@ export const toLogin = (context, payload) => {
         }
     });
 };
+
 /**
+ * Регистрация
  *
  * @param context
  * @param payload
@@ -45,14 +47,19 @@ export const toRegistration = (context, payload) => {
     });
 };
 
+/**
+ * Восстановления пароля
+ *
+ * @param context
+ * @param payload
+ */
 export const toForgotPassword = (context, payload) => {
+    context.commit('setError', []);
     let promise = axios.post('/api/forgot-password', {
         email: payload.email
     });
     promise.then(async function (response) {
-        if (response.data.status === 'success') {
-            payload.callback();
-        }
+        payload.callback(response.data.message);
     }).catch(function (error) {
         context.commit('setError', error.response.data.errors);
     });
@@ -71,20 +78,56 @@ export const tokenRefresh = (context) => {
             context.commit('setUserInfo', response.data.user);
         }
     }).catch(function (error) {
-        if(error.response.status === 401) {
+        if (error.response.status === 401) {
             context.dispatch('logOut').then(r => console.log(r));
         }
         console.error(error);
     })
 };
 
+/**
+ * Сменить пароль
+ *
+ * @param context
+ * @param payload
+ */
+export const changePassword = (context, payload) => {
+    let promise = axios.post('/api/resetPassword', {
+        token: payload.token,
+        password: payload.password,
+        password_confirmation: payload.password_confirmation,
+    });
+    promise.then(async function (response) {
+        if (response.data.status === 'success') {
+            context.commit('setToken', response.data.authorisation);
+            context.commit('setUserInfo', response.data.user);
+            payload.callback()
+        }
+    }).catch(function (error) {
+        if (error.response.status === 401) {
+            context.dispatch('logOut').then(r => console.log(r));
+        }
+        console.error(error);
+    })
+};
+
+/**
+ * Проверить доступ
+ *
+ * @param context
+ * @param payload
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
 export const isCorrectRole = (context, payload) => {
-    console.log(payload);
     return axios.post('/api/isCorrectRole', payload);
 };
 
 
-
+/**
+ * Разлогиниться
+ *
+ * @param context
+ */
 export const logOut = (context) => {
     let promise = axios.post('/api/logout');
     promise.then(async function () {

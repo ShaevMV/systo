@@ -7,9 +7,6 @@
       <div class="col-lg-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
-
-            <div class="messager">{{ getError('email') }}</div>
-
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="row">
@@ -32,6 +29,7 @@
                             class="btn btn-lg btn-block btn-outline-primary "> Восстановить пароль
                     </button>
                     <small class="form-text text-muted"> {{ getError('main') }}</small>
+                    <small class="form-text text-muted"> {{ message }}</small>
                   </div>
                 </div>
               </div>
@@ -41,17 +39,18 @@
       </div>
     </div>
   </div>
+
 </template>
 
 <script>
 import {mapActions, mapGetters} from "vuex";
-import {toForgotPassword} from "@/store/modules/UserModule/actions";
 
 export default {
   name: "ForgotPasswordAuth",
   data() {
     return {
       email: null,
+      message: null,
     }
   },
   computed: {
@@ -66,16 +65,11 @@ export default {
 
     sendForgotPassword: function () {
       let self = this;
-
+      self.message = null;
       this.toForgotPassword({
         'email': this.email,
-        'callback': function () {
-          let url = self.$route.query.nextUrl || null;
-          if (url !== null) {
-            location.href = url;
-          } else {
-            location.reload();
-          }
+        'callback': function (message) {
+          self.message = message;
         }
       })
     }
