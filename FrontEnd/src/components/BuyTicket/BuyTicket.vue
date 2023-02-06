@@ -40,7 +40,8 @@
                   <div class="row">
 
                     <div class="pp1">
-                      <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе аккаунт:
+                      <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе
+                      аккаунт:
                     </div>
 
                     <div class="col-md-12">
@@ -121,6 +122,20 @@
 
                       </div>
                     </div>
+                    <div class="col-md-6">
+                      <div class="form-group">
+                        <label for="form_phone">Город *</label>
+                        <input id="form_phone"
+                               type="email"
+                               name="city"
+                               class="form-control"
+                               placeholder="Please enter your city *"
+                               required="required"
+                               v-model="city"
+                               data-error="Valid phone is required.">
+
+                      </div>
+                    </div>
                     <!--                  Тип оргвзноса: *-->
                     <div class="col-md-6">
                       <div class="form-group">
@@ -160,7 +175,7 @@
                                 id="basic-addon1"><i class="bi bi-check"></i></span>
                         </div>
                         <small class="form-text text-muted" v-show="massageForPromoCode!==null">
-                           {{ massageForPromoCode }}
+                          {{ massageForPromoCode }}
                         </small>
                       </div>
                     </div>
@@ -246,7 +261,8 @@
 
                     </div>
                     <div class="col-md-6">
-                      <h4 class="my-lg-2 font-weight-normal">{{ getDiscountByPromoCode * countGuests}} <small class="text-muted">/
+                      <h4 class="my-lg-2 font-weight-normal">{{ getDiscountByPromoCode * countGuests }} <small
+                          class="text-muted">/
                         руб.</small></h4>
                     </div>
 
@@ -476,7 +492,7 @@ export default {
       this.idBuy = null;
       this.city = null;
       this.phone = null;
-      this.comment= null;
+      this.comment = null;
       this.confirm = false;
       this.clearPromoCode();
     },
