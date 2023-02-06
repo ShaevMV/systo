@@ -36,6 +36,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketModel whereDeletedAt($value)
  * @method static \Illuminate\Database\Query\Builder|TicketModel withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TicketModel withoutTrashed()
+ * @property int $kilter
+ * @method static Builder|TicketModel whereKilter($value)
  */
 class TicketModel extends Model
 {

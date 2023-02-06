@@ -12,6 +12,11 @@ export default {
             'email': localStorage.getItem('user.email') || null,
             'admin': localStorage.getItem('user.isAdmin') === 'true' || false,
         },
+        userData: {
+            'city': null,
+            'phone': null,
+            'name': null,
+        },
         dataError: [],
     },
     getters,

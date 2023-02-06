@@ -19,7 +19,6 @@ class UserPasswordResets extends Mailable
      * @return void
      */
     public function __construct(
-        private User $user,
         private string $activationLink,
     ) {
     }

@@ -7,6 +7,10 @@
       <div class="col-lg-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
+
+            <div class="messager" v-show="getError('email')">{{ getError('email') }}</div>
+            <div class="messager" v-show="message">{{ message }}</div>
+
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="row">
@@ -28,8 +32,6 @@
                             @click="sendForgotPassword"
                             class="btn btn-lg btn-block btn-outline-primary "> Восстановить пароль
                     </button>
-                    <small class="form-text text-muted"> {{ getError('main') }}</small>
-                    <small class="form-text text-muted"> {{ message }}</small>
                   </div>
                 </div>
               </div>

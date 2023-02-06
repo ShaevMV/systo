@@ -61,6 +61,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel whereFestivalId($value)
  * @method static Builder|OrderTicketModel whereIdBuy($value)
  * @method static Builder|OrderTicketModel wherePhone($value)
+ * @property int $kilter
+ * @method static Builder|OrderTicketModel whereKilter($value)
  */
 final class OrderTicketModel extends Model
 {

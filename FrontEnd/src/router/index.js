@@ -9,6 +9,7 @@ import RegView from "@/views/auth/RegView.vue";
 import Error404 from "@/views/error/Error404.vue";
 import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
+import ProfileView from "@/views/user/ProfileView.vue";
 
 const routes = [
     {
@@ -52,6 +53,14 @@ const routes = [
         path: '/myOrders',
         name: 'Orders',
         component: OrderView,
+        meta: {
+            'requiresAuth': true,
+        }
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: ProfileView,
         meta: {
             'requiresAuth': true,
         }

@@ -41,6 +41,8 @@ return new class extends Migration {
 
             $table->timestamps();
         });
+        DB::statement('alter table order_tickets
+    add kilter int(11) UNIQUE NOT NULL AUTO_INCREMENT FIRST');
     }
 
     /**

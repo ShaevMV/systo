@@ -61,7 +61,40 @@ export const toForgotPassword = (context, payload) => {
     promise.then(async function (response) {
         payload.callback(response.data.message);
     }).catch(function (error) {
-        context.commit('setError', error.response.data.errors);
+        payload.callback(error.response.data.errors.email);
+    });
+}
+
+/**
+ * Сменить данные пользователя
+ *
+ * @param context
+ * @param payload
+ */
+export const editProfile = (context, payload) => {
+    let promise = axios.post('/api/editProfile', {
+        city: payload.city,
+        phone: payload.phone,
+        name: payload.name,
+    });
+    promise.then(async function (response) {
+        payload.callback(response.data.message);
+    }).catch(function (error) {
+        payload.callback(error.response.data.errors);
+    });
+}
+
+/**
+ * Получить данные о пользователе
+ *
+ * @param context
+ */
+export const loadUserData = (context) => {
+    let promise = axios.get('/api/user');
+    promise.then(async function (response) {
+        context.commit('setUserData', response.data);
+    }).catch(function (error) {
+        console.error(error)
     });
 }
 
@@ -122,6 +155,25 @@ export const isCorrectRole = (context, payload) => {
     return axios.post('/api/isCorrectRole', payload);
 };
 
+
+/**
+ * Сменить пароль
+ *
+ * @param context
+ * @param payload
+ */
+export const editPassword = (context, payload) => {
+    let promise = axios.post('/api/editPassword', {
+        password: payload.password,
+        password_confirmation: payload.password_confirmation,
+    });
+    promise.then(async function (response) {
+        payload.callback(response.data.message);
+    }).catch(function (error) {
+        console.error(error.response.data);
+        payload.callback(error.response.data.message);
+    });
+};
 
 /**
  * Разлогиниться

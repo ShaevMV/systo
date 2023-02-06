@@ -49,3 +49,13 @@ export const getIdUser = state => {
     return state.userInfo.id;
 };
 
+
+export const getUserData = state => type => {
+    if(state.userData !== undefined && state.userData[type] !== undefined){
+        if(typeof state.userData[type] === "object"){
+            return state.userData[type];
+        }
+        return state.userData[type];
+    }
+    return null;
+}

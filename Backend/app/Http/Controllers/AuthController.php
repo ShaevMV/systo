@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Mail\UserPasswordResets;
 use App\Models\PasswordResets;
 use Bus;
 use DomainException;
@@ -160,8 +161,16 @@ class AuthController extends Controller
         $validate->validate();
         $email = $request->get('email');
         if ($user = User::where('email', '=', $email)->first()) {
-            $this->bus::chain([(new ProcessPasswordResets($user))])
-                ->dispatch();
+            $token = urlencode(md5($user->email));
+
+            $activationLink = url("/passwordResets/".$token);
+
+            PasswordResets::updateOrCreate([
+                'email' => $user->email,
+                'token' => $token
+            ]);
+
+            \Mail::to($user)->send(new UserPasswordResets($activationLink));
 
             return response()->json([
                 'message' => 'На указанный е-мейл отправлена ссылка для восстановления пароля'
@@ -169,11 +178,32 @@ class AuthController extends Controller
         }
         return response()->json([
             'errors' => [
-                'email' => ['Данный пользователь в системе не зарегистрирован']
+                'email' => 'Данный пользователь в системе не зарегистрирован'
             ]
         ], 422);
     }
 
+    /**
+     * @throws ValidationException
+     */
+    public function editPassword(Request $request): JsonResponse
+    {
+        Validator::make($request->all(), [
+            'password' => 'required|confirmed|min:6',
+        ], [
+            '*.required' => 'Поле обязательно для ввода',
+            '*.min' => 'Минимальное количество символов 6-ть',
+            '*.confirmed' => 'Пароль не совпадает'
+        ])->validate();
+        /** @var User $user */
+        $user = auth()->user();
+        $user->password = Hash::make($request->get('password'));
+        $user->save();
+
+        return response()->json([
+            'message' => 'Пароль сменён'
+        ]);
+    }
     /**
      * @throws ValidationException
      * @throws JsonException
@@ -208,5 +238,20 @@ class AuthController extends Controller
         $token = Auth::login($user);
 
         return $this->respondWithToken($token);
+    }
+
+    public function editProfile(Request $request): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $user->name = $request->get('name');
+        $user->phone = $request->get('phone');
+        $user->city = $request->get('city');
+        $user->save();
+
+        return response()->json([
+            'message' => 'Данные пользователя изменены'
+        ]);
     }
 }

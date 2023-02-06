@@ -25,6 +25,8 @@ return new class extends Migration
             $table->softDeletes();
             $table->timestamps();
         });
+        DB::statement('alter table tickets
+    add kilter int(11) UNIQUE NOT NULL AUTO_INCREMENT FIRST');
     }
 
     /**
