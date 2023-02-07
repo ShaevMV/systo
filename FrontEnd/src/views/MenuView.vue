@@ -41,7 +41,7 @@
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
-      <a class="nav-link" @click="logOut" href="javascript:void(0);">Выйти</a>
+      <a class="exit-link" @click="logOut" href="javascript:void(0);">Выйти из аккаунта</a>
     </li>
   </ul>
 

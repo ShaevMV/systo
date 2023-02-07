@@ -1,8 +1,11 @@
 <template>
-  <div>
+  <div class="row">
+    <div class="container">
+      <div class="title-block text-center"><h1 class="card-title">Заказ от {{ getDateBuy }}</h1></div>
+      <div class="row">
+        <div class="col-lg-12 mx-auto">
     <div class="card">
       <div class="card-body">
-        <h5 class="card-title">Заказ от {{ getDateBuy }}</h5>
         <table class="table table-hover">
           <thead>
           <tr>
@@ -32,6 +35,9 @@
     <order-button
         :id="getId"
         :status="getStatus"/>
+  </div>
+  </div>
+      </div>
   </div>
 </template>
 

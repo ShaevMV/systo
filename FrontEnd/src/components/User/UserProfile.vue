@@ -1,55 +1,64 @@
 <template>
-  <div>
-    <div class="card">
-      <div class="card-body pt-3">
-        <div class="tab-pane fade profile-edit pt-3 active show" id="profile-edit" role="tabpanel">
+  <div class="row" id="accounter">
+    <div class="container">
+      <div class="title-block text-center"><h1 class="card-title">Мой аккаунт</h1></div>
+      <div class="row">
+        <div class="col-lg-10 mx-auto">
+          <div class="card">
+            <div class="card-body pt-3">
+              <div class="tab-pane fade profile-edit pt-3 active show" id="profile-edit" role="tabpanel">
 
-          <!-- Profile Edit Form -->
-          <div>
-            <div class="row mb-3">
-              <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Имя</label>
-              <div class="col-md-8 col-lg-9">
-                <input name="fullName"
-                       type="text"
-                       v-model="name"
-                       class="form-control"
-                       id="fullName">
+                <!-- Profile Edit Form -->
+                <div>
+                  <div class="row mb-3">
+                    <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Имя</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="fullName"
+                             type="text"
+                             v-model="name"
+                             class="form-control"
+                             id="fullName">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="company" class="col-md-4 col-lg-3 col-form-label">Город</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="company"
+                             type="text"
+                             class="form-control"
+                             v-model="city"
+                             id="company">
+                    </div>
+                  </div>
+
+                  <div class="row mb-3">
+                    <label for="Job" class="col-md-4 col-lg-3 col-form-label">Телефон</label>
+                    <div class="col-md-8 col-lg-9">
+                      <input name="job"
+                             type="text"
+                             class="form-control"
+                             v-model="phone"
+                             id="Job">
+                    </div>
+                  </div>
+                  <div class="messager" v-show="message">{{ message }}</div>
+                  <div class="text-center">
+                    <button type="submit"
+                            @click="sendUserData"
+                            class="btn btn-primary">Сохранить изменения
+                    </button>
+                  </div>
+                </div><!-- End Profile Edit Form -->
+
               </div>
             </div>
-
-            <div class="row mb-3">
-              <label for="company" class="col-md-4 col-lg-3 col-form-label">Город</label>
-              <div class="col-md-8 col-lg-9">
-                <input name="company"
-                       type="text"
-                       class="form-control"
-                       v-model="city"
-                       id="company">
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <label for="Job" class="col-md-4 col-lg-3 col-form-label">Телефон</label>
-              <div class="col-md-8 col-lg-9">
-                <input name="job"
-                       type="text"
-                       class="form-control"
-                       v-model="phone"
-                       id="Job">
-              </div>
-            </div>
-            <div class="messager" v-show="message">{{ message }}</div>
-            <div class="text-center">
-              <button type="submit"
-                      @click="sendUserData"
-                      class="btn btn-primary">Сохранить
-              </button>
-            </div>
-          </div><!-- End Profile Edit Form -->
-
+          </div>
         </div>
       </div>
-    </div>
+
+      <div class="row">
+          <div class="col-lg-10 mx-auto">
     <div class="card">
       <div class="card-body">
         <div class="row mb-3">
@@ -81,6 +90,9 @@
         </div>
       </div>
     </div>
+        </div>
+  </div>
+  </div>
   </div>
 </template>
 

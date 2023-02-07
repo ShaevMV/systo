@@ -7,9 +7,6 @@
       <div class="col-lg-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
-
-            <div class="messager">{{ getError('email') }}</div>
-
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
               Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку <router-link
