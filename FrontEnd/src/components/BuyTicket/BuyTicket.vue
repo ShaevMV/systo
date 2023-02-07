@@ -286,7 +286,7 @@
           </div>
         </div>
         <!-- /.8 -->
-
+        <input type="hidden" name="name" id="forCopy">
       </div>
       <!-- /.row-->
       <div class="modal" tabindex="-1" role="dialog" id="myModal">
@@ -428,9 +428,13 @@ export default {
     ]),
     CopyTypesOfPayment: function (name) {
       let card = name.replace(/[^0-9, ]/g, "");
-      navigator.clipboard.writeText(card)
-          .then(() => console.log("Done!"))
-          .catch(err => console.error(err))
+      let area = document.createElement('textarea');
+
+      document.body.appendChild(area);
+      area.value = card;
+      area.select();
+      document.execCommand("copy");
+      document.body.removeChild(area);
     },
     /**
      * Отправить промо код
