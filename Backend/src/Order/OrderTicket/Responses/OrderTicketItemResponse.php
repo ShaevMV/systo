@@ -11,6 +11,7 @@ use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class OrderTicketItemResponse extends AbstractionEntity implements Response
 {
@@ -18,9 +19,26 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
     protected int $count;
     protected string $humanStatus;
 
+    /**
+     * @param  Uuid  $id
+     * @param  Uuid  $userId
+     * @param  int  $kilter
+     * @param  string  $name
+     * @param  float  $price
+     * @param  float  $discount
+     * @param  array  $guests
+     * @param  Status  $status
+     * @param  Carbon  $dateBuy
+     * @param  Carbon  $dateCreate
+     * @param  string  $typeOfPayment
+     * @param  string  $email
+     * @param  TicketDto[]  $tickets
+     * @param  string|null  $promoCode
+     */
     public function __construct(
         protected Uuid $id,
         protected Uuid $userId,
+        protected int $kilter,
         protected string $name,
         protected float $price,
         protected float $discount,
@@ -30,8 +48,8 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         protected Carbon $dateCreate,
         protected string $typeOfPayment,
         protected string $email,
+        protected array $tickets,
         protected ?string $promoCode = null,
-
     ) {
         $this->totalPrice = $price - $discount;
         $this->count = count($this->guests);
@@ -41,10 +59,15 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
     public static function fromState(array $data): self
     {
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
+        $tickets = [];
+        foreach ($data['tickets'] as $ticket) {
+            $tickets[] = TicketDto::fromState($ticket);
+        }
 
         return new self(
             new Uuid($data['id']),
             new Uuid($data['user_id']),
+            $data['kilter'],
             $data['ticket_type']['name'],
             $data['price'],
             $data['discount'],
@@ -54,6 +77,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
             new Carbon($data['created_at']),
             $data['type_of_payment']['name'],
             $data['users']['email'],
+            $tickets,
             $data['promo_code']
         );
     }

@@ -15,6 +15,7 @@ export default {
         orderItem: {
             name: null,
             count: 0,
+            kilter: null,
             price: 0.00,
             guests: [],
             totalPrice: 0,

@@ -67,15 +67,12 @@ export default {
       'isAuth',
       'isAdmin'
     ]),
-  }
-  ,
+  },
   methods: {
-    ...
-        mapActions('appUser', [
+    ...mapActions('appUser', [
           'logOut'
         ]),
-  }
-  ,
+  },
 }
 </script>
 

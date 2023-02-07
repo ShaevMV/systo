@@ -6,6 +6,7 @@ namespace App\Models\Ordering;
 
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Tickets\Shared\Infrastructure\Models\HasUuid;
@@ -84,6 +86,11 @@ final class OrderTicketModel extends Model
     public function users(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function tickets(): hasMany
+    {
+        return $this->hasMany(TicketModel::class, 'order_ticket_id');
     }
 
     public function ticketType(): BelongsTo

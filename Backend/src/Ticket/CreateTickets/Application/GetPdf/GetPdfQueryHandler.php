@@ -12,18 +12,9 @@ class GetPdfQueryHandler implements QueryHandler
 {
     private const PATH = 'storage/tickets/';
 
-    public function __construct(
-        private TicketsRepositoryInterface $ticketsRepository
-    ) {
-    }
-
     public function __invoke(GetPdfQuery $query): UrlsTicketPdfResponse
     {
-        $listIds = $this->ticketsRepository->getListIdByOrderId($query->getOrderId());
-        $listUrl = [];
-        foreach ($listIds as $id) {
-            $listUrl[] = asset(self::PATH.$id->value().'.pdf');
-        }
+        $listUrl[] = asset(self::PATH.$query->getTicketId()->value().'.pdf');
 
         return new UrlsTicketPdfResponse($listUrl);
     }

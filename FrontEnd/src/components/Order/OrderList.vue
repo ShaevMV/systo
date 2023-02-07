@@ -31,7 +31,7 @@
                 v-bind:key="index"
                 @click="goItemOrder(itemOrder.id)">
               <th scope="row">
-                {{ index + 1 }}
+                {{ itemOrder.kilter }}
               </th>
               <td v-if="isAdmin">{{ itemOrder.email }}</td>
               <td>{{ itemOrder.name }}</td>

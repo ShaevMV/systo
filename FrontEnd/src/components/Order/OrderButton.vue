@@ -2,10 +2,14 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Скачать pdf</h5>
-      <button type="button"
-              v-if="status === 'paid'"
-              @click="downloadTicket(id)"
-              class="btn btn-primary">Скачать</button>
+      <div v-if="status === 'paid'">
+        <button type="button"
+                v-for="(item,index) in listTickets"
+                v-bind:key="index"
+                @click="downloadTicket(item.id)"
+                class="btn btn-primary">Скачать билет для {{ item.name }}
+        </button>
+      </div>
       <span v-else> Билеты будут доступны для скачивания после проверки оплаты заказа </span>
     </div>
   </div>
@@ -21,13 +25,16 @@ export default {
       type: String,
       default: 'new',
     },
+    listTickets: {
+      type: Array
+    },
     id: {
       type: String
     }
   },
-  methods:{
-    ...mapActions('appOrder',[
-        'getUrlForPdf'
+  methods: {
+    ...mapActions('appOrder', [
+      'getUrlForPdf'
     ]),
     /**
      * Скачать билеты

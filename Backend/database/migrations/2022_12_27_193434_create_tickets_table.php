@@ -27,6 +27,7 @@ return new class extends Migration
         });
         DB::statement('alter table tickets
     add kilter int(11) UNIQUE NOT NULL AUTO_INCREMENT FIRST');
+        DB::statement('alter table tickets AUTO_INCREMENT = 1000');
     }
 
     /**

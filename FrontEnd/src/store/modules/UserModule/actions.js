@@ -184,7 +184,7 @@ export const logOut = (context) => {
     let promise = axios.post('/api/logout');
     promise.then(async function () {
         context.commit('removeToken');
-        location.reload();
+        location.href = '/';
     }).catch(function (error) {
         console.error(error);
         context.commit('removeToken');

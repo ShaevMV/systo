@@ -29,9 +29,10 @@ class TicketDto extends AbstractionEntity
     public static function fromState(array $data): self
     {
         return new self(
-            $data['order_id'],
+            new Uuid($data['order_ticket_id']),
             $data['name'],
-            $data['id']
+            new Uuid($data['id']),
+            $data['kilter']
         );
     }
 }

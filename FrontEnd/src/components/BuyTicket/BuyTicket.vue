@@ -286,7 +286,6 @@
           </div>
         </div>
         <!-- /.8 -->
-        <input type="hidden" name="name" id="forCopy">
       </div>
       <!-- /.row-->
       <div class="modal" tabindex="-1" role="dialog" id="myModal">

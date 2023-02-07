@@ -10,12 +10,12 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class GetPdfQuery implements Query
 {
     public function __construct(
-        private Uuid $orderId,
+        private Uuid $ticketId,
     ) {
     }
 
-    public function getOrderId(): Uuid
+    public function getTicketId(): Uuid
     {
-        return $this->orderId;
+        return $this->ticketId;
     }
 }

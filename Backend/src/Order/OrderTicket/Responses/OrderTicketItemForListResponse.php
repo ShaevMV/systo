@@ -21,6 +21,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
 
     public function __construct(
         protected Uuid $id,
+        protected int $kilter,
         protected string $email,
         protected string $name,
         protected float $price,
@@ -50,6 +51,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         $status = new Status($data['status']);
         return new self(
             new Uuid($data['id']),
+            $data['kilter'],
             $data['email'],
             $data['name'],
             (float) $data['price'] - (float) $data['discount'],

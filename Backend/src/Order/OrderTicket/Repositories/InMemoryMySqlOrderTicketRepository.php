@@ -192,9 +192,10 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->with('comments')
             ->with('ticketType')
             ->with('typeOfPayment')
+            ->with('tickets')
             ->first()
             ?->toArray();
 
-        return is_null($rawData) ? null :OrderTicketItemResponse::fromState($rawData);
+        return is_null($rawData) ? null : OrderTicketItemResponse::fromState($rawData);
     }
 }

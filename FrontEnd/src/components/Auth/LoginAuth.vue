@@ -100,9 +100,7 @@ export default {
           if (url !== null) {
             location.href = url;
           } else {
-            console.log(isAdmin === 'true');
-            console.log(isAdmin === true);
-            if (isAdmin === 'true') {
+            if (isAdmin === true) {
               location.href = '/orders';
             } else {
               location.href = '/myOrders';

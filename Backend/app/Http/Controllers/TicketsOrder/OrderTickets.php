@@ -7,6 +7,7 @@ namespace App\Http\Controllers\TicketsOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
+use App\Models\User;
 use Database\Seeders\FestivalSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Http\JsonResponse;
@@ -133,10 +134,11 @@ class OrderTickets extends Controller
     public function getOrderItem(string $id): JsonResponse
     {
         $orderItem = $this->getOrder->getItemById(new Uuid($id));
-
+        /** @var User $user */
+        $user = Auth::user();
         if (is_null($orderItem) ||
             (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
-                && !Auth::user()->is_admin)
+                && !$user->is_admin)
         ) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']
