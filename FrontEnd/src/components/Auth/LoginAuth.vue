@@ -9,9 +9,11 @@
           <div class="card-body">
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
-              Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку <router-link
+              Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку
+              <router-link
                   to="/registration"><b>Зарегистрироваться</b>
-              </router-link></p>
+              </router-link>
+            </p>
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="row">
@@ -78,7 +80,8 @@ export default {
   },
   computed: {
     ...mapGetters('appUser', [
-      'getError'
+      'getError',
+      'isAdmin'
     ])
   },
   methods: {
@@ -92,12 +95,18 @@ export default {
       this.toLogin({
         'email': this.email,
         'password': this.password,
-        'callback': function () {
+        'callback': function (isAdmin) {
           let url = self.$route.query.nextUrl || null;
           if (url !== null) {
             location.href = url;
           } else {
-            location.reload();
+            console.log(isAdmin === 'true');
+            console.log(isAdmin === true);
+            if (isAdmin === 'true') {
+              location.href = '/orders';
+            } else {
+              location.href = '/myOrders';
+            }
           }
         }
       })

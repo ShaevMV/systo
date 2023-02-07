@@ -10,6 +10,7 @@ import Error404 from "@/views/error/Error404.vue";
 import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
+import AboutView from "@/views/AboutView.vue";
 
 const routes = [
     {
@@ -66,7 +67,7 @@ const routes = [
         }
     },
     {
-        path: '/orders/:filter?',
+        path: '/orders',
         name: 'AllOrders',
         component: OrderListForAdmin,
         meta: {
@@ -82,7 +83,6 @@ const routes = [
             'requiresAuth': true,
         }
     },
-
     {
         path: '/admin',
         name: 'adminDashboard',
@@ -91,6 +91,11 @@ const routes = [
             'requiresAuth': true,
             'role': ['admin']
         }
+    },
+    {
+        path: '/conditions',
+        name: 'Conditions',
+        component: AboutView,
     },
     {
         path: '/:pathMatch(.*)*',

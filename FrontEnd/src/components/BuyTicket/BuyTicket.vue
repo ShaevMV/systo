@@ -195,6 +195,8 @@
                                      v-bind:value="typesOfPayment.id"
                                      v-bind:id="typesOfPayment.id">
                               {{ typesOfPayment.name }}
+                              <i class="bx bxs-copy"
+                                 @click="CopyTypesOfPayment(typesOfPayment.name)"></i>
                             </label>
                           </div>
                         </div>
@@ -237,7 +239,7 @@
                                id="defaultCheck1">
                         <label class="form-check-label" for="defaultCheck1">
                           Регистрируя организационный взнос, вы соглашаетесь с &nbsp;<a
-                            href="/conditions/" target="_blank">условиями фестиваля</a>
+                            href="/conditions" target="_blank">условиями фестиваля</a>
                         </label>
                       </div>
 
@@ -424,6 +426,12 @@ export default {
     ...mapActions('appOrder', [
       'goToCreateOrderTicket',
     ]),
+    CopyTypesOfPayment: function (name) {
+      let card = name.replace(/[^0-9, ]/g, "");
+      navigator.clipboard.writeText(card)
+          .then(() => console.log("Done!"))
+          .catch(err => console.error(err))
+    },
     /**
      * Отправить промо код
      */
