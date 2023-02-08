@@ -45,11 +45,14 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|string|email',
             'password' => 'required|string',
+        ], [
+            '*.required' => 'Поле обязательно для ввода',
+            '*.email' => 'E-mail не прошел проверку!'
         ]);
         $credentials = $request->only('email', 'password');
 
         if (!$token = auth()->attempt($credentials, true)) {
-            return response()->json(['message' => 'Логин и пароль указан не верно'], 401);
+            return response()->json(['message' => 'Твой пароль неверный, попробуй еще раз!'], 401);
         }
 
         return $this->respondWithToken($token);

@@ -50,7 +50,6 @@
                             @click="auth"
                             class="btn btn-lg btn-block btn-outline-primary "> Авторизоваться
                     </button>
-                    <small class="form-text text-muted"> {{ getError('main') }}</small>
                   </div>
                 </div>
                 <div class="row forgotten-pass">
@@ -58,6 +57,8 @@
                       to="/forgotPassword"><strong>Забыли пароль?</strong>
                   </router-link>
                 </div>
+                <small class="form-text text-muted"> {{ getError('main') }}</small>
+                <small class="form-text text-muted"> {{ getError('email') }}</small>
               </div>
             </div>
           </div>
