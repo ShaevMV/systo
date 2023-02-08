@@ -19,15 +19,6 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class CreateOrderTicketsRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize(): bool
-    {
-        return true;
-    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -37,7 +28,30 @@ class CreateOrderTicketsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'email' => 'required|email',
+            'date' => 'required|before:now',
+            'id_buy' => 'required|numeric',
+            'phone' => 'required|numeric',
+            'city' => 'required',
+            'guests' => 'required|array',
+            'ticket_type_id' => 'exists:App\Models\Ordering\InfoForOrder\TicketTypesModel,id',
+            'types_of_payment_id' => 'exists:App\Models\Ordering\InfoForOrder\TypesOfPaymentModel,id',
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            '*.required' => 'Поле обязательно для ввода',
+            '*.email' => 'Поле должно быть email',
+            '*.numeric' => 'Поле должно быть числом',
+            '*.exists' => 'Такой записи нет системе',
+            '*.before' => 'Дата платежа не может быть в будущем'
         ];
     }
 }

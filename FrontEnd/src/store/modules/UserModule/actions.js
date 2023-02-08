@@ -89,10 +89,13 @@ export const editProfile = (context, payload) => {
  *
  * @param context
  */
-export const loadUserData = (context) => {
+export const loadUserData = (context, payload) => {
     let promise = axios.get('/api/user');
     promise.then(async function (response) {
         context.commit('setUserData', response.data);
+        if(payload.callback !== undefined) {
+            payload.callback(response.data);
+        }
     }).catch(function (error) {
         console.error(error)
     });

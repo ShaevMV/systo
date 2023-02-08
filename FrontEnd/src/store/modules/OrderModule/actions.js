@@ -125,4 +125,8 @@ export const getUrlForPdf = (context, payload) => {
         console.error(error);
         context.commit('setError', error.response.data.errors);
     });
-}
+};
+
+export const clearError = (context) => {
+    context.commit('setError', []);
+};

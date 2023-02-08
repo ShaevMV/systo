@@ -9,7 +9,6 @@ use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use App\Models\User;
 use Database\Seeders\FestivalSeeder;
-use Database\Seeders\UserSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

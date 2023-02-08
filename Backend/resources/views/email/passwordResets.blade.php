@@ -47,6 +47,7 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Для сменны пароля пожалуйста перейдите по
                             <a href="{{$link}}" style="font-family: Tahoma, sans-serif; font-size: 18px; color: black">ссылке</a>.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если Вы получили это письмо ошибочно, проигнорируйте данное письмо!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Солар Систо</p>
                     </td>
                 </tr>
                 <tr>

@@ -87,6 +87,7 @@
                               </span>
                           </div>
                         </div>
+                        <small class="form-text text-muted"> {{ getError('guests') }}</small>
                       </div>
                     </div>
                   </div>
@@ -105,21 +106,22 @@
                                v-model="email"
                                v-bind:readonly="isAuth"
                                data-error="Valid email is required.">
-
+                        <small class="form-text text-muted"> {{ getError('email') }}</small>
                       </div>
                     </div>
                     <div class="col-md-6">
                       <div class="form-group">
-                        <label for="form_phone">Phone *</label>
+                        <label for="form_phone">Телефон *</label>
                         <input id="form_phone"
                                type="email"
                                name="phone"
                                class="form-control"
-                               placeholder="Please enter your phone *"
+                               placeholder="Введите свой номер телефона *"
                                required="required"
+                               v-bind:readonly="getUserData('phone') !== null"
                                v-model="phone"
                                data-error="Valid phone is required.">
-
+                        <small class="form-text text-muted"> {{ getError('phone') }}</small>
                       </div>
                     </div>
                     <div class="col-md-6">
@@ -131,9 +133,10 @@
                                class="form-control"
                                placeholder="Please enter your city *"
                                required="required"
+                               v-bind:readonly="getUserData('city') !== null"
                                v-model="city"
                                data-error="Valid phone is required.">
-
+                        <small class="form-text text-muted"> {{ getError('city') }}</small>
                       </div>
                     </div>
                     <!--                  Тип оргвзноса: *-->
@@ -153,7 +156,7 @@
                             {{ typeTickets.price }} руб.
                           </option>
                         </select>
-
+                        <small class="form-text text-muted"> {{ getError('ticket_type_id') }}</small>
                       </div>
                     </div>
                   </div>
@@ -198,19 +201,43 @@
                               <i class="bx bxs-copy"
                                  @click="CopyTypesOfPayment(typesOfPayment.name)"></i>
                             </label>
+                            <small class="form-text text-muted"> {{ getError('types_of_payment_id') }}</small>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                  <!--                  Дата плптежа -->
+                  <!--                  Дата платежа -->
                   <div class="row">
                     <div class="col-md-12">
                       <div class="form-group">
                         <label for="form_message">Введите данные о том, когда вы внесли платеж:</label>
-                        <input type="datetime-local" class="form-control-plaintext" id="selectData" v-model="date">
+                        <input type="number"
+                               max="31"
+                               min="1"
+                               class="form-control"
+                               v-model="day"
+                               placeholder="День">
+                        <select id="form_need"
+                                name="need"
+                                class="form-select"
+                                required="required"
+                                v-model="mount"
+                                data-error="Please specify your need.">
+                          <option disabled value="null">Месяц</option>
+                          <option v-for="(itemMount, index) in mounts"
+                                  v-bind:key="index"
+                                  v-bind:value="index">{{ itemMount }}
+                          </option>
+                        </select>
+                        <span>
+                          Время:
+                          <input type="number" class="form-control" v-model="hour" placeholder="часы" min="00" max="24"> :
+                          <input type="number" class="form-control" v-model="minute" placeholder="Минут" min="00"
+                                 max="59">
+                        </span>
                       </div>
-
+                      <small class="form-text text-muted"> {{ getError('date') }}</small>
                     </div>
                     <div class="col-md-12">
                       <div class="form-group">
@@ -220,7 +247,9 @@
                           При переводах на Сбербанк напишите сюда последние 4 цифры карты, с которой вы сделали перевод
                           <b>(сюда же вписываем ID или номер "живого билета" с весны для скидки)</b>
                         </small>
+                        <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
                       </div>
+
 
                     </div>
                     <div class="col-md-12">
@@ -275,7 +304,7 @@
                       <button type="button"
                               :disabled="!isNotCorrect"
                               @click="orderTicket"
-                              class="btn btn-lg btn-block btn-outline-primary ">Подтвердить внесение
+                              class="btn btn-lg btn-block btn-outline-primary">Подтвердить внесение
                         средств
                       </button>
                     </div>
@@ -314,11 +343,22 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
+import {getUserData} from "@/store/modules/UserModule/getters";
 
 export default {
   name: "BuyTicket",
   data() {
     return {
+      day: null,
+      mount: null,
+      mounts: {
+        2: 'Февраль',
+        3: 'Март',
+        4: 'Апрель',
+        5: 'Май',
+      },
+      hour: null,
+      minute: null,
       selectTypesOfPayment: null,
       guests: [],
       newGuest: null,
@@ -348,16 +388,22 @@ export default {
     ...mapGetters('appUser', [
       'isAuth',
       'getEmail',
+      'getUserData'
+    ]),
+    ...mapGetters('appOrder', [
+      'getError'
     ]),
     /**
      * Проверка на ведение всех данных
      * @returns {false|*|null}
      */
     isNotCorrect: function () {
+      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toDateString();
+
       return this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.guests.length > 0 &&
-          this.date !== null &&
+          date !== 'Invalid Date' &&
           this.confirm === true &&
           this.idBuy !== null &&
           this.phone !== null &&
@@ -424,6 +470,10 @@ export default {
     ]),
     ...mapActions('appOrder', [
       'goToCreateOrderTicket',
+      'clearError',
+    ]),
+    ...mapActions('appUser', [
+      'loadUserData',
     ]),
     CopyTypesOfPayment: function (name) {
       let card = name.replace(/[^0-9, ]/g, "");
@@ -469,12 +519,14 @@ export default {
      */
     orderTicket: function () {
       let self = this;
+      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toDateString();
+
       this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
         'promo_code': this.promoCode,
-        'date': this.date,
+        'date': date,
         'id_buy': this.idBuy,
         'city': this.city,
         'phone': this.phone,
@@ -498,7 +550,10 @@ export default {
       this.newGuest = '';
       this.email = this.getEmail;
       this.promoCode = null;
-      this.date = null;
+      this.day = null;
+      this.mount = null;
+      this.hour = null;
+      this.minute = null;
       this.massageForPromoCode = null;
       this.idBuy = null;
       this.city = null;
@@ -510,7 +565,17 @@ export default {
   },
   async created() {
     await this.loadDataForOrderingTickets();
-    this.email = this.getEmail;
+    await this.clearError();
+    if (this.isAuth) {
+      let self = this;
+      await this.loadUserData({
+        callback: function (data) {
+          self.phone = data.phone;
+          self.city = data.city;
+        }
+      });
+      this.email = this.getEmail;
+    }
   },
 }
 </script>
