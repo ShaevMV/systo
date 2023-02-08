@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Mail;
 use Nette\Utils\JsonException;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Domain\ProcessPasswordResets;
@@ -170,7 +171,7 @@ class AuthController extends Controller
                 'token' => $token
             ]);
 
-            \Mail::to($user)->send(new UserPasswordResets($activationLink));
+            Mail::to($user)->send(new UserPasswordResets($activationLink));
 
             return response()->json([
                 'message' => 'На указанный е-мейл отправлена ссылка для восстановления пароля'
