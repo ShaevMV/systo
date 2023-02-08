@@ -343,7 +343,6 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
-import {getUserData} from "@/store/modules/UserModule/getters";
 
 export default {
   name: "BuyTicket",
