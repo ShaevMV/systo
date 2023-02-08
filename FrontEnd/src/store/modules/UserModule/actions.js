@@ -140,7 +140,7 @@ export const changePassword = (context, payload) => {
         if (error.response.status === 401) {
             context.dispatch('logOut').then(r => console.log(r));
         }
-        console.error(error);
+        context.commit('setError', error.response.data.errors);
     })
 };
 

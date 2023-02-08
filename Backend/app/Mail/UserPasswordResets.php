@@ -20,7 +20,8 @@ class UserPasswordResets extends Mailable
      */
     public function __construct(
         private string $activationLink,
-    ) {
+    ){
+        $this->subject('Письмо с восстановлением пароля');
     }
 
     /**

@@ -1,30 +1,54 @@
 <template>
-  <div
-      class="form_overlay uk-padding uk-padding-remove-horizontal uk-padding-remove-bottom uk-width-1-1 uk-flex uk-flex-column uk-flex-middle">
-    <h2 class="text-500 uk-text-uppercase h2-header uk-align-center font-26">Восстановить пароль</h2>
-    <div class="form_overlay_block uk-margin-medium-bottom uk-padding-remove width_600">
-      <div class="as_user padding-form">
-        <div class="input_wrapper uk-flex uk-flex-column uk-flex-center">
-          <!-- У input_wrapper есть классы success и failed-->
-          <input placeholder="Пароль"
-                 v-model="password"
-                 type="password">
-        </div>
-        <div class="input_wrapper uk-flex uk-flex-column uk-flex-center">
-          <input placeholder="Повторите пароль"
-                 v-model="password_confirmation"
-                 type="password">
-        </div>
-        <div class="mistake_alert hidden"
-             v-html="getError('password')"
-             v-bind:class="{'visible':getError('password')}">
-        </div>
-        <div class="mistake_alert hidden"
-             v-html="getError('password_confirmation')"
-             v-bind:class="{'visible':getError('password_confirmation')}">
-        </div>
-        <div class="button_continue uk-text-uppercase button_conf_reg uk-align-center uk-margin-remove-bottom"
-             @click="send()">Сменить пароль/войти в систему
+  <div class="container">
+    <div class="text-center title-block">
+      <h1>Сменить пароль</h1>
+    </div>
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <div class="card mt-2 mx-auto">
+          <div class="card-body">
+            <div class="container">
+              <div id="contact-form" role="form">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="form_password" class="required hidder">Ваш пароль</label>
+                      <input id="form_password"
+                             type="password"
+                             name="email"
+                             class="form-control"
+                             placeholder="Введи свой пароль: *"
+                             required="required"
+                             v-model="password"
+                             data-error="Введи свой пароль!">
+
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="form_password" class="required hidder">Повторите пароль, что бы его не забыть</label>
+                      <input id="form_password"
+                             type="password"
+                             name="email"
+                             class="form-control"
+                             placeholder="Повторите пароль: *"
+                             required="required"
+                             v-model="password_confirmation"
+                             data-error="Повторите свой пароль!">
+
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <button type="button"
+                            @click="send()"
+                            class="btn btn-lg btn-block btn-outline-primary "> Сменить пароль/войти в систему
+                    </button>
+                    <small class="form-text text-muted"> {{ getError('password') }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -33,6 +57,7 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
+
 export default {
   name: "ResetPassword",
   data() {
@@ -48,7 +73,8 @@ export default {
   },
   methods: {
     ...mapActions('appUser', [
-      'changePassword'
+      'changePassword',
+      'clearError'
     ]),
     send() {
       this.changePassword({
@@ -60,8 +86,10 @@ export default {
         }
       })
     }
-
-  }
+  },
+  async created() {
+    await this.clearError();
+  },
 }
 </script>
 
