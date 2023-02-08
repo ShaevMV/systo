@@ -190,3 +190,7 @@ export const logOut = (context) => {
         context.commit('removeToken');
     });
 };
+
+export const clearError = (context) => {
+    context.commit('setError', []);
+};

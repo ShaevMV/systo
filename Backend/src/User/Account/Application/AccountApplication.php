@@ -59,10 +59,11 @@ final class AccountApplication
     /**
      * @throws Throwable
      */
-    private function createNewAccount(
+    public function createNewAccount(
         AccountDto $accountDto,
+        ?string $password = null
     ): void {
-        $password = Str::random(8);
+        $password = $password ?? Str::random(8);
         $account = Account::creatingNewAccount(
             $accountDto->getId(),
             $accountDto,

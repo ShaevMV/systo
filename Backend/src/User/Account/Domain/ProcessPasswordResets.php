@@ -47,7 +47,6 @@ class ProcessPasswordResets implements ShouldQueue, DomainEvent
             'token' => $token
         ]);
 
-        Mail::to($this->user)->send(new UserPasswordResets($this->user, $activationLink));
+        Mail::to($this->user)->send(new UserPasswordResets($activationLink));
     }
-
 }

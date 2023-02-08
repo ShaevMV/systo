@@ -19,6 +19,7 @@ use Mail;
 use Nette\Utils\JsonException;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Domain\ProcessPasswordResets;
+use Tickets\User\Account\Dto\AccountDto;
 
 class AuthController extends Controller
 {
@@ -56,6 +57,7 @@ class AuthController extends Controller
 
     /**
      * @throws JsonException
+     * @throws \Throwable
      */
     public function register(Request $request): JsonResponse
     {
@@ -65,18 +67,23 @@ class AuthController extends Controller
             'phone' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|confirmed|string|min:6',
+        ], [
+            '*.required' => 'Поле обязательно для ввода',
+            '*.email' => 'Поле должно быть email',
+            '*.unique' => 'Такой пользователь уже зарегистрирован в системе',
+            '*.confirmed' => 'Пароль не совпадает',
+            '*.min' => 'Минимальное количество символов 6-ть',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'city' => $request->city,
-            'phone' => $request->phone,
-            'password' => Hash::make($request->password),
-        ]);
-
-        $token = Auth::login($user);
-
+        $this->accountApplication->createNewAccount(
+            AccountDto::fromState($request->toArray()),
+            $request->password
+        );
+        $credentials = $request->only('email', 'password');
+        $token = auth()->attempt($credentials, true);
+        if (!$token = auth()->attempt($credentials, true)) {
+            return response()->json(['message' => 'Логин и пароль указан не верно'], 401);
+        }
         return $this->respondWithToken($token);
     }
 
@@ -162,16 +169,7 @@ class AuthController extends Controller
         $validate->validate();
         $email = $request->get('email');
         if ($user = User::where('email', '=', $email)->first()) {
-            $token = urlencode(md5($user->email));
-
-            $activationLink = url("/passwordResets/".$token);
-
-            PasswordResets::updateOrCreate([
-                'email' => $user->email,
-                'token' => $token
-            ]);
-
-            Mail::to($user)->send(new UserPasswordResets($activationLink));
+            $this->bus::chain([new ProcessPasswordResets($user)])->dispatch();
 
             return response()->json([
                 'message' => 'На указанный е-мейл отправлена ссылка для восстановления пароля'
@@ -205,6 +203,7 @@ class AuthController extends Controller
             'message' => 'Пароль сменён'
         ]);
     }
+
     /**
      * @throws ValidationException
      * @throws JsonException
@@ -253,6 +252,15 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Данные пользователя изменены'
+        ]);
+    }
+
+    public function findUserByEmail(string $email): JsonResponse
+    {
+        $userInfo = $this->accountApplication->getUserByEmail($email);
+
+        return response()->json([
+            'success' => !is_null($userInfo)
         ]);
     }
 }

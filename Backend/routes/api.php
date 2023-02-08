@@ -55,4 +55,5 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('isCorrectRole', 'isCorrectRole');
     Route::post('editProfile', 'editProfile');
     Route::post('editPassword', 'editPassword');
+    Route::get('findUserByEmail/:email', 'findUserByEmail');
 });
