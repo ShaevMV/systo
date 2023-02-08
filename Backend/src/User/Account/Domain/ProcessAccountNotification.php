@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Tickets\User\Account\Domain;
 
+use App\Mail\CreateUser;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 
 class ProcessAccountNotification implements ShouldQueue, DomainEvent
@@ -24,8 +24,9 @@ class ProcessAccountNotification implements ShouldQueue, DomainEvent
 
     public function handle(): void
     {
-        //TODO: реализовать отправку мыла
-        Log::debug($this->email);
-        Log::debug($this->password);
+        \Mail::to($this->email)->send(new CreateUser(
+            $this->email,
+            $this->password,
+        ));
     }
 }
