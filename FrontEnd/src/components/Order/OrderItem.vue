@@ -4,41 +4,48 @@
       <div class="title-block text-center"><h1 class="card-title">Заказ # {{ getDateBuy }}</h1></div>
       <div class="row">
         <div class="col-lg-12 mx-auto">
-    <div class="card">
-      <div class="card-body">
-        <table class="table table-hover">
-          <thead>
-          <tr>
-            <th scope="col">Название</th>
-            <th scope="col">Гости</th>
-            <th scope="col">Тип оплаты</th>
-            <th scope="col">Дата оплаты</th>
-            <th scope="col">Скидка</th>
-            <th scope="col">Стоимость</th>
-            <th scope="col">Статус</th>
-          </tr>
-          </thead>
-          <tbody>
-          <tr>
-            <td>{{ getName }}</td>
-            <td>{{ getGuests }}</td>
-            <td>{{ getTypeOfPayment }}</td>
-            <td>{{ getDateBuy }}</td>
-            <td class="text-right">{{ getDiscount }}</td>
-            <td class="text-right">{{ getTotalPrice }}</td>
-            <td>{{ getHumanStatus }}</td>
-          </tr>
-          </tbody>
-        </table>
+          <div class="card">
+            <div class="card-body">
+              <table class="table table-hover">
+                <thead>
+                <tr>
+                  <th scope="col">Название</th>
+                  <th scope="col">Гости</th>
+                  <th scope="col">Тип оплаты</th>
+                  <th scope="col">Дата оплаты</th>
+                  <th scope="col">Скидка</th>
+                  <th scope="col">Стоимость</th>
+                  <th scope="col">Статус</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>{{ getName }}</td>
+                  <td>{{ getGuests }}</td>
+                  <td>{{ getTypeOfPayment }}</td>
+                  <td>{{ getDateBuy }}</td>
+                  <td class="text-right">{{ getDiscount }}</td>
+                  <td class="text-right">{{ getTotalPrice }}</td>
+                  <td>{{ getHumanStatus }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <order-button
+              :id="getId"
+              :list-tickets="this.getOrderItem.tickets"
+              :status="getStatus"/>
+          <div class="card">
+            <div class="card-body">
+              <button type="button"
+                      @click="back"
+                      class="btn btn-primary">Назад в МОИ ОРГВЗНОСЫ</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <order-button
-        :id="getId"
-        :list-tickets="this.getOrderItem.tickets"
-        :status="getStatus"/>
-  </div>
-  </div>
-      </div>
   </div>
 </template>
 
@@ -108,6 +115,11 @@ export default {
       return this.getOrderItem.id;
     }
   },
+  methods: {
+    back: function () {
+      location.href='/myOrders';
+    }
+  }
 }
 </script>
 

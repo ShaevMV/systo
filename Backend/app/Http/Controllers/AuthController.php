@@ -180,7 +180,7 @@ class AuthController extends Controller
         }
         return response()->json([
             'errors' => [
-                'email' => 'Данный пользователь в системе не зарегистрирован'
+                'email' => 'Такой e-mail не зарегистрирован в системе!'
             ]
         ], 422);
     }
