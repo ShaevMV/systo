@@ -105,6 +105,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->getQuery();
     }
 
+    /**
+     * @throws JsonException
+     */
     public function findOrder(Uuid $uuid): ?OrderTicketDto
     {
         $rawData = $this->model::whereId($uuid->value())

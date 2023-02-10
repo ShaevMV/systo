@@ -18,8 +18,6 @@ return new class extends Migration
 
             $table->uuid('order_ticket_id');
             $table->foreign('order_ticket_id')->references('id')->on('order_tickets');
-
-            $table->integer('number');
             $table->string('name');
             $table->string('status')->default('new');
             $table->softDeletes();
@@ -27,7 +25,7 @@ return new class extends Migration
         });
         DB::statement('alter table tickets
     add kilter int(11) UNIQUE NOT NULL AUTO_INCREMENT FIRST');
-        DB::statement('alter table tickets AUTO_INCREMENT = 1000');
+        DB::statement('alter table tickets AUTO_INCREMENT = 20');
     }
 
     /**

@@ -19,8 +19,7 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
 
     public function __construct(
         private Uuid $orderId,
-        private array $quests,
-        private string $email
+        private array $quests
     ){
     }
 

@@ -6,6 +6,7 @@ namespace Tickets\Order\OrderTicket\Domain;
 
 use Illuminate\Support\Carbon;
 use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -32,6 +33,9 @@ class OrderTicketDto
         $this->id = $id ?? Uuid::random();
     }
 
+    /**
+     * @throws JsonException
+     */
     public static function fromState(
         array $data,
         Uuid $userId,
@@ -58,6 +62,9 @@ class OrderTicketDto
         );
     }
 
+    /**
+     * @throws JsonException
+     */
     public function toArray(): array
     {
         return [

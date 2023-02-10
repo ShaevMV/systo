@@ -12,13 +12,15 @@ use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 
 class ChanceStatusTest extends TestCase
 {
-    use DatabaseTransactions;
+    //use DatabaseTransactions;
 
     private ChanceStatus $chanceStatus;
     private InMemoryMySqlOrderTicketRepository $repositoryOrder;
+    private InMemoryMySqlTicketsRepository $ticketsRepository;
 
     /**
      * @throws ContainerExceptionInterface
@@ -34,6 +36,9 @@ class ChanceStatusTest extends TestCase
         /** @var InMemoryMySqlOrderTicketRepository $repositoryOrder */
         $repositoryOrder = $this->app->get(InMemoryMySqlOrderTicketRepository::class);
         $this->repositoryOrder = $repositoryOrder;
+        /** @var InMemoryMySqlTicketsRepository $repositoryTicket */
+        $repositoryTicket = $this->app->get(InMemoryMySqlTicketsRepository::class);
+        $this->ticketsRepository = $repositoryTicket;
     }
 
     /**
@@ -45,10 +50,11 @@ class ChanceStatusTest extends TestCase
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::PAID)
         );
-        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isPaid());
+        self::assertCount(1, $idList);
     }
-
 
 
     /**
@@ -60,7 +66,7 @@ class ChanceStatusTest extends TestCase
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::DIFFICULTIES_AROSE),
         );
-        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isdDifficultiesArose());
     }
 
@@ -73,7 +79,7 @@ class ChanceStatusTest extends TestCase
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::CANCEL)
         );
-        $orderDto = $this->repositoryOrder->findOrder( new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isCancel());
     }
 

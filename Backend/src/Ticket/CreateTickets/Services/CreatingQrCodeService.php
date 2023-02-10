@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tickets\Ticket\CreateTickets\Services;
 
 use Endroid\QrCode\Label\Font\OpenSans;
@@ -26,19 +28,20 @@ class CreatingQrCodeService
             ->size(300)
             ->margin(10)
             ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-            ->logoPath(__DIR__.'/assets/logo.png')
-            ->labelText('Welcome to Solar Systo 2023') //TODO: Автомотизировать
+            ->logoPath(__DIR__ . '/assets/logo.png')
+            ->labelText('Welcome to Solar Systo ' . date('Y')) //TODO: Автомотизировать
             ->labelFont(new OpenSans(16))
             ->labelAlignment(new LabelAlignmentCenter())
             ->validateResult(false)
             ->build();
     }
 
-    public function createPdf(ResultInterface $qrCode, Uuid $ticketId, string $name): void
+    public function createPdf(ResultInterface $qrCode, Uuid $ticketId, string $name, int $kilter): void
     {
         $pdf = Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),
             'name' => $name,
+            'kilter' => $kilter
         ]);
 
         $pdf->save(storage_path("app/public/tickets/{$ticketId->value()}.pdf"));

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
+use DomainException;
 use Nette\Utils\JsonException;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -16,7 +18,7 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 final class OrderTicket extends AggregateRoot
 {
     /**
-     * @param  Ticket[]  $ticket
+     * @param  GuestsDto[]  $ticket
      */
     public function __construct(
         protected Uuid $festival_id,
@@ -34,11 +36,11 @@ final class OrderTicket extends AggregateRoot
     {
         $tickets = [];
         foreach ($orderTicketDto->getTicket() as $guest) {
-            $tickets[] = Ticket::fromState($guest);
+            $tickets[] = GuestsDto::fromState($guest);
         }
 
         if (0 === count($tickets)) {
-            throw new \DomainException('В заказе нет билетов');
+            throw new DomainException('В заказе нет билетов');
         }
 
         return new self(
@@ -69,9 +71,6 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    /**
-     * @throws JsonException
-     */
     public static function toPaid(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
@@ -79,7 +78,6 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessCreateTicket(
             $result->id,
             $result->getTicket(),
-            $orderTicketDto->getEmail(),
         ));
 
         $result->record(new ProcessUserNotificationOrderPaid(
@@ -137,7 +135,7 @@ final class OrderTicket extends AggregateRoot
     }
 
     /**
-     * @return Ticket[]
+     * @return GuestsDto[]
      */
     public function getTicket(): array
     {

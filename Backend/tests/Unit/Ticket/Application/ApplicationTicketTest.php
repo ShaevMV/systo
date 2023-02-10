@@ -14,7 +14,7 @@ use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ApplicationTicketTest extends TestCase
 {
-    //use DatabaseTransactions;
+    use DatabaseTransactions;
 
     private TicketApplication $TicketApplication;
 

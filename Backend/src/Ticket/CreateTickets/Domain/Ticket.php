@@ -10,44 +10,29 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class Ticket extends AggregateRoot
 {
-    private Uuid $aggregateId;
-
     public function __construct(
         private Uuid $orderId,
         private string $name,
-        ?Uuid $aggregateId = null,
+        private int $kilter,
+        private Uuid $aggregateId,
     ) {
-        if (is_null($aggregateId)) {
-            $this->aggregateId = Uuid::random();
-        } else {
-            $this->aggregateId = $aggregateId;
-        }
     }
 
-    public static function newTicket(Uuid $orderId, string $quest): self
+    public static function newTicket(Uuid $orderId, string $quest, int $kilter, Uuid $id): self
     {
-        $result = new self($orderId, $quest);
+        $result = new self($orderId, $quest, $kilter, $id);
 
         $result->record(new ProcessCreatingQRCode(
             $result->aggregateId,
             $result->name,
+            $result->kilter,
         ));
 
         return $result;
     }
 
-    public function getOrderId(): Uuid
-    {
-        return $this->orderId;
-    }
-
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getAggregateId(): Uuid
-    {
-        return $this->aggregateId;
     }
 }

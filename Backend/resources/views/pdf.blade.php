@@ -16,5 +16,8 @@
 <p>
     <b> Имя: </b> <span> {{ $name }} </span>
 </p>
+<p>
+    <b> Id: </b> <span> {{ $kilter }} </span>
+</p>
 </body>
 </html>

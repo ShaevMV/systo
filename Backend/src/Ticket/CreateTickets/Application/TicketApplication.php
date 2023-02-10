@@ -6,7 +6,6 @@ namespace Tickets\Ticket\CreateTickets\Application;
 
 use Illuminate\Support\Facades\Bus;
 use Throwable;
-use Tickets\Order\OrderTicket\Domain\Ticket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
@@ -15,8 +14,12 @@ use Tickets\Ticket\CreateTickets\Application\Cancel\CancelTicketCommand;
 use Tickets\Ticket\CreateTickets\Application\Cancel\CancelTicketCommandHandler;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommand;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommandHandler;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\GetTicketHandler;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQuery;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQueryHandler;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\GetTicketQuery;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Domain\Ticket;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
 
@@ -30,6 +33,7 @@ class TicketApplication
         CreateTicketCommandHandler $commandHandler,
         CancelTicketCommandHandler $cancelTicketCommandHandler,
         GetPdfQueryHandler $pdfQueryHandler,
+        GetTicketHandler $getTicketHandler,
         private Bus $bus
     ) {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -39,11 +43,12 @@ class TicketApplication
 
         $this->queryBus = new InMemorySymfonyQueryBus([
             GetPdfQuery::class => $pdfQueryHandler,
+            GetTicketQuery::class => $getTicketHandler,
         ]);
     }
 
     /**
-     * @param  Ticket[]  $guests
+     * @param  GuestsDto[]  $guests
      *
      * @return Ticket[]
      * @throws Throwable
@@ -52,18 +57,26 @@ class TicketApplication
     {
         $tickets = [];
         foreach ($guests as $guest) {
-            $ticket = Ticket::createTicket($guest->getName());
-
+            $ticketDto =  new TicketDto(
+                $orderId,
+                $guest->getValue()
+            );
             $this->commandBus->dispatch(new CreateTicketCommand(
-                new TicketDto(
-                    $orderId,
-                    $guest->getName(),
-                    $ticket->getAggregateId()
-                )
+                $ticketDto
             ));
+            /** @var TicketResponse $ticketResponse */
+            $ticketResponse = $this->queryBus->ask(new GetTicketQuery($ticketDto->getId()));
+
+            $ticket = Ticket::newTicket(
+                $orderId,
+                $ticketResponse->getName(),
+                $ticketResponse->getKilter(),
+                $ticketResponse->getId(),
+            );
 
             $this->bus::chain($ticket->pullDomainEvents())
                 ->dispatch();
+
             $tickets[] = $ticket;
         }
 
