@@ -1572,6 +1572,73 @@ label.required::after{
     height: auto;
 }
 
+#contact-form .row{
+    justify-content: space-between;
+    align-items: center;
+}
+
+#promo-input small{
+    align-self: center;
+    margin-left: 30px;
+    margin-top: 0;
+}
+
+.payment-choice label{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.payment-choice{
+    margin-bottom: 20px;
+}
+
+.payment-choice .form-check-input{
+    margin-top: 0;
+}
+
+.in-choice > div:first-of-type span{
+    background-image: url('../img/icon-sber.png');
+    background-size: 25px;
+}
+
+.in-choice > div:nth-of-type(2) span{
+    background-image: url('../img/icon-qiwi.png');
+    background-size: 25px;
+}
+
+.in-choice > div:last-of-type span{
+    background-image: url('../img/icon-umoney.png');
+    background-size: 25px;
+}
+
+.payment-choice label span{
+    display: inline-block;
+    box-sizing: border-box;
+    background-color: rgba(235, 237, 244, 0.7);
+    background-repeat: no-repeat;
+    background-position: 6px center;
+    padding: 15px 45px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    margin-left: 30px;
+}
+
+.flex-flex{
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.payment-choice input[type="radio"]::checked{
+    border-color: rgb(30, 135, 28);
+}
+
+
+.reg-label{
+    margin-bottom: 10px;
+}
+
 .hidder{
     display: none !important;
 }

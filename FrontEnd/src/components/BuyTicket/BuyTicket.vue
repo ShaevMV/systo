@@ -36,38 +36,134 @@
             <div class="container">
               <div id="contact-form" role="form">
                 <div class="controls">
-                  <!--                  Добавить гостя-->
+                  <div class="pp1">
+                    <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе
+                    аккаунт:
+                  </div>
                   <div class="row">
-
-                    <div class="pp1">
-                      <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе
-                      аккаунт:
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="form_email">Email *</label>
+                        <input id="form_email"
+                               type="email"
+                               name="email"
+                               class="form-control"
+                               placeholder="Please enter your email *"
+                               required="required"
+                               v-model="email"
+                               v-bind:readonly="isAuth"
+                               data-error="Valid email is required.">
+                        <small class="form-text text-muted"> {{ getError('email') }}</small>
+                      </div>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="col-md-4">
                       <div class="form-group">
-                        <label for="newGuest">Имя и Фамилию гостя *</label>
-                        <div class="input-group mb-3">
-                          <input type="text"
-                                 id="newGuest"
-                                 class="form-control"
-                                 placeholder="Введите Имя и Фамилию гостя"
-                                 aria-label="Введите Имя и Фамилию гостя"
-                                 v-model="newGuest"
-                                 :disabled="!isAllowedNewGuest"
-                                 aria-describedby="basic-addon1">
-                          <div class="input-group-prepend">
-                              <span class="input-group-text btn"
-                                    @click="addGuest()"
-                                    id="basic-addon1">
-                                <i class="bi bi-person-plus"></i>
-                              </span>
-                          </div>
-                        </div>
+                        <label for="form_phone">Телефон *</label>
+                        <input id="form_phone"
+                               type="email"
+                               name="phone"
+                               class="form-control"
+                               placeholder="Введите свой номер телефона *"
+                               required="required"
+                               v-bind:readonly="getUserData('phone') !== null"
+                               v-model="phone"
+                               data-error="Valid phone is required.">
+                        <small class="form-text text-muted"> {{ getError('phone') }}</small>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="form_phone">Город *</label>
+                        <input id="form_phone"
+                               type="email"
+                               name="city"
+                               class="form-control"
+                               placeholder="Please enter your city *"
+                               required="required"
+                               v-bind:readonly="getUserData('city') !== null"
+                               v-model="city"
+                               data-error="Valid phone is required.">
+                        <small class="form-text text-muted"> {{ getError('city') }}</small>
                       </div>
                     </div>
                   </div>
-                  <!--                  Список гостей-->
+                  <div class="pp1">
+                    <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные каждого гостя, за которого будешь вносить
+                    средства:
+                  </div>
+
+                  <!--                  Тип оргвзноса: *-->
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="form_need">Тип оргвзноса: *</label>
+                    </div>
+
+                    <div class="col-md-8">
+                      <select id="form_need"
+                              name="need"
+                              class="col-md-8 form-select"
+                              required="required"
+                              v-model="selectTypeTicket"
+                              data-error="Please specify your need.">
+                        <option disabled value="null">Выберите тип оргвзноса</option>
+                        <option v-for="(typeTickets) in getTicketType"
+                                v-bind:key="typeTickets.id"
+                                v-bind:value="typeTickets.id">{{ typeTickets.name }} /
+                          {{ typeTickets.price }} руб.
+                        </option>
+                      </select>
+                      <small class="form-text text-muted"> {{ getError('ticket_type_id') }}</small>
+                    </div>
+                  </div>
+
+
+                  <!--                  Промокод-->
+                  <div class="row">
+                    <div class="col-mb-12">
+                      <div class="form-group">
+                        <label for="form_promo_cod">Промокод:</label>
+                        <div class="input-group mb-3" id="promo-input">
+                          <input type="text"
+                                 id="form_promo_cod"
+                                 class="form-control"
+                                 placeholder="Промокод"
+                                 aria-label="Промокод"
+                                 v-model="promoCode"
+                                 aria-describedby="basic-addon1">
+                          <span class="input-group-text"
+                                @click="sendPromoCode"
+                                id="basic-addon1"><i class="bi bi-check"></i></span>
+                          <small class="form-text text-muted" v-show="massageForPromoCode!==null">
+                            {{ massageForPromoCode }}
+                          </small>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-5">
+                      <label for="newGuest" class="reg-label">Данные о гостях:</label>
+                    </div>
+                    <div class="input-group mb-3">
+                      <input type="text"
+                             id="newGuest"
+                             class="form-control"
+                             placeholder="Введи Имя и Фамилию гостя и нажми Добавить"
+                             aria-label="Введи Имя и Фамилию гостя и нажми Добавить"
+                             v-model="newGuest"
+                             :disabled="!isAllowedNewGuest"
+                             aria-describedby="basic-addon1">
+                      <div class="input-group-prepend">
+                              <span class="input-group-text btn"
+                                    @click="addGuest()"
+                                    id="basic-addon1">Добавить гостя</span>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="row" v-show="guests.length > 0">
                     <div class="col-md-12">
                       <div class="form-group">
@@ -91,152 +187,71 @@
                       </div>
                     </div>
                   </div>
-                  <!--                  Email и Тип оргвзноса-->
-                  <div class="row">
-                    <!--                  Email -->
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="form_email">Email *</label>
-                        <input id="form_email"
-                               type="email"
-                               name="email"
-                               class="form-control"
-                               placeholder="Please enter your email *"
-                               required="required"
-                               v-model="email"
-                               v-bind:readonly="isAuth"
-                               data-error="Valid email is required.">
-                        <small class="form-text text-muted"> {{ getError('email') }}</small>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="form_phone">Телефон *</label>
-                        <input id="form_phone"
-                               type="email"
-                               name="phone"
-                               class="form-control"
-                               placeholder="Введите свой номер телефона *"
-                               required="required"
-                               v-bind:readonly="getUserData('phone') !== null"
-                               v-model="phone"
-                               data-error="Valid phone is required.">
-                        <small class="form-text text-muted"> {{ getError('phone') }}</small>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="form_phone">Город *</label>
-                        <input id="form_phone"
-                               type="email"
-                               name="city"
-                               class="form-control"
-                               placeholder="Please enter your city *"
-                               required="required"
-                               v-bind:readonly="getUserData('city') !== null"
-                               v-model="city"
-                               data-error="Valid phone is required.">
-                        <small class="form-text text-muted"> {{ getError('city') }}</small>
-                      </div>
-                    </div>
-                    <!--                  Тип оргвзноса: *-->
-                    <div class="col-md-6">
-                      <div class="form-group">
-                        <label for="form_need">Тип оргвзноса: *</label>
-                        <select id="form_need"
-                                name="need"
-                                class="form-select"
-                                required="required"
-                                v-model="selectTypeTicket"
-                                data-error="Please specify your need.">
-                          <option disabled value="null">Выберите тип оргвзноса</option>
-                          <option v-for="(typeTickets) in getTicketType"
-                                  v-bind:key="typeTickets.id"
-                                  v-bind:value="typeTickets.id">{{ typeTickets.name }} /
-                            {{ typeTickets.price }} руб.
-                          </option>
-                        </select>
-                        <small class="form-text text-muted"> {{ getError('ticket_type_id') }}</small>
-                      </div>
-                    </div>
+
+                  <div class="pp1">
+                    <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства, осуществи перевод и заполни данные о платеже!
                   </div>
-                  <!--                  Промокод-->
-                  <div class="row">
-                    <div class="col-mb-12">
-                      <div class="form-group">
-                        <label for="form_promo_cod">Промокод:</label>
-                        <div class="input-group mb-3">
-                          <input type="text"
-                                 id="form_promo_cod"
-                                 class="form-control"
-                                 placeholder="Промокод"
-                                 aria-label="Промокод"
-                                 v-model="promoCode"
-                                 aria-describedby="basic-addon1">
-                          <span class="input-group-text"
-                                @click="sendPromoCode"
-                                id="basic-addon1"><i class="bi bi-check"></i></span>
-                        </div>
-                        <small class="form-text text-muted" v-show="massageForPromoCode!==null">
-                          {{ massageForPromoCode }}
-                        </small>
-                      </div>
-                    </div>
-                  </div>
-                  <!--                  Способ оплаты: *-->
                   <div class="row">
                     <div class="col-md-12">
                       <div class="form-group">
                         <label for="form_need">Способ оплаты: *</label>
-                        <div class="payment-choice" v-for="typesOfPayment in getTypesOfPayment"
-                             v-bind:key="typesOfPayment.id">
-                          <div class="form-check">
-                            <label class="form-check-label" v-bind:for="typesOfPayment.id">
-                              <input type="radio"
-                                     class="form-check-input"
-                                     v-model="selectTypesOfPayment"
-                                     v-bind:value="typesOfPayment.id"
-                                     v-bind:id="typesOfPayment.id">
+                        <div class="in-choice">
+                          <div class="payment-choice" v-for="typesOfPayment in getTypesOfPayment"
+                               v-bind:key="typesOfPayment.id">
+                            <div class="form-check">
+                              <label class="form-check-label" v-bind:for="typesOfPayment.id">
+                                <input type="radio"
+                                       class="form-check-input"
+                                       v-model="selectTypesOfPayment"
+                                       v-bind:value="typesOfPayment.id"
+                                       v-bind:id="typesOfPayment.id">
+                                <span>
                               {{ typesOfPayment.name }}
                               <i class="bx bxs-copy"
                                  @click="CopyTypesOfPayment(typesOfPayment.name)"></i>
-                            </label>
-                            <small class="form-text text-muted"> {{ getError('types_of_payment_id') }}</small>
+                                </span>
+                              </label>
+
+                              <small class="form-text text-muted"> {{ getError('types_of_payment_id') }}</small>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
+
                   <!--                  Дата платежа -->
                   <div class="row">
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <label for="form_message">Введите данные о том, когда вы внесли платеж:</label>
-                        <input type="number"
-                               max="31"
-                               min="1"
-                               class="form-control"
-                               v-model="day"
-                               placeholder="День">
-                        <select id="form_need"
-                                name="need"
-                                class="form-select"
-                                required="required"
-                                v-model="mount"
-                                data-error="Please specify your need.">
-                          <option disabled value="null">Месяц</option>
-                          <option v-for="(itemMount, index) in mounts"
-                                  v-bind:key="index"
-                                  v-bind:value="index">{{ itemMount }}
-                          </option>
-                        </select>
+                    <div class="col-md-4">
+                        <label for="form_message">Дата и время перевода:</label>
+                      </div>
+                    <div class="col-md-4 flex-flex">
+                      <input type="number"
+                             max="31"
+                             min="1"
+                             class="form-control"
+                             v-model="day"
+                             placeholder="День">
+                      <select id="form_need"
+                              name="need"
+                              class="form-select"
+                              required="required"
+                              v-model="mount"
+                              data-error="Please specify your need.">
+                        <option disabled value="null">Месяц</option>
+                        <option v-for="(itemMount, index) in mounts"
+                                v-bind:key="index"
+                                v-bind:value="index">{{ itemMount }}
+                        </option>
+                      </select>
+                    </div>
+
                         <span>
                           Время:
                           <input type="number" class="form-control" v-model="hour" placeholder="часы" min="00" max="24"> :
                           <input type="number" class="form-control" v-model="minute" placeholder="Минут" min="00"
                                  max="59">
                         </span>
-                      </div>
                       <small class="form-text text-muted"> {{ getError('date') }}</small>
                     </div>
                     <div class="col-md-12">
@@ -273,7 +288,6 @@
                       </div>
 
                     </div>
-                  </div>
                   <!--                  Стоимость -->
                   <div class="row" v-show="totalPrice > 0">
                     <div class="col-md-6">
