@@ -62,8 +62,10 @@ class OrderTickets extends Controller
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
+
             $data = $createOrderTicketsRequest->toArray();
             $data['festival_id'] = FestivalSeeder::ID_FOR_2023_FESTIVAL;
+
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
                 $userId,

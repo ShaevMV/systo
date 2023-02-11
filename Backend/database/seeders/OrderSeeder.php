@@ -13,6 +13,8 @@ class OrderSeeder extends Seeder
 {
     public const ID_FOR_FIRST_ORDER = '222abc0c-fc8e-4a1d-a4b0-d345cafacf95';
     public const ID_FOR_SECOND_ORDER = '222abc0c-fc8e-4a1d-a4b0-d345cafacf99';
+    public const ID_FOR_FIRST_TICKET = '56f04400-02ab-4cbe-bfd4-4f7dda23d675';
+    public const ID_FOR_SECOND_TICKET = '56f04400-02ab-4cbe-bfd4-4f7dda23d676';
 
     /**
      * Run the database seeds.
@@ -27,6 +29,7 @@ class OrderSeeder extends Seeder
             'guests' => json_encode([
                 [
                     'value' => 'test',
+                    'id' => self::ID_FOR_FIRST_TICKET,
                 ]
             ], JSON_THROW_ON_ERROR),
             'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
@@ -48,6 +51,7 @@ class OrderSeeder extends Seeder
             'guests' => json_encode([
                 [
                     'value' => 'test',
+                    'id' => self::ID_FOR_SECOND_TICKET,
                 ]
             ], JSON_THROW_ON_ERROR),
             'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,

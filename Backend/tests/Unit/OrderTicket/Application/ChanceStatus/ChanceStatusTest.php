@@ -16,7 +16,7 @@ use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 
 class ChanceStatusTest extends TestCase
 {
-    //use DatabaseTransactions;
+    use DatabaseTransactions;
 
     private ChanceStatus $chanceStatus;
     private InMemoryMySqlOrderTicketRepository $repositoryOrder;
@@ -29,7 +29,6 @@ class ChanceStatusTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         /** @var ChanceStatus $chanceStatus */
         $chanceStatus = $this->app->get(ChanceStatus::class);
         $this->chanceStatus = $chanceStatus;
@@ -53,7 +52,9 @@ class ChanceStatusTest extends TestCase
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isPaid());
+
         self::assertCount(1, $idList);
+        self::assertTrue($orderDto->getTicket()[0]->getId()->equals($idList[0]));
     }
 
 
@@ -68,6 +69,7 @@ class ChanceStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isdDifficultiesArose());
+        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
     /**
@@ -81,6 +83,7 @@ class ChanceStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isCancel());
+        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
 }

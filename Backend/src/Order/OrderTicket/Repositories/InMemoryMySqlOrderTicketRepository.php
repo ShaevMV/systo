@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
@@ -37,9 +38,10 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     public function create(OrderTicketDto $orderTicketDto): bool
     {
         DB::beginTransaction();
+        $data = $orderTicketDto->toArray();
         try {
             $this->model->insert(
-                array_merge($orderTicketDto->toArray(),
+                array_merge($data,
                     [
                         'created_at' => (string) (new Carbon()),
                         'updated_at' => (string) (new Carbon()),
@@ -170,14 +172,27 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
+     * @param Uuid $orderId
+     * @param Status $newStatus
+     * @param GuestsDto[] $guests
+     * @return bool
      * @throws Throwable
      */
-    public function chanceStatus(Uuid $orderId, Status $newStatus): bool
+    public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool
     {
         DB::beginTransaction();
+        $arrGuests = [];
+        foreach ($guests as $guest) {
+            $arrGuests[]=[
+                'value' => $guest->getValue(),
+                'id' => $guest->getId()->value(),
+            ];
+        }
+
         try {
             $order = $this->model::find($orderId->value());
             $order->status = (string) $newStatus;
+            $order->guests = $arrGuests;
             $order->save();
             DB::commit();
 

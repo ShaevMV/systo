@@ -52,5 +52,5 @@ interface OrderTicketRepositoryInterface
      */
     public function getList(Filters $filters): array;
 
-    public function chanceStatus(Uuid $orderId, Status $newStatus): bool;
+    public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool;
 }

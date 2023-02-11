@@ -12,12 +12,16 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class PriceService
 {
     public function __construct(
-        private GetTicketType $getPriceByTicketType,
+        private GetTicketType      $getPriceByTicketType,
         private IsCorrectPromoCode $isCorrectPromoCode,
-    ) {
+    ){
     }
 
-    public function getPriceDto(Uuid $ticketTypeId, int $count, ?string $promoCode = null): PriceDto
+    public function getPriceDto(
+        Uuid    $ticketTypeId,
+        int     $count,
+        ?string $promoCode = null
+    ): PriceDto
     {
         $priceByType = $this->getPriceByTicketType->getPrice($ticketTypeId);
         $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);

@@ -10,6 +10,7 @@ use JsonException;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Tickets\Shared\Domain\ValueObject\Status;
 
 class ChanceStatusCommandHandler implements CommandHandler
 {
@@ -34,22 +35,12 @@ class ChanceStatusCommandHandler implements CommandHandler
             нельзя перевести в статус ".$command->getNextStatus()->getHumanStatus());
         }
 
-        $orderTicket = null;
-        if ($command->getNextStatus()->isPaid()) {
-            $orderTicket = OrderTicket::toPaid($orderTicketDto);
-        }
-
-        if ($command->getNextStatus()->isCancel()) {
-            $orderTicket = OrderTicket::toCancel($orderTicketDto);
-        }
-
-        if ($command->getNextStatus()->isdDifficultiesArose()) {
-            $orderTicket = OrderTicket::toDifficultiesArose($orderTicketDto);
-        }
-
-        if (is_null($orderTicket)) {
-            throw new DomainException('Не коректнный статус');
-        }
+        $orderTicket = match ((string)$command->getNextStatus()) {
+            Status::PAID => OrderTicket::toPaid($orderTicketDto),
+            Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
+            Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto),
+            default => throw new DomainException('Не коректнный статус' . $command->getNextStatus()),
+        };
 
 
         $list = $orderTicket->pullDomainEvents();
@@ -57,7 +48,8 @@ class ChanceStatusCommandHandler implements CommandHandler
 
         $this->orderTicketRepository->chanceStatus(
             $command->getOrderId(),
-            $command->getNextStatus()
+            $command->getNextStatus(),
+            $orderTicket->getTicket()
         );
     }
 }

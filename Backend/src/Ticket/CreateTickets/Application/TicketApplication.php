@@ -59,7 +59,8 @@ class TicketApplication
         foreach ($guests as $guest) {
             $ticketDto =  new TicketDto(
                 $orderId,
-                $guest->getValue()
+                $guest->getValue(),
+                $guest->getId() ?? null,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(
                 $ticketDto

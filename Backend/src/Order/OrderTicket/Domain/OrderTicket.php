@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
-use DomainException;
 use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
@@ -13,7 +12,6 @@ use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
-
 
 final class OrderTicket extends AggregateRoot
 {
@@ -34,22 +32,13 @@ final class OrderTicket extends AggregateRoot
 
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
     {
-        $tickets = [];
-        foreach ($orderTicketDto->getTicket() as $guest) {
-            $tickets[] = GuestsDto::fromState($guest);
-        }
-
-        if (0 === count($tickets)) {
-            throw new DomainException('В заказе нет билетов');
-        }
-
         return new self(
             $orderTicketDto->getFestivalId(),
             $orderTicketDto->getUserId(),
             $orderTicketDto->getTypesOfPaymentId(),
             $orderTicketDto->getPriceDto(),
             $orderTicketDto->getStatus(),
-            $tickets,
+            $orderTicketDto->getTicket(),
             $orderTicketDto->getId(),
             $orderTicketDto->getPromoCode(),
         );
@@ -89,13 +78,10 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    /**
-     * @throws JsonException
-     */
     public static function toCancel(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
-
+        $result->updateIdTicket();
         $result->record(new ProcessCancelTicket(
             $result->id,
         ));
@@ -109,13 +95,17 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    /**
-     * @throws JsonException
-     */
+    private function updateIdTicket(): void
+    {
+        foreach ($this->ticket as &$guestsDto) {
+            $guestsDto->updateId();
+        }
+    }
+
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
-
+        $result->updateIdTicket();
         $result->record(new ProcessCancelTicket(
             $result->id,
         ));

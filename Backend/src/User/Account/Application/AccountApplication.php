@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Application;
 
-use DomainException;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Str;
 use Throwable;
@@ -18,7 +17,6 @@ use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQueryHandler
 use Tickets\User\Account\Domain\Account;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
-use Tickets\User\Account\Response\IdAccountResponse;
 
 final class AccountApplication
 {
@@ -77,7 +75,6 @@ final class AccountApplication
 
         $this->bus::chain($account->pullDomainEvents())
             ->dispatch();
-
     }
 
     public function getUserByEmail(string $email): ?UserInfoDto

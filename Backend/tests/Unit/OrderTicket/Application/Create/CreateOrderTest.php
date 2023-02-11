@@ -10,6 +10,7 @@ use Nette\Utils\JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
+use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
@@ -43,8 +44,7 @@ class CreateOrderTest extends TestCase
 
     /**
      * @dataProvider dataProvider
-     * @throws \Throwable
-     * @throws JsonException
+     * @throws Throwable
      */
     public function test_it_create(OrderTicketDto $orderTicketDto): void
     {
@@ -58,7 +58,7 @@ class CreateOrderTest extends TestCase
 
     /**
      * @dataProvider dataProvider
-     * @throws \Throwable
+     * @throws Throwable
      * @throws JsonException
      */
     public function test_it_save_order(OrderTicketDto $orderTicketDto): void
@@ -81,6 +81,8 @@ class CreateOrderTest extends TestCase
             '{
             "festival_id":"9d679bcf-b438-4ddb-ac04-023fa9bff4b2",
             "email":"admin@admin.ru",
+            "phone": "+9555555555",
+            "city": "SPB",
             "ticket_type_id":"222abc0c-fc8e-4a1d-a4b0-d345cafacf95",
             "guests":[{"value":"321"},{"value":"321321"}],
             "promo_code":"Systo",
