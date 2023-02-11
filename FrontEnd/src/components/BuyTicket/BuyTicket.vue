@@ -189,7 +189,8 @@
                   </div>
 
                   <div class="pp1">
-                    <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства, осуществи перевод и заполни данные о платеже!
+                    <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства, осуществи перевод и заполни данные о
+                    платеже!
                   </div>
                   <div class="row">
                     <div class="col-md-12">
@@ -222,9 +223,9 @@
 
                   <!--                  Дата платежа -->
                   <div class="row">
-                    <div class="col-md-4">
-                        <label for="form_message">Дата и время перевода:</label>
-                      </div>
+                    <div class="col-md-3">
+                      <label for="form_message">Дата и время перевода:</label>
+                    </div>
                     <div class="col-md-4 flex-flex">
                       <input type="number"
                              max="31"
@@ -246,49 +247,55 @@
                       </select>
                     </div>
 
-                        <span>
-                          Время:
-                          <input type="number" class="form-control" v-model="hour" placeholder="часы" min="00" max="24"> :
-                          <input type="number" class="form-control" v-model="minute" placeholder="Минут" min="00"
-                                 max="59">
-                        </span>
-                      <small class="form-text text-muted"> {{ getError('date') }}</small>
+                    <div class="col-md-4 flex-flex">
+                      Время:
+
+                      <input type="number" class="form-control" v-model="hour" placeholder="часы" min="00" max="24"> :
+                      <input type="number" class="form-control" v-model="minute" placeholder="Минут" min="00"
+                             max="59">
                     </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <label for="idBuy">Идентификатор платежа:</label>
-                        <input class="form-control" v-model="idBuy" id="idBuy">
-                        <small class="form-text text-muted">
-                          При переводах на Сбербанк напишите сюда последние 4 цифры карты, с которой вы сделали перевод
-                          <b>(сюда же вписываем ID или номер "живого билета" с весны для скидки)</b>
-                        </small>
-                        <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
-                      </div>
+                    <small class="form-text text-muted"> {{ getError('date') }}</small>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3 flex-flex">
+                      <label for="idBuy">Идентификатор платежа:</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control" v-model="idBuy" id="idBuy">
+                    </div>
+                    <div class="col-md-6">
+                      <small class="form-text text-muted">
+                        При переводах на Сбербанк напишите сюда <b>последние 4 цифры карты</b>, с которой вы сделали перевод
+                        <b>(сюда же вписываем ID или номер "живого билета" с весны для скидки)</b>
+                      </small>
+                    </div>
+                    <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <label for="idBuy">Комментарий к заказу:</label>
+                    </div>
+
+                    <div class="col-md-9">
+                      <textarea class="form-control" v-model="comment" id="idBuy"></textarea>
+                    </div>
 
 
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-check">
+                      <input class="form-check-input"
+                             type="checkbox"
+                             value=""
+                             v-model="confirm"
+                             id="defaultCheck1">
+                      <label class="form-check-label" for="defaultCheck1">
+                        Регистрируя добровольный оргвзнос, ты соглашаешься с &nbsp;<a
+                          href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
+                      </label>
                     </div>
-                    <div class="col-md-12">
-                      <div class="form-group">
-                        <label for="idBuy">Комментарий к заказу:</label>
-                        <textarea class="form-control" v-model="comment" id="idBuy"></textarea>
-                      </div>
+                  </div>
 
-                    </div>
-                    <div class="col-md-12">
-                      <div class="form-check">
-                        <input class="form-check-input"
-                               type="checkbox"
-                               value=""
-                               v-model="confirm"
-                               id="defaultCheck1">
-                        <label class="form-check-label" for="defaultCheck1">
-                          Регистрируя организационный взнос, вы соглашаетесь с &nbsp;<a
-                            href="/conditions" target="_blank">условиями фестиваля</a>
-                        </label>
-                      </div>
-
-                    </div>
-                  <!--                  Стоимость -->
                   <div class="row" v-show="totalPrice > 0">
                     <div class="col-md-6">
                       <h4 class="my-lg-2 font-weight-normal">Итог: {{ totalPrice }} <small class="text-muted">/
@@ -322,6 +329,15 @@
                         средств
                       </button>
                     </div>
+                  </div>
+                  <div class="row">
+                    <p>
+                      После оплаты в течение 3-4 дней на твой e-mail придет подтверждение оргвзноса и
+                      <strong>электронный билет с QR-кодом</strong> для входа на Солар Систо 2023!
+                      <b>Будь внимателен!</b> В этом году вход будет осуществляться только при предъявлении билета с кодом на
+                      экране телефона или в распечатанном виде (как в аэропортах).
+                      Позаботься об этом заранее! Прежняя система с ID и фамилией действовать не будет.
+                    </p>
                   </div>
                 </div>
               </div>

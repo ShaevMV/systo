@@ -1452,6 +1452,7 @@ label.required::after{
     width: 100%;
     padding: .375rem .75rem;
     appearance: none;
+    resize: none;
 }
 
 .form-select{
@@ -1590,7 +1591,7 @@ label.required::after{
 }
 
 .payment-choice{
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .payment-choice .form-check-input{
@@ -1622,12 +1623,14 @@ label.required::after{
     overflow: hidden;
     border-radius: 10px;
     border: 3px solid transparent;
-    margin-left: 30px;
+    margin-left: 20px;
+    min-width: 470px;
 }
 
 .flex-flex{
     display: flex;
     flex-wrap: nowrap;
+    align-items: center;
 }
 
 .payment-choice input[type="radio"]::checked{
