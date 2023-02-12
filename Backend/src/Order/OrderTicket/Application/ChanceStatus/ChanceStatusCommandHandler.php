@@ -44,12 +44,13 @@ class ChanceStatusCommandHandler implements CommandHandler
 
 
         $list = $orderTicket->pullDomainEvents();
-        $this->bus::chain($list)->dispatch();
 
         $this->orderTicketRepository->chanceStatus(
             $command->getOrderId(),
             $command->getNextStatus(),
             $orderTicket->getTicket()
         );
+
+        $this->bus::chain($list)->dispatch();
     }
 }

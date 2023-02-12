@@ -7,6 +7,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Log;
+use Throwable;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
@@ -23,22 +25,22 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function handle(
         CreatingQrCodeService $codeInPdfService,
     ): void
     {
         try {
-            $qrCode = $codeInPdfService->createQrCode($this->ticketId);
-            $codeInPdfService->createPdf(
-                $qrCode,
+            $pdf = $codeInPdfService->createPdf(
                 $this->ticketId,
                 $this->name,
                 $this->kilter,
             );
-        } catch (\Throwable $throwable) {
-            \Log::error($throwable->getMessage());
+
+            $pdf->save(storage_path("app/public/tickets/{$this->ticketId->value()}.pdf"));
+        } catch (Throwable $throwable) {
+            Log::error($throwable->getMessage());
             throw $throwable;
         }
     }

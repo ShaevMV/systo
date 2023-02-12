@@ -44,6 +44,7 @@ interface OrderTicketRepositoryInterface
      * @return OrderTicketItemResponse|null
      */
     public function getItem(Uuid $uuid): ?OrderTicketItemResponse;
+
     /**
      * Получить список заказов по фильтру
      *
@@ -52,5 +53,17 @@ interface OrderTicketRepositoryInterface
      */
     public function getList(Filters $filters): array;
 
-    public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool;
+    /**
+     * Сменить статус заказа
+     *
+     * @param Uuid $orderId
+     * @param Status $newStatus
+     * @param array $guests
+     * @return bool
+     */
+    public function chanceStatus(
+        Uuid $orderId,
+        Status $newStatus,
+        array $guests
+    ): bool;
 }

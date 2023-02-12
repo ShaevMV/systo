@@ -28,7 +28,6 @@ class TicketApplication
     private InMemorySymfonyCommandBus $commandBus;
     private InMemorySymfonyQueryBus $queryBus;
 
-
     public function __construct(
         CreateTicketCommandHandler $commandHandler,
         CancelTicketCommandHandler $cancelTicketCommandHandler,

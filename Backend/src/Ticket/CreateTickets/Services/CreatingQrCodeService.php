@@ -17,7 +17,7 @@ use Endroid\QrCode\Writer\PngWriter;
 
 class CreatingQrCodeService
 {
-    public function createQrCode(Uuid $ticketId): ResultInterface
+    private function createQrCode(Uuid $ticketId): ResultInterface
     {
         return Builder::create()
             ->writer(new PngWriter())
@@ -36,14 +36,14 @@ class CreatingQrCodeService
             ->build();
     }
 
-    public function createPdf(ResultInterface $qrCode, Uuid $ticketId, string $name, int $kilter): void
+    public function createPdf(Uuid $ticketId, string $name, int $kilter): \Barryvdh\DomPDF\PDF
     {
-        $pdf = Pdf::loadView('pdf', [
+        $qrCode = $this->createQrCode($ticketId);
+
+        return Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),
             'name' => $name,
             'kilter' => $kilter
         ]);
-
-        $pdf->save(storage_path("app/public/tickets/{$ticketId->value()}.pdf"));
     }
 }

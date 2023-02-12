@@ -6,7 +6,6 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-
 /**
  * @property string|null $email
  * @property string $date
