@@ -32,7 +32,7 @@ class CreateOrderTicketsRequest extends FormRequest
             'email' => 'required|email',
             'date' => 'required|before:now',
             'id_buy' => 'required|numeric',
-            'phone' => 'required|numeric',
+            'phone' => 'required',
             'city' => 'required',
             'guests' => 'required|array',
             'ticket_type_id' => 'exists:App\Models\Ordering\InfoForOrder\TicketTypesModel,id',
