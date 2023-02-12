@@ -87,7 +87,6 @@ final class OrderTicket extends AggregateRoot
         ));
 
         $result->record(new ProcessUserNotificationOrderCancel(
-                $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
             )
         );

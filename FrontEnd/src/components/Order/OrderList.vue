@@ -30,7 +30,7 @@
             <tbody>
             <tr v-for="(itemOrder,index) in getOrderList"
                 v-bind:key="index"
-                @click="goItemOrder(itemOrder.id)">
+                @click="goItemOrder(itemOrder.id, itemOrder.status)">
               <th scope="row">
                 {{ itemOrder.kilter }}
               </th>
@@ -151,9 +151,11 @@ export default {
         color: color,
       }
     },
-    goItemOrder(idOrderItem) {
+    goItemOrder(idOrderItem, status) {
       if (!this.isAdmin) {
-        this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+        if(status !== 'cancel') {
+          this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+        }
       }
     },
     /**
