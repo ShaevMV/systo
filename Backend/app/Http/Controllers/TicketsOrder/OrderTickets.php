@@ -156,11 +156,20 @@ class OrderTickets extends Controller
      */
     public function toChanceStatus(string $id, Request $request): JsonResponse
     {
+        if($request->get('status') === Status::DIFFICULTIES_AROSE) {
+            $request->validate([
+                'comment' => 'required|string'
+            ], [
+                '*.required' => 'Поле обязательно для ввода',
+            ]);
+        }
+
         try {
             $status = new Status($request->get('status'));
             $this->chanceStatus->chance(
                 new Uuid($id),
-                $status
+                $status,
+                $request->get('comment', null)
             );
 
             return response()->json([

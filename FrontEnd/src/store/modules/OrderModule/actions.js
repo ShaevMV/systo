@@ -98,16 +98,20 @@ export const sendCommentByOrder = (context, payload) => {
  */
 export const sendToChanceStatus = (context, payload) => {
     let promise = axios.post('/api/v1/festival/ticketsOrder/toChanceStatus/' + payload.id, {
-        'status': payload.status
+        'status': payload.status,
+        'comment': payload.comment
     });
     promise.then(function (response) {
+        if(payload.callback !== undefined) {
+            payload.callback()
+        }
         context.commit('chanceStatus', {
             'id': payload.id,
             'humanStatus': response.data.status.humanStatus,
             'status': response.data.status.name,
             'listCorrectNextStatus': response.data.status.listCorrectNextStatus,
         })
-        console.log(response)
+        console.log(response);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);

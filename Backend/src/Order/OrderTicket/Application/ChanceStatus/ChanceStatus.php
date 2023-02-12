@@ -24,11 +24,13 @@ class ChanceStatus
     /**
      * @throws Throwable
      */
-    public function chance(Uuid $orderId, Status $status): void
+    public function chance(Uuid $orderId, Status $status, ?string $comment = null): void
     {
         $this->commandBus->dispatch(new ChanceStatusCommand(
             $orderId,
-            $status
+            $status,
+            new Uuid(auth()->id()),
+            $comment,
         ));
     }
 }

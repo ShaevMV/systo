@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
-use Nette\Utils\JsonException;
+use DomainException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
@@ -102,17 +102,22 @@ final class OrderTicket extends AggregateRoot
         }
     }
 
-    public static function toDifficultiesArose(OrderTicketDto $orderTicketDto): self
+    public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
+        if(is_null($comment)) {
+            throw new DomainException('Комментарий обязательный для смены статус "Возникли трудности"');
+        }
+
         $result = self::fromOrderTicketDto($orderTicketDto);
         $result->updateIdTicket();
         $result->record(new ProcessCancelTicket(
             $result->id,
         ));
 
-        $result->record(new ProcessUserNotificationOrderCancel(
+        $result->record(new ProcessUserNotificationOrderDifficultiesArose(
                 $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
+                $comment
             )
         );
 

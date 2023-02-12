@@ -11,6 +11,8 @@ class ChanceStatusCommand implements Command
     public function __construct(
         private Uuid $orderId,
         private Status $nextStatus,
+        private Uuid $userId,
+        private ?string $comment,
     ){
     }
 
@@ -22,5 +24,15 @@ class ChanceStatusCommand implements Command
     public function getOrderId(): Uuid
     {
         return $this->orderId;
+    }
+
+    public function getComment(): ?string
+    {
+        return $this->comment;
+    }
+
+    public function getUserId(): Uuid
+    {
+        return $this->userId;
     }
 }

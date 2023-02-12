@@ -13,6 +13,7 @@
             <thead>
             <tr>
               <th scope="col">№ заказа</th>
+              <th scope="col" v-if="isAdmin"></th>
               <th scope="col" v-if="isAdmin">Email</th>
               <th scope="col">Тип оргвзноса</th>
               <th scope="col">Стоимость</th>
@@ -23,7 +24,7 @@
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
               <th scope="col">Статус</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
-              <th scope="col"></th>
+
             </tr>
             </thead>
             <tbody>
@@ -33,17 +34,7 @@
               <th scope="row">
                 {{ itemOrder.kilter }}
               </th>
-              <td v-if="isAdmin">{{ itemOrder.email }}</td>
-              <td>{{ itemOrder.name }}</td>
-              <td>{{ itemOrder.price }} рублей</td>
-              <td>{{ itemOrder.count }}</td>
-              <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
-              <td>{{ itemOrder.dateBuy }}</td>
-              <td>{{ itemOrder.typeOfPaymentName }}</td>
-              <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>
-              <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
-              <td>
+              <td v-if="isAdmin">
                 <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
@@ -58,9 +49,52 @@
                   </div>
                 </div>
               </td>
+              <td v-if="isAdmin">{{ itemOrder.email }}</td>
+              <td>{{ itemOrder.name }}</td>
+              <td>{{ itemOrder.price }} рублей</td>
+              <td>{{ itemOrder.count }}</td>
+              <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
+              <td>{{ itemOrder.dateBuy }}</td>
+              <td>{{ itemOrder.typeOfPaymentName }}</td>
+              <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
+              <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>
+              <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
+
             </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
+            data-target="#exampleModal">
+      Launch demo modal
+    </button>
+
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Сообщения для пользователя</h5>
+            <button type="button" class="close"
+                    data-dismiss="modal"
+                    id="closeModal"
+                    aria-label="Close">
+              <span aria-hidden="true">
+              </span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" v-model="comment"></textarea>
+            <small class="form-text text-muted"> {{ getError('comment') }}</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button"
+                    @click="sendDifficultiesArose"
+                    class="btn btn-secondary">Сменить статус на возникли трудности</button>
+          </div>
         </div>
       </div>
     </div>
@@ -72,6 +106,12 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "OrderList",
+  data(){
+    return {
+      comment: null,
+      selectId: null,
+    }
+  },
   props: {
     isAdmin: {
       type: Boolean,
@@ -80,9 +120,9 @@ export default {
   },
   computed: {
     ...mapGetters('appOrder', [
-      'getOrderList'
+      'getOrderList',
+      'getError'
     ]),
-
   },
   methods: {
     ...mapActions('appOrder', [
@@ -122,12 +162,35 @@ export default {
      * @param id
      */
     chanceStatus(status, id) {
-      this.sendToChanceStatus({
-        'id': id,
-        'status': status
-      });
+      if(status === 'difficulties_arose') {
+        this.selectId = id;
+        document.getElementById('modalOpenBtn').click();
+      } else {
+        this.sendToChanceStatus({
+          'id': id,
+          'status': status,
+          'comment': null
+        });
+      }
     },
+    /**
+     * Сменить статус на возникли трудности и отправить сообщение для пользователя
+     */
+    sendDifficultiesArose() {
+      let self = this;
+      this.sendToChanceStatus({
+        'id': this.selectId,
+        'status': 'difficulties_arose',
+        'comment': this.comment,
+        'callback': function () {
+          document.getElementById('closeModal').click();
+          self.selectId = null;
+          self.comment = null;
+        }
+      });
 
+
+    }
   }
 }
 </script>
