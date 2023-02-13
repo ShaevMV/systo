@@ -1,17 +1,19 @@
 <template>
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title">Скачать pdf</h5>
+      <h4>Скачать pdf</h4>
       <span> {{ getText }} </span>
-      <div v-if="status === 'paid'">
-        <button type="button"
-                v-for="(item,index) in listTickets"
-                v-bind:key="index"
-                @click="downloadTicket(item.id)"
-                class="btn btn-primary">Скачать билет для {{ item.name }}
-        </button>
-      </div>
-    </div>
+  <div class="row b-row mt-3">
+        <div v-if="status === 'paid'">
+          <button type="button"
+                  v-for="(item,index) in listTickets"
+                  v-bind:key="index"
+                  @click="downloadTicket(item.id)"
+                  class="btn btn-primary">Скачать билет для {{ item.name }}
+          </button>
+  </div>
+
+  <button type="button"
+          @click="back"
+          class="btn btn-primary">Назад в МОИ ОРГВЗНОСЫ</button>
   </div>
 </template>
 

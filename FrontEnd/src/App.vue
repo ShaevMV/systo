@@ -1,9 +1,6 @@
 <template>
     <header id="header" class="header fixed-top d-flex align-items-center">
-            <a href="/" class="logo d-flex">
-                <img src="/assets/img/systo-nota.png" alt="systo-nota" id="nota">
-                <img src="/assets/img/regsolarsysto.png" alt="systo-logo" id="logo">
-            </a>
+            <a href="/" class="logo d-flex">Система регистрации оргвзносов на систо</a>
     </header>
 
     <aside id="sidebar" class="sidebar">

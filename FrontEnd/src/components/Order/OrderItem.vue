@@ -30,17 +30,11 @@
                 </tr>
                 </tbody>
               </table>
-            </div>
-          </div>
-          <order-button
-              :id="getId"
-              :list-tickets="this.getOrderItem.tickets"
-              :status="getStatus"/>
-          <div class="card">
-            <div class="card-body">
-              <button type="button"
-                      @click="back"
-                      class="btn btn-primary">Назад в МОИ ОРГВЗНОСЫ</button>
+
+                <order-button
+                    :id="getId"
+                    :list-tickets="this.getOrderItem.tickets"
+                    :status="getStatus"/>
             </div>
           </div>
         </div>
