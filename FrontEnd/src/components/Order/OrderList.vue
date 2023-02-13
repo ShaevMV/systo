@@ -24,13 +24,13 @@
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
               <th scope="col">Статус</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
-
+              <th scope="col" v-if="isAdmin"></th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(itemOrder,index) in getOrderList"
                 v-bind:key="index"
-                @click="goItemOrder(itemOrder.id, itemOrder.status)">
+                @click="goItemOrderForUser(itemOrder.id, itemOrder.status)">
               <th scope="row">
                 {{ itemOrder.kilter }}
               </th>
@@ -60,7 +60,15 @@
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
               <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>
               <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
-
+              <td v-if="isAdmin">
+                <router-link
+                    :to="{
+                    name: 'orderItems',
+                    params: {id: itemOrder.id}
+                }">
+                  Перейти к билету
+                </router-link>
+                </td>
             </tr>
             </tbody>
           </table>
@@ -152,7 +160,7 @@ export default {
         color: color,
       }
     },
-    goItemOrder(idOrderItem, status) {
+    goItemOrderForUser(idOrderItem, status) {
       if (!this.isAdmin) {
         if(status !== 'cancel') {
           this.$router.push({name: 'orderItems', params: {id: idOrderItem}});

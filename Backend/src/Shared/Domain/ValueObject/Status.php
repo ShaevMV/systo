@@ -14,9 +14,9 @@ final class Status implements EntityDataInterface
     public const CANCEL = 'cancel';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
     private const HUMAN_STATUS_LIST = [
-        self::NEW => 'Новый',
+        self::NEW => 'Ожидает проверки',
         self::CANCEL => 'Отменён',
-        self::PAID => 'Оплаченный',
+        self::PAID => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
     ];
 
@@ -38,7 +38,8 @@ final class Status implements EntityDataInterface
 
     public function __construct(
         private string $name
-    ) {
+    )
+    {
         $this->isCorrect($this->name);
     }
 
@@ -67,7 +68,7 @@ final class Status implements EntityDataInterface
 
     public function isCorrectNextStatus(Status $nextStatus): bool
     {
-        $strNextStatus = (string) $nextStatus;
+        $strNextStatus = (string)$nextStatus;
         $role = self::ROLE_CHANCE_STATUS[$this->name];
         $result = in_array($strNextStatus, $role, true);
 
