@@ -43,6 +43,8 @@ export default {
       if (this.status === 'difficulties_arose') {
         return 'С твоим заказом возникли трудности. Пожалуйста свяжись с организаторами.';
       }
+
+      return '';
     },
   },
   methods: {
