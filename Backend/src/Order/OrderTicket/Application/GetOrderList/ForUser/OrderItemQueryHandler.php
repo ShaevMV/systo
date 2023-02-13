@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
 
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
@@ -10,7 +12,7 @@ class OrderItemQueryHandler implements QueryHandler
 {
     public function __construct(
         private OrderTicketRepositoryInterface $orderTicketRepository
-    ) {
+    ){
     }
 
     public function __invoke(OrderIdQuery $query): ?OrderTicketItemResponse

@@ -53,8 +53,9 @@
               <td>{{ itemOrder.name }}</td>
               <td>{{ itemOrder.price }} рублей</td>
               <td>{{ itemOrder.count }}</td>
-              <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
               <td>{{ itemOrder.dateBuy }}</td>
+              <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
+
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
               <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>

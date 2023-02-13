@@ -47,13 +47,13 @@ final class OrderTicket extends AggregateRoot
 
     public static function create(
         OrderTicketDto $orderTicketDto,
+        int $kilter,
     ): self {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
-                $result->getId(),
-                $result->user_id,
                 $orderTicketDto->getEmail(),
+                $kilter
             )
         );
 

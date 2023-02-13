@@ -108,4 +108,9 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
     {
         return $this->id;
     }
+
+    public function getKilter(): int
+    {
+        return $this->kilter;
+    }
 }

@@ -2,6 +2,7 @@
   <div class="card">
     <div class="card-body">
       <h5 class="card-title">Скачать pdf</h5>
+      <span> {{ getText }} </span>
       <div v-if="status === 'paid'">
         <button type="button"
                 v-for="(item,index) in listTickets"
@@ -10,7 +11,6 @@
                 class="btn btn-primary">Скачать билет для {{ item.name }}
         </button>
       </div>
-      <span v-else> Билеты будут доступны для скачивания после проверки оплаты заказа </span>
     </div>
   </div>
 </template>
@@ -31,6 +31,19 @@ export default {
     id: {
       type: String
     }
+  },
+  computed: {
+    getText() {
+      if (this.status === 'new') {
+        return 'Твои билеты будут доступны для скачивания после проверки оплаты заказа. Ты также получишь их на свой e-mail.'
+      }
+      if (this.status === 'paid') {
+        return 'Твои билеты доступны для скачивания по ссылке ниже. Они также отправлены на на твой e-mail';
+      }
+      if (this.status === 'difficulties_arose') {
+        return 'С твоим заказом возникли трудности. Пожалуйста свяжись с организаторами.';
+      }
+    },
   },
   methods: {
     ...mapActions('appOrder', [
