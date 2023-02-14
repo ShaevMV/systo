@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,12 +22,17 @@ Route::get('/', function () {
 
 Route::get('/tikets', function () {
 
-    $qrCode = App::make(\Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService::class)->createQrCode(new \Tickets\Shared\Domain\ValueObject\Uuid('0c5775e0-357a-4d44-8626-ce0f838ed422'));
+    $pdf = App::make(CreatingQrCodeService::class)->createPdf(
+        new TicketResponse(
+            'test',
+            1000,
+            new Uuid('0c5775e0-357a-4d44-8626-ce0f838ed422'),
+            'test@test.ru',
+            '+799555545',
+            'SPB'
+        )
 
-    return view('pdf', [
-        'url' => $qrCode->getDataUri(),
-        'name' => 'Митрофан Шаев',
-        'email' => 'test@test.ru',
-        'kilter' => 1000
-    ]);
+    );
+
+    return $pdf->download('ticket.pdf');
 });
