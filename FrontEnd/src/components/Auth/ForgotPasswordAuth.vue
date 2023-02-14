@@ -1,10 +1,10 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <div class="text-center title-block">
       <h1>Забыли пароль?</h1>
     </div>
     <div class="row">
-      <div class="col-lg-10 mx-auto">
+      <div class="col-lg-10 col-md-12 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
 
@@ -13,10 +13,9 @@
 
             <p class="pp1 text-center">Забыл пароль? Бывает... Введите ваш e-mail и система напомните его Вам.</p>
 
-            <div class="container">
               <div id="contact-form" role="form">
                 <div class="row">
-                  <div class="col-md-12">
+                  <div class="col-12">
                     <div class="form-group">
                       <label for="form_email" class="required hidder">Ваш email</label>
                       <input id="form_email"
@@ -29,14 +28,13 @@
                              data-error="Введи свою почту!">
                     </div>
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-12">
                     <button type="button"
                             @click="sendForgotPassword"
                             class="btn btn-lg btn-block btn-outline-primary ">Напомнить пароль</button>
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>

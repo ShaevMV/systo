@@ -1,19 +1,13 @@
 <template>
-      <h4>Скачать pdf</h4>
-      <span> {{ getText }} </span>
-  <div class="row b-row mt-3">
-        <div v-if="status === 'paid'">
+      <h4 class="download-title">Скачать электронные билеты с qr-кодом:</h4>
+      <div class="qr-text"> {{ getText }} </div>
+        <div v-if="status === 'paid'" class="mb-3 mt-3">
           <button type="button"
                   v-for="(item,index) in listTickets"
                   v-bind:key="index"
                   @click="downloadTicket(item.id)"
-                  class="btn btn-primary">Скачать билет для {{ item.name }}
+                  class="downloader">Скачать билет для {{ item.name }}
           </button>
-  </div>
-
-  <button type="button"
-          @click="back"
-          class="btn btn-primary">Назад в МОИ ОРГВЗНОСЫ</button>
   </div>
 </template>
 

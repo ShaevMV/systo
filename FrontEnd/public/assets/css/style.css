@@ -29,6 +29,7 @@ body {
     background: #fff;
     color: #333;
     font-size: 16px;
+    min-width: 320px;
 }
 
 a {
@@ -43,8 +44,8 @@ a:hover {
 }
 
 #main {
-    margin-top: 60px;
     padding: 20px 30px;
+    margin-top: 60px;
     transition: var(--transition);
     background: url('../img/main-bg.jpg') center no-repeat;
     background-size: cover;
@@ -257,11 +258,12 @@ a:hover {
 }
 
 .card-title {
-    padding: 20px 0 15px 0;
-    font-size: 18px;
-    font-weight: 500;
-    color: #012970;
-    font-family: "Poppins", sans-serif;
+    margin-top: 0;
+    margin-bottom: 2vw;
+    font-size: 23px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
 }
 
 .card-title span {
@@ -373,14 +375,6 @@ a:hover {
     background-color: #fff;
     color: #4154f1;
     border-bottom: 2px solid #4154f1;
-}
-
-
-.logo span {
-    font-size: 26px;
-    font-weight: 700;
-    color: #012970;
-    font-family: "Nunito", sans-serif;
 }
 
 .header {
@@ -611,18 +605,13 @@ a:hover {
     width: 300px;
     z-index: 996;
     transition: all 0.3s;
-    padding: 20px;
+    padding: 20px 0;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #aab7cf transparent;
     box-shadow: 0px 0px 20px rgba(1, 41, 112, 0.1);
     background-color: #fff;
-}
-
-@media (max-width: 1199px) {
-    .sidebar {
-        left: -300px;
-    }
+    box-sizing: border-box;
 }
 
 .sidebar::-webkit-scrollbar {
@@ -635,36 +624,18 @@ a:hover {
     background-color: #aab7cf;
 }
 
-@media (min-width: 1200px) {
-
-    #main,
-    #footer {
-        margin-left: 300px;
-    }
+#main,
+#footer {
+    margin-left: 300px;
 }
 
-@media (max-width: 1199px) {
-    .toggle-sidebar .sidebar {
-        left: 0;
-    }
-}
-
-@media (min-width: 1200px) {
-
-    .toggle-sidebar #main,
-    .toggle-sidebar #footer {
-        margin-left: 0;
-    }
-
-    .toggle-sidebar .sidebar {
-        left: -300px;
-    }
-}
 
 .sidebar-nav {
     padding: 0;
     margin: 0;
     list-style: none;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .sidebar-nav li {
@@ -1269,7 +1240,7 @@ a:hover {
     height: 100%;
     align-items: center;
     font-size: 18px;
-    color: #ffffff;
+    color: #ffffff !important;
     font-weight: bold;
     text-decoration: none;
     text-transform: uppercase;
@@ -1359,6 +1330,8 @@ a:hover {
 
 #left-logo{
     margin-bottom: 1.6vw;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 #left-logo .left-logo{
@@ -1378,6 +1351,9 @@ a:hover {
 
 #left-sub{
     margin-top: 2vw;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-bottom: 30px;
 }
 
 #left-sub ul{
@@ -1417,18 +1393,38 @@ a:hover {
 }
 
 #prana{
-    font-size: 11px;
+    font-size: 12px;
     color: var(--c-red);
-    margin-top: 3vw;
-    padding-left: 30px;
-    background: url('../img/prana_icon_red_mini.png') left center no-repeat;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #fff;
+    padding-bottom: 7px;
+    padding-top: 10px;
+    box-sizing: border-box;
+    width: 295px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#prana::before{
+    content: '';
+    display: block;
+    width: 25px;
+    height: 20px;
+    background: url(../img/prana_icon_red_mini.png) left center no-repeat;
     background-size: 24px auto;
+    margin-right: 3px;
+    position: relative;
+    top: -2px;
 }
 
 #prana a{
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: underline;
+    margin-left: 5px;
 }
 
 html, body, #app{
@@ -1457,7 +1453,6 @@ label.required::after{
     display: block;
     width: 100%;
     padding: .375rem .75rem;
-    appearance: none;
     resize: none;
 }
 
@@ -1473,7 +1468,15 @@ label.required::after{
     display: block;
     width: 100%;
     padding: .375rem .75rem;
-    /*appearance: none;*/
+
+}
+
+select.form-select::after{
+    content: '';
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    background-color: grey;
 }
 
 .form-control:focus, .form-select:focus {
@@ -1486,7 +1489,7 @@ label.required::after{
     border-radius: var(--radius);
 }
 
-#contact-form .col-md-12 button, #reg-form .btn{
+#contact-form .col-12 button, #reg-form .btn{
     width: 100%;
     margin-top: 2vw;
 }
@@ -1507,6 +1510,7 @@ label.required::after{
 .pp1 span{
     color: var(--c-red);
     font-weight: bold;
+    margin-right: 10px;
 }
 
 #contact-form .btn{
@@ -1523,11 +1527,11 @@ label.required::after{
     margin-bottom: 2vw;
 }
 
-#contact-form .col-md-4{
+#app .y-row .col-md-4{
     width: 32%;
 }
 
-#contact-form > .row{
+#contact-form > .row, #contact-form .d-flex.y-row {
     justify-content: space-between;
 }
 
@@ -1584,10 +1588,26 @@ label.required::after{
     align-items: center;
 }
 
+#app .row.pp1{
+    justify-content: flex-start;
+}
+
 #promo-input small{
     align-self: center;
     margin-left: 30px;
     margin-top: 0;
+}
+
+
+#promo-input .input-group-text{
+    background-color: #1e871c;
+    background-image: url('../img/icon-check.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 21px;
+    border: 1px solid #1e871c;
+    padding-left: 25px;
+    padding-right: 25px;
 }
 
 .payment-choice label{
@@ -1640,7 +1660,7 @@ label.required::after{
     align-items: center;
 }
 
-.payment-choice input[type="radio"]::checked + span{
+.payment-choice input[type="radio"]:checked + span{
     border-color: rgb(30, 135, 28) !important;
 }
 
@@ -1738,7 +1758,7 @@ label.required::after{
     top: 8px;
 }
 
-.flex-flex.col-md-5 > *{
+.flex-flex.col-5 > *, #validationDefault01{
     margin-right: 15px;
 }
 
@@ -1751,12 +1771,12 @@ label.required::after{
     margin-left: 15px;
 }
 
-#id-info{
+#contact-form .id-info{
     line-height: 1.3;
     font-size: 14px;
     color: #333;
     opacity: 1;
-    margin-left: 40px;
+    margin-left: 20px;
     display: block;
 }
 
@@ -1777,6 +1797,13 @@ label.required::after{
     margin-top: -10px;
 }
 
+#contact-form .x-row input[type="text"]{
+    background-color: rgba(30, 135, 28, 0.1);
+    font-size: 16px;
+    color: #333333;
+    font-weight: bold;
+}
+
 .b-row{
     justify-content: space-between;
 }
@@ -1789,6 +1816,393 @@ label.required::after{
     width: 100%;
 }
 
+#filter .col-md-4{
+    padding-right: 3%;
+    margin-bottom: 2vw;
+    text-align: center;
+}
+
+#total-numberz p{
+    margin-bottom: 0;
+}
+
+#total-numberz span{
+    font-weight: bold;
+    color: var(--c-red);
+    position: relative;
+    top: 1px;
+    margin-left: 4px;
+}
+
+.downloader{
+    font-size: 16px;
+    color: #86201c;
+    font-weight: bold;
+    display: inline-block;
+    width: 500px;
+    position: relative;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background-color: rgba(241, 242, 247, 0.5);
+    border: 2px solid rgb(241, 242, 247);
+    text-align: left;
+    background-image: url('../img/icon-pdf.png');
+    background-repeat: no-repeat;
+    background-position: 9px center;
+    box-sizing: border-box;
+    background-size: 42px;
+    padding: 20px;
+    padding-left: 65px;
+}
+
+.x-button{
+    width: 450px;
+}
+
+.download-title{
+    font-weight: bold;
+    font-size: 20px;
+    margin-top: 0;
+}
+
+#header button{
+    display: block;
+    box-sizing: border-box;
+    padding: 0;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 2px solid #fff;
+    background-image: url('../img/threelines-white.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px auto;
+    /*display: none;*/
+}
+
 .hidder{
     display: none !important;
+}
+
+.logo img{
+    width: 34px;
+    height: auto;
+    display: none;
+}
+
+
+/* SHANTIX ADAPTIVE */
+
+
+@media (max-width: 1200px) {
+    .sidebar {
+        left: -300px;
+    }
+
+    #header button{
+        display: block;
+    }
+
+    #main, #footer{
+        margin-left: 0;
+    }
+}
+
+
+@media(max-width: 1100px){
+    #main h1{
+        font-size: 27px;
+    }
+}
+
+
+@media(max-width: 1030px){
+    #main h1 {
+        font-size: 26px;
+    }
+
+    th span{
+        display: none !important;
+    }
+
+    .table tbody tr > *{
+        font-size: 15px;
+    }
+
+}
+
+@media(max-width: 900px) {
+    #main h1 {
+        font-size: 25px;
+    }
+
+    #defaultCheck1{
+        width: 25px;
+        height: 25px;
+        border-width: 1px;
+    }
+
+    .form-control{
+        font-size: 15px;
+    }
+
+    .pp1{
+        margin-bottom: 2vw;
+    }
+
+    .pp1 br{
+        display: none;
+    }
+
+    .logo{
+        font-size: 17px;
+    }
+}
+
+@media(max-width: 800px) {
+    #main h1 {
+        font-size: 24px;
+    }
+
+    #app .row.pp1 {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .pp1, .forgotten-pass{
+        text-align: center;
+    }
+
+    .pp1 span{
+        margin-right: 0;
+    }
+
+    .card-body > table thead {
+        display: none;
+    }
+
+    .card-body > table tbody td,  .card-body > table tbody th{
+        display: flex;
+        justify-content: space-between;
+        font-size: 14px;
+    }
+
+    .card-body > table tbody tr{
+        display: block;
+    }
+
+    .card-body > table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        margin-right: 20px;
+    }
+
+    .payment-choice label span{
+        margin-left: 10px;
+        min-width: auto;
+        width: 100%;
+    }
+
+    .payment-choice .form-check-input {
+        display: none;
+    }
+
+    .copy-btn{
+        text-align: center;
+    }
+
+    .form-check{
+        padding-left: 0;
+    }
+
+    .payment-choice label span{
+        margin-left: 0;
+        background-position: 3px center;
+    }
+}
+
+@media(max-width: 700px) {
+    #main h1 {
+        font-size: 23px;
+    }
+
+    .logo{
+        font-size: 16px;
+    }
+
+}
+
+@media(max-width: 600px) {
+    #main h1 {
+        font-size: 22px;
+    }
+
+    .form-control:not(textarea){
+        font-size: 14px;
+        height: 45px;
+    }
+
+
+    #app #contact-form .y-row .col-md-4{
+        margin-bottom: 20px;
+    }
+
+    #main {
+        padding: 10px;
+    }
+
+    .logo{
+        font-size: 15px;
+    }
+
+    #basic-addon1, #basic-addon2{
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    #contact-form .row, #accounter .row, #contact-form .d-flex.y-row{
+        flex-direction: column;
+    }
+
+    #contact-form .col-md-4, #contact-form .col-md-9, #contact-form .y-row .col-md-4, #accounter .row .col-8, #accounter .row .col-4, #main-form #contact-form .col-9, #main-form #contact-form .col-4, #main-form #contact-form .col-3, #main-form #contact-form .col-5, #main-form #contact-form .col-6 {
+        width: 100%;
+        text-align: center;
+    }
+
+    #main-form #contact-form .col-5.flex-flex{
+        justify-content: space-between;
+        margin-top: 10px;
+    }
+
+    #main-form #contact-form .col-5.flex-flex > *{
+        width: 48%;
+        margin-right: 0;
+    }
+
+    #main-form #contact-form .col-4.flex-flex{
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    #main-form #contact-form .col-4.flex-flex span{
+        display: block;
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .flex-flex .hourz, .flex-flex .minutez{
+        margin-left: 0;
+        margin-right: 0;
+        width: 48%;
+    }
+
+    #contact-form .id-info{
+        margin-left: 0;
+        margin-top: 8px;
+    }
+
+    body{
+        font-size: 15px;
+    }
+
+    .pp1{
+        font-size: 15px;
+        line-height: 1.3;
+    }
+}
+
+
+@media(max-width: 500px) {
+    #main h1 {
+        font-size: 21px;
+    }
+
+    #basic-addon1, #basic-addon2{
+        font-size: 13px;
+        padding-top: 20px;
+        padding-bottom: 17px;
+    }
+
+    .header{
+        height: 50px;
+    }
+
+    #main{
+        margin-top: 50px;
+    }
+
+    .logo span{
+        display: none;
+    }
+
+    .logo{
+        position: relative;
+        left: -8px;
+    }
+
+    .btn{
+        font-size: 15px;
+    }
+
+    .logo img{
+        display: block;
+    }
+
+    #header button{
+        border-width: 1px;
+        right: 8px;
+        top: 8px;
+        width: 35px;
+        height: 35px;
+    }
+
+    #contact-form .reg-btn{
+        font-size: 19px;
+    }
+
+}
+
+
+@media(max-width: 400px) {
+    #main h1 {
+        font-size: 20px;
+    }
+
+    .form-control:not(textarea) {
+        font-size: 13px;
+        height: 40px;
+    }
+
+    .card{
+        padding: 1rem 0;
+    }
+
+    body, .pp1{
+        font-size: 14px;
+    }
+
+}
+
+
+@media(max-width: 360px) {
+    #main h1 {
+        font-size: 19px;
+    }
+}
+
+@media(max-width: 320px) {
+    #main h1 {
+        font-size: 18px;
+    }
+
+    body{
+        font-size: 13px;
+    }
 }

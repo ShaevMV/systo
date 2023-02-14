@@ -1,9 +1,7 @@
 <template>
-  <div class="row">
-    <div class="container">
+    <div class="container-fluid">
       <UserOrderList/>
     </div>
-  </div>
 </template>
 
 <script>

@@ -1,6 +1,5 @@
 <template>
-  <div class="row">
-    <div class="container">
+    <div class="container-fluid">
       <div class="title-block text-center"><h1 class="card-title">Заказ # {{ getDateBuy }}</h1></div>
       <div class="row">
         <div class="col-lg-12 mx-auto">
@@ -35,12 +34,15 @@
                     :id="getId"
                     :list-tickets="this.getOrderItem.tickets"
                     :status="getStatus"/>
+
+              <button type="button"
+                      @click="back"
+                      class="btn btn-primary x-button">Назад в МОИ ОРГВЗНОСЫ</button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>

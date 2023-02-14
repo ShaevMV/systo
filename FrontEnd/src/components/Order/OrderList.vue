@@ -1,7 +1,7 @@
 <template>
   <div class="title-block text-center">
     <h1 class="card-title" v-if="!isAdmin">Мои Оргвзносы</h1>
-    <h1 class="card-title" v-else> Заказы пользователя </h1>
+    <h1 class="card-title" v-else> Заказы пользователей </h1>
   </div>
   <div class="row">
     <div class="col-lg-12 mx-auto">
