@@ -12,7 +12,7 @@
         #wrapper{
             width: 990px;
             margin: 0 auto;
-            background: url({{ asset('/images/main-bg.jpg')}}) no-repeat center;
+            background: url('http://193.106.175.59/images/top-img.png') no-repeat center;
             background-size: cover;
         }
 
@@ -107,7 +107,7 @@
 <div id="wrapper">
     <div id="top">
         <div class="container">
-            <img src="{{ asset('images/top-img.png') }}" alt="top-img">
+            <img src="http://193.106.175.59/images/main-bg.jpg" alt="top-img">
         </div>
     </div>
 

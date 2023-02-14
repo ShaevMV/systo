@@ -20,9 +20,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/tikets', function () {
+Route::get('/ticket', function () {
 
-    $pdf = App::make(CreatingQrCodeService::class)->createPdf(
+    ini_set('memory_limit', '-1');
+
+    $pdf = (new CreatingQrCodeService())->createPdf(
         new TicketResponse(
             'test',
             1000,
@@ -33,6 +35,8 @@ Route::get('/tikets', function () {
         )
 
     );
+    $pdf->save(storage_path("app/public/tickets/0c5775e0-357a-4d44-8626-ce0f838ed422.pdf"));
+    $path = Storage::disk('local')->path("public/tickets/0c5775e0-357a-4d44-8626-ce0f838ed422.pdf");
 
-    return $pdf->download('ticket.pdf');
+    return response()->download($path, basename($path));
 });

@@ -40,7 +40,13 @@ class CORS
         $this->allowCredentials = true;
         $this->maxAge = 600;
         $this->exposeHeaders = [];
-        $this->allowOrigins = ['http://localhost:8081','http://api.tickets.loc','http://193.106.175.59:8081'];
+        $this->allowOrigins = [
+            'http://localhost:8081',
+            'http://api.tickets.loc',
+            'http://193.106.175.59:8081',
+            'http://localhost',
+            'http://193.106.175.59',
+        ];
     }
 
     public function handle(Request $request, Closure $next)
