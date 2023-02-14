@@ -1,12 +1,11 @@
 <template>
-  <div class="row" id="reg-form">
-    <div class="container">
+  <div class="container-fluid" id="reg-form">
       <div class="text-center title-block">
         <h1>Регистрация аккаунта</h1>
       </div>
 
       <div class="row">
-        <div class="col-lg-10 mx-auto">
+        <div class="col-lg-10 col-md-12 mx-auto">
           <div class="card mt-2 mx-auto">
             <p class="pp1 text-center">Чтобы зарегистрировать свой аккаунт в системе заполни все поля данной формы:</p>
             <div class="card-body">
@@ -62,7 +61,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 
 </template>

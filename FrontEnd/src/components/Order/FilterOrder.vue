@@ -1,13 +1,12 @@
 <template>
-  <div class="row">
-    <div class="col-lg-12 mx-auto">
+  <div class="row" id="filter">
+    <div class="col-lg-12 mx-auto mb-5">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Фильтр</h5>
 
-          <div class="row g-3">
-            <!-- тип оргвзноса -->
-            <div class="col-md-3">
+          <div class="d-flex flex-wrap">
+            <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Тип оргвзноса</label>
               <select class="form-select"
                       v-model="typeOrder"
@@ -20,8 +19,7 @@
                 </option>
               </select>
             </div>
-            <!-- Способ покупки билета -->
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Способ покупки билета</label>
               <select class="form-select"
                       v-model="typesOfPayment"
@@ -33,7 +31,6 @@
                 </option>
               </select>
             </div>
-            <!-- email -->
             <div class="col-md-4">
               <label for="validationDefaultUsername" class="form-label">Email</label>
               <div class="input-group">
@@ -46,7 +43,6 @@
               </div>
             </div>
 
-            <!-- статус заказа -->
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Статус заказа</label>
               <select class="form-select"
@@ -68,19 +64,19 @@
                      class="form-control"
                      id="validationDefault03">
             </div>
-            <div class="col-6">
+          </div>
+
+            <div class="row b-row mt-2">
               <button class="btn btn-primary"
                       @click="sendFilter"
                       type="submit">Применить фильтр
               </button>
-            </div>
-            <div class="col-6">
               <button class="btn btn-primary"
                       @click="clearFilter"
                       type="submit">Сбросить фильтр
               </button>
-            </div>
-          </div>
+              </div>
+
         </div>
       </div>
     </div>

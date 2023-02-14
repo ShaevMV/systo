@@ -22,6 +22,7 @@ use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Domain\Ticket;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
+use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
 
 class TicketApplication
 {
@@ -67,12 +68,7 @@ class TicketApplication
             /** @var TicketResponse $ticketResponse */
             $ticketResponse = $this->queryBus->ask(new GetTicketQuery($ticketDto->getId()));
 
-            $ticket = Ticket::newTicket(
-                $orderId,
-                $ticketResponse->getName(),
-                $ticketResponse->getKilter(),
-                $ticketResponse->getId(),
-            );
+            $ticket = Ticket::newTicket($ticketResponse);
 
             $this->bus::chain($ticket->pullDomainEvents())
                 ->dispatch();

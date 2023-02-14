@@ -7,32 +7,30 @@ namespace Tickets\Ticket\CreateTickets\Domain;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
 
 class Ticket extends AggregateRoot
 {
     public function __construct(
-        private Uuid $orderId,
         private string $name,
         private int $kilter,
         private Uuid $aggregateId,
+        private string $email,
     ) {
     }
 
-    public static function newTicket(Uuid $orderId, string $quest, int $kilter, Uuid $id): self
+    public static function newTicket(TicketResponse $ticketResponse): self
     {
-        $result = new self($orderId, $quest, $kilter, $id);
+        $result = new self(
+            $ticketResponse->getName(),
+            $ticketResponse->getKilter(),
+            $ticketResponse->getId(),
+            $ticketResponse->getEmail());
 
-        $result->record(new ProcessCreatingQRCode(
-            $result->aggregateId,
-            $result->name,
-            $result->kilter,
-        ));
+        $result->record(new ProcessCreatingQRCode($ticketResponse));
 
         return $result;
     }
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
             data-target="#exampleModal">
       Launch demo modal
@@ -29,18 +29,17 @@
       <h1>Форма подтверждения добровольного оргвзноса</h1>
       <small class="form-text text-muted">на создание туристического слёта Солар Систо 2023 с 18 по 22 мая</small>
     </div>
-    <div class="row ">
-      <div class="col-lg-10 mx-auto">
+    <div class="row" id="main-form">
+      <div class="col-12 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
-            <div class="container">
               <div id="contact-form" role="form">
                 <div class="controls">
-                  <div class="pp1">
+                  <div class="pp1 row">
                     <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически создаст тебе
                     аккаунт:
                   </div>
-                  <div class="row">
+                  <div class="row y-row">
                     <div class="col-md-4">
                       <div class="form-group">
                         <label for="form_email" class="hidder">Email *</label>
@@ -88,17 +87,17 @@
                       </div>
                     </div>
                   </div>
-                  <div class="pp1">
+                  <div class="pp1 row">
                     <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные каждого гостя, за которого будешь вносить
                     средства:
                   </div>
 
                   <div class="row mb-3">
-                    <div class="col-md-3">
+                    <div class="col-3">
                       <label for="form_need">Тип оргвзноса: *</label>
                     </div>
 
-                    <div class="col-md-9">
+                    <div class="col-9">
                       <select id="form_need"
                               name="need"
                               class="col-md-8 form-select"
@@ -119,10 +118,10 @@
 
                   <!--                  Промокод-->
                   <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-3">
                         <label for="form_promo_cod">Промокод:</label>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-4">
                         <div class="input-group" id="promo-input">
                           <input type="text"
                                  id="form_promo_cod"
@@ -133,18 +132,18 @@
                                  aria-describedby="basic-addon1">
                           <span class="input-group-text"
                                 @click="sendPromoCode"
-                                id="basic-addon1"><i class="bi bi-check"></i></span>
+                                id="basic-addon1"></span>
                         </div>
                   </div>
-                    <div class="col-md-5">
-                      <small class="form-text text-muted" v-show="massageForPromoCode!==null">
+                    <div class="col-5">
+                      <small class="form-text text-muted id-info" v-show="massageForPromoCode!==null">
                         {{ massageForPromoCode }}
                       </small>
                     </div>
                     </div>
 
                   <div class="row mt-3 mb-3">
-                    <div class="col-md-5">
+                    <div class="col-5">
                       <label for="newGuest" class="reg-label">Данные о гостях:</label>
                     </div>
                     <div class="input-group mb-3">
@@ -165,7 +164,7 @@
                   </div>
 
                   <div class="row x-row" v-show="guests.length > 0">
-                    <div class="col-md-12">
+                    <div class="col-12">
                       <div class="form-group">
                         <div class="input-group mb-3"
                              v-for="(itemGuest,index) in guests" v-bind:key="index">
@@ -188,35 +187,29 @@
                   </div>
 
                   <div class="row itog-row mb-4" v-show="totalPrice > 0">
-                    <div class="col-md-4">
+                    <div class="col-4">
                       <h4 class="my-lg-2 font-weight-normal">Итого к внесению: {{ totalPrice }} <small class="text-muted">
                         руб.</small></h4>
 
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-4">
                       <h4 class="my-lg-2 font-weight-normal">Кол-во гостей: <small class="text-muted">{{ countGuests }}</small></h4>
                     </div>
 
-                  </div>
-                  <div class="row" v-show="totalPrice > 0 && getDiscountByPromoCode > 0">
-                    <div class="col-md-6">
-                      <h4 class="my-lg-2 font-weight-normal">Скидка по промокоду: </h4>
-
-                    </div>
-                    <div class="col-md-6">
-                      <h4 class="my-lg-2 font-weight-normal">{{ getDiscountByPromoCode * countGuests }} <small
-                          class="text-muted">/
-                        руб.</small></h4>
+                    <div class="col-4" v-show="totalPrice > 0 && getDiscountByPromoCode > 0">
+                      <h4 class="my-lg-2 font-weight-normal">Скидка по промокоду: <small class="text-muted">{{ getDiscountByPromoCode * countGuests }}  рублей</small></h4>
                     </div>
 
                   </div>
 
-                  <div class="pp1">
+
+
+                  <div class="pp1 row">
                     <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства, осуществи перевод и заполни данные о
                     платеже!
                   </div>
                   <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                       <div class="form-group">
                         <label for="form_need" class="hidder">Способ оплаты: *</label>
                         <div class="in-choice">
@@ -247,10 +240,10 @@
 
                   <!--                  Дата платежа -->
                   <div class="row mt-5 mb-4">
-                    <div class="col-md-3">
+                    <div class="col-3">
                       <label for="form_message">Дата и время перевода:</label>
                     </div>
-                    <div class="col-md-5 flex-flex">
+                    <div class="col-5 flex-flex">
                       <input type="number"
                              max="31"
                              min="1"
@@ -271,35 +264,34 @@
                       </select>
                     </div>
 
-                    <div class="col-md-4 flex-flex">
-                      Время:
-
-                      <input type="number" class="form-control hourz" v-model="hour" placeholder="часы" min="00" max="24"> :
-                      <input type="number" class="form-control minutez" v-model="minute" placeholder="Минут" min="00"
+                    <div class="col-4 flex-flex">
+                      <span>Время:</span>
+                      <input type="number" class="form-control hourz" v-model="hour" placeholder="Часы" min="00" max="24"> :
+                      <input type="number" class="form-control minutez" v-model="minute" placeholder="Минуты" min="00"
                              max="59">
                     </div>
                     <small class="form-text text-muted"> {{ getError('date') }}</small>
                   </div>
-                  <div class="row mb-4">
-                    <div class="col-md-3 flex-flex">
+                  <div class="row mb-4 flex-flex">
+                    <div class="col-3">
                       <label for="idBuy">Идентификатор платежа:</label>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-3">
                       <input class="form-control" v-model="idBuy" id="idBuy">
                     </div>
-                    <div class="col-md-6">
-                      <small class="form-text text-muted" id="id-info">
+                    <div class="col-6">
+                      <small class="form-text text-muted id-info">
                         При переводах на Сбербанк напиши сюда <b>последние 4 цифры номера карты</b>, с которой был сделан перевод
                       </small>
                     </div>
                     <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
                   </div>
                   <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-3">
                       <label for="idBuy">Комментарий к заказу:</label>
                     </div>
 
-                    <div class="col-md-9">
+                    <div class="col-9">
                       <textarea class="form-control order-text" v-model="comment" id="idBuy"></textarea>
                     </div>
 
@@ -320,7 +312,7 @@
                   </div>
 
                   <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-12">
                       <button type="button"
                               :disabled="!isNotCorrect"
                               @click="orderTicket"
@@ -341,7 +333,6 @@
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
         <!-- /.8 -->

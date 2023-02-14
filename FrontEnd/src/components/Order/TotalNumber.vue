@@ -1,19 +1,21 @@
 <template>
-  <div class="row">
-    <div class="col-lg-12">
+  <div class="row mb-5" id="total-numberz">
+    <div class="col-lg-12 mx-auto">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Отчёт о билетах</h5>
-          <p>
+          <div class="d-flex">
+          <p class="col-md-4 text-center">
             <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
           </p>
-          <p>
+          <p class="col-md-4 text-center">
             <b>На сумму:</b><span> {{ getTotalAmount }} </span>
           </p>
-          <p>
+          <p class="col-md-4 text-center">
             <b>Всего заказов:</b><span> {{ getTotalCount }} </span>
           </p>
         </div>
+          </div>
       </div>
     </div>
   </div>

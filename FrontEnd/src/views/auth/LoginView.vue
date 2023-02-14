@@ -1,7 +1,5 @@
 <template>
-  <div class="row">
     <LoginAuth/>
-  </div>
 </template>
 
 <script>

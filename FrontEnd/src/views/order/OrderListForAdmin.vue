@@ -1,9 +1,7 @@
 <template>
-  <section class="section">
       <filter-order/>
       <total-number/>
       <order-list :is-admin="true"/>
-  </section>
 </template>
 
 <script>

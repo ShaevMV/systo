@@ -1,18 +1,16 @@
 <template>
-  <div class="row" id="accounter">
-    <div class="container">
+    <div class="container-fluid" id="accounter">
       <div class="title-block text-center"><h1 class="card-title">Мой аккаунт</h1></div>
       <div class="row">
-        <div class="col-lg-10 mx-auto">
+        <div class="col-12 mx-auto">
           <div class="card">
             <div class="card-body pt-3">
               <div class="tab-pane fade profile-edit pt-3 active show" id="profile-edit" role="tabpanel">
 
-                <!-- Profile Edit Form -->
                 <div>
                   <div class="row mb-3">
-                    <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Имя</label>
-                    <div class="col-md-8 col-lg-9">
+                    <label for="fullName" class="col-4 col-form-label">Имя:</label>
+                    <div class="col-8">
                       <input name="fullName"
                              type="text"
                              v-model="name"
@@ -22,8 +20,8 @@
                   </div>
 
                   <div class="row mb-3">
-                    <label for="company" class="col-md-4 col-lg-3 col-form-label">Город</label>
-                    <div class="col-md-8 col-lg-9">
+                    <label for="company" class="col-4 col-form-label">Город:</label>
+                    <div class="col-8">
                       <input name="company"
                              type="text"
                              class="form-control"
@@ -32,9 +30,9 @@
                     </div>
                   </div>
 
-                  <div class="row mb-3">
-                    <label for="Job" class="col-md-4 col-lg-3 col-form-label">Телефон</label>
-                    <div class="col-md-8 col-lg-9">
+                  <div class="row mb-4">
+                    <label for="Job" class="col-4 col-form-label">Телефон:</label>
+                    <div class="col-8">
                       <input name="job"
                              type="text"
                              class="form-control"
@@ -42,8 +40,8 @@
                              id="Job">
                     </div>
                   </div>
-                  <div class="messager" v-show="message">{{ message }}</div>
-                  <div class="text-center">
+                  <div class="row messager" v-show="message">{{ message }}</div>
+                  <div class="row text-center">
                     <button type="submit"
                             @click="sendUserData"
                             class="btn btn-primary">Сохранить изменения
@@ -57,13 +55,13 @@
         </div>
       </div>
 
-      <div class="row">
-          <div class="col-lg-10 mx-auto">
+      <div class="row mt-4 mb-5">
+          <div class="col-12 mx-auto">
     <div class="card">
       <div class="card-body">
         <div class="row mb-3">
-          <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Сменить пароль</label>
-          <div class="col-md-8 col-lg-9">
+          <label for="fullName" class="col-4 col-form-label">Пароль:</label>
+          <div class="col-8">
             <input name="fullName"
                    type="password"
                    v-model="password"
@@ -71,9 +69,9 @@
                    id="fullName">
           </div>
         </div>
-        <div class="row mb-3">
-          <label for="fullName" class="col-md-4 col-lg-3 col-form-label">Повторите пароль</label>
-          <div class="col-md-8 col-lg-9">
+        <div class="row mb-4">
+          <label for="fullName" class="col-4 col-form-label">Пароль еще раз:</label>
+          <div class="col-8">
             <input name="fullName"
                    type="password"
                    v-model="password_confirmation"
@@ -81,8 +79,8 @@
                    id="fullName">
           </div>
         </div>
-        <div class="text-center">
-          <div class="messager" v-show="messagePassword">{{ messagePassword }}</div>
+        <div class="row messager" v-show="messagePassword">{{ messagePassword }}</div>
+        <div class="row text-center">
           <button type="submit"
                   @click="sendEditPassword"
                   class="btn btn-primary">Сменить пароль
@@ -91,7 +89,6 @@
       </div>
     </div>
         </div>
-  </div>
   </div>
   </div>
 </template>
