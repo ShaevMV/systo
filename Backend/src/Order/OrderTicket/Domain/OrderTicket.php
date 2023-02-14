@@ -66,7 +66,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->getTicket()
         ));
 
         $result->record(new ProcessUserNotificationOrderPaid(

@@ -14,10 +14,12 @@ use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
 use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
 
 class CreatingQrCodeService
 {
-    private function createQrCode(Uuid $ticketId): ResultInterface
+    public function createQrCode(Uuid $ticketId): ResultInterface
     {
         return Builder::create()
             ->writer(new PngWriter())
@@ -29,21 +31,22 @@ class CreatingQrCodeService
             ->margin(10)
             ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
             ->logoPath(__DIR__ . '/assets/logo.png')
-            ->labelText('Welcome to Solar Systo ' . date('Y')) //TODO: Автомотизировать
+            ->labelText('') //TODO: Автомотизировать
             ->labelFont(new OpenSans(16))
             ->labelAlignment(new LabelAlignmentCenter())
             ->validateResult(false)
             ->build();
     }
 
-    public function createPdf(Uuid $ticketId, string $name, int $kilter): \Barryvdh\DomPDF\PDF
+    public function createPdf(TicketResponse $dataInfoForPdf): \Barryvdh\DomPDF\PDF
     {
-        $qrCode = $this->createQrCode($ticketId);
+        $qrCode = $this->createQrCode($dataInfoForPdf->getId());
 
         return Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),
-            'name' => $name,
-            'kilter' => $kilter
+            'name' => $dataInfoForPdf->getName(),
+            'email' => $dataInfoForPdf->getEmail(),
+            'kilter' => $dataInfoForPdf->getKilter()
         ]);
     }
 }

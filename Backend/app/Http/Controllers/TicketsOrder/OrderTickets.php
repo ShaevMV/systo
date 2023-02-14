@@ -164,28 +164,21 @@ class OrderTickets extends Controller
             ]);
         }
 
-        try {
-            $status = new Status($request->get('status'));
-            $this->chanceStatus->chance(
-                new Uuid($id),
-                $status,
-                $request->get('comment', null)
-            );
+        $status = new Status($request->get('status'));
+        $this->chanceStatus->chance(
+            new Uuid($id),
+            $status,
+            $request->get('comment', null)
+        );
 
-            return response()->json([
-                'success' => true,
-                'status' => [
-                    'name' => $request->get('status'),
-                    'humanStatus' => $status->getHumanStatus(),
-                    'listCorrectNextStatus' => $status->getListNextStatus(),
-                ]
-            ]);
-        } catch (Throwable $throwable) {
-            return response()->json([
-                'success' => false,
-                'massage' => $throwable->getMessage()
-            ], 422);
-        }
+        return response()->json([
+            'success' => true,
+            'status' => [
+                'name' => $request->get('status'),
+                'humanStatus' => $status->getHumanStatus(),
+                'listCorrectNextStatus' => $status->getListNextStatus(),
+            ]
+        ]);
     }
 
     /**
