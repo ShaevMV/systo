@@ -6,99 +6,103 @@
     <style>
         body {
             font-family: "dejavu sans", serif;
-            font-size: 20px;
+            font-size: 18px;
         }
 
-        #wrapper{
-            width: 990px;
-            margin: 0 auto;
-            background: url('http://193.106.175.59/images/top-img.png') no-repeat center;
+        #wrapper {
+            width: 210mm;
+            height: 250mm;
+            background: url('http://193.106.175.59/images/top-img.png');
             background-size: cover;
+            position: relative;
         }
 
-        .container{
+        .container {
             position: relative;
             box-sizing: border-box;
-            margin-left: 45px;
-            margin-right: 45px;
+            margin-left: 30px;
+            margin-right: 30px;
         }
 
-        #top{
+        #top {
             border-bottom: 4px solid #86201c;
             background-color: #fff;
             box-sizing: border-box;
-            height: 80px;
+            height: 60px;
 
         }
 
-        #top img{
-            width: 70%;
+        #top img {
+            width: 465px;
             position: relative;
-            top: 10px;
-            left: -7px;
+            top: 7px;
+            left: -5px;
         }
 
-        #main{
-            margin-top: 40px;
+        #main {
+            margin-top: 28px;
         }
 
-        #in-main{
+        #in-main {
             display: flex;
             flex-wrap: nowrap;
             justify-content: space-between;
-            margin-top: 45px;
+            margin-top: 28px;
         }
 
-        .lefter{
-            width: 400px;
+        .lefter {
+            width: 290px;
         }
 
-        .lefter img{
+        .lefter img {
             width: 100%;
             height: auto;
         }
 
-        .righter{
-            width: 450px;
-            padding-top: 10px;
+        .righter {
+            width: 421px;
+            padding-top: 2px;
         }
 
-        .item{
-            margin-bottom: 50px;
+        .item {
+            margin-bottom: 35px;
         }
 
-        .item h5{
+        .item h5 {
             margin-top: 0;
-            margin-bottom: 17px;
-            font-size: 25px;
+            margin-bottom: 14px;
+            font-size: 22px;
         }
 
-        .item span{
+        .item span {
             color: #86201c;
-            font-size: 23px;
+            font-size: 22px;
         }
 
-        #sub{
-            margin-top: 150px;
-            padding-bottom: 150px;
+        #sub {
+            margin-top: 60px;
+            padding-bottom: 52px;
         }
 
-        #sub h3{
+        #sub h3 {
             margin-top: 0;
             color: #86201c;
-            font-size: 28px;
-            margin-bottom: 25px;
+            font-size: 26px;
+            margin-bottom: 24px;
         }
 
-        #sub p{
+        #sub p {
             line-height: 1.5;
-            margin-top: 25px;
-            margin-bottom: 25px;
+            margin-top: 0;
+            margin-bottom: 27px;
         }
 
-        #footer{
+        #footer {
             height: 60px;
             background: #86201c;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
         }
 
     </style>
@@ -107,7 +111,7 @@
 <div id="wrapper">
     <div id="top">
         <div class="container">
-            <img src="http://193.106.175.59/images/main-bg.jpg" alt="top-img">
+            <img src="http://193.106.175.59/images/main-bg.jpg" alt="top-img" width="210">
         </div>
     </div>
 
@@ -144,7 +148,8 @@
     <div id="sub">
         <div class="container">
             <h3>Внимание!</h3>
-            <p>На входе на фестиваль каждому гостю необходимо будет показать свой qr-код <br>на экране телефона или в распечатанном виде!<br>
+            <p>На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в
+                распечатанном виде!<br>
                 Позаботься об этом заранее!</p>
 
             <p>До встречи, на фестивале!</p>
@@ -156,3 +161,4 @@
 </div>
 </body>
 </html>
+
