@@ -17,12 +17,11 @@
   </div>
   </div>
 </template>
-<script>
 
 export default {
-  name: "About",
+  name: "AboutView",
   created() {
     document.title = "Условиями туристического слёта"
-  },
+  }
 }
 </script>
