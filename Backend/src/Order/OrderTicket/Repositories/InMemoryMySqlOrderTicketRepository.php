@@ -82,6 +82,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TypesOfPaymentModel::TABLE.'.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->orderBy($this->model::TABLE.'.kilter')
             ->get()
             ->toArray();
 
@@ -147,7 +148,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TicketTypesModel::TABLE.'.name',
                 TypesOfPaymentModel::TABLE.'.name as payment_name'
             ])
-            ->selectSub($this->getSubQueryLastComment(), 'last_comment');
+            ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->orderBy($this->model::TABLE.'.kilter');
 
         /** @var Filter $filter */
         foreach ($filters as $filter) {

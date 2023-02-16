@@ -6,159 +6,141 @@
     <style>
         body {
             font-family: "dejavu sans", serif;
-            font-size: 18px;
-        }
-
-        #wrapper {
-            width: 210mm;
-            height: 250mm;
-            background: url('http://193.106.175.59/images/top-img.png');
+            font-size: 12px;
             background-size: cover;
             position: relative;
+            padding: 0;
+            margin: 0;
+            height: 1019px;
+            width: 720px;
         }
 
-        .container {
-            position: relative;
+        #fon {
+            width: 720px;
+            height: 1019px;
+            position: fixed;
             box-sizing: border-box;
-            margin-left: 30px;
-            margin-right: 30px;
+            z-index: 1;
         }
 
-        #top {
-            border-bottom: 4px solid #86201c;
+        #top{
+            height: 60px;
+            left: 0;
+            width: 1019px;
             background-color: #fff;
-            box-sizing: border-box;
-            height: 60px;
-
-        }
-
-        #top img {
-            width: 465px;
-            position: relative;
-            top: 7px;
-            left: -5px;
-        }
-
-        #main {
-            margin-top: 28px;
-        }
-
-        #in-main {
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-between;
-            margin-top: 28px;
-        }
-
-        .lefter {
-            width: 290px;
-        }
-
-        .lefter img {
-            width: 100%;
-            height: auto;
-        }
-
-        .righter {
-            width: 421px;
-            padding-top: 2px;
-        }
-
-        .item {
-            margin-bottom: 35px;
-        }
-
-        .item h5 {
-            margin-top: 0;
-            margin-bottom: 14px;
-            font-size: 22px;
-        }
-
-        .item span {
-            color: #86201c;
-            font-size: 22px;
-        }
-
-        #sub {
-            margin-top: 60px;
-            padding-bottom: 52px;
-        }
-
-        #sub h3 {
-            margin-top: 0;
-            color: #86201c;
-            font-size: 26px;
-            margin-bottom: 24px;
-        }
-
-        #sub p {
-            line-height: 1.5;
-            margin-top: 0;
-            margin-bottom: 27px;
-        }
-
-        #footer {
-            height: 60px;
-            background: #86201c;
+            z-index: 3;
             position: absolute;
-            bottom: 0;
-            width: 100%;
+            border-bottom: 2px solid #86201c;
+            z-index: 5;
         }
+
+        #top-img{
+            width: 410px;
+            height: auto;
+            position: absolute;
+            top: 11px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        #top-class-title{
+            position: absolute;
+            top: 85px;
+            left: 15px;
+            font-size: 17px;
+            position: absolute;
+            margin: 0;
+            width: 600px;
+            z-index: 5;
+        }
+
+        #qr-code{
+            width: 320px;
+            height: 320px;
+            position: absolute;
+            left: 16px;
+            top: 150px;
+            z-index: 5;
+        }
+
+        .name{
+            position: absolute;
+            left: 380px;
+            top: 162px;
+            font-size: 18px;
+            z-index: 5;
+        }
+
+        .email{
+            position: absolute;
+            left: 380px;
+            top: 240px;
+            font-size: 18px;
+            z-index: 5;
+        }
+
+        .id{
+            position: absolute;
+            left: 380px;
+            top: 320px;
+            font-size: 18px;
+            z-index: 5;
+        }
+
+        #sub{
+            position: absolute;
+            top: 533px;
+            left: 15px;
+            width: 610px;
+            font-size: 19px;
+            line-height: 1.5;
+            margin: 0;
+            z-index: 5;
+        }
+
+
+        footer{
+            position: absolute;
+            width: 720px;
+            bottom: 0;
+            height: 40px;
+            background-color: #86201c;
+            z-index: 5;
+        }
+
+
 
     </style>
 </head>
 <body>
-<div id="wrapper">
-    <div id="top">
-        <div class="container">
-            <img src="http://193.106.175.59/images/main-bg.jpg" alt="top-img" width="210">
-        </div>
-    </div>
+<img src="http://193.106.175.59/images/main-bg.jpg" alt="fon" id="fon">
+<div id="top"></div>
+<img src="http://193.106.175.59/images/top-img.png" alt="top" id="top-img">
+<img src="{{$url}}" width="420" height="420" id="qr-code">
 
-    <div id="main">
-        <div class="container">
-            <p>Привет дорогой друг, это твой электронный билет на Солар Систо 2023!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Солар Систо 2023!</p>
 
-            <div id="in-main">
-                <div class="lefter">
-                    <img src="{{$url}}" alt="qr-code">
-                </div>
-
-                <div class="righter">
-                    <div class="item">
-                        <h5>Имя:</h5>
-                        <span style="font-weight: bold; text-transform: uppercase;">{{$name}}</span>
-                    </div>
-
-                    <div class="item">
-                        <h5>Email:</h5>
-                        <span>{{$email}}</span>
-                    </div>
-
-                    <div class="item">
-                        <h5>Id Билета:</h5>
-                        <span style="font-weight: bold; text-transform: uppercase;">E-{{$kilter}}</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="sub">
-        <div class="container">
-            <h3>Внимание!</h3>
-            <p>На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в
-                распечатанном виде!<br>
-                Позаботься об этом заранее!</p>
-
-            <p>До встречи, на фестивале!</p>
-        </div>
-    </div>
-    <div id="footer">
-
-    </div>
+<div class="name">
+    {{$name}}
 </div>
+
+<div class="email">
+    {{$email}}
+</div>
+
+<div class="id">
+    {{$kilter}}
+</div>
+
+<p id="sub"><strong style="    color: #86201c;
+    font-weight: bold;
+    font-size: 23px;
+    display: inline-block;
+    margin-bottom: 20px;">Внимание!</strong><br>
+    На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде!
+    Позаботься об этом заранее!<br><br>
+    До встречи, на фестивале!</p>
+<footer></footer>
 </body>
 </html>
 
