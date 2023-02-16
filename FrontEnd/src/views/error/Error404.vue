@@ -12,7 +12,10 @@
 
 <script>
 export default {
-  name: "Error_404"
+  name: "Error_404",
+  created() {
+    document.title = "Потеря потерь!!!!"
+  },
 }
 </script>
 

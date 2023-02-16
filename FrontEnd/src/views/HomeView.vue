@@ -8,6 +8,9 @@ export default {
   name: 'HomeView',
   components: {
     BuyTicket,
-  }
+  },
+  created() {
+    document.title = "Система регистрации оргвзносов на систо"
+  },
 }
 </script>

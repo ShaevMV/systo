@@ -115,7 +115,10 @@ export default {
     back: function () {
       location.href='/myOrders';
     }
-  }
+  },
+  created() {
+    document.title = "Заказ №" + this.getDateBuy
+  },
 }
 </script>
 

@@ -16,6 +16,10 @@ export default {
     window.store.dispatch('appOrder/getOrderListForAdmin');
     next();
   },
+  created() {
+    document.title = "Все заказы"
+  },
+
 }
 </script>
 

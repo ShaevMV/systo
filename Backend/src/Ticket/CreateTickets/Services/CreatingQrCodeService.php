@@ -24,7 +24,7 @@ class CreatingQrCodeService
         return Builder::create()
             ->writer(new PngWriter())
             ->writerOptions([])
-            ->data($ticketId->value())
+            ->data(env('APP_BAZA_URL').'/newTickets/'.$ticketId->value())
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(300)

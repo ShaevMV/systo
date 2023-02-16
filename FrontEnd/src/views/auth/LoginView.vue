@@ -7,7 +7,10 @@ import LoginAuth from "@/components/Auth/LoginAuth";
 
 export default {
   name: "LoginView",
-  components: {LoginAuth}
+  components: {LoginAuth},
+  created() {
+    document.title = "Авторизоваться"
+  },
 }
 </script>
 

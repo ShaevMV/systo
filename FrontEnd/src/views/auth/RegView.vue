@@ -7,7 +7,10 @@ import RegAuth from "@/components/Auth/RegAuth.vue";
 
 export default {
   name: "RegView",
-  components: {RegAuth}
+  components: {RegAuth},
+  created() {
+    document.title = "Зарегистрироваться"
+  },
 }
 </script>
 

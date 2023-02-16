@@ -14,6 +14,10 @@ export default {
     window.store.dispatch('appOrder/getOrderListForUser');
     next();
   },
+  created() {
+    document.title = "Мои заказы"
+  },
+
 }
 </script>
 
