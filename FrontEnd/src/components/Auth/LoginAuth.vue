@@ -4,14 +4,14 @@
       <h1>Авторизация</h1>
     </div>
     <div class="row">
-      <div class="col-12 mx-auto">
+      <div class="col-md-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
               Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку
               <router-link
-                  to="/registration"><b>Зарегистрироваться</b>
+                  to="/registration"><b style="text-transform:uppercase">Зарегистрироваться</b>
               </router-link>
             </p>
               <div id="contact-form" role="form">

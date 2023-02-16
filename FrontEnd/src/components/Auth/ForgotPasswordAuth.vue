@@ -4,7 +4,7 @@
       <h1>Забыли пароль?</h1>
     </div>
     <div class="row">
-      <div class="col-lg-10 col-md-12 mx-auto">
+      <div class="col-md-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
 

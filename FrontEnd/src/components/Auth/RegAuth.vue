@@ -5,7 +5,7 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-10 col-md-12 mx-auto">
+        <div class="col-md-10 mx-auto">
           <div class="card mt-2 mx-auto">
             <p class="pp1 text-center">Чтобы зарегистрировать свой аккаунт в системе заполни все поля данной формы:</p>
             <div class="card-body">

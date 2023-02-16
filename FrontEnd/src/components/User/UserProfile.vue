@@ -2,7 +2,7 @@
     <div class="container-fluid" id="accounter">
       <div class="title-block text-center"><h1 class="card-title">Мой аккаунт</h1></div>
       <div class="row">
-        <div class="col-12 mx-auto">
+        <div class="col-md-10 col mx-auto">
           <div class="card">
             <div class="card-body pt-3">
               <div class="tab-pane fade profile-edit pt-3 active show" id="profile-edit" role="tabpanel">
@@ -56,7 +56,7 @@
       </div>
 
       <div class="row mt-4 mb-5">
-          <div class="col-12 mx-auto">
+          <div class="col-md-10 mx-auto">
     <div class="card">
       <div class="card-body">
         <div class="row mb-3">

@@ -30,7 +30,7 @@
       <small class="form-text text-muted">на создание туристического слёта Солар Систо 2023 с 18 по 22 мая</small>
     </div>
     <div class="row" id="main-form">
-      <div class="col-12 mx-auto">
+      <div class="col-10 mx-auto">
         <div class="card mt-2 mx-auto">
           <div class="card-body">
               <div id="contact-form" role="form">

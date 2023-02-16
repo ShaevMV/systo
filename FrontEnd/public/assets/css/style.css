@@ -1793,6 +1793,14 @@ select.form-select::after{
     padding-bottom: 20px;
 }
 
+#contact-form .reg-btn.btn-block{
+    background-color: grey;
+}
+
+input[readonly]{
+    background-color: #e3ffe8 !important;
+}
+
 #contact-form .x-row{
     margin-top: -10px;
 }
@@ -1882,6 +1890,16 @@ select.form-select::after{
     background-position: center;
     background-size: 20px auto;
     /*display: none;*/
+}
+
+
+#reg-form .card-body .col-12:last-of-type{
+    font-size: 18px;
+    margin-top: 2vw;
+}
+
+.invalid-feedback{
+    font-style: italic;
 }
 
 .hidder{
