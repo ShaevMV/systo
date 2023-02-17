@@ -242,32 +242,10 @@
                     <div class="col-3">
                       <label for="form_message">Дата и время перевода:</label>
                     </div>
-                    <div class="col-5 flex-flex">
-                      <input type="number"
-                             max="31"
-                             min="1"
+                    <div class="col-12 flex-flex">
+                      <input type="datetime-local"
                              class="form-control"
-                             v-model="day"
-                             placeholder="День">
-                      <select id="form_need"
-                              name="need"
-                              class="form-select"
-                              required="required"
-                              v-model="mount"
-                              data-error="Please specify your need.">
-                        <option disabled value="null">Месяц</option>
-                        <option v-for="(itemMount, index) in mounts"
-                                v-bind:key="index"
-                                v-bind:value="index">{{ itemMount }}
-                        </option>
-                      </select>
-                    </div>
-
-                    <div class="col-4 flex-flex">
-                      <span>Время:</span>
-                      <input type="number" class="form-control hourz" v-model="hour" placeholder="Часы" min="00" max="24"> :
-                      <input type="number" class="form-control minutez" v-model="minute" placeholder="Минуты" min="00"
-                             max="59">
+                             v-model="date">
                     </div>
                     <small class="form-text text-muted"> {{ getError('date') }}</small>
                   </div>
@@ -313,7 +291,6 @@
                   <div class="row">
                     <div class="col-12">
                       <button type="button"
-                              :disabled="!isNotCorrect"
                               @click="orderTicket"
                               class="btn btn-lg btn-block btn-outline-primary reg-btn">Зарегистрировать оргвзнос</button>
                     </div>
@@ -417,12 +394,12 @@ export default {
      * @returns {false|*|null}
      */
     isNotCorrect: function () {
-      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toDateString();
+
 
       return this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.guests.length > 0 &&
-          date !== 'Invalid Date' &&
+          this.date !== null &&
           this.confirm === true &&
           this.idBuy !== null &&
           this.phone !== null &&
@@ -538,20 +515,13 @@ export default {
      */
     orderTicket: function () {
       let self = this;
-<<<<<<< HEAD
-
-
-      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute);
-=======
-      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toString();
->>>>>>> 911383015259bb46a78499085f41c3cf7f5499f4
 
       this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
         'promo_code': this.promoCode,
-        'date': date.toDateString() + ' ' + date.toLocaleTimeString(),
+        'date': this.date,
         'id_buy': this.idBuy,
         'city': this.city,
         'phone': this.phone,
@@ -577,7 +547,7 @@ export default {
       this.promoCode = null;
       this.day = null;
       this.mount = null;
-      this.hour = null;
+      this.date = null;
       this.minute = null;
       this.massageForPromoCode = null;
       this.idBuy = null;
