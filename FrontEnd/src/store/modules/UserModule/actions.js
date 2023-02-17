@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = process.env.VUE_APP_BACKEND_ENDPOINT
+axios.defaults.baseURL = 'http://api.solarsysto.ru/';
 axios.defaults.withCredentials = true
 
 /**
