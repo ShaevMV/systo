@@ -1218,6 +1218,12 @@ a:hover {
      align-items: center;
  }
 
+
+button[disabled]{
+    background-color: grey !important;
+}
+
+
 .ximg, #left-logo img{
     width: 100%;
     height: auto;
@@ -1895,7 +1901,7 @@ input[readonly]{
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px auto;
-    /*display: none;*/
+    display: none;
 }
 
 
@@ -1925,6 +1931,10 @@ input[readonly]{
 @media (max-width: 1200px) {
     .sidebar {
         left: -300px;
+    }
+
+    .sidebar.active {
+        left: 0 !important;
     }
 
     #header button{
@@ -2262,6 +2272,10 @@ input[readonly]{
         background-size: 21px;
     }
 
+    .sidebar{
+        top: 48px;
+    }
+
 }
 
 
@@ -2269,6 +2283,8 @@ input[readonly]{
     #main h1 {
         font-size: 20px;
     }
+
+
 
     label {
         margin-bottom: 6px;

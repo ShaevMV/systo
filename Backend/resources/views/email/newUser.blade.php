@@ -31,6 +31,14 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
+<<<<<<< HEAD
+=======
+                                <td>
+                                    <a href="http://org.solarsysto.ru/">
+                                        <img src="http://193.106.175.59/images/top-img.png" alt="">
+                                    </a>
+                                </td>
+>>>>>>> 911383015259bb46a78499085f41c3cf7f5499f4
                                 <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Добро пожаловать в систему регистрации оргвзносов на Систо</td>
                             </tr>
                         </table>
