@@ -45,6 +45,8 @@ class CORS
             'http://api.tickets.loc',
             'http://193.106.175.59:8081',
             'http://localhost',
+            'http://api.solarsysto.ru',
+            'http://org.solarsysto.ru',
             'http://193.106.175.59',
         ];
     }
