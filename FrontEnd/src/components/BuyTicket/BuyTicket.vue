@@ -538,7 +538,7 @@ export default {
      */
     orderTicket: function () {
       let self = this;
-      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toDateString();
+      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toString();
 
       this.goToCreateOrderTicket({
         'email': this.email,
@@ -578,7 +578,7 @@ export default {
       this.city = null;
       this.phone = null;
       this.comment = null;
-      this.confirm = false;
+      this.confirm = true;
       this.clearPromoCode();
     },
   },
