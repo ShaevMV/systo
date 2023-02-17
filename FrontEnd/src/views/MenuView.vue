@@ -65,6 +65,12 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "MenuView",
+  props: {
+    active: {
+      type: Boolean,
+      default: true,
+    },
+  },
   computed: {
     ...mapGetters('appUser', [
       'isAuth',
