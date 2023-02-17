@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
     public const ID_FOR_ADMIN_UUID = 'b9df62af-252a-4890-afd7-73c2a356c259';
     public const ID_FOR_USER_UUID = 'b9df62af-252a-4890-afd7-73c2a356c260';
     public const EMAIL_USER = 'user@user.ru';
-    public const EMAIL_ADMIN = 'admin@admin.ru';
+    public const EMAIL_ADMIN = 'admin@spaceofjoy.ru';
 
     /**
      * Run the database seeds.
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
             'phone' => '+999999999',
             'city' => 'spb',
             'email' => self::EMAIL_ADMIN,
-            'password' => Hash::make('password'),
+            'password' => Hash::make('2457114soj'),
             'is_admin' => true,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),

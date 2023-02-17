@@ -21,22 +21,24 @@ class CommentSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('comment')->insert([
-            'id' => self::ID_FOR_FIRST_COMMENT,
-            'user_id' => UserSeeder::ID_FOR_USER_UUID,
-            'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
-            'comment' => 'Test request',
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        if(env('APP_DEBUG')) {
+            DB::table('comment')->insert([
+                'id' => self::ID_FOR_FIRST_COMMENT,
+                'user_id' => UserSeeder::ID_FOR_USER_UUID,
+                'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
+                'comment' => 'Test request',
+                'created_at' => new Carbon(),
+                'updated_at' => new Carbon(),
+            ]);
 
-        DB::table('comment')->insert([
-            'id' => self::ID_FOR_SECOND_COMMENT,
-            'user_id' => UserSeeder::ID_FOR_ADMIN_UUID,
-            'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
-            'comment' => 'Test response',
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+            DB::table('comment')->insert([
+                'id' => self::ID_FOR_SECOND_COMMENT,
+                'user_id' => UserSeeder::ID_FOR_ADMIN_UUID,
+                'order_tickets_id' => OrderSeeder::ID_FOR_FIRST_ORDER,
+                'comment' => 'Test response',
+                'created_at' => new Carbon(),
+                'updated_at' => new Carbon(),
+            ]);
+        }
     }
 }

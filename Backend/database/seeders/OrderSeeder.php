@@ -24,46 +24,49 @@ class OrderSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('order_tickets')->insert([
-            'id' => self::ID_FOR_FIRST_ORDER,
-            'guests' => json_encode([
-                [
-                    'value' => 'test',
-                    'id' => self::ID_FOR_FIRST_TICKET,
-                ]
-            ], JSON_THROW_ON_ERROR),
-            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
-            'id_buy' => '2312',
-            'phone' => '+9999999999',
-            'user_id' => UserSeeder::ID_FOR_USER_UUID,
-            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-            'promo_code' => PromoCodSeeder::NAME_FOR_SYSTO,
-            'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
-            'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
-            'discount' => PromoCodSeeder::DISCOUNT_FOR_SYSTO,
-            'date' => '2022-12-16 18:24:00',
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        if(env('APP_DEBUG')) {
+            DB::table('order_tickets')->insert([
+                'id' => self::ID_FOR_FIRST_ORDER,
+                'guests' => json_encode([
+                    [
+                        'value' => 'test',
+                        'id' => self::ID_FOR_FIRST_TICKET,
+                    ]
+                ], JSON_THROW_ON_ERROR),
+                'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+                'id_buy' => '2312',
+                'phone' => '+9999999999',
+                'user_id' => UserSeeder::ID_FOR_USER_UUID,
+                'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+                'promo_code' => PromoCodSeeder::NAME_FOR_SYSTO,
+                'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
+                'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
+                'discount' => PromoCodSeeder::DISCOUNT_FOR_SYSTO,
+                'date' => '2022-12-16 18:24:00',
+                'created_at' => new Carbon(),
+                'updated_at' => new Carbon(),
+            ]);
 
-        DB::table('order_tickets')->insert([
-            'id' => self::ID_FOR_SECOND_ORDER,
-            'guests' => json_encode([
-                [
-                    'value' => 'test',
-                    'id' => self::ID_FOR_SECOND_TICKET,
-                ]
-            ], JSON_THROW_ON_ERROR),
-            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
-            'id_buy' => '2312',
-            'phone' => '+9999999999',
-            'user_id' => UserSeeder::ID_FOR_USER_UUID,
-            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-            'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
-            'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
-            'date' => '2022-12-16 18:24:00',
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+            DB::table('order_tickets')->insert([
+                'id' => self::ID_FOR_SECOND_ORDER,
+                'guests' => json_encode([
+                    [
+                        'value' => 'test',
+                        'id' => self::ID_FOR_SECOND_TICKET,
+                    ]
+                ], JSON_THROW_ON_ERROR),
+                'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+                'id_buy' => '2312',
+                'phone' => '+9999999999',
+                'user_id' => UserSeeder::ID_FOR_USER_UUID,
+                'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+                'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
+                'price' => TypeTicketsSeeder::PRICE_FOR_FIRST_WAVE,
+                'date' => '2022-12-16 18:24:00',
+                'created_at' => new Carbon(),
+                'updated_at' => new Carbon(),
+            ]);
+        }
+
     }
 }
