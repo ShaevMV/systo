@@ -25,7 +25,7 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{ name: 'Profile' }">Личный кабинет
+          :to="{ name: 'Profile' }">Мой аккаунт
       </router-link>
     </li>
     <li class="nav-item" v-if="isAdmin && isAuth">

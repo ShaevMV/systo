@@ -547,7 +547,7 @@ export default {
         'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
         'promo_code': this.promoCode,
-        'date': date.toDateString() + ' ' + date.toTimeString(),
+        'date': date.toDateString() + ' ' + date.toLocaleTimeString(),
         'id_buy': this.idBuy,
         'city': this.city,
         'phone': this.phone,
