@@ -243,9 +243,7 @@
                       <label for="form_message">Дата и время перевода:</label>
                     </div>
                     <div class="col-12 flex-flex">
-                      <input type="datetime-local"
-                             class="form-control"
-                             v-model="date">
+                      <DatePicker v-model="date" mode="dateTime" :timezone="0"/>
                     </div>
                     <small class="form-text text-muted"> {{ getError('date') }}</small>
                   </div>
@@ -340,9 +338,12 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
-
+import { DatePicker } from 'v-calendar';
 export default {
   name: "BuyTicket",
+  components: {
+    DatePicker,
+  },
   data() {
     return {
       day: null,

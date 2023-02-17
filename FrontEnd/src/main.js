@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from 'axios';
+import 'v-calendar/dist/style.css';
+import VCalendar from 'v-calendar';
 
 window.store = store;
 
@@ -33,4 +35,8 @@ axios.interceptors.request.use(function (config) {
     return Promise.reject(error.response);
 });
 
-createApp(App).use(store).use(router).mount('#app')
+createApp(App)
+    .use(store)
+    .use(router)
+    .use(VCalendar)
+    .mount('#app')
