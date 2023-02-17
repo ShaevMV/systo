@@ -1212,6 +1212,12 @@ a:hover {
     color: #012970;
 }
 
+#check-check{
+     display: flex;
+     flex-wrap: nowrap;
+     align-items: center;
+ }
+
 .ximg, #left-logo img{
     width: 100%;
     height: auto;
@@ -1994,6 +2000,14 @@ input[readonly]{
         font-size: 24px;
     }
 
+    #check-check.form-check .form-check-input{
+        margin-left: 0;
+    }
+
+    #defaultCheck1 + label{
+        font-size: 15px;
+    }
+
     #app .row.pp1 {
         justify-content: center;
         flex-direction: column;
@@ -2071,6 +2085,10 @@ input[readonly]{
 @media(max-width: 600px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    #defaultCheck1 + label {
+        font-size: 14px;
     }
 
     #main .title-block small {
@@ -2224,6 +2242,26 @@ input[readonly]{
         font-size: 15px
     }
 
+    #contact-form .col-12 button, #reg-form .btn{
+        margin-top: 5vw;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+
+    .in-choice > div:first-of-type span{
+        background-size: 20px;
+    }
+
+    .in-choice > div:nth-of-type(2) span {
+        background-size: 22px;
+    }
+
+    .in-choice > div:last-of-type span {
+        background-size: 21px;
+    }
+
 }
 
 
@@ -2232,8 +2270,22 @@ input[readonly]{
         font-size: 20px;
     }
 
+    label {
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+
+    #contact-form .id-info {
+        font-size: 13px;
+    }
+
+    #defaultCheck1 + label {
+        font-size: 13px;
+    }
+
     .payment-choice label span{
-        padding: 6px 35px;
+        padding: 6px 18px 6px 30px;
+        font-size: 14px;
     }
 
     .card-body {
@@ -2241,7 +2293,9 @@ input[readonly]{
     }
 
     .copy-payment{
-        right: 20px;
+        width: 20px;
+        height: 20px;
+        right: 9px;
         top: 7px;
     }
 

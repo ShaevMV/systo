@@ -297,7 +297,7 @@
 
                   </div>
                   <div class="row mt-4">
-                    <div class="form-check">
+                    <div class="form-check" id="check-check">
                       <input class="form-check-input"
                              type="checkbox"
                              value=""
