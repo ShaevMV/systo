@@ -11,16 +11,15 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Успех</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">
-              </span>
+              <span aria-hidden="true">х</span>
             </button>
           </div>
           <div class="modal-body" v-html="massage">
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
           </div>
         </div>
       </div>
@@ -342,9 +341,9 @@
         <div class="modal-dialog" role="document">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title">Modal title</h5>
+              <h5 class="modal-title">Успех</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
+                <span aria-hidden="true">x</span>
               </button>
             </div>
             <div class="modal-body">
@@ -387,7 +386,7 @@ export default {
       phone: null,
       city: null,
       idBuy: null,
-      confirm: false,
+      confirm: true,
       massage: null,
       promoCode: null,
       massageForPromoCode: null,

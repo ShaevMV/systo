@@ -1794,7 +1794,7 @@ select.form-select::after{
 }
 
 #contact-form .reg-btn.btn-block{
-    background-color: grey;
+    background-color: #1e871c;
 }
 
 input[readonly]{
