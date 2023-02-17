@@ -538,14 +538,16 @@ export default {
      */
     orderTicket: function () {
       let self = this;
-      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute).toString();
+
+
+      let date = new Date(this.mount + '/' + this.day + '/2023 ' + this.hour + ':' + this.minute);
 
       this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
         'guests': this.guests,
         'promo_code': this.promoCode,
-        'date': date,
+        'date': date.toDateString() + ' ' + date.toTimeString(),
         'id_buy': this.idBuy,
         'city': this.city,
         'phone': this.phone,
