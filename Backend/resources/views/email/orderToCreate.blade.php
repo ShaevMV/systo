@@ -32,11 +32,11 @@
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
-                                    <a href="">
-                                        <img src="/images/content/logo.png" alt="">
+                                    <a href="http://org.solarsysto.ru/">
+                                        <img src="/images/content/top-img.png" alt="">
                                     </a>
                                 </td>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на Солар Систо {{date('Y')}} создан отменён </td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на Solar Systo Togathering {{date('Y')}} создан</td>
                             </tr>
                         </table>
                     </td>
@@ -45,8 +45,8 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} создан и ожидает проверки ответственным организатором.  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В течение 3-4 дней на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на Солар Систо {{date('Y')}}! </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Солар Систо</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В течение 3-4 дней на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на Solar Systo Togathering {{date('Y')}}! </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
                 <tr>
@@ -54,9 +54,7 @@
                         <table style="border: none; width: 100%; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td style="max-width: 250px;" class="footer-td">
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—2023, Солар систо 2023.</p>
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">Все права защищены. Использование материалов сайта только с согласия правообладателей.
-                                    <p>
+                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—{{date('Y')}}, Solar Systo Togathering {{date('Y')}}.</p>
                                 </td>
                             </tr>
                         </table>

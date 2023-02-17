@@ -118,18 +118,18 @@
 <img src="http://193.106.175.59/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Солар Систо 2023!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering 2023!</p>
 
 <div class="name">
-    {{$name}}
+    Имя: {{$name}}
 </div>
 
 <div class="email">
-    {{$email}}
+   Email: {{$email}}
 </div>
 
 <div class="id">
-    {{$kilter}}
+    ID: E-{{$kilter}}
 </div>
 
 <p id="sub"><strong style="    color: #86201c;

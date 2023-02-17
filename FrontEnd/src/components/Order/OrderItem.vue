@@ -105,7 +105,7 @@ export default {
       return this.getOrderItem.status;
     },
     getDateBuy: function () {
-      return this.getOrderItem.kilter;
+      return this.getOrderItem.dateBuy;
     },
     getId: function () {
       return this.getOrderItem.id;

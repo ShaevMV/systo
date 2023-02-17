@@ -17,7 +17,7 @@ class OrderToPaid extends Mailable
     public function __construct(
         private array $tickets
     ){
-        $this->subject('Билеты на Солар Систо '. date('Y'));
+        $this->subject('Билеты на Solar Systo Togathering '. date('Y'));
     }
 
     /**

@@ -32,8 +32,8 @@
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
-                                    <a href="">
-                                        <img src="/images/content/logo.png" alt="">
+                                    <a href="http://org.solarsysto.ru/">
+                                        <img src="/images/content/top-img.png" alt="">
                                     </a>
                                 </td>
                                 <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Добро пожаловать в систему регистрации оргвзносов на Систо</td>
@@ -47,7 +47,7 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой аккаунт в системе регистрации оргвзносов на Систо создан</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ваш логин {{$login}}</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ваш пароль {{$password}}</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Солар Систо</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
                 <tr>
@@ -55,9 +55,7 @@
                         <table style="border: none; width: 100%; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td style="max-width: 250px;" class="footer-td">
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—2023, Солар систо 2023.</p>
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">Все права защищены. Использование материалов сайта только с согласия правообладателей.
-                                    <p>
+                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—{{date('Y')}}, Solar Systo Togathering {{date('Y')}}.</p>
                                 </td>
                             </tr>
                         </table>
