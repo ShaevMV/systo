@@ -33,7 +33,7 @@
                             <tr>
                                 <td>
                                     <a href="http://org.solarsysto.ru/">
-                                        <img src="/images/content/top-img.png" alt="">
+                                        <img src="http://193.106.175.59/images/top-img.png" alt="">
                                     </a>
                                 </td>
                                 <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Возникли трудности с подтверждением оргвзноса на Solar Systo Togathering {{date('Y')}}</td>
