@@ -251,11 +251,11 @@
                     <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
                   </div>
                   <!--                  Дата платежа -->
-                  <div class="row mt-5 mb-4">
+                  <div class="row mt-4">
                     <div class="col-3">
                       <label for="form_message">Дата и время перевода:</label>
                     </div>
-                    <div class="col-12 flex-flex">
+                    <div class="col-9 flex-flex">
                       <input type="text" class="form-control"
                              placeholder="Введи Дата и время перевода"
                              aria-label="Дата и время перевода"
