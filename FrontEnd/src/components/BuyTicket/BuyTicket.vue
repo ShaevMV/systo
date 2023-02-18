@@ -292,7 +292,7 @@
                   <div class="row">
                     <div class="col-12">
                       <button type="button"
-                              :disabled="preload"
+                              :disabled="preload || !isNotCorrect"
                               @click="orderTicket"
                               class="btn btn-lg btn-block btn-outline-primary reg-btn">
                         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" v-show="preload"></span>
