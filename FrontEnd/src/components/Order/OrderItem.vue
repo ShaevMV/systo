@@ -120,7 +120,7 @@ export default {
     }
   },
   created() {
-    document.title = "Заказ №" + this.getDateKilter()
+    document.title = "Заказ №" + this.getDateKilter
   },
 }
 </script>
