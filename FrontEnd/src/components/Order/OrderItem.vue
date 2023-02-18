@@ -1,6 +1,6 @@
 <template>
     <div class="container-fluid">
-      <div class="title-block text-center"><h1 class="card-title">Заказ # {{ getDateBuy }}</h1></div>
+      <div class="title-block text-center"><h1 class="card-title">Заказ # {{ getDateKilter }}</h1></div>
       <div class="row">
         <div class="col-lg-12 mx-auto">
           <div class="card">
@@ -106,6 +106,9 @@ export default {
     },
     getDateBuy: function () {
       return this.getOrderItem.dateBuy;
+    },
+    getDateKilter: function () {
+      return this.getOrderItem.kilter;
     },
     getId: function () {
       return this.getOrderItem.id;

@@ -545,6 +545,7 @@ export default {
     clearData: function () {
       this.selectTypesOfPayment = null;
       this.guests = [];
+      this.preload = false;
       this.newGuest = '';
       this.email = this.getEmail;
       this.promoCode = null;
