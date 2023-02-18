@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://api.tickets.loc/';
+axios.defaults.baseURL = 'http://api.solarsysto.ru/'
 axios.defaults.withCredentials = true
 
 /**
