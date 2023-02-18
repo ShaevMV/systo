@@ -146,6 +146,22 @@
       <path value="$PROJECT_DIR$/Backend/vendor/sebastian/comparator" />
       <path value="$PROJECT_DIR$/Backend/vendor/sebastian/exporter" />
       <path value="$PROJECT_DIR$/Backend/vendor/sebastian/version" />
+      <path value="$PROJECT_DIR$/Backend/vendor/clue/stream-filter" />
+      <path value="$PROJECT_DIR$/Backend/vendor/nyholm/psr7" />
+      <path value="$PROJECT_DIR$/Backend/vendor/http-interop/http-factory-guzzle" />
+      <path value="$PROJECT_DIR$/Backend/vendor/jean85/pretty-package-versions" />
+      <path value="$PROJECT_DIR$/Backend/vendor/sentry/sentry" />
+      <path value="$PROJECT_DIR$/Backend/vendor/sentry/sentry-laravel" />
+      <path value="$PROJECT_DIR$/Backend/vendor/symfony/http-client-contracts" />
+      <path value="$PROJECT_DIR$/Backend/vendor/symfony/options-resolver" />
+      <path value="$PROJECT_DIR$/Backend/vendor/symfony/http-client" />
+      <path value="$PROJECT_DIR$/Backend/vendor/symfony/psr-http-message-bridge" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/message" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/discovery" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/promise" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/httplug" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/message-factory" />
+      <path value="$PROJECT_DIR$/Backend/vendor/php-http/client-common" />
     </include_path>
   </component>
   <component name="PhpInterpreters">
