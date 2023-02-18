@@ -236,20 +236,6 @@
                       <div class="copy-btn">Нажми на <span></span> чтобы скопировать реквизиты</div>
                     </div>
                   </div>
-
-                  <!--                  Дата платежа -->
-                  <div class="row mt-5 mb-4">
-                    <div class="col-3">
-                      <label for="form_message">Дата и время перевода:</label>
-                    </div>
-                    <div class="col-12 flex-flex">
-                      <input type="text" class="form-control"
-                             placeholder="Введи Дата и время перевода"
-                             aria-label="Дата и время перевода"
-                             v-model="date">
-                    </div>
-                    <small class="form-text text-muted"> {{ getError('date') }}</small>
-                  </div>
                   <div class="row mb-4 flex-flex">
                     <div class="col-3">
                       <label for="idBuy">Идентификатор платежа:</label>
@@ -264,6 +250,20 @@
                     </div>
                     <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
                   </div>
+                  <!--                  Дата платежа -->
+                  <div class="row mt-5 mb-4">
+                    <div class="col-3">
+                      <label for="form_message">Дата и время перевода:</label>
+                    </div>
+                    <div class="col-12 flex-flex">
+                      <input type="text" class="form-control"
+                             placeholder="Введи Дата и время перевода"
+                             aria-label="Дата и время перевода"
+                             v-model="date">
+                    </div>
+                    <small class="form-text text-muted"> {{ getError('date') }}</small>
+                  </div>
+
                   <div class="row">
                     <div class="col-3">
                       <label for="idBuy">Комментарий к заказу:</label>
@@ -292,8 +292,11 @@
                   <div class="row">
                     <div class="col-12">
                       <button type="button"
+                              :disabled="preload"
                               @click="orderTicket"
-                              class="btn btn-lg btn-block btn-outline-primary reg-btn">Зарегистрировать оргвзнос</button>
+                              class="btn btn-lg btn-block btn-outline-primary reg-btn">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" v-show="preload"></span>
+                        Зарегистрировать оргвзнос</button>
                     </div>
                   </div>
                   <div class="row mt-4">
@@ -345,6 +348,7 @@ export default {
   name: "BuyTicket",
   data() {
     return {
+      preload: false,
       day: null,
       mount: null,
       mounts: {
@@ -513,7 +517,7 @@ export default {
      */
     orderTicket: function () {
       let self = this;
-
+      this.preload = true;
       this.goToCreateOrderTicket({
         'email': this.email,
         'ticket_type_id': this.getSelectTicketTypeId,
@@ -531,6 +535,7 @@ export default {
           }
           self.massage = massage;
           document.getElementById('modalOpenBtn').click();
+          self.preload = false;
         }
       })
     },
