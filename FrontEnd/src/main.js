@@ -8,7 +8,7 @@ import VCalendar from 'v-calendar';
 
 window.store = store;
 
-axios.defaults.baseURL = 'http://api.solarsysto.ru/'
+axios.defaults.baseURL = 'http://api.tickets.loc/'
 axios.defaults.withCredentials = true
 
 

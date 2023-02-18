@@ -243,7 +243,10 @@
                       <label for="form_message">Дата и время перевода:</label>
                     </div>
                     <div class="col-12 flex-flex">
-                      <DatePicker v-model="date" mode="dateTime" :timezone="0"/>
+                      <input type="text" class="form-control"
+                             placeholder="Введи Дата и время перевода"
+                             aria-label="Дата и время перевода"
+                             v-model="date">
                     </div>
                     <small class="form-text text-muted"> {{ getError('date') }}</small>
                   </div>
@@ -338,12 +341,8 @@
 
 <script>
 import {mapGetters, mapActions} from 'vuex';
-import { DatePicker } from 'v-calendar';
 export default {
   name: "BuyTicket",
-  components: {
-    DatePicker,
-  },
   data() {
     return {
       day: null,
@@ -395,8 +394,6 @@ export default {
      * @returns {false|*|null}
      */
     isNotCorrect: function () {
-
-
       return this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.guests.length > 0 &&

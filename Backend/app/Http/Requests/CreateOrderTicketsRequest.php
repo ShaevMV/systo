@@ -29,7 +29,7 @@ class CreateOrderTicketsRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'date' => 'required|before:now',
+            'date' => 'required',
             'id_buy' => 'required|numeric',
             'phone' => 'required',
             'city' => 'required',

@@ -26,7 +26,7 @@ class OrderTicketDto
      * @param GuestsDto[] $ticket
      * @param string $id_buy
      * @param PriceDto $priceDto
-     * @param Carbon $datePay
+     * @param string $datePay
      * @param Status|null $status
      * @param string|null $promo_code
      * @param Uuid|null $id
@@ -41,7 +41,7 @@ class OrderTicketDto
         protected array    $ticket,
         protected string   $id_buy,
         protected PriceDto $priceDto,
-        protected Carbon   $datePay,
+        protected string   $datePay,
         protected ?Status  $status,
         protected ?string  $promo_code = null,
         ?Uuid              $id = null,
@@ -77,7 +77,7 @@ class OrderTicketDto
             $tickets,
             $data['id_buy'],
             $priceDto,
-            new Carbon($data['date']),
+            $data['date'],
             new Status($status),
             $data['promo_code'],
             $id
