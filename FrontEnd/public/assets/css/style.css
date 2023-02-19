@@ -1596,6 +1596,7 @@ select.form-select::after{
 }
 
 #contact-form .row{
+    margin-top: 10px;
     justify-content: space-between;
     align-items: center;
 }
@@ -1624,7 +1625,7 @@ select.form-select::after{
 
 .payment-choice label{
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
 }
 
@@ -1979,7 +1980,7 @@ input[readonly]{
     }
 
     #defaultCheck1{
-        width: 25px;
+        width: 35px;
         height: 25px;
         border-width: 1px;
     }

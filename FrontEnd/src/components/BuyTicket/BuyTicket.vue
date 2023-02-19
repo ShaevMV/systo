@@ -128,7 +128,8 @@
                                  placeholder="Промокод"
                                  aria-label="Промокод"
                                  v-model="promoCode"
-                                 aria-describedby="basic-addon1">
+                                 aria-describedby="basic-addon1"
+                                 @blur="sendPromoCode">
                           <span class="input-group-text"
                                 @click="sendPromoCode"
                                 id="basic-addon1"></span>
@@ -237,8 +238,8 @@
                       <div class="copy-btn">Нажми на <span></span> чтобы скопировать реквизиты</div>
                     </div>
                   </div>
-                  <div class="row flex-flex justify-content-center mt-2" style="color:var(--c-red); text-align: center;">ТЕПЕРЬ СОВЕРШИТЕ ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ БАНКА</div>
-                  <div class="row mb-4 flex-flex justify-content-center" style="text-align: center;">и только после этого заполните поля ниже</div>
+                  <div class="row flex-flex justify-content-center mt-2" style="color:var(--c-red); text-align: center;  font-weight: bold;">ТЕПЕРЬ СОВЕРШИ ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ БАНКА</div>
+                  <div class="row mb-4 flex-flex justify-content-center" style="text-align: center;  font-weight: bold;">и только после этого заполни поля ниже</div>
                   <div class="row mb-4 flex-flex">
                     <div class="col-3">
                       <label for="idBuy">Идентификатор платежа:</label>
@@ -302,7 +303,7 @@
                         Зарегистрировать оргвзнос</button>
                     </div>
                   </div>
-                  <div class="row justify-content-center" v-if="!isNotCorrect" style="text-align: center;">Если кнопка не активна проверьте все ли поля Вы заполнили.</div>
+                  <div class="row justify-content-center" v-if="!isNotCorrect" style="text-align: center;">Если кнопка не активна проверь все ли поля Вы заполнены!</div>
                   <div class="row mt-4">
                     <div class="after-order">
                       <p>
