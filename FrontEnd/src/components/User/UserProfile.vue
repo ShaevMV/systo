@@ -9,17 +9,6 @@
 
                 <div>
                   <div class="row mb-3">
-                    <label for="fullName" class="col-4 col-form-label">Имя:</label>
-                    <div class="col-8">
-                      <input name="fullName"
-                             type="text"
-                             v-model="name"
-                             class="form-control"
-                             id="fullName">
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
                     <label for="company" class="col-4 col-form-label">Город:</label>
                     <div class="col-8">
                       <input name="company"
@@ -56,7 +45,7 @@
       </div>
 
       <div class="row mt-4 mb-5">
-          <div class="col-md-10 mx-auto">
+          <div class="col-md-10 col mx-auto">
     <div class="card">
       <div class="card-body">
         <div class="row mb-3">
