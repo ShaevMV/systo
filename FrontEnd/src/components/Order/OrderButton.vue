@@ -1,13 +1,16 @@
 <template>
+  <div style="display: block;">
       <h4 class="download-title">Скачать электронные билеты с qr-кодом:</h4>
       <div class="qr-text"> {{ getText }} </div>
-        <div v-if="status === 'paid'" class="mb-3 mt-3">
-          <button type="button"
-                  v-for="(item,index) in listTickets"
-                  v-bind:key="index"
-                  @click="downloadTicket(item.id)"
-                  class="downloader">Скачать билет для {{ item.name }}
-          </button>
+      <div v-if="status === 'paid'" class="mb-3 mt-3">
+        <button type="button"
+                v-for="(item,index) in listTickets"
+                v-bind:key="index"
+                @click="downloadTicket(item.id)"
+                class="downloader"
+                style="display: block;">Скачать билет для {{ item.name }}
+        </button>
+      </div>
   </div>
 </template>
 
@@ -51,8 +54,10 @@ export default {
      * Скачать билеты
      * @param id
      */
-    downloadTicket(id) {
-      this.getUrlForPdf(id);
+    async downloadTicket(id) {
+      const win = window.open('about:blank', '_target=blank');
+      var ticket = await this.getUrlForPdf(id);
+      win.location = ticket;
     }
   }
 }
