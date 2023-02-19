@@ -11,6 +11,7 @@ import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
+import store from '../store'
 
 const routes = [
     {
@@ -112,6 +113,7 @@ const router = createRouter({
  * Проверяем наличие маршрута и права доступа
  */
 router.beforeEach((to, from, next) => {
+        store.commit('HIDE_MENU');
         let token = (localStorage['user.token'] !== undefined && localStorage['user.token'] !== '' && localStorage['user.token'] !== null);
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {
