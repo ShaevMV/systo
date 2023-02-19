@@ -303,7 +303,7 @@
                         Зарегистрировать оргвзнос</button>
                     </div>
                   </div>
-                  <div class="row justify-content-center" v-if="!isNotCorrect" style="text-align: center;">Если кнопка не активна проверь все ли поля Вы заполнены!</div>
+                  <div class="row justify-content-center" v-if="!isNotCorrect" style="text-align: center;">Если кнопка не активна проверь все ли поля заполнены!</div>
                   <div class="row mt-4">
                     <div class="after-order">
                       <p>
