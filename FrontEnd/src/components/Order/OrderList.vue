@@ -12,7 +12,7 @@
           <table class="table table-hover">
             <thead>
             <tr>
-              <th scope="col">№ заказа</th>
+              <th scope="col" class="mobile">№ заказа</th>
               <th scope="col" v-if="isAdmin"></th>
               <th scope="col" v-if="isAdmin">Email</th>
               <th scope="col">Тип оргвзноса</th>
@@ -22,7 +22,7 @@
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col">Статус</th>
+              <th scope="col" class="mobile">Статус</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin"></th>
             </tr>
@@ -31,7 +31,7 @@
             <tr v-for="(itemOrder,index) in getOrderList"
                 v-bind:key="index"
                 @click="goItemOrderForUser(itemOrder.id, itemOrder.status)">
-              <th scope="row">
+              <th scope="row" class="mobile">
                 {{ itemOrder.kilter }}
               </th>
               <td v-if="isAdmin">
@@ -58,7 +58,7 @@
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>
+              <td :style="styleObject(itemOrder.status)" class="mobile">{{ itemOrder.humanStatus }}</td>
               <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
               <td v-if="isAdmin">
                 <router-link

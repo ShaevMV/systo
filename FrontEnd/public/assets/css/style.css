@@ -2033,18 +2033,16 @@ input[readonly]{
         margin-right: 0;
     }
 
-    .card-body > table thead {
+    .card-body > table th:not(.mobile){
         display: none;
     }
-
+    .card-body > table td:not(.mobile){
+        display: none;
+    }
+    
     .card-body > table tbody td,  .card-body > table tbody th{
-        display: flex;
         justify-content: space-between;
         font-size: 14px;
-    }
-
-    .card-body > table tbody tr{
-        display: block;
     }
 
     .card-body > table td::before {
