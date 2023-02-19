@@ -153,7 +153,8 @@
                              aria-label="Введи Имя и Фамилию гостя и нажми Добавить"
                              v-model="newGuest"
                              :disabled="!isAllowedNewGuest"
-                             aria-describedby="basic-addon1">
+                             aria-describedby="basic-addon1"
+                             @blur="addGuest">
                       <div class="input-group-prepend">
                               <span class="input-group-text btn"
                                     @click="addGuest()"
@@ -236,6 +237,8 @@
                       <div class="copy-btn">Нажми на <span></span> чтобы скопировать реквизиты</div>
                     </div>
                   </div>
+                  <div class="row flex-flex justify-content-center mt-2" style="color:var(--c-red); text-align: center;">ТЕПЕРЬ СОВЕРШИТЕ ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ БАНКА</div>
+                  <div class="row mb-4 flex-flex justify-content-center" style="text-align: center;">и только после этого заполните поля ниже</div>
                   <div class="row mb-4 flex-flex">
                     <div class="col-3">
                       <label for="idBuy">Идентификатор платежа:</label>
@@ -253,11 +256,11 @@
                   <!--                  Дата платежа -->
                   <div class="row mt-4">
                     <div class="col-3">
-                      <label for="form_message">Дата и время перевода:</label>
+                      <label for="form_message">Когда был сделан платеж?</label>
                     </div>
                     <div class="col-9 flex-flex">
                       <input type="text" class="form-control"
-                             placeholder="Введи Дата и время перевода"
+                             placeholder="Например: 18 февраля в 13.20"
                              aria-label="Дата и время перевода"
                              v-model="date">
                     </div>
@@ -299,6 +302,7 @@
                         Зарегистрировать оргвзнос</button>
                     </div>
                   </div>
+                  <div class="row justify-content-center" v-if="!isNotCorrect" style="text-align: center;">Если кнопка не активна проверьте все ли поля Вы заполнили.</div>
                   <div class="row mt-4">
                     <div class="after-order">
                       <p>
