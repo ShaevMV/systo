@@ -13,7 +13,7 @@
             <thead>
             <tr>
               <th scope="col" class="mobile">№ заказа</th>
-              <th scope="col" v-if="isAdmin"></th>
+              <th scope="col" v-if="isAdmin" class="mobile"></th>
               <th scope="col" v-if="isAdmin">Email</th>
               <th scope="col">Тип оргвзноса</th>
               <th scope="col">Стоимость</th>
@@ -24,7 +24,7 @@
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
               <th scope="col" class="mobile">Статус</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
-              <th scope="col" v-if="isAdmin"></th>
+              <th scope="col" v-if="isAdmin" class="mobile"></th>
             </tr>
             </thead>
             <tbody>
@@ -34,7 +34,7 @@
               <th scope="row" class="mobile">
                 {{ itemOrder.kilter }}
               </th>
-              <td v-if="isAdmin">
+              <td v-if="isAdmin" class="mobile">
                 <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
@@ -60,7 +60,7 @@
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile">{{ itemOrder.humanStatus }}</td>
               <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
-              <td v-if="isAdmin">
+              <td v-if="isAdmin" class="mobile">
                 <router-link
                     :to="{
                     name: 'orderItems',
