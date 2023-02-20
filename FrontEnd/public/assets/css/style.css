@@ -1860,7 +1860,7 @@ input[readonly]{
     color: #86201c;
     font-weight: bold;
     display: inline-block;
-    width: 500px;
+    width: 100%;
     position: relative;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -1877,7 +1877,7 @@ input[readonly]{
 }
 
 .x-button{
-    width: 450px;
+    width: 100%;
 }
 
 .download-title{
