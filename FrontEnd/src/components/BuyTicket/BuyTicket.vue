@@ -74,7 +74,7 @@
                       <div class="form-group">
                         <label for="form_phone" class="hidder">Город *</label>
                         <input id="form_phone"
-                               type="email"
+                               type="text"
                                name="city"
                                class="form-control"
                                placeholder="Город:*"
