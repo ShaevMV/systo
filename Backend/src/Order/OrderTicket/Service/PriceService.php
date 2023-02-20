@@ -14,7 +14,8 @@ class PriceService
     public function __construct(
         private GetTicketType      $getPriceByTicketType,
         private IsCorrectPromoCode $isCorrectPromoCode,
-    ){
+    )
+    {
     }
 
     public function getPriceDto(
@@ -25,10 +26,11 @@ class PriceService
     {
         $priceByType = $this->getPriceByTicketType->getPrice($ticketTypeId);
         $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
+        $discount = $this->isCorrectPromoCode->findPromoCode($promoCode)?->getDiscount() ?? 0.00;
 
         return new PriceDto(
             $totalPrice,
-            $this->isCorrectPromoCode->findPromoCode($promoCode)?->getDiscount() ?? 0.00
+            $discount * $count
         );
     }
 }

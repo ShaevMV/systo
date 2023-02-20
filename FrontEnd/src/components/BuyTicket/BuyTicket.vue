@@ -441,7 +441,7 @@ export default {
       if (this.getSelectTicketType !== null) {
         price = this.getSelectTicketType.price;
         let count = this.getSelectTicketTypeLimit !== null ? 1 : this.guests.length;
-        return (price * count) - this.getDiscountByPromoCode;
+        return (price * count) - (this.getDiscountByPromoCode * count);
       }
 
       return 0;
