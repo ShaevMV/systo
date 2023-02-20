@@ -58,9 +58,9 @@
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)" class="mobile">{{ itemOrder.humanStatus }}</td>
+              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">{{ itemOrder.humanStatus }}</td>
               <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
-              <td v-if="isAdmin" class="mobile">
+              <td v-if="isAdmin" class="mobile" style="text-align: left;">
                 <router-link
                     :to="{
                     name: 'orderItems',

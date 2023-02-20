@@ -2049,7 +2049,6 @@ input[readonly]{
     .card-body > table td::before {
         content: attr(data-label);
         font-weight: bold;
-        margin-right: 20px;
     }
 
     .payment-choice label span{

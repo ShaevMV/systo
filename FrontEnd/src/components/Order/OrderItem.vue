@@ -116,7 +116,7 @@ export default {
   },
   methods: {
     back: function () {
-      location.href='/myOrders';
+      this.$router.back();
     }
   },
   created() {
