@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\TotalNumber;
 
@@ -14,18 +14,21 @@ class TotalNumberQueryHandler implements QueryHandler
         $totalCount = 0;
         $totalCountToPaid = 0;
         $totalAmount = 0.00;
+        $totalCountTickets = 0;
 
         foreach ($numberQuery->getOrderList() as $itemForListResponse) {
             $totalCount++;
-            if($itemForListResponse->getStatus()->isPaid()){
+            if ($itemForListResponse->getStatus()->isPaid()) {
                 $totalCountToPaid++;
-                $totalAmount+=$itemForListResponse->getPrice();
+                $totalAmount += $itemForListResponse->getPrice();
+                $totalCountTickets+= $itemForListResponse->getCount();
             }
         }
 
         return new TotalNumberResponse(
             $totalCount,
             $totalCountToPaid,
+            $totalCountTickets,
             $totalAmount
         );
     }

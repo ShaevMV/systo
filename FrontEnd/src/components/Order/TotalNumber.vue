@@ -6,14 +6,15 @@
           <h5 class="card-title">Отчёт о билетах</h5>
           <div class="d-flex">
           <p class="col-md-4 text-center">
-            <b>Продано:</b><span> {{ getTotalCountToPaid }} </span>
+            <b>Подтвержденные заказы:</b><span> {{ getTotalCountToPaid }} </span>
           </p>
           <p class="col-md-4 text-center">
             <b>На сумму:</b><span> {{ getTotalAmount }} </span>
           </p>
-          <p class="col-md-4 text-center">
-            <b>Всего заказов:</b><span> {{ getTotalCount }} </span>
-          </p>
+            <p class="col-md-4 text-center">
+              <b>Всего билетов:</b><span> {{ getTotalCountTicket }} </span>
+            </p>
+
         </div>
           </div>
       </div>
@@ -38,6 +39,9 @@ export default {
     },
     getTotalCount: function () {
       return this.getTotalNumber.totalCount;
+    },
+    getTotalCountTicket: function () {
+      return this.getTotalNumber.countTickets;
     }
   },
 }

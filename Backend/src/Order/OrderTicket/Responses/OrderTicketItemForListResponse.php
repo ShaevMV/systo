@@ -75,4 +75,9 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     {
         return $this->price;
     }
+
+    public function getCount(): int
+    {
+        return $this->count;
+    }
 }
