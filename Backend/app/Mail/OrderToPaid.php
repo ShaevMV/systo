@@ -36,10 +36,7 @@ class OrderToPaid extends Mailable
 
         foreach ($this->tickets as $ticket) {
             $contents = $qrCodeService->createPdf($ticket);
-            $mail->attach($contents->output(), array(
-                    'as' => 'Билет ' . $ticket->getName() . '.pdf',
-                    'mime' => 'application/pdf')
-            );
+            $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
         }
 
         return $mail;
