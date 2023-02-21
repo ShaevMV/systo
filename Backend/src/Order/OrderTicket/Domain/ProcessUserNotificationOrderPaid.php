@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Mail;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
 {
@@ -24,14 +25,23 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
      */
     public function __construct(
         private string $email,
-        private array $tickets,
-    ) {
+        private array  $tickets,
+    )
+    {
     }
 
-    public function handle(): void
+    public function handle(
+        TicketsRepositoryInterface $repository
+    ): void
     {
+        $result = [];
+
+        foreach ($this->tickets as $ticket) {
+            $result[] = $repository->getTicket($ticket->getId());
+        }
+
         Mail::to($this->email)->send(new OrderToPaid(
-            $this->tickets,
+            $result,
         ));
     }
 }

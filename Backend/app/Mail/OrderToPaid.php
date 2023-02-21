@@ -6,13 +6,15 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
 class OrderToPaid extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
-     * @param GuestsDto[] $tickets
+     * @param TicketResponse[] $tickets
      */
     public function __construct(
         private array $tickets
@@ -25,13 +27,15 @@ class OrderToPaid extends Mailable
      *
      * @return $this
      */
-    public function build(): static
+    public function build(
+        CreatingQrCodeService $qrCodeService,
+    ): static
     {
         $mail = $this->view('email.orderToPaid');
 
         foreach ($this->tickets as $ticket) {
-            $contents = \Storage::get(storage_path("app/public/tickets/{$ticket->getId()->value()}.pdf"));
-            $mail->attach($contents);
+            $contents = $qrCodeService->createPdf($ticket);
+            $mail->attach($contents->output());
         }
 
         return $mail;
