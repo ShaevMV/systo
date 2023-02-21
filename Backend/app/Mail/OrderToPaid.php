@@ -30,8 +30,7 @@ class OrderToPaid extends Mailable
         $mail = $this->view('email.orderToPaid');
 
         foreach ($this->tickets as $ticket) {
-            $contents = \Storage::get(storage_path("app/public/tickets/{$ticket->getId()->value()}.pdf"));
-            $mail->attach($contents);
+            $mail->attach(storage_path("app/public/tickets/{$ticket->getId()->value()}.pdf"));
         }
 
         return $mail;
