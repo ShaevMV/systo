@@ -2015,6 +2015,10 @@ input[readonly]{
         margin-left: 0;
     }
 
+    .form-check-label{
+        width: 100%;
+    }
+
     #defaultCheck1 + label{
         font-size: 15px;
     }
