@@ -18,8 +18,9 @@ class OrderToPaid extends Mailable
      */
     public function __construct(
         private array $tickets
-    ){
-        $this->subject('Билеты на Solar Systo Togathering '. date('Y'));
+    )
+    {
+        $this->subject('Билеты на Solar Systo Togathering ' . date('Y'));
     }
 
     /**
@@ -35,7 +36,10 @@ class OrderToPaid extends Mailable
 
         foreach ($this->tickets as $ticket) {
             $contents = $qrCodeService->createPdf($ticket);
-            $mail->attach($contents->output());
+            $mail->attach($contents->output(), array(
+                    'as' => 'Билет ' . $ticket->getName() . '.pdf',
+                    'mime' => 'application/pdf')
+            );
         }
 
         return $mail;
