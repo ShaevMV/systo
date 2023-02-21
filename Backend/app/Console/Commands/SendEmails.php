@@ -46,8 +46,11 @@ class SendEmails extends Command
             foreach ($ticket['tickets'] as $guest) {
                 $guestsDtoList[] = new GuestsDto($guest['name'], new Uuid($guest['id']));
             }
-
-            $listEmail = new ProcessUserNotificationOrderPaid(
+            echo(
+            $ticket['users']['email'].'
+'
+            );
+            $listEmail[] = new ProcessUserNotificationOrderPaid(
                 $ticket['users']['email'],
                 $guestsDtoList
             );
