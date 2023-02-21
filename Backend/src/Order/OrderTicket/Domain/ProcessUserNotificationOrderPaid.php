@@ -34,6 +34,7 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
         TicketsRepositoryInterface $repository
     ): void
     {
+        ini_set('memory_limit', '44M');
         $result = [];
 
         foreach ($this->tickets as $ticket) {
