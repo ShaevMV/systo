@@ -32,6 +32,7 @@ class OrderToPaid extends Mailable
         CreatingQrCodeService $qrCodeService,
     ): static
     {
+        ini_set('memory_limit', '44M');
         $mail = $this->view('email.orderToPaid');
 
         foreach ($this->tickets as $ticket) {
