@@ -15,6 +15,7 @@
               <th scope="col" class="mobile">№ заказа</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
               <th scope="col" v-if="isAdmin">Email</th>
+              <th scope="col" v-if="isAdmin">Гости</th>
               <th scope="col">Тип оргвзноса</th>
               <th scope="col">Стоимость</th>
               <th scope="col">Кол-во</th>
@@ -38,6 +39,7 @@
                 <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
+                          :style="{'background-color': activeColor(itemOrder.status)}"
                           aria-expanded="false">
                     ...
                   </button>
@@ -50,6 +52,9 @@
                 </div>
               </td>
               <td v-if="isAdmin">{{ itemOrder.email }}</td>
+              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) ">
+                {{ getListQuests(itemOrder.guests, false) }}
+              </td>
               <td>{{ itemOrder.name }}</td>
               <td>{{ itemOrder.price }} рублей</td>
               <td>{{ itemOrder.count }}</td>
@@ -58,8 +63,13 @@
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">{{ itemOrder.humanStatus }}</td>
-              <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
+              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
+                {{ itemOrder.humanStatus }}
+              </td>
+              <td v-if="isAdmin" :title="itemOrder.lastComment">
+
+                {{ cuttedText(itemOrder.lastComment) }}
+              </td>
               <td v-if="isAdmin" class="mobile" style="text-align: left;">
                 <router-link
                     :to="{
@@ -68,7 +78,7 @@
                 }">
                   Перейти к билету
                 </router-link>
-                </td>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -102,7 +112,8 @@
           <div class="modal-footer">
             <button type="button"
                     @click="sendDifficultiesArose"
-                    class="btn btn-secondary">Сменить статус на возникли трудности</button>
+                    class="btn btn-secondary">Сменить статус на возникли трудности
+            </button>
           </div>
         </div>
       </div>
@@ -115,7 +126,7 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "OrderList",
-  data(){
+  data() {
     return {
       comment: null,
       selectId: null,
@@ -162,10 +173,35 @@ export default {
     },
     goItemOrderForUser(idOrderItem, status) {
       if (!this.isAdmin) {
-        if(status !== 'cancel') {
+        if (status !== 'cancel') {
           this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
         }
       }
+    },
+    activeColor: function (status) {
+      let color = '#86201c';
+      if (status === 'paid') {
+        color = '#1e871c';
+      }
+
+      return color
+    },
+    getListQuests: function (quests, isAll = true) {
+      let result = '';
+      let max = isAll ? quests.length : 3;
+      quests.forEach(function(item, i) {
+        if(i < max) {
+          result = result + item.value + " ";
+        }
+      });
+
+      return result;
+    },
+    cuttedText: function (text) {
+      if(text !== null && text.length > 25) {
+        return text.slice(0,25) + "...";
+      }
+      return text
     },
     /**
      * Сменить статус
@@ -173,7 +209,7 @@ export default {
      * @param id
      */
     chanceStatus(status, id) {
-      if(status === 'difficulties_arose') {
+      if (status === 'difficulties_arose') {
         this.selectId = id;
         document.getElementById('modalOpenBtn').click();
       } else {

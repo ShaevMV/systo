@@ -41,11 +41,11 @@ class CORS
         $this->maxAge = 600;
         $this->exposeHeaders = [];
         $this->allowOrigins = [
-            'http://localhost:8080',
-            'http://localhost:8081',
+    /*        'http://localhost:8080',
+            'http://localhost:8081',*/
             'http://api.tickets.loc',
             'http://193.106.175.59:8081',
-            'http://localhost',
+       //     'http://localhost',
             'http://api.solarsysto.ru',
             'http://org.solarsysto.ru',
             'http://org.tickets.loc/',
