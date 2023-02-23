@@ -51,6 +51,10 @@ class CORS
             'http://org.tickets.loc/',
             'http://193.106.175.59',
         ];
+
+        if(env('APP_DEBUG')) {
+            $this->allowOrigins[] = 'http://localhost:8081';
+        }
     }
 
     public function handle(Request $request, Closure $next)

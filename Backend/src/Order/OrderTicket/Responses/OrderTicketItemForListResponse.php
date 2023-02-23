@@ -80,4 +80,22 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     {
         return $this->count;
     }
+
+    /**
+     * @return GuestsDto[]
+     */
+    public function getGuests(): array
+    {
+        return $this->guests;
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
+
+    public function getKilter(): int
+    {
+        return $this->kilter;
+    }
 }
