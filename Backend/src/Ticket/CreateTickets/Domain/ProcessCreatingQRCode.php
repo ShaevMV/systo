@@ -30,6 +30,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
         CreatingQrCodeService $codeInPdfService,
     ): void
     {
+        ini_set('memory_limit', '-1');
         try {
             $pdf = $codeInPdfService->createPdf(
                 $this->dataInfoForPdf
