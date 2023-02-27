@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models\Ordering\InfoForOrder;
 
+use App\Models\Ordering\CommentOrderTicketModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Tickets\Shared\Infrastructure\Models\HasUuid;
 
@@ -38,4 +40,10 @@ class TicketTypesModel extends Model
     public const TABLE = 'ticket_type';
 
     protected $table = self::TABLE;
+
+
+    public function ticketTypePrice(): HasMany
+    {
+        return $this->hasMany(TicketTypesPriceModel::class, 'ticket_type_id');
+    }
 }

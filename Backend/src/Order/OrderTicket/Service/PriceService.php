@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Service;
 
+use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
@@ -21,10 +22,14 @@ class PriceService
     public function getPriceDto(
         Uuid    $ticketTypeId,
         int     $count,
-        ?string $promoCode = null
+        ?string $promoCode = null,
+        ?Carbon $dateTime = null,
     ): PriceDto
     {
-        $priceByType = $this->getPriceByTicketType->getPrice($ticketTypeId);
+        $priceByType = $this->getPriceByTicketType->getPrice(
+            $ticketTypeId,
+                $dateTime ?? new Carbon()
+        );
         $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
         $discount = $this->isCorrectPromoCode->findPromoCode($promoCode)?->getDiscount() ?? 0.00;
 

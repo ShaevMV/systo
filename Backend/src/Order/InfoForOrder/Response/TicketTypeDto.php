@@ -20,13 +20,16 @@ final class TicketTypeDto extends AbstractionEntity implements Response
 
     public static function fromState(array $data): self
     {
-        $groupLimit = isset($data['groupLimit']) &&
-        !empty($data['groupLimit']) ? (int)$data['groupLimit'] : null;
+        $groupLimit = isset($data['groupLimit']) && !empty($data['groupLimit']) ?
+            (int)$data['groupLimit'] :
+            null;
+
+        $price = count($data['ticket_type_price']) > 0 ? $data['ticket_type_price'][0]['price'] : $data['price'];
 
         return new self(
             new Uuid($data['id']),
             $data['name'],
-            (float) $data['price'],
+            (float) $price,
             $groupLimit
         );
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Repositories;
 
+use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -14,5 +15,8 @@ interface TicketTypeInterface
      */
     public function getList(): array;
 
-    public function getById(Uuid $uuid): TicketTypeDto;
+    public function getById(
+        Uuid $uuid,
+        ?Carbon $afterDate = null,
+    ): TicketTypeDto;
 }

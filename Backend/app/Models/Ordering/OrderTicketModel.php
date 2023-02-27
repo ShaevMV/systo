@@ -65,6 +65,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel wherePhone($value)
  * @property int $kilter
  * @method static Builder|OrderTicketModel whereKilter($value)
+ * @property-read Collection|TicketModel[] $tickets
+ * @property-read int|null $tickets_count
  */
 final class OrderTicketModel extends Model
 {

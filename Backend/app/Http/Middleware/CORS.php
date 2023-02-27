@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types =1);
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -25,7 +25,7 @@ class CORS
     /**
      * @var string[]
      */
-    private array $headers  = [
+    private array $headers = [
         'origin' => 'Access-Control-Allow-Origin',
         'Access-Control-Request-Headers' => 'Access-Control-Allow-Headers',
         'Access-Control-Request-Method' => 'Access-Control-Allow-Methods'
@@ -41,19 +41,21 @@ class CORS
         $this->maxAge = 600;
         $this->exposeHeaders = [];
         $this->allowOrigins = [
-    /*        'http://localhost:8080',
-            'http://localhost:8081',*/
+            /*        'http://localhost:8080',
+                    'http://localhost:8081',*/
             'http://api.tickets.loc',
             'http://193.106.175.59:8081',
-       //     'http://localhost',
+            //     'http://localhost',
             'http://api.solarsysto.ru',
             'http://org.solarsysto.ru',
             'http://org.tickets.loc/',
             'http://193.106.175.59',
         ];
 
-        if(env('APP_DEBUG')) {
-            $this->allowOrigins[] = 'http://localhost:8081';
+        if (env('APP_DEBUG')) {
+            $this->allowOrigins = array_merge(['http://localhost:8080',
+                'http://localhost:8081',
+                'http://localhost'], $this->allowOrigins);
         }
     }
 

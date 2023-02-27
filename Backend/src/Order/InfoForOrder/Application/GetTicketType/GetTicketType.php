@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
-use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetAllInfoForOrderQuery;
+use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Response\PriceByTicketTypeResponse;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -24,10 +24,13 @@ final class GetTicketType
         ]);
     }
 
-    public function getPrice(Uuid $ticketsTypeId): PriceByTicketTypeResponse
+    public function getPrice(Uuid $ticketsTypeId, Carbon $dateTime): PriceByTicketTypeResponse
     {
         /** @var PriceByTicketTypeResponse $result */
-        $result = $this->queryBus->ask(new GetPriceByTicketTypeQuery($ticketsTypeId));
+        $result = $this->queryBus->ask(new GetPriceByTicketTypeQuery(
+            $ticketsTypeId,
+            $dateTime
+        ));
 
         return $result;
     }
