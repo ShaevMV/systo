@@ -7,7 +7,6 @@ namespace Tickets\Ticket\CreateTickets\Services;
 use Endroid\QrCode\Label\Font\OpenSans;
 use Pdf;
 use Endroid\QrCode\Writer\Result\ResultInterface;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
@@ -15,11 +14,10 @@ use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
-use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
 
 class CreatingQrCodeService
 {
-    public function createQrCode(Uuid $ticketId): ResultInterface
+    public function createQrCode(string $ticketId): ResultInterface
     {
         return Builder::create()
             ->writer(new PngWriter())
@@ -40,7 +38,7 @@ class CreatingQrCodeService
 
     public function createPdf(TicketResponse $dataInfoForPdf): \Barryvdh\DomPDF\PDF
     {
-        $qrCode = $this->createQrCode($dataInfoForPdf->getId());
+        $qrCode = $this->createQrCode($dataInfoForPdf->getId()->value());
 
         return Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),
