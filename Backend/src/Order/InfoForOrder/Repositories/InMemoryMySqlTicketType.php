@@ -39,7 +39,7 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
             $ticketType = $ticketType
                 ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')->limit(1)->first()]);
         }
-        $sql = $ticketType->toSql();
+
         $ticketType = $ticketType->first();
 
         if (is_null($ticketType)) {
