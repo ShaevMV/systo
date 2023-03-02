@@ -31,6 +31,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected string $dateBuy,
         protected array $listCorrectNextStatus,
         protected string $idBuy,
+        protected float $priceWithoutDiscount,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
     ) {
@@ -61,6 +62,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['date'],
             $status->getListNextStatus(),
             $data['id_buy'],
+            (float) $data['price'],
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
         );
@@ -97,5 +99,10 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getKilter(): int
     {
         return $this->kilter;
+    }
+
+    public function getPriceWithoutDiscount(): float
+    {
+        return $this->priceWithoutDiscount;
     }
 }

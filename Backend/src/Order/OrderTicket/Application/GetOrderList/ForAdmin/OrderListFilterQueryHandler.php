@@ -68,7 +68,7 @@ class OrderListFilterQueryHandler implements QueryHandler
         $result = [];
 
         foreach ($orderTicketItem as $item) {
-            if (($item->getPrice() / count($item->getGuests()) === $price)) {
+            if (($item->getPriceWithoutDiscount() / count($item->getGuests()) === $price)) {
                 $result[] = $item;
             }
         }
