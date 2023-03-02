@@ -48,6 +48,8 @@ class CORS
             //     'http://localhost',
             'http://api.solarsysto.ru',
             'http://org.solarsysto.ru',
+            'https://org.solarsysto.ru',
+            'https://api.solarsysto.ru',
             'http://org.tickets.loc/',
             'http://193.106.175.59',
         ];
