@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Unit\OrderTicket\Application\Create;
+namespace Tests\Unit\Order\OrderTicket\Application\Create;
 
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

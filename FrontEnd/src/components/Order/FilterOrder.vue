@@ -14,7 +14,7 @@
                 <option value=null>Выберите тип оргвзноса</option>
                 <option v-for="(typeTickets) in getTicketType"
                         v-bind:key="typeTickets.id"
-                        v-bind:value="typeTickets.id">{{ typeTickets.name }} /
+                        v-bind:value="typeTickets.price">{{ typeTickets.name }} /
                   {{ typeTickets.price }} руб.
                 </option>
               </select>
@@ -66,16 +66,16 @@
             </div>
           </div>
 
-            <div class="row b-row mt-2">
-              <button class="btn btn-primary"
-                      @click="sendFilter"
-                      type="submit">Применить фильтр
-              </button>
-              <button class="btn btn-primary"
-                      @click="clearFilter"
-                      type="submit">Сбросить фильтр
-              </button>
-              </div>
+          <div class="row b-row mt-2">
+            <button class="btn btn-primary"
+                    @click="sendFilter"
+                    type="submit">Применить фильтр
+            </button>
+            <button class="btn btn-primary"
+                    @click="clearFilter"
+                    type="submit">Сбросить фильтр
+            </button>
+          </div>
 
         </div>
       </div>
@@ -106,6 +106,7 @@ export default {
   methods: {
     ...mapActions('appFestivalTickets', [
       'loadDataForOrderingTickets',
+      'getListPriceFor',
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
@@ -115,7 +116,7 @@ export default {
      */
     sendFilter: function () {
       this.getOrderListForAdmin({
-        'typeOrder': this.typeOrder,
+        'price': this.typeOrder,
         'email': this.email,
         'status': this.status,
         'promoCode': this.promoCode,
@@ -133,6 +134,7 @@ export default {
   },
   async created() {
     await this.loadDataForOrderingTickets();
+    await this.getListPriceFor();
   },
 }
 </script>

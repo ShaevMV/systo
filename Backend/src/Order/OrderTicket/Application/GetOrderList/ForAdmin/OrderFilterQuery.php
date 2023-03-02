@@ -10,17 +10,12 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class OrderFilterQuery implements Query
 {
     public function __construct(
-        private ?Uuid $typeOrder = null,
         private ?Uuid $typesOfPayment = null,
         private ?string $email = null,
         private ?string $status = null,
         private ?string $promoCode = null,
+        private ?float $price = null,
     ) {
-    }
-
-    public function getTypeOrder(): ?Uuid
-    {
-        return $this->typeOrder;
     }
 
     public function getTypesOfPayment(): ?Uuid
@@ -45,15 +40,19 @@ class OrderFilterQuery implements Query
 
     public static function fromState(array $data): self
     {
-        $typeOrder = $data['typeOrder'] ?? null;
         $typesOfPayment = $data['typesOfPayment'] ?? null;
 
         return new self(
-            (null !== $typeOrder) ? new Uuid($data['typeOrder']) : null,
             (null !== $typesOfPayment) ? new Uuid($data['typesOfPayment']) : null,
             $data['email'] ?? null,
             $data['status'] ?? null,
             $data['promoCode'] ?? null,
+            $data['price'] ?? null,
         );
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
     }
 }

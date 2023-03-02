@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @property ?string $email
- * @property ?string $typeOrder
+ * @property ?float $price
  * @property ?string $typesOfPayment
  * @property ?string $status
  * @property ?string $promoCode

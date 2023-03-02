@@ -13,10 +13,12 @@ interface TicketTypeInterface
     /**
      * @return TicketTypeDto[]
      */
-    public function getList(): array;
+    public function getList(Carbon $afterDate): array;
 
     public function getById(
         Uuid $uuid,
         ?Carbon $afterDate = null,
     ): TicketTypeDto;
+
+    public function getListPrice(): array;
 }

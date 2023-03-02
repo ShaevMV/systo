@@ -57,3 +57,12 @@ export const clearPromoCode = (context) => {
         name: null,
     });
 };
+
+
+
+export const getListPriceFor =  (context) => {
+    let promise = axios.get('/api/v1/festival/getListPrice');
+    promise.then(function (response) {
+        context.commit('setTicketType', response.data.ticketType);
+    })
+};

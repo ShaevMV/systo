@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\OrderTicket\Application\ChanceStatus;
+namespace Tests\Unit\Order\OrderTicket\Application\ChanceStatus;
 
 use Database\Seeders\OrderSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;

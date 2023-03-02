@@ -159,7 +159,7 @@
                       <div class="input-group-prepend">
                               <span class="input-group-text btn"
                                     @click="addGuest()"
-                                    id="basic-addon1">Добавить гостя</span>
+                                    id="basic-addon1">Добавить</span>
                       </div>
                     </div>
                   </div>

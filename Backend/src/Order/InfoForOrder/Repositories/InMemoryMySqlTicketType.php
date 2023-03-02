@@ -19,13 +19,15 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
     {
     }
 
-    public function getList(): array
+    public function getList(Carbon $afterDate): array
     {
         $result = [];
 
-        $data = $this->model::with('ticketTypePrice')->get();
+        $data = $this->model::with('ticketTypePrice')
+            ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')])
+            ->get()->toArray();
         foreach ($data as $item) {
-            $result[] = TicketTypeDto::fromState($item->toArray());
+            $result[] = TicketTypeDto::fromState($item);
         }
 
         return $result;
@@ -37,7 +39,7 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
             ::whereId($uuid->value());
         if (!is_null($afterDate)) {
             $ticketType = $ticketType
-                ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')->limit(1)->first()]);
+                ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')]);
         }
 
         $ticketType = $ticketType->first();
@@ -47,5 +49,28 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
         }
 
         return TicketTypeDto::fromState($ticketType->toArray());
+    }
+
+    public function getListPrice(): array
+    {
+        $result = [];
+        $rawResult = $this->model
+            ->with('ticketTypePrice')
+            ->get()
+            ->toArray();
+
+        foreach ($rawResult as $item) {
+            $data = $item;
+            unset($data['ticket_type_price']);
+            $result[] = TicketTypeDto::fromState($data);
+            if (count($item['ticket_type_price']) > 0) {
+                foreach ($item['ticket_type_price'] as $value) {
+                    $data['price'] = $value['price'];
+                    $result[] = TicketTypeDto::fromState($data);
+                }
+            }
+        }
+
+        return $result;
     }
 }

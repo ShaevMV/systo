@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\OrderTicket\Application\GetOrderTicketsList;
+namespace Tests\Unit\Order\OrderTicket\Application\GetOrderTicketsList;
 
 use Database\Seeders\OrderSeeder;
 use Database\Seeders\PromoCodSeeder;

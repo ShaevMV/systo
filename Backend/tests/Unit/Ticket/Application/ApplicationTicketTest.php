@@ -3,6 +3,7 @@
 namespace Tests\Unit\Ticket\Application;
 
 use Database\Seeders\OrderSeeder;
+use Endroid\QrCode\Exception\ValidationException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -58,5 +59,37 @@ class ApplicationTicketTest extends TestCase
             'http://localhost/storage/tickets/56f04400-02ab-4cbe-bfd4-4f7dda23d675.pdf',
             $tickets->getUrls()[0]
         );
+    }
+
+
+    /**
+     * @throws ValidationException
+     */
+    public function test_in_create_QR_code(): void
+    {
+        /*$service = new CreatingQrCodeService();
+        for($i = 1;$i<=2500;$i++) {
+            $number = $this->addZero($i);
+            $qrCode = $service->createQrCode($number);
+            $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");
+        }*/
+    }
+
+
+    private function addZero(int $number): string
+    {
+        $zero = '';
+
+        if ($number < 1000) {
+            $zero.='0';
+        }
+        if ($number < 100) {
+            $zero.='0';
+        }
+        if ($number < 10) {
+            $zero.='0';
+        }
+
+        return $zero.$number;
     }
 }
