@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://api.solarsysto.ru/'
+axios.defaults.baseURL = 'https://api.solarsysto.ru/'
 axios.defaults.withCredentials = true
 
 /**
