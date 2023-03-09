@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
+namespace Tickets\Order\Shared\Dto;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;

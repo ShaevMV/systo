@@ -2,11 +2,12 @@
 
 declare(strict_types = 1);
 
-namespace Tickets\Order\OrderTicket\Repositories;
+namespace Tickets\Order\Shared\Repositories;
 
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
+use Tickets\Order\Shared\Domain\BaseOrderTicketDto;
+use Tickets\Order\Shared\Responses\BaseOrderTicketItemResponse;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -15,11 +16,8 @@ interface OrderTicketRepositoryInterface
 {
     /**
      * Создать заказ
-     *
-     * @param  OrderTicketDto  $orderTicketDto
-     * @return bool
      */
-    public function create(OrderTicketDto $orderTicketDto): bool;
+    public function create(BaseOrderTicketDto $orderTicketDto): bool;
 
     /**
      * Получить список заказов у пользователя
@@ -35,15 +33,15 @@ interface OrderTicketRepositoryInterface
      * @param  Uuid  $uuid
      * @return OrderTicketDto|null
      */
-    public function findOrder(Uuid $uuid): ?OrderTicketDto;
+    public function findOrder(Uuid $uuid): ?BaseOrderTicketDto;
 
     /**
      * Вывести один заказ для пользователя
      *
      * @param  Uuid  $uuid
-     * @return OrderTicketItemResponse|null
+     * @return BaseOrderTicketItemResponse|null
      */
-    public function getItem(Uuid $uuid): ?OrderTicketItemResponse;
+    public function getItem(Uuid $uuid): ?BaseOrderTicketItemResponse;
 
     /**
      * Получить список заказов по фильтру

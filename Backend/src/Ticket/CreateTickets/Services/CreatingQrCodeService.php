@@ -17,12 +17,12 @@ use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 
 class CreatingQrCodeService
 {
-    public function createQrCode(string $ticketId): ResultInterface
+    public function createQrCode(string $ticketId, string $url): ResultInterface
     {
         return Builder::create()
             ->writer(new PngWriter())
             ->writerOptions([])
-            ->data(env('APP_BAZA_URL').'/newTickets/'.$ticketId)
+            ->data(env('APP_BAZA_URL').$url.$ticketId)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(300)
@@ -36,9 +36,9 @@ class CreatingQrCodeService
             ->build();
     }
 
-    public function createPdf(TicketResponse $dataInfoForPdf): \Barryvdh\DomPDF\PDF
+    public function createPdf(TicketResponse $dataInfoForPdf, string $url): \Barryvdh\DomPDF\PDF
     {
-        $qrCode = $this->createQrCode($dataInfoForPdf->getId()->value());
+        $qrCode = $this->createQrCode($dataInfoForPdf->getId()->value(), $url);
 
         return Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),

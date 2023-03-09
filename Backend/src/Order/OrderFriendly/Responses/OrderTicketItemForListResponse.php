@@ -1,8 +1,8 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Responses;
+namespace Tickets\Order\OrderFriendly\Responses;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
@@ -18,21 +18,15 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     protected string $humanStatus;
 
     public function __construct(
-        protected Uuid $id,
-        protected int $kilter,
+        protected Uuid   $id,
+        protected int    $kilter,
         protected string $email,
-        protected string $name,
-        protected float $price,
-        protected array $guests,
-        protected string $typeOfPaymentName,
+        protected float  $price,
+        protected array  $guests,
         protected Status $status,
-        protected string $dateBuy,
-        protected array $listCorrectNextStatus,
-        protected string $idBuy,
-        protected float $priceWithoutDiscount,
-        protected ?string $lastComment = null,
-        protected ?string $promoCode = null,
-    ) {
+        protected array  $listCorrectNextStatus,
+    )
+    {
         $this->count = count($guests);
         $this->humanStatus = $this->status->getHumanStatus();
     }
@@ -52,17 +46,10 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             new Uuid($data['id']),
             $data['kilter'],
             $data['email'],
-            $data['name'],
-            (float) $data['price'] - (float) $data['discount'],
+            (float)$data['price'],
             $guests,
-            $data['payment_name'],
             $status,
-            $data['date'],
             $status->getListNextStatus(),
-            $data['id_buy'],
-            (float) $data['price'],
-            $data['last_comment'] ?? null,
-            $data['promo_code'] ?? null,
         );
     }
 
@@ -97,10 +84,5 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getKilter(): int
     {
         return $this->kilter;
-    }
-
-    public function getPriceWithoutDiscount(): float
-    {
-        return $this->priceWithoutDiscount;
     }
 }

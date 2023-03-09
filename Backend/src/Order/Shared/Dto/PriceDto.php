@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
+namespace Tickets\Order\Shared\Dto;
 
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 

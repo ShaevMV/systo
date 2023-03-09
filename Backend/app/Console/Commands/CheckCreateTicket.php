@@ -6,7 +6,7 @@ use App\Models\Ordering\OrderTicketModel;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tickets\Order\OrderTicket\Inspectors\CheckStatusChangeInspector;
-use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\Shared\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Criteria\FilterOperator;
 use Tickets\Shared\Domain\Criteria\Filters;
 use Tickets\Shared\Domain\ValueObject\Status;

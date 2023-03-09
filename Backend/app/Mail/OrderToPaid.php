@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
@@ -36,7 +35,7 @@ class OrderToPaid extends Mailable
         $mail = $this->view('email.orderToPaid');
 
         foreach ($this->tickets as $ticket) {
-            $contents = $qrCodeService->createPdf($ticket);
+            $contents = $qrCodeService->createPdf($ticket,'/newTickets/');
             $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
             \Log::info('Отправлен билет на имя '. $ticket->getName());
         }

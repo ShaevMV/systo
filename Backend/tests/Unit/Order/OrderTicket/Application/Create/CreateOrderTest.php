@@ -14,8 +14,8 @@ use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
+use Tickets\Order\Shared\Dto\PriceDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class CreateOrderTest extends TestCase

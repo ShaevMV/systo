@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Responses;
+namespace Tickets\Order\OrderFriendly\Responses;
 
 use Carbon\Carbon;
 use Nette\Utils\Json;
@@ -24,35 +24,25 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response, Bas
      * @param  Uuid  $id
      * @param  Uuid  $userId
      * @param  int  $kilter
-     * @param  string  $name
      * @param  float  $price
-     * @param  float  $discount
      * @param  array  $guests
      * @param  Status  $status
-     * @param  string  $dateBuy
      * @param  Carbon  $dateCreate
-     * @param  string  $typeOfPayment
      * @param  string  $email
      * @param  TicketDto[]  $tickets
-     * @param  string|null  $promoCode
      */
     public function __construct(
         protected Uuid $id,
         protected Uuid $userId,
         protected int $kilter,
-        protected string $name,
         protected float $price,
-        protected float $discount,
         protected array $guests,
         protected Status $status,
-        protected string $dateBuy,
         protected Carbon $dateCreate,
-        protected string $typeOfPayment,
         protected string $email,
         protected array $tickets,
-        protected ?string $promoCode = null,
     ) {
-        $this->totalPrice = $price - $discount;
+        $this->totalPrice = $price;
         $this->count = count($this->guests);
         $this->humanStatus = $this->status->getHumanStatus();
     }
@@ -69,30 +59,13 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response, Bas
             new Uuid($data['id']),
             new Uuid($data['user_id']),
             $data['kilter'],
-            $data['ticket_type']['name'],
             $data['price'],
-            $data['discount'],
             $guests,
             new Status($data['status']),
-            $data['date'],
             new Carbon($data['created_at']),
-            $data['type_of_payment']['name'],
             $data['users']['email'],
             $tickets,
-            $data['promo_code']
         );
-    }
-
-    public function setTypeOfPayment(?string $typeOfPayment): OrderTicketItemResponse
-    {
-        $this->typeOfPayment = $typeOfPayment;
-        return $this;
-    }
-
-    public function setComment(?array $comment): OrderTicketItemResponse
-    {
-        $this->comment = $comment;
-        return $this;
     }
 
     public function getUserId(): Uuid
@@ -100,10 +73,6 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response, Bas
         return $this->userId;
     }
 
-    public function getGuests(): array
-    {
-        return $this->guests;
-    }
 
     public function getId(): Uuid
     {

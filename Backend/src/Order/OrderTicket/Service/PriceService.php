@@ -7,7 +7,7 @@ namespace Tickets\Order\OrderTicket\Service;
 use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\Shared\Dto\PriceDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PriceService

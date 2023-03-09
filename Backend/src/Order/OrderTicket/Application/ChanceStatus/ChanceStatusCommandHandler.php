@@ -7,11 +7,10 @@ namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 use Bus;
 use DomainException;
 use Illuminate\Validation\ValidationException;
-use JsonException;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\Order\Shared\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\Shared\Domain\ValueObject\Status;
 

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
-use Illuminate\Support\Carbon;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\Shared\Domain\BaseOrderTicketDto;
+use Tickets\Order\Shared\Dto\GuestsDto;
+use Tickets\Order\Shared\Dto\PriceDto;
 use Tickets\Shared\Domain\ValueObject\Status;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class OrderTicketDto
+class OrderTicketDto extends BaseOrderTicketDto
 {
     protected Uuid $id;
 
@@ -114,26 +114,6 @@ class OrderTicketDto
         ];
     }
 
-    public function getTicket(): array
-    {
-        return $this->ticket;
-    }
-
-    /**
-     * @return Uuid
-     */
-    public function getFestivalId(): Uuid
-    {
-        return $this->festival_id;
-    }
-
-    /**
-     * @return Uuid
-     */
-    public function getUserId(): Uuid
-    {
-        return $this->user_id;
-    }
 
     /**
      * @return Uuid
@@ -143,37 +123,8 @@ class OrderTicketDto
         return $this->types_of_payment_id;
     }
 
-    /**
-     * @return Status
-     */
-    public function getStatus(): Status
-    {
-        return $this->status;
-    }
-
     public function getPromoCode(): ?string
     {
         return $this->promo_code;
-    }
-
-    public function getId(): Uuid
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return PriceDto
-     */
-    public function getPriceDto(): PriceDto
-    {
-        return $this->priceDto;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmail(): string
-    {
-        return $this->email;
     }
 }

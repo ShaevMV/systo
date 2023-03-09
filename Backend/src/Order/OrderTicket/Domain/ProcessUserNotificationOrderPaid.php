@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\Shared\Dto\GuestsDto;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 

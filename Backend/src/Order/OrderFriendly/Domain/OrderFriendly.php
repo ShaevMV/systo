@@ -2,9 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Domain;
+namespace Tickets\Order\OrderFriendly\Domain;
 
-use DomainException;
+use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationNewOrderTicket;
+use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderCancel;
+use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderDifficultiesArose;
+use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderPaid;
 use Tickets\Order\Shared\Dto\GuestsDto;
 use Tickets\Order\Shared\Dto\PriceDto;
 use Tickets\Shared\Domain\Aggregate\AggregateRoot;
@@ -13,7 +16,7 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
-final class OrderTicket extends AggregateRoot
+class OrderFriendly extends AggregateRoot
 {
     /**
      * @param  GuestsDto[]  $ticket
@@ -21,26 +24,24 @@ final class OrderTicket extends AggregateRoot
     public function __construct(
         protected Uuid $festival_id,
         protected Uuid $user_id,
-        protected Uuid $types_of_payment_id,
         protected PriceDto $price,
         protected Status $status,
         protected array $ticket,
         protected Uuid $id,
-        protected ?string $promo_code = null,
     ) {
     }
+
+
 
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
     {
         return new self(
             $orderTicketDto->getFestivalId(),
             $orderTicketDto->getUserId(),
-            $orderTicketDto->getTypesOfPaymentId(),
             $orderTicketDto->getPriceDto(),
             $orderTicketDto->getStatus(),
             $orderTicketDto->getTicket(),
             $orderTicketDto->getId(),
-            $orderTicketDto->getPromoCode(),
         );
     }
 
@@ -104,7 +105,7 @@ final class OrderTicket extends AggregateRoot
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
         if(is_null($comment)) {
-            throw new DomainException('Комментарий обязательный для смены статус "Возникли трудности"');
+            throw new \DomainException('Комментарий обязательный для смены статус "Возникли трудности"');
         }
 
         $result = self::fromOrderTicketDto($orderTicketDto);
@@ -123,17 +124,8 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    public function getId(): Uuid
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return GuestsDto[]
-     */
     public function getTicket(): array
     {
         return $this->ticket;
     }
-
 }

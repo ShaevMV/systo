@@ -9,6 +9,7 @@ use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use DomainException;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Throwable;
@@ -18,10 +19,13 @@ use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 {
+    protected Model $model;
+
     public function __construct(
-        private TicketModel $model,
+        TicketModel $model,
     )
     {
+        $this->model = $model;
     }
 
     /**
@@ -83,13 +87,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     public function getTicket(Uuid $ticketId): TicketResponse
     {
         $result = $this->model->where($this->model::TABLE.'.id','=',$ticketId->value())
-            ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
-                OrderTicketModel::TABLE . '.phone',
+                User::TABLE . '.phone',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
             ])->first()?->toArray();
