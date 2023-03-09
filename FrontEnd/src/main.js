@@ -3,12 +3,10 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import axios from 'axios';
-import 'v-calendar/dist/style.css';
-import VCalendar from 'v-calendar';
 
 window.store = store;
 
-axios.defaults.baseURL = 'https://api.solarsysto.ru/'
+axios.defaults.baseURL = process.env.VUE_APP_BACKEND_ENDPOINT || 'https://api.solarsysto.ru/';
 axios.defaults.withCredentials = true
 
 
@@ -38,5 +36,4 @@ axios.interceptors.request.use(function (config) {
 createApp(App)
     .use(store)
     .use(router)
-    .use(VCalendar)
     .mount('#app')
