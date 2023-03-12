@@ -187,7 +187,7 @@
                     </div>
                   </div>
 
-                  <div class="row itog-row mb-4" v-show="totalPrice > 0">
+                  <div class="row itog-row mb-4" v-show="totalPrice !== null">
                     <div class="col-4">
                       <h4 class="my-lg-2 font-weight-normal">Итого к внесению: {{ totalPrice }} <small class="text-muted">
                         руб.</small></h4>
@@ -197,7 +197,7 @@
                       <h4 class="my-lg-2 font-weight-normal">Кол-во гостей: <small class="text-muted">{{ countGuests }}</small></h4>
                     </div>
 
-                    <div class="col-4" v-show="totalPrice > 0 && getDiscountByPromoCode > 0">
+                    <div class="col-4" v-show="getDiscountByPromoCode > 0">
                       <h4 class="my-lg-2 font-weight-normal">Скидка по промокоду: <small class="text-muted">{{ getDiscountByPromoCode * countGuests }}  рублей</small></h4>
                     </div>
 
@@ -433,10 +433,9 @@ export default {
     },
     /**
      * Стоимость билета
-     * @returns {number}
      */
     totalPrice: function () {
-      let price = 0;
+      let price = null;
 
       if (this.getSelectTicketType !== null) {
         price = this.getSelectTicketType.price;
@@ -444,7 +443,7 @@ export default {
         return (price * count) - (this.getDiscountByPromoCode * count);
       }
 
-      return 0;
+      return null;
     },
     /**
      * Кол-во гостей
