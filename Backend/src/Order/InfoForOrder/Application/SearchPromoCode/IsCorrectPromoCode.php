@@ -20,7 +20,7 @@ final class IsCorrectPromoCode
         ]);
     }
 
-    public function findPromoCode(?string $name): PromoCodeDto
+    public function findPromoCode(?string $name, float $price): PromoCodeDto
     {
         if (is_null($name)) {
             return new PromoCodeDto();
@@ -30,6 +30,12 @@ final class IsCorrectPromoCode
         $result = $this->queryBus->ask(
             new PromoCodeQuery($name)
         );
+
+        if($result->isPercent()) {
+            return $result->setDiscount(
+                ($price * ($result->getDiscount() / 100))
+            );
+        }
 
         return $result;
     }

@@ -28,10 +28,13 @@ class PriceService
     {
         $priceByType = $this->getPriceByTicketType->getPrice(
             $ticketTypeId,
-                $dateTime ?? new Carbon()
+            $dateTime ?? new Carbon()
         );
         $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
-        $discount = $this->isCorrectPromoCode->findPromoCode($promoCode)?->getDiscount() ?? 0.00;
+        $discount = $this->isCorrectPromoCode->findPromoCode(
+            $promoCode,
+            $priceByType->getPrice()
+        )?->getDiscount() ?? 0.00;
 
         return new PriceDto(
             $totalPrice,

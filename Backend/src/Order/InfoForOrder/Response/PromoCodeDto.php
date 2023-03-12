@@ -22,6 +22,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
         protected ?string $name = null,
         protected float $discount = 0.00,
         protected bool $isSuccess = false,
+        protected bool $isPercent = false
     ) {
     }
 
@@ -34,7 +35,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             new Uuid($data['id']),
             $data['name'],
             $data['discount'],
-            true
+            true,
+            (bool)$data['is_percent'],
         );
     }
 
@@ -48,5 +50,24 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     public function getDiscount(): float
     {
         return $this->discount;
+    }
+
+    public function get(): string
+    {
+        return $this->massage;
+    }
+
+    public function isPercent(): bool
+    {
+        return $this->isPercent;
+    }
+
+    public function setDiscount(float $discount): PromoCodeDto
+    {
+        $this->discount = $discount;
+        $this->massage = str_replace('{getDiscountByPromoCode}', (string)$discount, self::MASSAGE_IN_SUCCESS);
+
+
+        return $this;
     }
 }
