@@ -13,7 +13,7 @@
                       id="validationDefault01">
                 <option value=null>Выберите тип оргвзноса</option>
                 <option v-for="(typeTickets) in getTicketType"
-                        v-bind:key="typeTickets.id"
+                        v-bind:key="typeTickets.price"
                         v-bind:value="typeTickets.price">{{ typeTickets.name }} /
                   {{ typeTickets.price }} руб.
                 </option>
