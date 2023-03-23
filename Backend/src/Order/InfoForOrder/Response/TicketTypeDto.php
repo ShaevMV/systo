@@ -24,7 +24,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             (int)$data['groupLimit'] :
             null;
 
-        $price = !isset($data['ticket_type_price']) || count($data['ticket_type_price']) == 0 ?  $data['price'] : $data['ticket_type_price'][0]['price'];
+        $price = !isset($data['ticket_type_price']) || count($data['ticket_type_price']) == 0 ?  $data['price'] : end($data['ticket_type_price'])['price'];
 
         return new self(
             new Uuid($data['id']),

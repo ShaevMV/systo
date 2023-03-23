@@ -25,7 +25,9 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
 
         $data = $this->model::with('ticketTypePrice')
             ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')])
-            ->get()->toArray();
+            ->get()
+            ->toArray();
+
         foreach ($data as $item) {
             $result[] = TicketTypeDto::fromState($item);
         }

@@ -33,6 +33,14 @@ class GetPriceListTest extends TestCase
     public function test_in_correct_get_list(): void
     {
         $r = $this->getPriceList->getAllPrice();
-        self::assertCount(4, $r->getTicketType());
+        self::assertCount(6, $r->getTicketType());
+    }
+
+
+    public function test_in_correct_get_price():void
+    {
+        $r = $this->allInfoForOrderingTicketsSearcher->getInfo()->toArray();
+
+
     }
 }
