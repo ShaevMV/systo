@@ -44,7 +44,7 @@ class OrderingTicketsController extends Controller
     /**
      * @throws JsonException
      */
-    public function findPromoCode(Request $request, string $promoCode): array
+    public function findPromoCode(Request $request, ?string $promoCode): array
     {
         $price = $this->getTicketType->getPrice(new Uuid($request->input('typeOrder')), new Carbon());
 
