@@ -9,6 +9,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
 use Throwable;
 use Tickets\PromoCode\Application\PromoCodes;
+use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -16,6 +17,7 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 class GetPromoCodesTest extends TestCase
 {
     private PromoCodes $getListPromoCodes;
+    private IsCorrectPromoCode $isCorrectPromoCode;
 
     /**
      * @throws ContainerExceptionInterface
@@ -28,6 +30,9 @@ class GetPromoCodesTest extends TestCase
         /** @var PromoCodes $getListPromoCodes */
         $getListPromoCodes = $this->app->get(PromoCodes::class);
         $this->getListPromoCodes = $getListPromoCodes;
+        /** @var IsCorrectPromoCode $isCorrectPromoCode */
+        $isCorrectPromoCode = $this->app->get(IsCorrectPromoCode::class);
+        $this->isCorrectPromoCode = $isCorrectPromoCode;
     }
 
     public function test_in_correct_get_list(): void
@@ -51,7 +56,7 @@ class GetPromoCodesTest extends TestCase
     public function test_in_correct_create(): void
     {
         self::assertTrue($this->getListPromoCodes->createOrUpdatePromoCode([
-            'name'=>'spb',
+            'name' => 'spb',
             'discount' => 100,
             'is_percent' => true,
             'active' => true
@@ -73,6 +78,13 @@ class GetPromoCodesTest extends TestCase
                 'limit' => null,
             ])
         );
+    }
+
+    public function test_in_correct_fine_promoCode(): void
+    {
+        $res = $this->isCorrectPromoCode->findPromoCode(PromoCodSeeder::NAME_FOR_SYSTO,1000);
+
+        self::assertFalse($res->isSuccess());
     }
 
 }

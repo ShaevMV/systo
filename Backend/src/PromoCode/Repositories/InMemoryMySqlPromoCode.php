@@ -29,6 +29,10 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
             OrderTicketModel::TABLE . '.promo_code')
             ->where($this->model::TABLE . '.name', '=', $name)
             ->where($this->model::TABLE . '.active', '=', true)
+            ->select([
+                $this->model::TABLE . '.*',
+                \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses')
+            ])
             ->groupBy([
                 OrderTicketModel::TABLE . '.promo_code',
                 $this->model::TABLE . '.id',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Application\SearchPromoCode;
 
+use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
@@ -22,7 +23,7 @@ final class IsCorrectPromoCode
     public function findPromoCode(?string $name, float $price): PromoCodeDto
     {
         if (is_null($name)) {
-            return new PromoCodeDto();
+            return new PromoCodeDto(new LimitPromoCodeDto());
         }
 
         /** @var PromoCodeDto $result */
