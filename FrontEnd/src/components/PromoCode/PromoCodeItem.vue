@@ -24,7 +24,7 @@
                     <select class="form-select"
                             v-model="isPercent"
                             id="validationDefault01">
-                      <option value=null>Выберите тип оргвзноса</option>
+                      <option value=null>Выберите тип скидки</option>
                       <option value=false>Фиксированная</option>
                       <option value=true>Процент</option>
                     </select>
@@ -168,7 +168,7 @@ export default {
       'sendSavePromoCode',
     ]),
     back: function () {
-      this.$router.back();
+      this.$router.push({name: 'PromoCodes'});
     },
     save: function () {
       let app = this;

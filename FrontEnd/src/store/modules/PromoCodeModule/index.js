@@ -11,7 +11,7 @@ export default {
             id: null,
             name: null,
             discount: 0.00,
-            isPercent: false,
+            isPercent: null,
             isSuccess: false,
             limit: {
                 count: 0,

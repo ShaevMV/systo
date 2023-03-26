@@ -110,7 +110,7 @@ const routes = [
         }
     },
     {
-        path: '/promoCode/:id',
+        path: '/promoCode/:id?',
         name: 'promoCodeItem',
         component: PromoCodeItemView,
         meta: {

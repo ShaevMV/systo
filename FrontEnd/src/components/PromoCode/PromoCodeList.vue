@@ -30,6 +30,12 @@
             </tr>
             </tbody>
           </table>
+          <div class="row b-row mt-2">
+            <button type="submit"
+                    @click="goItem(null)"
+                    class="btn btn-primary">Добавить новый промокод</button>
+
+          </div>
         </div>
       </div>
     </div>
