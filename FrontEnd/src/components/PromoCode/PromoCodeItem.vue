@@ -185,7 +185,7 @@ export default {
         'id': this.id,
         'name': this.name,
         'discount': this.discount,
-        'is_percent': Boolean(this.isPercent),
+        'is_percent': this.isPercent === "true",
         'active': this.isActive,
         'limit': this.limit,
         'callback': function () {
