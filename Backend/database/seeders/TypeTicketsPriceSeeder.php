@@ -38,5 +38,22 @@ class TypeTicketsPriceSeeder extends Seeder
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
         ]);
+
+        DB::table('ticket_type_price')->insert([
+            'id' => Uuid::random()->value(),
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+            'price' => 4600,
+            'before_date' => (new Carbon())->subDays(1),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
+        DB::table('ticket_type_price')->insert([
+            'id' => Uuid::random()->value(),
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_REGIONS,
+            'price' => 4400,
+            'before_date' => (new Carbon())->subDays(1),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
     }
 }

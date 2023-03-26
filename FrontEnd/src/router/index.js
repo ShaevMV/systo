@@ -12,6 +12,7 @@ import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
 import store from '../store'
+import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 
 const routes = [
     {
@@ -97,6 +98,11 @@ const routes = [
         path: '/conditions',
         name: 'Conditions',
         component: AboutView,
+    },
+    {
+        path: '/promo-codes',
+        name: 'PromoCodes',
+        component: PromoCodeView,
     },
     {
         path: '/:pathMatch(.*)*',

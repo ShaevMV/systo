@@ -27,6 +27,8 @@ Route::prefix('v1/festival')->group(static function (): void {
         [OrderingTicketsController::class, 'getInfoForOrder']);
     Route::post('/findPromoCode/{promoCode}',
         [OrderingTicketsController::class, 'findPromoCode']);
+    Route::get('/getListPromoCode',
+        [OrderingTicketsController::class, 'getListPromoCode']);
 
     Route::get('/getListPrice',
         [OrderingTicketsController::class, 'getPriceList']);

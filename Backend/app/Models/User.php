@@ -55,6 +55,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @property string|null $city
  * @method static Builder|User whereCity($value)
  * @method static Builder|User wherePhone($value)
+ * @property string|null $project
+ * @method static Builder|User whereProject($value)
  */
 class User extends Authenticatable implements JWTSubject
 {

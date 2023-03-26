@@ -32,6 +32,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketTypesModel wherePrice($value)
  * @method static Builder|TicketTypesModel whereUpdatedAt($value)
  * @mixin Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Ordering\InfoForOrder\TicketTypesPriceModel[] $ticketTypePrice
+ * @property-read int|null $ticket_type_price_count
  */
 class TicketTypesModel extends Model
 {

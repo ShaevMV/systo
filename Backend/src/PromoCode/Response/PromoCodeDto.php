@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\InfoForOrder\Response;
+namespace Tickets\PromoCode\Response;
 
+use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\Shared\Domain\Bus\Query\Response;
 use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -15,14 +16,15 @@ final class PromoCodeDto extends AbstractionEntity implements Response
 
     private const MASSAGE_IN_ERROR_FOR_TYPE = 'Данные промокод не подходит к этому типу билета';
 
-
     public function __construct(
+        protected LimitPromoCodeDto $limit,
         protected string $massage = self::MASSAGE_IN_ERROR,
         protected ?Uuid $id = null,
         protected ?string $name = null,
         protected float $discount = 0.00,
         protected bool $isSuccess = false,
-        protected bool $isPercent = false
+        protected bool $isPercent = false,
+
     ) {
     }
 
@@ -31,11 +33,12 @@ final class PromoCodeDto extends AbstractionEntity implements Response
         $massage = str_replace('{getDiscountByPromoCode}', (string)$data['discount'], self::MASSAGE_IN_SUCCESS);
 
         return new self(
+            LimitPromoCodeDto::fromState($data),
             $massage,
             new Uuid($data['id']),
             $data['name'],
             $data['discount'],
-            true,
+            (bool)$data['active'],
             (bool)$data['is_percent'],
         );
     }
@@ -43,6 +46,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     public static function fromGroupTicket(): self
     {
         return new self(
+            new LimitPromoCodeDto(),
             self::MASSAGE_IN_ERROR_FOR_TYPE
         );
     }
@@ -69,5 +73,10 @@ final class PromoCodeDto extends AbstractionEntity implements Response
 
 
         return $this;
+    }
+
+    public function getLimit(): LimitPromoCodeDto
+    {
+        return $this->limit;
     }
 }

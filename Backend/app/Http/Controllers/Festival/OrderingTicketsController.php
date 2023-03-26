@@ -6,13 +6,14 @@ namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
 use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceList;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
-use Tickets\Order\InfoForOrder\Application\SearchPromoCode\IsCorrectPromoCode;
-use Illuminate\Http\Request;
-use Tickets\Order\InfoForOrder\Response\PromoCodeDto;
+use Tickets\PromoCode\Application\ListPromoCodes\GetPromoCodes;
+use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
+use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class OrderingTicketsController extends Controller
@@ -22,6 +23,7 @@ class OrderingTicketsController extends Controller
         private IsCorrectPromoCode                $isCorrectPromoCode,
         private GetTicketType                     $getTicketType,
         private GetPriceList                      $getPriceList,
+        private GetPromoCodes                     $getPromoCodes,
     )
     {
     }
@@ -52,6 +54,15 @@ class OrderingTicketsController extends Controller
                 $promoCode,
                 $price->getPrice()
             )->toArray();
+    }
+
+
+    /**
+     * @throws JsonException
+     */
+    public function getListPromoCode(): array
+    {
+        return $this->getPromoCodes->getList()->toArray();
     }
 
     /**

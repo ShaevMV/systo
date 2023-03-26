@@ -35,6 +35,13 @@
           :to="{ name: 'AllOrders' }">Все оргвзносы
       </router-link>
     </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'PromoCodes' }">Промокоды
+      </router-link>
+    </li>
     <li class="nav-item" v-if="!isAuth">
       <router-link
           class="nav-link"

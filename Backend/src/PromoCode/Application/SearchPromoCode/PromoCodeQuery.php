@@ -1,9 +1,8 @@
 <?php
 
-namespace Tickets\Order\InfoForOrder\Application\SearchPromoCode;
+namespace Tickets\PromoCode\Application\SearchPromoCode;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 final class PromoCodeQuery implements Query
 {

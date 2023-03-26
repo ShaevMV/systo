@@ -1,12 +1,8 @@
 <?php
 
-use Carbon\Carbon;
-use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 return new class extends Migration
 {
@@ -17,7 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-
+        Schema::table('promo_code', function (Blueprint $table) {
+            $table->boolean('active')->default(true);
+            $table->integer('limit')->nullable(true);
+        });
     }
 
     /**
@@ -27,8 +26,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('ticket_type_price', function (Blueprint $table) {
-            //
+        Schema::table('promo_code', function (Blueprint $table) {
+            $table->dropColumn(['active','limit']);
         });
     }
 };
