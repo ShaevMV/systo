@@ -79,4 +79,14 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     {
         return $this->limit;
     }
+
+    public function isCorrectForLimit(): bool
+    {
+        return $this->limit->getCorrect();
+    }
+
+    public function isSuccess(): bool
+    {
+        return $this->isSuccess;
+    }
 }

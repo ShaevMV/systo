@@ -29,9 +29,9 @@ class GetPromoCodesTest extends TestCase
     public function test_is_correct_get_list(): void
     {
         $result = $this->getListPromoCodes->getList()->getListPromoCode();
-        self::assertCount(3,$result);
+        self::assertCount(3, $result);
 
         self::assertEquals(new LimitPromoCodeDto(1), $result[PromoCodSeeder::ID_FOR_SYSTO]->getLimit());
-        self::assertEquals(new LimitPromoCodeDto(0,20), $result[PromoCodSeeder::ID_FOR_ILLUNIMISCATA]->getLimit());
+        self::assertEquals(new LimitPromoCodeDto(0, 20), $result[PromoCodSeeder::ID_FOR_ILLUNIMISCATA]->getLimit());
     }
 }

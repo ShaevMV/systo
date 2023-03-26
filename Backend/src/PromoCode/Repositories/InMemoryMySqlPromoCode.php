@@ -19,8 +19,20 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
 
     public function find(string $name): ?PromoCodeDto
     {
-        $promoCode = $this->model::whereName($name)
-            ->whereActive(true)
+        $promoCode = $this->model->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE.'.name',
+            '=',
+            OrderTicketModel::TABLE.'.promo_code')
+            ->where($this->model::TABLE.'.name','=',$name)
+            ->where($this->model::TABLE.'.active','=',true)
+            ->groupBy([
+                OrderTicketModel::TABLE.'.promo_code',
+                $this->model::TABLE.'.id',
+                $this->model::TABLE.'.name',
+                $this->model::TABLE.'.discount',
+                $this->model::TABLE.'.is_percent',
+                $this->model::TABLE.'.active',
+                $this->model::TABLE.'.limit',
+            ])
             ->first()?->toArray();
 
         if (!is_null($promoCode)) {

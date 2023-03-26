@@ -103,6 +103,19 @@ const routes = [
         path: '/promo-codes',
         name: 'PromoCodes',
         component: PromoCodeView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/promoCode/:id',
+        name: 'promoCodeItem',
+        component: OrderItemView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
     },
     {
         path: '/:pathMatch(.*)*',
