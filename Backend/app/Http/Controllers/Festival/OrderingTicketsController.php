@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
+use Throwable;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
 use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceList;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
-use Tickets\PromoCode\Application\GetPromoCodes\GetPromoCodes;
+use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -24,7 +26,7 @@ class OrderingTicketsController extends Controller
         private IsCorrectPromoCode                $isCorrectPromoCode,
         private GetTicketType                     $getTicketType,
         private GetPriceList                      $getPriceList,
-        private GetPromoCodes                     $getPromoCodes,
+        private PromoCodes                        $getPromoCodes,
     )
     {
     }
@@ -71,9 +73,9 @@ class OrderingTicketsController extends Controller
      */
     public function getItemPromoCode(?string $idPromoCode): JsonResponse
     {
-        if(!is_null($idPromoCode)) {
-            if($result = $this->getPromoCodes->getItem(new Uuid($idPromoCode))) {
-                return response()->json($result->toArray());
+        if (!is_null($idPromoCode)) {
+            if ($result = $this->getPromoCodes->getItem(new Uuid($idPromoCode))) {
+                return response()->json($result->toArrayForTable());
             }
 
             return response()->json([
@@ -82,6 +84,22 @@ class OrderingTicketsController extends Controller
         }
 
         return response()->json([]);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function savePromoCode(
+        CreatePromoCodeRequest $createPromoCodeRequest
+    ): JsonResponse
+    {
+        $id = $this->getPromoCodes->createOrUpdatePromoCode($createPromoCodeRequest->toArray());
+        $massage = $createPromoCodeRequest->id ? 'промокод обнавлён' : 'промокод добавлен';
+
+        return response()->json([
+            'massage' => $massage,
+            'id' => $id->value(),
+        ]);
     }
 
     /**

@@ -82,6 +82,7 @@ const routes = [
         path: '/order/:id',
         name: 'orderItems',
         component: OrderItemView,
+        props: true,
         meta: {
             'requiresAuth': true,
         }
@@ -113,6 +114,7 @@ const routes = [
         path: '/promoCode/:id?',
         name: 'promoCodeItem',
         component: PromoCodeItemView,
+        props: true,
         meta: {
             'requiresAuth': true,
             'role': ['admin']

@@ -44,6 +44,11 @@ class PromoCodeModel extends Model
     public const TABLE = "promo_code";
     protected $table = self::TABLE;
 
+
+    protected $fillable = [
+        'id', 'name', 'discount', 'is_percent', 'active', 'limit'
+    ];
+
     public function orderTickets(): HasMany
     {
         return $this->hasMany(OrderTicketModel::class, 'promo_code');

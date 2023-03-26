@@ -27,15 +27,16 @@ export const loadPromoCodeItem = (context, payload) => {
 
 export const sendSavePromoCode = (context, payload) => {
     let promise = axios.post('/api/v1/festival/savePromoCode/' + payload.id, {
+        'id' : payload.id,
         'name' : payload.name,
         'discount': payload.discount,
         'is_percent': payload.is_percent,
         'active': payload.active,
         'limit': payload.limit
     })
-    promise.then(function (response) {
+    promise.then(function () {
         if(payload.callback !== undefined) {
-            payload.callback(response.massage)
+            payload.callback()
         }
     }).catch(function (error) {
         console.error(error);

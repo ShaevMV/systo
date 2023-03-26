@@ -31,7 +31,11 @@ Route::prefix('v1/festival')->group(static function (): void {
         [OrderingTicketsController::class, 'getListPromoCode'])->middleware('auth:api')->middleware('admin');
 
     Route::get('/getItemPromoCode/{idPromoCode?}',
-        [OrderingTicketsController::class, 'getItemPromoCode']);
+        [OrderingTicketsController::class, 'getItemPromoCode'])->middleware('auth:api')->middleware('admin');
+    Route::post('/savePromoCode/{idPromoCode?}',
+        [OrderingTicketsController::class, 'savePromoCode'])->middleware('auth:api')->middleware('admin');
+
+
 
     Route::get('/getListPrice',
         [OrderingTicketsController::class, 'getPriceList']);

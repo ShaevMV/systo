@@ -17,6 +17,7 @@
                            v-model="name"
                            id="company">
                   </div>
+                  <small class="form-text text-muted"> {{ getError('name') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Тип скидки:</label>
@@ -25,10 +26,11 @@
                             v-model="isPercent"
                             id="validationDefault01">
                       <option value=null>Выберите тип скидки</option>
-                      <option value=false>Фиксированная</option>
-                      <option value=true>Процент</option>
+                      <option value="false">Фиксированная</option>
+                      <option value="true">Процент</option>
                     </select>
                   </div>
+                  <small class="form-text text-muted"> {{ getError('is_percent') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Скидка:</label>
@@ -39,6 +41,7 @@
                            v-model="discount"
                            id="company">
                   </div>
+                  <small class="form-text text-muted"> {{ getError('discount') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Кол-во использований (оставти пустым если нужно
@@ -50,6 +53,7 @@
                            v-model="limit"
                            id="company">
                   </div>
+                  <small class="form-text text-muted"> {{ getError('limit') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Активна:</label>
@@ -60,15 +64,18 @@
                            v-model="isActive"
                            id="company">
                   </div>
+                  <small class="form-text text-muted"> {{ getError('active') }}</small>
                 </div>
                 <div class="row massager">{{ massage }}</div>
                 <div class="row b-row mt-2">
                   <button type="submit"
                           @click="save"
-                          class="btn btn-primary">Сохранить изменения</button>
+                          class="btn btn-primary">Сохранить изменения
+                  </button>
                   <button type="submit"
                           @click="back"
-                          class="btn btn-primary">Отмена/назад </button>
+                          class="btn btn-primary">Отмена/назад
+                  </button>
                 </div>
               </div><!-- End Profile Edit Form -->
 
@@ -97,7 +104,7 @@ export default {
       newName: null,
       newIsPercent: null,
       newDiscount: null,
-      newIsActive: null,
+      newIsActive: false,
       newLimit: null,
       massage: null,
     }
@@ -121,7 +128,7 @@ export default {
     isPercent: {
       get: function () {
         if (this.newIsPercent === null) {
-          return this.getPromoCodeItem.isPercent;
+          return this.getPromoCodeItem.is_percent;
         }
         return this.newIsPercent;
       },
@@ -132,7 +139,7 @@ export default {
     isActive: {
       get: function () {
         if (this.newIsActive === null) {
-          return this.getPromoCodeItem.isSuccess;
+          return this.getPromoCodeItem.active;
         }
         return this.newIsActive;
       },
@@ -166,23 +173,34 @@ export default {
   methods: {
     ...mapActions('appPromoCode', [
       'sendSavePromoCode',
+      'clearError'
     ]),
     back: function () {
       this.$router.push({name: 'PromoCodes'});
     },
     save: function () {
       let app = this;
+      this.clearError();
       this.sendSavePromoCode({
         'id': this.id,
         'name': this.name,
         'discount': this.discount,
-        'is_percent': this.isActive,
+        'is_percent': Boolean(this.isPercent),
+        'active': this.isActive,
         'limit': this.limit,
-        'callback': function (massage) {
-          app.massage = massage
+        'callback': function () {
+          app.$router.push({name: 'PromoCodes'});
         }
       })
     }
+  },
+  created() {
+    if (this.name === null) {
+      document.title = "Создать новый промокод";
+    } else {
+      document.title = "Промокод " + this.name;
+    }
+    this.clearError();
   }
 }
 </script>

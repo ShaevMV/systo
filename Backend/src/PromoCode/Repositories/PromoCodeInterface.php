@@ -17,4 +17,6 @@ interface PromoCodeInterface
     public function getList(): array;
 
     public function getItem(Uuid $id): ?PromoCodeDto;
+
+    public function createOrUpdate(PromoCodeDto $promoCodeDto): bool;
 }

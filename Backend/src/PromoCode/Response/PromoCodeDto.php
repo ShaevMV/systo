@@ -89,4 +89,30 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     {
         return $this->isSuccess;
     }
+
+    public function toArrayForTable(): array
+    {
+        return [
+            'id' => $this->id->value(),
+            'name' => $this->name,
+            'discount' => $this->discount,
+            'is_percent' => $this->isPercent,
+            'active' => $this->isSuccess,
+            'limit' => $this->limit->getLimit(),
+        ];
+    }
+
+    public function getId(): ?Uuid
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * @param Uuid|null $id
+     */
+    public function setId(?Uuid $id): void
+    {
+        $this->id = $id;
+    }
 }
