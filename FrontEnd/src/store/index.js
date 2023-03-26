@@ -29,6 +29,6 @@ export default createStore({
         'appFestivalTickets': appFestivalTickets,
         'appUser': appUserModule,
         'appOrder': appOrderModule,
-        'appPromoCodeModule': appPromoCodeModule,
+        'appPromoCode': appPromoCodeModule,
     }
 })

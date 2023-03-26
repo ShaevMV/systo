@@ -7,6 +7,7 @@ use App\Models\Ordering\InfoForOrder\PromoCodeModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use Tickets\PromoCode\Response\PromoCodeDto;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlPromoCode implements PromoCodeInterface
 {
@@ -73,5 +74,12 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
         }
 
         return $result;
+    }
+
+    public function getItem(Uuid $id): ?PromoCodeDto
+    {
+        $data = $this->model::find($id->value())?->toArray();
+
+        return is_null($data) ? null : PromoCodeDto::fromState($data);
     }
 }

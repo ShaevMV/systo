@@ -11,7 +11,7 @@ export default {
   name: "PromoCodeView",
   components: {PromoCodeList},
   created() {
-    document.title = "Промокод"
+    document.title = "Промокоды"
   }
 }
 </script>

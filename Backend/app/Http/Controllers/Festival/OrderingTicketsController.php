@@ -6,12 +6,13 @@ namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
 use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceList;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
-use Tickets\PromoCode\Application\ListPromoCodes\GetPromoCodes;
+use Tickets\PromoCode\Application\GetPromoCodes\GetPromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
@@ -63,6 +64,24 @@ class OrderingTicketsController extends Controller
     public function getListPromoCode(): array
     {
         return $this->getPromoCodes->getList()->toArray();
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function getItemPromoCode(?string $idPromoCode): JsonResponse
+    {
+        if(!is_null($idPromoCode)) {
+            if($result = $this->getPromoCodes->getItem(new Uuid($idPromoCode))) {
+                return response()->json($result->toArray());
+            }
+
+            return response()->json([
+                'errors' => ['error' => 'Промокод не найден']
+            ], 404);
+        }
+
+        return response()->json([]);
     }
 
     /**

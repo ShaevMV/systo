@@ -13,6 +13,7 @@ import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
 import store from '../store'
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
+import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 
 const routes = [
     {
@@ -111,7 +112,7 @@ const routes = [
     {
         path: '/promoCode/:id',
         name: 'promoCodeItem',
-        component: OrderItemView,
+        component: PromoCodeItemView,
         meta: {
             'requiresAuth': true,
             'role': ['admin']

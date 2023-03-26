@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\PromoCode\Application\ListPromoCodes;
+namespace Tickets\PromoCode\Application\GetPromoCodes;
 
 use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\PromoCode\Response\PromoCodeListDto;

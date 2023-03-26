@@ -6,8 +6,9 @@ use Database\Seeders\PromoCodSeeder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
-use Tickets\PromoCode\Application\ListPromoCodes\GetPromoCodes;
+use Tickets\PromoCode\Application\GetPromoCodes\GetPromoCodes;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class GetPromoCodesTest extends TestCase
 {
@@ -33,5 +34,10 @@ class GetPromoCodesTest extends TestCase
 
         self::assertEquals(new LimitPromoCodeDto(1), $result[PromoCodSeeder::ID_FOR_SYSTO]->getLimit());
         self::assertEquals(new LimitPromoCodeDto(0, 20), $result[PromoCodSeeder::ID_FOR_ILLUNIMISCATA]->getLimit());
+    }
+
+    public function test_is_correct_get_item(): void
+    {
+        $this->getListPromoCodes->getItem(new Uuid(PromoCodSeeder::ID_FOR_SYSTO));
     }
 }

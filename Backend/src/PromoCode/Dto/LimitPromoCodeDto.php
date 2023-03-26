@@ -18,8 +18,8 @@ class LimitPromoCodeDto extends AbstractionEntity
     public static function fromState(array $data): self
     {
         return new self(
-            $data['countUses'],
-            $data['limit'],
+            $data['countUses'] ?? 0,
+            $data['limit'] ?? null,
         );
     }
 

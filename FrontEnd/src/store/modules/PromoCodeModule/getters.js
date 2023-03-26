@@ -9,6 +9,10 @@ export const getError = state => type => {
 };
 
 
-export const getPromoCode = state => {
+export const getPromoCodeList = state => {
     return state.promoCodeList;
+}
+
+export const getPromoCodeItem = state => {
+    return state.promoCodeItem;
 }

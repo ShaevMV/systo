@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\PromoCode\Application\ListPromoCodes;
+namespace Tickets\PromoCode\Application\GetPromoCodes;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 

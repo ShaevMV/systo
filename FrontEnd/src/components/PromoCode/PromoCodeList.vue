@@ -17,13 +17,13 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="(item,index) in getPromoCode"
+            <tr v-for="(item,index) in getPromoCodeList"
                 v-bind:key="index"
                 @click="goItem(item.id)"
                 style="cursor: pointer"
             >
               <td>{{ item.name }}</td>
-              <td>{{ getTypeDiscount(item.is_percent) }}</td>
+              <td>{{ getTypeDiscount(item.isPercent) }}</td>
               <td>{{ item.discount }}</td>
               <td>{{ item.limit.count }} / {{ getLimit(item.limit.limit) }}</td>
               <td>{{ getActive(item.isSuccess) }}</td>
@@ -38,19 +38,18 @@
 </template>
 
 <script>
-
 import {mapGetters, mapActions} from 'vuex';
 
 export default {
   name: "PromoCodeList",
   computed: {
-    ...mapGetters('appPromoCodeModule', [
+    ...mapGetters('appPromoCode', [
       'getError',
-      'getPromoCode',
+      'getPromoCodeList',
     ]),
   },
   methods: {
-    ...mapActions('appPromoCodeModule', [
+    ...mapActions('appPromoCode', [
       'loadListPromoCode',
     ]),
     goItem(idItem) {
