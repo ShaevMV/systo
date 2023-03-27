@@ -40,7 +40,7 @@ class ProcessPasswordResets implements ShouldQueue, DomainEvent
     {
         $token = urlencode(md5($this->user->email));
 
-        $activationLink = "https://org.solarsysto.ru//resetPassword/".$token;
+        $activationLink = "https://org.solarsysto.ru/resetPassword/".$token;
 
         PasswordResets::updateOrCreate([
             'email' => $this->user->email,
