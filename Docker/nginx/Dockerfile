@@ -7,6 +7,7 @@ RUN adduser --disabled-password --gecos "" user
 
 RUN touch /var/run/nginx.pid \
     && mkdir /socket \
+    && mkdir /etc/nginx/ssl \
     && chown -Rf user:user \
     /etc/nginx/nginx.conf \
     /var/cache/nginx \
