@@ -1,0 +1,845 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    outline: none;
+}
+
+input[type="search"], input[type="number"] {
+    height: 50px;
+    padding-left: 5px;
+    outline: none;
+    border-radius: 5px 0 0 5px;
+    border-radius: 5px 0 0 5px;
+    border: 2px solid #160233;
+    width: 25%;
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+}
+
+
+.logox{
+    width: 250px;
+    height: auto;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+
+
+input[type="search"]::placeholder, input[type="number"]::placeholder{
+    color: #000;
+}
+
+input[type="submit"] {
+    height: 50px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #e8db06;
+    background: #160233;
+    outline: none;
+    border: 2px solid #160233;
+    transition: all 0.2s;
+    border-left: none;
+    border-radius: 0 5px 5px 0;
+}
+
+input[type="submit"]:hover {
+    color: #000;
+    background: #e8db06;
+}
+
+body > h2, body > form {
+    margin-bottom: 15px;
+}
+
+/* Old browsers HTML5 compatibility */
+header, section, footer, aside, nav, article, hgroup, div {
+    display: block;
+}
+
+body {
+    text-align: center;
+    font-family: Tahoma, Verdana, Arial;
+    padding-bottom: 50px;
+}
+
+h1, h2, h3 {
+    color: #160233;
+    text-shadow: none;
+}
+
+header {
+    height: 50px;
+    background-color: #160233;
+    color: #ffffff;
+}
+
+header h3 {
+    color: #fff;
+    position: relative;
+    top: 12px;
+    font-size: 17px;
+}
+
+header h3 a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+header h3 a:hover {
+    text-decoration: none;
+}
+
+nav {
+    background-color: #1e2541;
+    box-shadow: 0px 0px 10px #160233;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 99;
+}
+
+nav a {
+    font-weight: bold;
+    display: inline-block;
+    font-weight: bold;
+    padding-top: 3px;
+    padding-bottom: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 1px solid #ffffff;
+    border-radius: 5px;
+    margin-top: 11px;
+    margin-bottom: 11px;
+    background: #e8db06;
+    color: #000;
+    transition: all 0.2s;
+}
+
+nav a:hover, nav .active a {
+    background: #160233;
+    color: #e8db06;
+}
+
+nav li {
+    display: inline-block;
+    list-style: none;
+    padding: 0px 10px;
+}
+
+table {
+    margin: auto;
+    width: 95%;
+    border-collapse: collapse;
+}
+
+th {
+    padding: 10px 3px;
+    background-color: #160233;
+    font-size: 15px;
+    color: #fff;
+}
+
+td {
+    text-align: left;
+    padding: 10px 5px;
+    font-size: 15px;
+    background-color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #EEEEEE;
+}
+
+a {
+    text-decoration: none;
+    color: #333333;
+}
+
+.big {
+    height: 30px;
+    width: 200px;
+    font-weight: bold;
+    font-size: 20px;
+    color: #000066;
+}
+
+.center {
+    text-align: center;
+}
+
+#picture {
+    width: 190px;
+    height: auto;
+    margin: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#login {
+    width: 150px;
+    height: 100px;
+    margin: auto;
+    margin-top: 50px;
+    border: 1px solid grey;
+    padding: 10px;
+    text-align: left;
+}
+
+#error {
+    margin: auto;
+    color: red;
+}
+
+#sync {
+    margin: auto;
+}
+
+ul#pixel-tabs {
+    margin: 0;
+    padding: 0;
+}
+
+ul#pixel-tabs li {
+    display: inline-block;
+    line-height: 30px;
+    border: 1px solid #999;
+    border-bottom: 0 none;
+}
+
+ul#pixel-tabs [aria-selected="false"] {
+    border-bottom: 1px solid #999;
+    background: #eee;
+    height: 29px;
+}
+
+ul#pixel-tabs li a {
+    display: block;
+    color: #666;
+    text-decoration: none;
+    display: block;
+    padding: 0px 12px;
+    white-space: nowrap;
+}
+
+ul#pixel-tabs li a:focus {
+    outline: thin dotted;
+    outline-offset: -2px;
+}
+
+ul#pixel-tabs li a:hover {
+    background: #fff;
+}
+
+ul#pixel-tabs [aria-selected="true"] {
+    background: #fff;
+    border-bottom: 0 none;
+}
+
+#content-region {
+    border: 1px solid #999;
+    margin: -1px 0 0 0;
+    padding: 20px;
+}
+
+#content-region [aria-hidden="true"] {
+    display: none;
+}
+
+input[type="checkbox"] {
+    width: 25px;
+    height: 25px;
+}
+
+#loginer {
+    width: 450px;
+    margin: 0 auto;
+    margin-top: 8%;
+    background: #f2f2f2;
+    padding: 35px;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 16px;
+}
+
+#loginer input[type="text"], #loginer input[type="password"] {
+    height: 32px;
+    padding-left: 5px;
+    width: 70%;
+    display: block;
+    margin: 5px auto;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+}
+
+#loginer textarea {
+    display: block;
+    padding-left: 5px;
+    padding-top: 5px;
+    height: 70px;
+    box-sizing: border-box;
+    resize: none;
+    width: 70%;
+    margin: 5px auto;
+    border: 1px solid #000000;
+}
+
+#loginer input[type="submit"] {
+    font-size: 19px;
+    padding-top: 3px;
+    padding-left: 30px;
+    padding-right: 30px;
+    border-radius: 5px;
+    height: 44px;
+    margin-top: 15px;
+    border: 2px solid #2a1753;
+}
+
+#tabs-cards form > select, #tabs-order form > select, #tabs-list form > select {
+    position: relative;
+    left: 5px;
+    outline: none;
+    font-size: 16px;
+    height: 50px;
+    border: 2px solid #160233;
+    margin-bottom: 30px;
+}
+
+.inlinst strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.inlinst {
+    display: inline-block;
+    width: 19%;
+    vertical-align: top;
+    text-align: left;
+}
+
+.inlinst input[type="text"] {
+    border: 1px solid #000000;
+    box-sizing: border-box;
+    width: 95%;
+    height: 32px;
+    outline: none;
+    padding-left: 5px;
+}
+
+.inlinst textarea {
+    resize: none;
+    border: 1px solid #000000;
+    height: 32px;
+    padding-left: 5px;
+    padding-top: 5px;
+    box-sizing: border-box;
+    width: 95%;
+}
+
+.inlinst select {
+    outline: none;
+    width: 95%;
+    height: 32px;
+    border: 1px solid #000000;
+    box-sizing: border-box;
+}
+
+.bug {
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #2a1753;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 26px;
+    letter-spacing: -1px;
+    margin-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#list > div {
+    position: relative;
+    margin-top: 10px;
+}
+
+.ticket_nmb {
+    margin-bottom: 6px;
+    font-size: 16px;
+}
+
+.leftpos {
+    position: relative;
+    left: 5px;
+}
+
+#add-to-base {
+    border: 2px solid #2a1753;
+    border-radius: 4px;
+    height: 42px;
+    padding-top: 0px;
+    font-size: 18px;
+    margin-top: 30px;
+}
+
+#logster h2 {
+    margin-top: 30px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    color: #160233;
+}
+
+#logster h1{
+    color: #7c0002;
+}
+
+#logster form span{
+    display: block;
+    text-align: center;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#logster p{
+    margin-bottom: 30px;
+}
+
+#logster input[type="text"], #logster input[type="password"]{
+    height: 35px;
+    width: 600px;
+    text-align: center;
+    font-size: 16px;
+}
+
+#logster input[type="submit"]{
+    width: 600px;
+    background-color: #160233;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    height: auto;
+    color: #fff;
+    border: 3px solid #160233;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    transition: all 0.3s;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+#logster input[type="submit"]:hover{
+    background-color: #e8db06;
+    border: 3px solid  #160233;
+    color: #160233
+}
+
+#picture ~ form p{
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+input[value="ПрОпУсТиТь"]{
+    margin-left: -5px;
+}
+
+
+#picture img{
+    width: 100%;
+    height: auto;
+}
+
+
+/* color - 1 - #7c0002
+color - 2 - #d42127
+ */
+
+/* Shantix Adaptive */
+
+@media (max-width: 1000px) {
+    header h3 {
+        top: 14px;
+        font-size: 16px;
+    }
+
+    .inlinst strong {
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    h1, h2 {
+        font-size: 23px;
+    }
+}
+
+@media (max-width: 900px) {
+    header {
+        height: 35px;
+    }
+
+    #tabs.ui-tabs .ui-tabs-panel {
+        padding: 0;
+        padding-top: 15px;
+    }
+
+    input[type="search"], input[type="number"] {
+        width: 40%;
+    }
+
+    .inlinst strong {
+        font-size: 14px;
+        margin-bottom: 3px;
+    }
+
+    th {
+        padding: 3px 2px;
+        font-size: 15px;
+        line-height: 18px;
+    }
+
+    td {
+        padding: 3px 3px;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    #picture {
+        margin-bottom: 4px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    header h3 {
+        top: 7px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 800px) {
+    header h3 {
+        top: 8px;
+        font-size: 14px;
+    }
+
+    input[type="search"], input[type="number"] {
+        width: 50%;
+    }
+
+    th {
+        padding: 2px 1px;
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+    td {
+        padding: 2px 2px;
+        font-size: 13px;
+    }
+
+    #picture {
+        margin-top: 10px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 21px;
+        margin-bottom: 13px;
+    }
+}
+
+@media (max-width: 700px) {
+    body > h1, body > h2 {
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    #logster input[type="text"], #logster input[type="password"], #logster input[type="submit"]{
+        width: 90%;
+    }
+
+    .inlinst strong {
+        font-size: 13px;
+    }
+
+    #picture img {
+        width: 100px;
+    }
+
+    table {
+        width: 99%;
+    }
+}
+
+@media (max-width: 600px) {
+    header h3 {
+        top: 5px;
+        font-size: 13px;
+    }
+
+    .ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+        font-size: 15px;
+    }
+
+    .inlinst {
+        width: 30%;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+
+    #loginer {
+        width: 85%;
+        margin: 0 auto;
+        margin-top: 4%;
+        padding: 35px 20px;
+    }
+
+    th {
+        font-size: 13px;
+        line-height: 15px;
+    }
+
+    td {
+        font-size: 12px;
+    }
+
+    nav {
+        margin-bottom: 5px;
+    }
+
+    #picture {
+        margin-top: 5px;
+        position: relative;
+    }
+
+    header {
+        height: 48px;
+    }
+
+    nav li {
+        padding: 0px 5px;
+    }
+
+    nav a {
+        font-size: 15px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 19px;
+        margin-bottom: 11px;
+    }
+
+    .ticket_nmb {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 500px) {
+    nav a {
+
+        font-size: 14px;
+    }
+
+    input[type="search"], input[type="number"] {
+        width: 60%;
+    }
+
+    #loginer {
+        width: 85%;
+        margin-top: 4%;
+        padding: 30px 15px;
+    }
+
+    th {
+        font-size: 12px;
+        line-height: 14px;
+    }
+
+    td {
+        font-size: 11px;
+    }
+
+    nav {
+        margin-bottom: 5px;
+    }
+
+    #picture {
+        margin-top: 5px;
+    }
+
+    #picture {
+        margin-bottom: 0px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 18px;
+        margin-bottom: 9px;
+    }
+}
+
+@media (max-width: 450px) {
+    header h3 {
+        top: 6px;
+        font-size: 12px;
+    }
+
+    #loginer {
+        width: 88%;
+        padding: 25px 9px;
+    }
+
+    table {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    body > h1, body > h2 {
+        font-size: 17px;
+        margin-bottom: 8px;
+    }
+
+    nav a {
+        padding-left: 5px;
+        padding-right: 5px;
+    }
+
+    .ticket_nmb {
+        font-size: 14px;
+    }
+
+    #tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+        padding: .5em 9%;
+    }
+}
+
+@media (max-width: 400px) {
+    nav a {
+        font-size: 13px;
+    }
+
+    #tabs-cards form > select, #tabs-order form > select {
+        font-size: 14px;
+    }
+
+    #tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+        font-size: 14px;
+        padding: .5em 4%;
+    }
+
+    .inlinst strong {
+        font-size: 12px;
+    }
+
+    #loginer {
+        font-size: 15px;
+        padding: 20px 9px;
+    }
+
+    th {
+        font-size: 10px;
+        line-height: 13px;
+    }
+
+    td {
+        font-size: 10px;
+    }
+
+    #picture img {
+        width: 65px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    nav li {
+
+        padding: 0px 3px;
+
+    }
+}
+
+@media (max-width: 360px) {
+    header h3 {
+        top: 3px;
+        font-size: 11px;
+    }
+
+    .inlinst {
+        width: 45%;
+    }
+
+    #loginer {
+        width: 90%;
+        margin-top: 4%;
+        padding: 15px 4px;
+    }
+
+    th {
+        font-size: 9px;
+    }
+
+    td {
+        font-size: 8px;
+    }
+
+    nav a {
+        font-size: 12px;
+    }
+
+    nav li {
+        padding: 0 2px;
+    }
+
+    body > h1, body > h2 {
+        font-size: 15px;
+        margin-bottom: 5px;
+    }
+
+    input[type="number"] {
+        width: 49%;
+    }
+
+    #tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+        font-size: 13px;
+    }
+
+}
+
+@media (max-width: 330px) {
+    nav a {
+        padding-left: 2px;
+        padding-right: 2px;
+        font-size: 11px;
+    }
+
+    .ticket_nmb {
+        font-size: 13px;
+    }
+
+    #tabs.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+        font-size: 11px;
+    }
+
+    #loginer {
+        width: 95%;
+        margin-top: 1%;
+    }
+
+    #loginer input[type="text"], #loginer input[type="password"], #loginer textarea {
+        width: 85%;
+    }
+
+}

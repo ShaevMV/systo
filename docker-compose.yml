@@ -15,13 +15,15 @@ services:
       - ./Docker/nginx/proxy_params:/etc/nginx/proxy_params
       - ./Backend:/var/www/html
       - ./FrontEnd:/var/app/
+      - ./Baza:/var/baza/
     user: user
     networks:
       - backend
     links:
-      - php
       - mysql
       - node
+      - phpBaza
+      - php
 
   php:
     build:
@@ -33,6 +35,19 @@ services:
       - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ~/.ssh/id_rsa.pub:/home/user/.ssh/id_rsa.pub
+    user: user
+    networks:
+      - backend
+
+  phpBaza:
+    build:
+      context: ./Docker/phpBaza
+    image: 'laravelbaza'
+    container_name: php-baza
+    volumes:
+      - ./Baza:/var/baza
+      - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
     user: user
     networks:
       - backend
