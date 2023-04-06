@@ -14,5 +14,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'stripe/*',
         'http://drug.solarsysto.ru/*',
+        'http://drug.solarsysto.ru',
     ];
 }
