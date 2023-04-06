@@ -17,6 +17,7 @@ services:
       - ./FrontEnd:/var/app/
       - ./Baza:/var/baza/
       - ./Friendly:/var/friendly
+      - ./List:/var/list
     user: user
     networks:
       - backend
@@ -25,6 +26,7 @@ services:
       - node
       - phpBaza
       - phpFriendly
+      - phpList
       - php
 
   php:
@@ -61,6 +63,19 @@ services:
     container_name: php-friendly
     volumes:
       - ./Friendly:/var/friendly
+      - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+      - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    user: user
+    networks:
+      - backend
+
+  phpList:
+    build:
+      context: ./Docker/phpList
+    image: 'laravellist'
+    container_name: php-list
+    volumes:
+      - ./List:/var/list
       - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
     user: user
