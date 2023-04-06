@@ -146,7 +146,7 @@ services:
       - ./Docker/mysqlFriendly/log/mysql.log:/var/log/mysql/mysql.log
       - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
     ports:
-      - "33065:3307"
+      - "33065:3306"
     networks:
       - backend
 
