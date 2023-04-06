@@ -111,6 +111,8 @@ services:
     image: 'laravelworker'
     volumes:
       - ./Backend:/var/www/html
+      - ./Friendly:/var/friendly
+      - ./List:/var/list
       - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
