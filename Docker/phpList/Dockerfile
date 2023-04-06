@@ -45,5 +45,5 @@ ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN adduser --disabled-password --gecos "" user
 RUN mkdir -p /var/list
-RUN chown user:user /var/list
+RUN chown -R user:user /var/list
 RUN chgrp -R user /var/list
