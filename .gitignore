@@ -1,3 +1,4 @@
 Docker/mysql/db/
+Docker/mysqlFriendly/db/
 Docker/redis/data
 .idea/*

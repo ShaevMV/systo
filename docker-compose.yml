@@ -136,6 +136,18 @@ services:
     networks:
       - backend
 
+  database:
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD=common404"
+      - "MYSQL_DATABASE=friendly"
+    volumes:
+      - ./Docker/mysqlFriendly/db:/var/lib/mysql
+      - ./Docker/mysqlFriendly/log/mysql.log:/var/log/mysql/mysql.log
+      - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "33065:3307"
+
 networks:
   backend:
     driver: bridge
