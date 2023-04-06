@@ -1,66 +1,49 @@
-FROM php:8.0-fpm
+FROM php:7.4-fpm
 
-WORKDIR /var/list
-
+RUN docker-php-ext-install pdo_mysql
 RUN apt-get update && apt-get install -y \
-        libpng-dev \
-        zlib1g-dev \
-        libxml2-dev \
-        libzip-dev \
-        libonig-dev \
-        zip \
-        ssh \
-        git \
-        telnet \
-        curl \
-        unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libpng-dev \
-        && docker-php-ext-configure gd --with-freetype --with-jpeg \
-        && docker-php-ext-install -j$(nproc) gd \
-        && docker-php-ext-install pdo_mysql \
-        && docker-php-ext-install mysqli \
-        && docker-php-ext-install zip \
-        && docker-php-ext-install soap \
-        && docker-php-ext-install sockets \
-        && docker-php-source delete
+        git \
+        unzip \
+        zip \
+        gnupg2 \
+        wget \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) gd
 
 
 
+ENV HOME /var/list
+ENV DOCKER_PHP ${HOME}/docker/php
+ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_HOME /tmp
+ENV COMPOSER_VERSION 2.0.2
 
-#ENV HOME /var/www/html
-#ENV DOCKER_PHP ${HOME}/docker/php
+RUN set -eux; \
+  curl --silent --fail --location --retry 3 --output /tmp/installer.php --url https://raw.githubusercontent.com/composer/getcomposer.org/cb19f2aa3aeaa2006c0cd69a7ef011eb31463067/web/installer; \
+  php -r " \
+    \$signature = '48e3236262b34d30969dca3c37281b3b4bbe3221bda826ac6a9a62d6444cdb0dcd0615698a5cbe587c3f0fe57a54d8f5'; \
+    \$hash = hash('sha384', file_get_contents('/tmp/installer.php')); \
+    if (!hash_equals(\$signature, \$hash)) { \
+      unlink('/tmp/installer.php'); \
+      echo 'Integrity check failed, installer is either corrupt or worse.' . PHP_EOL; \
+      exit(1); \
+    }"; \
+  php /tmp/installer.php --no-ansi --install-dir=/usr/bin --filename=composer --version=${COMPOSER_VERSION}; \
+  composer --ansi --version --no-interaction; \
+  rm -f /tmp/installer.php; \
+  find /tmp -type d -exec chmod -v 1777 {} +
 
-#COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY vhost.conf /etc/apache2/sites-available/000-default.conf
-#COPY custom.ini /usr/local/etc/php/conf.d/custom.ini
-
-#composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-#xdebug
-#RUN pecl install xdebug \
-#    && docker-php-ext-enable xdebug
+RUN pecl install xdebug-2.8.1 \
+    && docker-php-ext-enable xdebug
 
 
-#Redis
-RUN pecl install redis && docker-php-ext-enable redis
-
-#rebbitMQ
-RUN apt-get install -y librabbitmq-dev
-RUN pecl install amqp && docker-php-ext-enable amqp
-
-#node
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-RUN node -v
-
-#
+# OTHER CONFIGURATION
+ENV TZ=Europe/Moscow
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN adduser --disabled-password --gecos "" user
-RUN chown -R user:user /var/list
+RUN mkdir -p /var/list
+RUN chown user:user /var/list
 RUN chgrp -R user /var/list
-
-
-
