@@ -1,5 +1,5 @@
 Docker/mysql/db/
 Docker/mysqlFriendly/db/
-Docker/mysqlFriendly/log/
+Docker/mysqlFriendly/log/*
 Docker/redis/data
 .idea/*
