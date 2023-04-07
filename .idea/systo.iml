@@ -12,6 +12,10 @@
       <sourceFolder url="file://$MODULE_DIR$/Friendly/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
       <sourceFolder url="file://$MODULE_DIR$/Friendly/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/Frendly/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/List/app" isTestSource="false" packagePrefix="App\" />
+      <sourceFolder url="file://$MODULE_DIR$/List/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />
+      <sourceFolder url="file://$MODULE_DIR$/List/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
+      <sourceFolder url="file://$MODULE_DIR$/List/tests" isTestSource="true" packagePrefix="Tests\" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/lines-of-code" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/complexity" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/diff" />
