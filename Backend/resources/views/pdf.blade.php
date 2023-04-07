@@ -113,9 +113,9 @@
     </style>
 </head>
 <body>
-<img src="http://193.106.175.59/images/main-bg.jpg" alt="fon" id="fon">
+<img src="https://api.solarsysto.ru/images/main-bg.jpg" alt="fon" id="fon">
 <div id="top"></div>
-<img src="http://193.106.175.59/images/top-img.png" alt="top" id="top-img">
+<img src="https://api.solarsysto.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
 <p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering 2023!</p>
