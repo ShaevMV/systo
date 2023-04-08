@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Ordering\OrderTicketModel;
 use Database\Seeders\TypeTicketsPriceSeeder;
+use Database\Seeders\TypeTicketsPriceThirdWaveSeeder;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tickets\Order\OrderTicket\Inspectors\CheckStatusChangeInspector;
@@ -29,10 +30,11 @@ class AddPriceForTypeTicket extends Command
     protected $description = 'Добавить цены';
 
     public function handle(
-       TypeTicketsPriceSeeder $typeTicketsPriceSeeder
+        TypeTicketsPriceThirdWaveSeeder $typeTicketsPriceSeeder
     ): int
     {
         $typeTicketsPriceSeeder->run();
+
         return CommandAlias::SUCCESS;
     }
 }
