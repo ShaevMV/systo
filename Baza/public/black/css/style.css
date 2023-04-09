@@ -1,0 +1,33 @@
+:root {
+    scroll-behavior: smooth;
+    --transition: all 0.5s 0.03s ease;
+    --radius: 10px;
+    --c-red: rgb(134, 32, 28);
+    --c-red-bg: rgba(134, 32, 28, 0.1);
+    --c-red-hover: #ff0a00;
+    --c-grey: rgb(235, 237, 244);
+    --c-lightgrey: rgba(235, 237, 244, 0.5);
+    --c-green: rgb(30, 135, 28);
+}
+
+#prana{
+    font-size: 12px;
+    color: var(--c-red);
+    bottom: 0;
+    padding-bottom: 7px;
+    padding-top: 10px;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+}
+#prana::before{
+    content: '';
+    display: block;
+    width: 25px;
+    height: 20px;
+    background: url(../img/prana_icon_red_mini.png) left center no-repeat;
+    background-size: 24px auto;
+    margin-right: 3px;
+    position: relative;
+    top: -2px;
+}

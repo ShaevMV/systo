@@ -14,6 +14,7 @@ use JsonException;
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
@@ -82,7 +83,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 
     public function getTicket(Uuid $ticketId): TicketResponse
     {
-        $result = $this->model->where($this->model::TABLE.'.id','=',$ticketId->value())
+        $result = $this->model->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->select([

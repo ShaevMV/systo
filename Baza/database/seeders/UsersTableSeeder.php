@@ -12,12 +12,12 @@ class UsersTableSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run(): void
     {
         DB::table('users')->insert([
             'id' => 1,
             'name' => 'Admin Admin',
-            'email' => 'admin@black.com',
+            'email' => 'admin@admin.ru',
             'email_verified_at' => now(),
             'password' => Hash::make('secret'),
             'created_at' => now(),
