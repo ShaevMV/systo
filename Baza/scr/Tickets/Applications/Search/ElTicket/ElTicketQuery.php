@@ -3,7 +3,7 @@
 namespace Baza\Tickets\Applications\Search\ElTicket;
 
 use Baza\Shared\Domain\Bus\Query\Query;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Baza\Shared\Domain\ValueObject\Uuid;
 
 class ElTicketQuery implements Query
 {

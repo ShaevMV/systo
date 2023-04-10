@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('scan',[ScanController::class, 'search'])->name('tickets.scan.search');
+Route::post('enter',[ScanController::class, 'enter'])->name('tickets.scan.enter');

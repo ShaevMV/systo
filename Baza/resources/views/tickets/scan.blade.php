@@ -4,10 +4,29 @@
     <div class="row">
         <div class="col-md-12">
             <div class="card">
+                <div class="card-header">
+                    <h5 class="title">{{ __('Результат поиска') }}</h5>
+                    <span id="error-result" class="error"></span>
+                </div>
+                <div class="card-body" id="scan-result" style="display: none;">
+                    <b>ID: </b><p id="kilter"></p>
+                    <b>Имя: </b><p id="name"></p>
+
+                    <b>Проект: </b><p id="project"></p>
+                    <b>Куратор: </b><p id="curator"></p>
+                    <b>Email: </b><p id="email"></p>
+                    <b>Дата получение билета: </b><p id="date-order"></p>
+                </div>
+                <div class="card-footer">
+                    <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ </button>
+                    <span id="already-passed" class="btn btn-fill btn-primary error" style="display: none;"></span>
+                </div>
+            </div>
+            <div class="card">
                 <div class="card-body">
                     <div id="video-container">
-                    <video id="qr-video"></video>
-                </div>
+                        <video id="qr-video"></video>
+                    </div>
                 </div>
                 <div class="card-footer">
                     <h5 class="title">{{ __('Настройки') }}</h5>
@@ -28,7 +47,8 @@
                     <div>
                         <select id="inversion-mode-select">
                             <option value="original">Scan original (dark QR code on bright background)</option>
-                            <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
+                            <option value="invert">Scan with inverted colors (bright QR code on dark background)
+                            </option>
                             <option value="both">Scan both</option>
                         </select>
                         <br>
@@ -61,16 +81,7 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="title">{{ __('Результат поиска') }}</h5>
-                </div>
-                <div class="card-body">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
     </div>
@@ -89,8 +100,14 @@
         const flashState = document.getElementById('flash-state');
         const camQrResult = document.getElementById('cam-qr-result');
         const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
-        const fileSelector = document.getElementById('file-selector');
-        const fileQrResult = document.getElementById('file-qr-result');
+
+        const errorResult = document.getElementById('error-result');
+        const scanResult = document.getElementById('scan-result');
+        const enterResult = document.getElementById('enter-result');
+
+
+        var idTicket = null;
+        var typeTicket = null;
 
         function setResult(label, result) {
             scanner.stop();
@@ -102,7 +119,17 @@
                     "search": result.data
                 },
                 success: function (data) {
-                   console.log(data);
+                    scanResult.style.display = "block";
+                    idTicket = data.kilter;
+                    typeTicket = data.type;
+                    if(typeTicket === 'spisok') {
+                        setSpisok(data);
+                    }
+                },
+                error: function (data) {
+                    console.error(data);
+                    errorResult.textContent = data.responseJSON;
+                    //scanner.start();
                 }
             });
 
@@ -113,6 +140,45 @@
             clearTimeout(label.highlightTimeout);
             label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         }
+        const nameResult = document.getElementById('name');
+        const kilterResult = document.getElementById('kilter');
+        const projectResult = document.getElementById('project');
+        const curatorResult = document.getElementById('curator');
+        const emailResult = document.getElementById('email');
+        const dateOrderResult = document.getElementById('date-order');
+        function setSpisok(data) {
+            if(data.date_change === null) {
+                enterResult.style.display = "block";
+            }
+            nameResult.textContent = data.name;
+            kilterResult.textContent = data.kilter;
+            projectResult.textContent = data.project;
+            curatorResult.textContent = data.curator;
+            emailResult.textContent = data.email;
+            dateOrderResult.textContent = data.date_order;
+        }
+
+        enterResult.addEventListener('click', () => {
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('tickets.scan.enter') }}',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "id": idTicket,
+                    "type": typeTicket,
+                    "user_id": {{ auth()->user()->id }}
+                },
+                success: function (data) {
+                    console.log(data);
+                    scanner.start();
+                },
+                error: function (data) {
+                    console.error(data);
+                    errorResult.textContent = data.responseJSON;
+                    //scanner.start();
+                }
+            });
+        });
 
         // ####### Web Cam Scanning #######
 

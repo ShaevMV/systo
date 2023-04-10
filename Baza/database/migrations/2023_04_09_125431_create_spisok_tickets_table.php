@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('project')->nullable(false);
             $table->string('curator')->nullable(false);
             $table->string('email')->nullable(false);
+            $table->string('name')->nullable(false);
             $table->dateTime('date_order')->nullable(false);
-
             $table->integer('change_id')->nullable();
             $table->dateTime('date_change')->nullable();
             $table->timestamps();

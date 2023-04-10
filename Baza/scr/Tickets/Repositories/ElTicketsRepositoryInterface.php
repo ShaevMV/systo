@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use Baza\Tickets\Applications\Search\ElTicket\ElTicketResponse;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Baza\Shared\Domain\ValueObject\Uuid;
 
 interface ElTicketsRepositoryInterface
 {

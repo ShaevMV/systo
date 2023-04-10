@@ -10,15 +10,15 @@ use Baza\Tickets\Applications\Search\ElTicket\ElTicketQuery;
 use Baza\Tickets\Applications\Search\ElTicket\ElTicketsQueryHandler;
 use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketQuery;
 use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketQueryHandler;
-use Baza\Tickets\Domain\Ticket;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use DomainException;
 
 class SearchEngine
 {
-
     private QueryBus $bus;
 
     public function __construct(
+        private DefineService    $defineService,
+
         ElTicketsQueryHandler    $elSearchQueryHandler,
         SpisokTicketQueryHandler $spisokTicketQueryHandler,
     )
@@ -30,8 +30,22 @@ class SearchEngine
     }
 
 
-    public function find(string $type, int|Uuid $identifier): Ticket
+    public function get(string $link): TicketResponseInterface
     {
-        switch ()
+        $searchDto = $this->defineService->getTypeByReference($link);
+
+        $query = match ($searchDto->getType()) {
+            DefineService::ELECTRON_TICKET => new ElTicketQuery($searchDto->getId()),
+            DefineService::SPISOK_TICKET => new SpisokTicketQuery($searchDto->getId()),
+            default => throw new DomainException('Не верный тип ' . $searchDto->getType()),
+        };
+        /** @var TicketResponseInterface|null $result */
+        $result = $this->bus->ask($query);
+
+        if (is_null($result)) {
+            throw new DomainException('Не найден билет: Тип ' . DefineService::HUMAN_LIST[$searchDto->getType()] . ' идентификатор ' . $searchDto->getIdToString());
+        }
+
+        return $result;
     }
 }

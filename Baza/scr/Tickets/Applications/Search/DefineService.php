@@ -14,6 +14,20 @@ class DefineService
     public const LIVE_TICKET = 'live';
     public const FRIENDLY_TICKET = 'friendly';
 
+    public const HUMAN_LIST = [
+        self::ELECTRON_TICKET => 'Электронный',
+        self::SPISOK_TICKET => 'Список',
+        self::LIVE_TICKET => 'Живой',
+        self::FRIENDLY_TICKET => 'Френдли',
+    ];
+
+    public const PREFIX_LIST = [
+        self::ELECTRON_TICKET => 'E-',
+        self::SPISOK_TICKET => 'S',
+        self::LIVE_TICKET => '',
+        self::FRIENDLY_TICKET => 'f',
+    ];
+
     private const URL = [
         'http://baza.spaceofjoy.ru',
         '/search?q=',
