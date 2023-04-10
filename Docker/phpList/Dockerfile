@@ -36,8 +36,8 @@ RUN set -eux; \
   rm -f /tmp/installer.php; \
   find /tmp -type d -exec chmod -v 1777 {} +
 
-RUN pecl install xdebug-2.8.1 \
-    && docker-php-ext-enable xdebug
+# RUN pecl install xdebug-2.8.1 \
+#    && docker-php-ext-enable xdebug
 
 
 # OTHER CONFIGURATION
