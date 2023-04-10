@@ -559,11 +559,7 @@
           <configuration_options>
             <configuration_option name="include_path" value=".:/usr/local/lib/php" />
           </configuration_options>
-          <debuggers>
-            <debugger_info debugger="xdebug" debugger_version="3.1.5">
-              <debug_extensions />
-            </debugger_info>
-          </debuggers>
+          <debuggers />
           <loaded_extensions>
             <extension name="Core" />
             <extension name="PDO" />
@@ -601,7 +597,6 @@
             <extension name="sqlite3" />
             <extension name="standard" />
             <extension name="tokenizer" />
-            <extension name="xdebug" />
             <extension name="xml" />
             <extension name="xmlreader" />
             <extension name="xmlwriter" />
@@ -619,7 +614,7 @@
   <component name="PhpUnit">
     <phpunit_settings>
       <phpunit_by_interpreter interpreter_id="7211e3ff-cb6e-40a2-8a0b-1c78a6f55502" custom_loader_path="/var/www/html/vendor/autoload.php" />
-      <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/Backend/vendor/autoload.php" />
+      <PhpUnitSettings configuration_file_path="$PROJECT_DIR$/List/phpunit.xml" custom_loader_path="$PROJECT_DIR$/List/vendor/autoload.php" use_configuration_file="true" />
     </phpunit_settings>
   </component>
   <component name="PsalmOptionsConfiguration">

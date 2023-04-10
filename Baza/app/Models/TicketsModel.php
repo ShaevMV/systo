@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ElTicketsModel extends Model
+class TicketsModel extends Model
 {
-    protected $table = 'elTickets';
+    protected $table = 'tickets';
 
     protected $fillable = [
         'kilter',
+        'type',
         'uuid',
         'name',
         'email',
         'phone',
         'date_order',
+        'status',
+        'date_change',
     ];
 }

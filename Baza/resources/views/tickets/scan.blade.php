@@ -3,57 +3,76 @@
 @section('content')
     <div class="row">
         <div class="col-md-12">
-            <div id="video-container">
-                <video id="qr-video"></video>
+            <div class="card">
+                <div class="card-body">
+                    <div id="video-container">
+                    <video id="qr-video"></video>
+                </div>
+                </div>
+                <div class="card-footer">
+                    <h5 class="title">{{ __('Настройки') }}</h5>
+                    <div>
+                        <label>
+                            Highlight Style
+                            <select id="scan-region-highlight-style-select">
+                                <option value="default-style">Default style</option>
+                                <option value="example-style-1">Example custom style 1</option>
+                                <option value="example-style-2">Example custom style 2</option>
+                            </select>
+                        </label>
+                        <label>
+                            <input id="show-scan-region" type="checkbox">
+                            Show scan region canvas
+                        </label>
+                    </div>
+                    <div>
+                        <select id="inversion-mode-select">
+                            <option value="original">Scan original (dark QR code on bright background)</option>
+                            <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
+                            <option value="both">Scan both</option>
+                        </select>
+                        <br>
+                    </div>
+                    <b>Device has camera: </b>
+                    <span id="cam-has-camera"></span>
+                    <br>
+                    <div>
+                        <b>Preferred camera:</b>
+                        <select id="cam-list">
+                            <option value="environment" selected>Environment Facing (default)</option>
+                            <option value="user">User Facing</option>
+                        </select>
+                    </div>
+                    <b>Camera has flash: </b>
+                    <span id="cam-has-flash"></span>
+                    <div>
+                        <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
+                    </div>
+                    <br>
+                    <b>Detected QR code: </b>
+                    <span id="cam-qr-result">None</span>
+                    <br>
+                    <b>Last detected at: </b>
+                    <span id="cam-qr-result-timestamp"></span>
+                    <br>
+                    <button id="start-button">Start</button>
+                    <button id="stop-button">Stop</button>
+                    <hr>
+                </div>
             </div>
-            <div>
-                <label>
-                    Highlight Style
-                    <select id="scan-region-highlight-style-select">
-                        <option value="default-style">Default style</option>
-                        <option value="example-style-1">Example custom style 1</option>
-                        <option value="example-style-2">Example custom style 2</option>
-                    </select>
-                </label>
-                <label>
-                    <input id="show-scan-region" type="checkbox">
-                    Show scan region canvas
-                </label>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="title">{{ __('Результат поиска') }}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <select id="inversion-mode-select">
-                    <option value="original">Scan original (dark QR code on bright background)</option>
-                    <option value="invert">Scan with inverted colors (bright QR code on dark background)</option>
-                    <option value="both">Scan both</option>
-                </select>
-                <br>
-            </div>
-            <b>Device has camera: </b>
-            <span id="cam-has-camera"></span>
-            <br>
-            <div>
-                <b>Preferred camera:</b>
-                <select id="cam-list">
-                    <option value="environment" selected>Environment Facing (default)</option>
-                    <option value="user">User Facing</option>
-                </select>
-            </div>
-            <b>Camera has flash: </b>
-            <span id="cam-has-flash"></span>
-            <div>
-                <button id="flash-toggle">📸 Flash: <span id="flash-state">off</span></button>
-            </div>
-            <br>
-            <b>Detected QR code: </b>
-            <span id="cam-qr-result">None</span>
-            <br>
-            <b>Last detected at: </b>
-            <span id="cam-qr-result-timestamp"></span>
-            <br>
-            <button id="start-button">Start</button>
-            <button id="stop-button">Stop</button>
-            <hr>
         </div>
+
     </div>
 @endsection
 
@@ -74,6 +93,19 @@
         const fileQrResult = document.getElementById('file-qr-result');
 
         function setResult(label, result) {
+            scanner.stop();
+            $.ajax({
+                type: 'POST',
+                url: '{{ route('tickets.scan.search') }}',
+                data: {
+                    "_token": "{{ csrf_token() }}",
+                    "search": result.data
+                },
+                success: function (data) {
+                   console.log(data);
+                }
+            });
+
             console.log(result.data);
             label.textContent = result.data;
             camQrResultTimestamp.textContent = new Date().toString();
@@ -92,7 +124,6 @@
             highlightScanRegion: true,
             highlightCodeOutline: true,
         });
-
 
 
         const updateFlashAvailability = () => {
@@ -151,18 +182,6 @@
 
         document.getElementById('stop-button').addEventListener('click', () => {
             scanner.stop();
-        });
-
-        // ####### File Scanning #######
-
-        fileSelector.addEventListener('change', event => {
-            const file = fileSelector.files[0];
-            if (!file) {
-                return;
-            }
-            QrScanner.scanImage(file, { returnDetailedScanResult: true })
-                .then(result => setResult(fileQrResult, result))
-                .catch(e => setResult(fileQrResult, { data: e || 'No QR code found.' }));
         });
     </script>
 @endsection
