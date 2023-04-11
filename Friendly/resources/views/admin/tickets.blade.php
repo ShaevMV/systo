@@ -18,7 +18,7 @@
                 <tbody>
                 @foreach ($tickets as $ticket)
                     <tr>
-                        <td><a href="/admin/tickets/{{$ticket->id}}">f{{$ticket->id}}</a></td>
+                        <td><a href="/admin/tickets/{{$ticket->id}}" target="_blank">f{{$ticket->id}}</a></td>
                         <td>{{$ticket->email}}</td>
                         <td>{{$ticket->fio}}</td>
                         <td>{{$ticket->seller}}</td>
