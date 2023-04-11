@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\User;
+use App\Services\CreatingQrCodeService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
@@ -21,14 +24,16 @@ class AdminController extends Controller
     private $updateUserPassword;
 
     public function __construct(
-        CreateNewUser $createNewUser,
+        CreateNewUser                $createNewUser,
         UpdateUserProfileInformation $updateUserProfileInformation,
-        UpdateUserPassword $updateUserPassword
+        UpdateUserPassword           $updateUserPassword,
+        CreatingQrCodeService        $creatingQrCodeService
     )
     {
         $this->createNewUser = $createNewUser;
         $this->updateUserProfileInformation = $updateUserProfileInformation;
         $this->updateUserPassword = $updateUserPassword;
+        $this->creatingQrCodeService = $creatingQrCodeService;
     }
 
     /**
@@ -91,8 +96,8 @@ class AdminController extends Controller
     public function tickets()
     {
         $tickets = ListTicket::where(
-            'id' , '>=' , 1000
-            )->get();
+            'id', '>=', 1000
+        )->get();
 
         return view('admin.tickets', [
             'tickets' => $tickets,
@@ -106,5 +111,14 @@ class AdminController extends Controller
         ListTicket::destroy($id);
 
         return redirect()->route('adminTickets');
+    }
+
+    public function getPdf(int $id): Response
+    {
+        /** @var FriendlyTicket $ticket */
+        $ticket = FriendlyTicket::whereId($id)->first();
+        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email);
+
+        return $pdf->download('Билет для ' . $ticket->fio . '.pdf');
     }
 }
