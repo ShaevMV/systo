@@ -17,7 +17,7 @@
                 <tbody>
                 @foreach ($tickets as $ticket)
                     <tr>
-                        <td>S{{$ticket->id}}</td>
+                        <td><a href="/admin/tickets/{{$ticket->id}}">S{{$ticket->id}}</a></td>
                         <td>{{$ticket->email}}</td>
                         <td>{{$ticket->curator}}</td>
                         <td>{{$ticket->project}}</td>
