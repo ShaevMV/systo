@@ -115,9 +115,9 @@ class AdminController extends Controller
 
     public function getPdf(int $id): Response
     {
-        /** @var FriendlyTicket $ticket */
-        $ticket = FriendlyTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email);
+        /** @var ListTicket $ticket */
+        $ticket = ListTicket::whereId($id)->first();
+        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email, $ticket->project);
 
         return $pdf->download('Билет для ' . $ticket->fio . '.pdf');
     }
