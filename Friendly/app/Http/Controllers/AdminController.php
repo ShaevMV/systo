@@ -7,11 +7,13 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\FriendlyTicket;
 use App\Models\User;
+use App\Services\CreatingQrCodeService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -20,16 +22,19 @@ class AdminController extends Controller
     private $createNewUser;
     private $updateUserProfileInformation;
     private $updateUserPassword;
+    private CreatingQrCodeService $creatingQrCodeService;
 
     public function __construct(
         CreateNewUser $createNewUser,
         UpdateUserProfileInformation $updateUserProfileInformation,
-        UpdateUserPassword $updateUserPassword
+        UpdateUserPassword $updateUserPassword,
+        CreatingQrCodeService $creatingQrCodeService
     )
     {
         $this->createNewUser = $createNewUser;
         $this->updateUserProfileInformation = $updateUserProfileInformation;
         $this->updateUserPassword = $updateUserPassword;
+        $this->creatingQrCodeService = $creatingQrCodeService;
     }
 
     /**
@@ -112,5 +117,14 @@ class AdminController extends Controller
         FriendlyTicket::destroy($id);
 
         return redirect()->route('adminTickets');
+    }
+
+    public function getPdf(int $id): Response
+    {
+        /** @var FriendlyTicket $ticket */
+        $ticket = FriendlyTicket::whereId($id)->first();
+        $pdf = $this->creatingQrCodeService->createPdf('f'.$id, $ticket->fio, $ticket->email);
+
+        return $pdf->download('Билет для '.$ticket->fio.'.pdf');
     }
 }
