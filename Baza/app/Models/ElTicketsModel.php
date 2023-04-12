@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -38,7 +39,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|ElTicketsModel whereStatus($value)
  * @method static Builder|ElTicketsModel whereUpdatedAt($value)
  * @method static Builder|ElTicketsModel whereUuid($value)
- * @mixin \Eloquent
+ * @mixin Eloquent
  */
 class ElTicketsModel extends Model
 {
@@ -46,13 +47,13 @@ class ElTicketsModel extends Model
 
     protected $fillable = [
         'kilter',
-        'type',
         'uuid',
         'name',
         'email',
         'phone',
         'date_order',
         'status',
+        'change_id',
         'date_change',
     ];
 }

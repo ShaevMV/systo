@@ -43,13 +43,13 @@ class SpisokTicketModel extends Model
 
     protected $fillable = [
         'kilter',
-        'type',
+        'curator',
         'project',
         'name',
         'email',
         'phone',
         'date_order',
         'status',
-        'date_change',
+        'change_id',
     ];
 }

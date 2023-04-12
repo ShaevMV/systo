@@ -9,16 +9,29 @@
                     <span id="error-result" class="error"></span>
                 </div>
                 <div class="card-body" id="scan-result" style="display: none;">
-                    <b>ID: </b><p id="kilter"></p>
-                    <b>Имя: </b><p id="name"></p>
+                    <b>ID: </b>
+                    <p id="kilter"></p>
+                    <b>Имя: </b>
+                    <p id="name"></p>
 
-                    <b>Проект: </b><p id="project"></p>
-                    <b>Куратор: </b><p id="curator"></p>
-                    <b>Email: </b><p id="email"></p>
-                    <b>Дата получение билета: </b><p id="date-order"></p>
+                    <b>Проект: </b>
+                    <p id="project"></p>
+                    <b>Куратор: </b>
+                    <p id="curator"></p>
+                    <b>Email: </b>
+                    <p id="email"></p>
+                    <b>Дата получение билета: </b>
+                    <p id="date-order"></p>
+                </div>
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>Билет пропущен</strong> Добро пожаловать на фестиваль!
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <div class="card-footer">
-                    <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ </button>
+                    <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ
+                    </button>
                     <span id="already-passed" class="btn btn-fill btn-primary error" style="display: none;"></span>
                 </div>
             </div>
@@ -104,7 +117,7 @@
         const errorResult = document.getElementById('error-result');
         const scanResult = document.getElementById('scan-result');
         const enterResult = document.getElementById('enter-result');
-
+        const alreadyPassedResult = document.getElementById('already-passed');
 
         var idTicket = null;
         var typeTicket = null;
@@ -122,7 +135,7 @@
                     scanResult.style.display = "block";
                     idTicket = data.kilter;
                     typeTicket = data.type;
-                    if(typeTicket === 'spisok') {
+                    if (typeTicket === 'spisok') {
                         setSpisok(data);
                     }
                 },
@@ -140,15 +153,22 @@
             clearTimeout(label.highlightTimeout);
             label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
         }
+
         const nameResult = document.getElementById('name');
         const kilterResult = document.getElementById('kilter');
         const projectResult = document.getElementById('project');
         const curatorResult = document.getElementById('curator');
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
+
         function setSpisok(data) {
-            if(data.date_change === null) {
+            if (data.date_change === null) {
                 enterResult.style.display = "block";
+            } else {
+                alreadyPassedResult.style.display = "block";
+                alreadyPassedResult.textContent = "Был пропущен " + data.date_change;
+                idTicket = null;
+                typeTicket = null;
             }
             nameResult.textContent = data.name;
             kilterResult.textContent = data.kilter;
@@ -156,6 +176,22 @@
             curatorResult.textContent = data.curator;
             emailResult.textContent = data.email;
             dateOrderResult.textContent = data.date_order;
+        }
+
+        function clearResult() {
+            scanResult.style.display = "none";
+            enterResult.style.display = "none";
+            alreadyPassedResult.style.display = "none";
+            alreadyPassedResult.textContent = '';
+            nameResult.textContent = '';
+            kilterResult.textContent = '';
+            projectResult.textContent = '';
+            curatorResult.textContent = '';
+            emailResult.textContent = '';
+            dateOrderResult.textContent = '';
+            idTicket = null;
+            typeTicket = null;
+            errorResult.textContent = '';
         }
 
         enterResult.addEventListener('click', () => {
@@ -170,6 +206,7 @@
                 },
                 success: function (data) {
                     console.log(data);
+                    clearResult();
                     scanner.start();
                 },
                 error: function (data) {
@@ -178,6 +215,11 @@
                     //scanner.start();
                 }
             });
+        });
+
+        alreadyPassedResult.addEventListener('click', () => {
+            clearResult();
+            scanner.start();
         });
 
         // ####### Web Cam Scanning #######
@@ -244,6 +286,7 @@
 
         document.getElementById('start-button').addEventListener('click', () => {
             scanner.start();
+            clearResult();
         });
 
         document.getElementById('stop-button').addEventListener('click', () => {

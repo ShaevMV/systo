@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Repositories;
 
-use App\Models\SpisokTicketModel;
+use App\Models\FriendlyTicketModel;
+use Baza\Tickets\Applications\Search\FriendlyTicket\FriendlyTicketResponse;
 use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
 
-class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
+class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 {
 
     public function __construct(
-        private SpisokTicketModel $spisokTicketModel
+        private FriendlyTicketModel $friendlyTicketModel
     )
     {
     }
 
 
-    public function search(int $kilter): ?SpisokTicketResponse
+    public function search(int $kilter): ?FriendlyTicketResponse
     {
-        $data = $this->spisokTicketModel::whereKilter($kilter)->first()?->toArray();
+        $data = $this->friendlyTicketModel::whereKilter($kilter)->first()?->toArray();
 
         if(is_null($data)) {
             return null;
         }
 
-        return SpisokTicketResponse::fromState($data);
+        return FriendlyTicketResponse::fromState($data);
     }
 
     /**
@@ -36,7 +37,7 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->spisokTicketModel::whereKilter($id)->first();
+        $rawData = $this->friendlyTicketModel::whereKilter($id)->first();
 
         DB::beginTransaction();
         try {

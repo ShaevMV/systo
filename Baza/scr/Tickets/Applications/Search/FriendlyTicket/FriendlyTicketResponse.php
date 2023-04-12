@@ -2,19 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\SpisokTicket;
+namespace Baza\Tickets\Applications\Search\FriendlyTicket;
 
 use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
 use Carbon\Carbon;
 
-class SpisokTicketResponse implements TicketResponseInterface
+class FriendlyTicketResponse implements TicketResponseInterface
 {
     public function __construct(
         protected int     $kilter,
         protected string  $name,
         protected string  $project,
-        protected string  $curator,
         protected string  $email,
         protected Carbon  $date_order,
         protected ?int    $change_id = null,
@@ -26,11 +25,10 @@ class SpisokTicketResponse implements TicketResponseInterface
     public function toArray(): array
     {
         return [
-            'type' => DefineService::SPISOK_TICKET,
+            'type' => DefineService::FRIENDLY_TICKET,
             'kilter' => $this->kilter,
             'name' => $this->name,
             'email' => $this->email,
-            'curator' => $this->curator,
             'project' => $this->project,
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
@@ -46,7 +44,6 @@ class SpisokTicketResponse implements TicketResponseInterface
             $data['kilter'],
             $data['name'],
             $data['project'],
-            $data['curator'],
             $data['email'],
             Carbon::parse($data['date_order']),
             $data['change_id'] ?? null,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Applications\Search\ElTicket;
 
+use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
 use Carbon\Carbon;
 use Baza\Shared\Domain\ValueObject\Uuid;
@@ -26,6 +27,7 @@ class ElTicketResponse implements TicketResponseInterface
     public function toArray(): array
     {
         return [
+            'type' => DefineService::ELECTRON_TICKET,
             'kilter' => $this->kilter,
             'uuid' => $this->uuid->value(),
             'name' => $this->name,
