@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ticket\CreateTickets\Application\PushTicket;
+namespace Tickets\Ticket\CreateTickets\Application\PushTicket\Get;
 
 use Tickets\Shared\Domain\Bus\Query\Query;
 use Tickets\Shared\Domain\ValueObject\Uuid;
