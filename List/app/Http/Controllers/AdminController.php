@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
-use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\User;
 use App\Services\CreatingQrCodeService;
@@ -22,6 +21,7 @@ class AdminController extends Controller
     private $createNewUser;
     private $updateUserProfileInformation;
     private $updateUserPassword;
+    private CreatingQrCodeService $creatingQrCodeService;
 
     public function __construct(
         CreateNewUser                $createNewUser,

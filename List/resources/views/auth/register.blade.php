@@ -32,7 +32,7 @@
             <div class="mt-4">
                 <x-jet-label for="project" value="{{ __('Админ') }}"/>
                 <input id="project" class="block mt-1 w-full" type="checkbox" name="is_admin" value="1"
-                    {{  ($user->is_admin == 1 ? ' checked' : '') }}
+                    {{  (($user->is_admin ?? 0) == 1 ? ' checked' : '') }}
                              />
             </div>
 
@@ -48,7 +48,7 @@
 
             <div class="flex items-center justify-end mt-4">
                 <x-jet-button class="ml-4">
-                    @if (!isset($user->id))
+                    @if ($user ?? null)
                         {{ __('Создать') }}
                     @else
                         {{ __('Сохранить') }}
