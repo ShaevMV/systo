@@ -7,16 +7,11 @@ namespace Tickets\Ticket\CreateTickets\Repositories;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
-use DomainException;
-use Exception;
-use Illuminate\Support\Facades\DB;
-use JsonException;
-use Throwable;
+use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsResponse;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\Get\PushTicketsResponse;
 use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
-use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterface
 {
@@ -26,7 +21,7 @@ class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterfa
     {
     }
 
-    private function getRequest(): TicketModel
+    private function getRequest(): Builder|TicketModel
     {
         return $this->model::withTrashed()
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
@@ -45,7 +40,7 @@ class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterfa
     public function getTicket(Uuid $ticketId): PushTicketsResponse
     {
         $rawData = $this->getRequest()
-            ->whereId($ticketId->value())
+            ->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->get()
             ->toArray();
 
@@ -69,5 +64,20 @@ class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterfa
         }
 
         return new PushTicketsResponse($result);
+    }
+
+    public function setInBaza(PushTicketsDto $ticketsDto): bool
+    {
+        $data = $ticketsDto->toArray();
+
+        if(!DB::connection('mysqlBaza')->table('el_tickets')->where('uuid', '=', $ticketsDto->getUuid()->value())->exists()) {
+            return DB::connection('mysqlBaza')
+                ->table('el_tickets')
+                ->insert(
+                    $data
+                );
+        }
+
+        return true;
     }
 }

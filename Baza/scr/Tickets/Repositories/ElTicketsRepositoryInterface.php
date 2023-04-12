@@ -10,4 +10,6 @@ use Baza\Shared\Domain\ValueObject\Uuid;
 interface ElTicketsRepositoryInterface
 {
     public function search(Uuid $id): ?ElTicketResponse;
+
+    public function skip(int $id, int $userId): bool;
 }

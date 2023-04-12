@@ -11,6 +11,9 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PushTicketsDto extends AbstractionEntity
 {
+    protected Carbon $created_at;
+    protected Carbon $updated_at;
+
     public function __construct(
         protected int $kilter,
         protected Uuid $uuid,
@@ -20,6 +23,8 @@ class PushTicketsDto extends AbstractionEntity
         protected Status $status,
         protected Carbon $date_order,
     ){
+        $this->created_at = Carbon::now();
+        $this->updated_at = Carbon::now();
     }
 
     public static function fromState(array $data): self
@@ -33,5 +38,10 @@ class PushTicketsDto extends AbstractionEntity
             new Status($data['status']),
             Carbon::parse($data['created_at']),
         );
+    }
+
+    public function getUuid(): Uuid
+    {
+        return $this->uuid;
     }
 }
