@@ -36,7 +36,7 @@ Route::post('/password-request', [LoginController::class, 'passwordRequestPage']
 
 
 //Home
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [ScanController::class, 'scanPage'])->name('home');
 
 //Profile
 Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
