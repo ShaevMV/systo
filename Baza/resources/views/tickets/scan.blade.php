@@ -7,27 +7,27 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Результат поиска') }}</h5>
                     <span id="error-result" class="error"></span>
+                    <span id="massage-result" class="massage"></span>
                 </div>
                 <div class="card-body" id="scan-result" style="display: none;">
                     <b>ID: </b>
                     <p id="kilter"></p>
                     <b>Имя: </b>
                     <p id="name"></p>
-
-                    <b>Проект: </b>
-                    <p id="project"></p>
-                    <b>Куратор: </b>
-                    <p id="curator"></p>
                     <b>Email: </b>
                     <p id="email"></p>
                     <b>Дата получение билета: </b>
                     <p id="date-order"></p>
-                </div>
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong>Билет пропущен</strong> Добро пожаловать на фестиваль!
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <b>Телефон: </b>
+                    <p id="phone"></p>
+                    <b>Статус: </b>
+                    <p id="status"></p>
+                    <b>Проект: </b>
+                    <p id="project"></p>
+                    <b>Куратор: </b>
+                    <p id="curator"></p>
+
+
                 </div>
                 <div class="card-footer">
                     <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ
@@ -118,6 +118,7 @@
         const scanResult = document.getElementById('scan-result');
         const enterResult = document.getElementById('enter-result');
         const alreadyPassedResult = document.getElementById('already-passed');
+        const massageResult = document.getElementById('massage-result');
 
         var idTicket = null;
         var typeTicket = null;
@@ -135,9 +136,14 @@
                     scanResult.style.display = "block";
                     idTicket = data.kilter;
                     typeTicket = data.type;
+                    massageResult.textContent = '';
                     if (typeTicket === 'spisok') {
                         setSpisok(data);
                     }
+                    if (typeTicket === 'electron') {
+                        setElectron(data);
+                    }
+
                 },
                 error: function (data) {
                     console.error(data);
@@ -160,6 +166,8 @@
         const curatorResult = document.getElementById('curator');
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
+        const phoneResult = document.getElementById('phone');
+        const statusResult = document.getElementById('status');
 
         function setSpisok(data) {
             if (data.date_change === null) {
@@ -178,6 +186,23 @@
             dateOrderResult.textContent = data.date_order;
         }
 
+        function setElectron(data) {
+            if (data.date_change === null) {
+                enterResult.style.display = "block";
+            } else {
+                alreadyPassedResult.style.display = "block";
+                alreadyPassedResult.textContent = "Был пропущен " + data.date_change;
+                idTicket = null;
+                typeTicket = null;
+            }
+            nameResult.textContent = data.name;
+            kilterResult.textContent = data.kilter;
+            emailResult.textContent = data.email;
+            phoneResult.textContent = data.phone;
+            statusResult.textContent = data.status;
+            dateOrderResult.textContent = data.date_order;
+        }
+
         function clearResult() {
             scanResult.style.display = "none";
             enterResult.style.display = "none";
@@ -189,6 +214,9 @@
             curatorResult.textContent = '';
             emailResult.textContent = '';
             dateOrderResult.textContent = '';
+
+            phoneResult.textContent = '';
+            statusResult.textContent = '';
             idTicket = null;
             typeTicket = null;
             errorResult.textContent = '';
@@ -205,8 +233,10 @@
                     "user_id": {{ auth()->user()->id }}
                 },
                 success: function (data) {
+                    massageResult.textContent = 'Билет '+idTicket+' прошел';
                     console.log(data);
                     clearResult();
+
                     scanner.start();
                 },
                 error: function (data) {
