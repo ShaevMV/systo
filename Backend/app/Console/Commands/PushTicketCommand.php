@@ -9,7 +9,7 @@ use Nette\Utils\JsonException;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicket;
+use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class PushTicketCommand extends Command
 {

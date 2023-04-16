@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Domain;
 
@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Throwable;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicket;
+use Tickets\Ticket\CreateTickets\Application\PushTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ProcessCreateTicket implements ShouldQueue, DomainEvent
@@ -20,9 +20,10 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
-        private Uuid $orderId,
+        private Uuid  $orderId,
         private array $quests
-    ){
+    )
+    {
     }
 
     /**
@@ -30,13 +31,13 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
      */
     public function handle(
         TicketApplication $application,
-        PushTicket $pushTicket,
+        PushTicket        $pushTicket,
     ): void
     {
         $tickets = $application->createList($this->orderId, $this->quests);
+
         foreach ($tickets as $ticket) {
             $pushTicket->pushTicket($ticket->getId());
         }
-
     }
 }

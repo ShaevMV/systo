@@ -37,6 +37,5 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(OrderTicketRepositoryInterface::class, InMemoryMySqlOrderTicketRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, InMemoryMySqlCommentRepository::class);
         $this->app->bind(TicketsRepositoryInterface::class, InMemoryMySqlTicketsRepository::class);
-        $this->app->bind(PushTicketsRepositoryInterface::class, InMemoryMySqlPushTicketsRepository::class);
     }
 }

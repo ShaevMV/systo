@@ -13,7 +13,7 @@ class CreateTicketCommandHandler implements CommandHandler
     }
 
 
-    public function __invoke(CreateTicketCommand $ticket)
+    public function __invoke(CreateTicketCommand $ticket): void
     {
         $this->ticketsRepository->createTickets($ticket->getTicketDto());
     }

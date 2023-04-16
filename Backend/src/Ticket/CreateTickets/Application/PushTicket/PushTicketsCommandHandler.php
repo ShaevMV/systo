@@ -2,17 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate;
+namespace Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 use DomainException;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
-use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
-use Tickets\Ticket\CreateTickets\Repositories\PushTicketsRepositoryInterface;
+use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicketsCommandHandler implements CommandHandler
 {
     public function __construct(
-        private PushTicketsRepositoryInterface $ticketsRepository
+        private TicketsRepositoryInterface $ticketsRepository
     )
     {
     }

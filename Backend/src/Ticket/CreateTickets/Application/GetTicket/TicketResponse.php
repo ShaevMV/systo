@@ -4,19 +4,23 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Application\GetTicket;
 
+use Carbon\Carbon;
 use Tickets\Shared\Domain\Bus\Query\Response;
+use Tickets\Shared\Domain\Entity\AbstractionEntity;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class TicketResponse implements Response
+class TicketResponse extends AbstractionEntity implements Response
 {
     public function __construct(
-        private string $name,
-        private int    $kilter,
-        private Uuid   $id,
-        private string $email,
-        private string $phone,
-        private string $city,
-    ){
+        protected string $name,
+        protected int    $kilter,
+        protected Uuid   $uuid,
+        protected string $email,
+        protected string $phone,
+        protected string $city,
+        protected Carbon $data_order,
+    )
+    {
     }
 
     /**
@@ -34,7 +38,7 @@ class TicketResponse implements Response
 
     public function getId(): Uuid
     {
-        return $this->id;
+        return $this->uuid;
     }
 
     public function getEmail(): string
@@ -50,5 +54,13 @@ class TicketResponse implements Response
     public function getCity(): string
     {
         return $this->city;
+    }
+
+    /**
+     * @return Carbone
+     */
+    public function getDataOrder(): Carbone
+    {
+        return $this->dataOrder;
     }
 }

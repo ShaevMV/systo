@@ -4,6 +4,7 @@ namespace Tickets\Ticket\CreateTickets\Repositories;
 
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 interface TicketsRepositoryInterface
@@ -19,4 +20,9 @@ interface TicketsRepositoryInterface
     public function getListIdByOrderId(Uuid $orderId): array;
 
     public function getTicket(Uuid $ticketId): TicketResponse;
+
+
+    public function setInBaza(TicketResponse $ticketsDto): bool;
+
+
 }

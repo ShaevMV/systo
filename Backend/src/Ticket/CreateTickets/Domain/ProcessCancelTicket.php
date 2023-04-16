@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Throwable;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicket;
+use Tickets\Ticket\CreateTickets\Application\PushTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ProcessCancelTicket implements ShouldQueue, DomainEvent

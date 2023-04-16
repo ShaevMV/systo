@@ -7,6 +7,7 @@ namespace Tickets\Ticket\CreateTickets\Repositories;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
+use Carbon\Carbon;
 use DomainException;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -91,6 +92,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
                 OrderTicketModel::TABLE . '.phone',
+                OrderTicketModel::TABLE . '.created_at',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
             ])->first()?->toArray();
@@ -106,6 +108,27 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['email'],
             $result['phone'],
             $result['city'],
+            Carbon::parse($result['created_at'])
         );
+    }
+
+    /**
+     * @throws \Nette\Utils\JsonException
+     */
+    public function setInBaza(TicketResponse $ticketsDto): bool
+    {
+        $data = $ticketsDto->toArray();
+
+        if (!$rawModel =
+            DB::connection('mysqlBaza')->table('el_tickets')
+            ->where('uuid', '=', $ticketsDto->getId()->value())
+        ) {
+            return DB::connection('mysqlBaza')
+                ->table('el_tickets')
+                ->insert(
+                    $data
+                );
+        }
+        return $rawModel->update($data) > 0;
     }
 }

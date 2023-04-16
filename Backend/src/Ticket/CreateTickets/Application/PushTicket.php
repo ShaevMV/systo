@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ticket\CreateTickets\Application\PushTicket;
+namespace Tickets\Ticket\CreateTickets\Application;
 
 use DomainException;
 use Nette\Utils\JsonException;
@@ -10,9 +10,8 @@ use Throwable;
 use Tickets\Shared\Domain\Bus\Command\CommandBus;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate\PushTicketsCommand;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate\PushTicketsCommandHandler;
-use Tickets\Ticket\CreateTickets\Domain\Ticket;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommand;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicket
