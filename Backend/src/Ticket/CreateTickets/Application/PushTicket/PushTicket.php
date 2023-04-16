@@ -8,32 +8,23 @@ use DomainException;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Shared\Domain\Bus\Command\CommandBus;
-use Tickets\Shared\Domain\Bus\Query\QueryBus;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\Get\PushTicketQuery;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\Get\PushTicketQueryHandler;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\Get\PushTicketsResponse;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\Set\SetPushTicketCommand;
-use Tickets\Ticket\CreateTickets\Application\PushTicket\Set\SetPushTicketCommandHandler;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate\PushTicketsCommand;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate\PushTicketsCommandHandler;
+use Tickets\Ticket\CreateTickets\Domain\Ticket;
+use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicket
 {
-    private QueryBus $bus;
     private CommandBus $commandBus;
 
     public function __construct(
-        private PushTicketQueryHandler      $pushTicketQueryHandler,
-        private SetPushTicketCommandHandler $setPushTicketCommandHandler,
-    )
-    {
-        $this->bus = new InMemorySymfonyQueryBus([
-            PushTicketQuery::class => $this->pushTicketQueryHandler
-        ]);
-
+        PushTicketsCommandHandler $handler,
+        private TicketsRepositoryInterface $ticketsRepository,
+    ){
         $this->commandBus = new InMemorySymfonyCommandBus([
-            SetPushTicketCommand::class => $setPushTicketCommandHandler
+            PushTicketsCommand::class => $handler
         ]);
     }
 
@@ -43,17 +34,20 @@ class PushTicket
      * @throws DomainException
      * @throws Throwable
      */
-    public function pushTicket(?Uuid $id = null): array
+    public function pushTicket(Uuid $id): void
     {
-        $resultList = [];
-        /** @var PushTicketsResponse $pushTicketsResponse */
-        $pushTicketsResponse = $this->bus->ask(new PushTicketQuery($id));
-        foreach ($pushTicketsResponse->getTicketDto() as $ticketsDto) {
-            $this->commandBus->dispatch(new SetPushTicketCommand($ticketsDto));
+        $this->commandBus->dispatch(new PushTicketsCommand($id));
+    }
 
-            $resultList[] = $ticketsDto->getUuid()->value();
+    /**
+     * @throws Throwable
+     * @throws JsonException
+     */
+    public function pushByOrderId(Uuid $orderId): void
+    {
+        $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId);
+        foreach ($idTickets as $id) {
+            $this->pushTicket($id);
         }
-
-        return $resultList;
     }
 }

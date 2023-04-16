@@ -10,9 +10,13 @@ use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 
 interface PushTicketsRepositoryInterface
 {
-    public function getTicket(Uuid $ticketId): PushTicketsResponse;
+    public function getTicket(Uuid $ticketId): PushTicketsDto;
 
-    public function getAllTickets(): PushTicketsResponse;
+    /**
+     * @param Uuid|null $uuid
+     * @return PushTicketsDto[];
+     */
+    public function getTicketsAllOrFirst(?Uuid $uuid): array;
 
     public function setInBaza(PushTicketsDto $ticketsDto): bool;
 }

@@ -1,13 +1,11 @@
 <?php
 
-declare(strict_types=1);
+namespace Tickets\Ticket\CreateTickets\Application\PushTicket\PushUpdate;
 
-namespace Tickets\Ticket\CreateTickets\Application\PushTicket\Get;
-
-use Tickets\Shared\Domain\Bus\Query\Query;
+use Tickets\Shared\Domain\Bus\Command\Command;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class PushTicketQuery implements Query
+class PushTicketsCommand implements Command
 {
     public function __construct(
         private ?Uuid $id=null

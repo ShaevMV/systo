@@ -8,7 +8,9 @@ use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use DB;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Nette\Utils\JsonException;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\PushTicket\Get\PushTicketsResponse;
 use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
@@ -37,23 +39,33 @@ class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterfa
             ]);
     }
 
-    public function getTicket(Uuid $ticketId): PushTicketsResponse
+    /**
+     * @throws Exception
+     */
+    public function getTicket(Uuid $ticketId): PushTicketsDto
     {
         $rawData = $this->getRequest()
             ->where($this->model::TABLE . '.id', '=', $ticketId->value())
-            ->get()
-            ->toArray();
-
-        $result = [];
-        foreach ($rawData as $datum) {
-            $result[] = PushTicketsDto::fromState($datum);
+            ->first()
+            ?->toArray();
+        if (is_null($rawData)) {
+            throw new Exception('Не получилось найти билет ' . $ticketId->value());
         }
-
-        return new PushTicketsResponse($result);
+        return PushTicketsDto::fromState($rawData);
     }
 
-    public function getAllTickets(): PushTicketsResponse
+
+    /**
+     * @param Uuid|null $uuid
+     * @return PushTicketsDto[]
+     * @throws Exception
+     */
+    public function getTicketsAllOrFirst(?Uuid $uuid): array
     {
+        if (!is_null($uuid)) {
+            return [$this->getTicket($uuid)];
+        }
+
         $rawData = $this->getRequest()
             ->get()
             ->toArray();
@@ -63,21 +75,24 @@ class InMemoryMySqlPushTicketsRepository implements PushTicketsRepositoryInterfa
             $result[] = PushTicketsDto::fromState($datum);
         }
 
-        return new PushTicketsResponse($result);
+        return $result;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function setInBaza(PushTicketsDto $ticketsDto): bool
     {
         $data = $ticketsDto->toArray();
 
-        if(!DB::connection('mysqlBaza')->table('el_tickets')->where('uuid', '=', $ticketsDto->getUuid()->value())->exists()) {
+        if (!$rawModel = DB::connection('mysqlBaza')->table('el_tickets')
+            ->where('uuid', '=', $ticketsDto->getUuid()->value())) {
             return DB::connection('mysqlBaza')
                 ->table('el_tickets')
                 ->insert(
                     $data
                 );
         }
-
-        return true;
+        return $rawModel->update($data) > 0;
     }
 }

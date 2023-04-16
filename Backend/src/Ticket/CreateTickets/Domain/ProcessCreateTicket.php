@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Throwable;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ProcessCreateTicket implements ShouldQueue, DomainEvent
@@ -28,9 +29,14 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
      * @throws Throwable
      */
     public function handle(
-        TicketApplication $application
+        TicketApplication $application,
+        PushTicket $pushTicket,
     ): void
     {
-        $application->createList($this->orderId, $this->quests);
+        $tickets = $application->createList($this->orderId, $this->quests);
+        foreach ($tickets as $ticket) {
+            $pushTicket->pushTicket($ticket->getId());
+        }
+
     }
 }

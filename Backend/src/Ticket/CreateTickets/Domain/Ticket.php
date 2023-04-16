@@ -33,4 +33,12 @@ class Ticket extends AggregateRoot
         return $result;
     }
 
+    /**
+     * @return Uuid
+     */
+    public function getId(): Uuid
+    {
+        return $this->aggregateId;
+    }
+
 }
