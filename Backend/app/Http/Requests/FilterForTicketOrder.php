@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property ?string $typesOfPayment
  * @property ?string $status
  * @property ?string $promoCode
+ * @property ?string $typePrice
  */
 class FilterForTicketOrder extends FormRequest
 {

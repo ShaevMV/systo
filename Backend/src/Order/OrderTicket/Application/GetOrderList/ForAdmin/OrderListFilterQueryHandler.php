@@ -46,7 +46,12 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'field' => OrderTicketModel::TABLE . '.promo_code',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getPromoCode(),
-            ]
+            ],
+            [
+                'field' => OrderTicketModel::TABLE . '.ticket_type_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getTypeOrder()?->value(),
+            ],
         ]);
         $orderTicketItem = $this->orderTicketRepository->getList($filter);
 

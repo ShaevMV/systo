@@ -56,11 +56,12 @@ class ToGetListTest extends TestCase
     {
         $result = $this->toGetList->listByFilter(
             new OrderFilterQuery(
+                null,
+                null,
+                null,
+                null,
+                4200,
                 new Uuid(TypeTicketsSeeder::ID_FOR_FIRST_WAVE),
-                new Uuid(TypesOfPaymentSeeder::ID_FOR_YANDEX),
-                UserSeeder::EMAIL_USER,
-                Status::NEW,
-                PromoCodSeeder::NAME_FOR_SYSTO
             )
         );
 

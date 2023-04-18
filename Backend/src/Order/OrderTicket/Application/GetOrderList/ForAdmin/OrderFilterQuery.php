@@ -15,6 +15,7 @@ class OrderFilterQuery implements Query
         private ?string $status = null,
         private ?string $promoCode = null,
         private ?float $price = null,
+        private ?Uuid $typeOrder = null,
     ) {
     }
 
@@ -41,6 +42,7 @@ class OrderFilterQuery implements Query
     public static function fromState(array $data): self
     {
         $typesOfPayment = $data['typesOfPayment'] ?? null;
+        $typePrice = $data['typePrice'] ?? null;
 
         return new self(
             (null !== $typesOfPayment) ? new Uuid($data['typesOfPayment']) : null,
@@ -48,11 +50,17 @@ class OrderFilterQuery implements Query
             $data['status'] ?? null,
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
+            (null !== $typePrice) ? new Uuid($typePrice) : null,
         );
     }
 
     public function getPrice(): ?float
     {
         return $this->price;
+    }
+
+    public function getTypeOrder(): ?Uuid
+    {
+        return $this->typeOrder;
     }
 }
