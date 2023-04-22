@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('kilter');
             $table->string('project');
+            $table->string('seller');
             $table->string('email')->nullable(false);
             $table->string('name')->nullable(false);
             $table->dateTime('date_order')->nullable(false);

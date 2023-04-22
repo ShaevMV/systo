@@ -129,6 +129,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     $data
                 );
         }
+
         return $rawModel->update($data) > 0;
     }
 }
