@@ -126,9 +126,11 @@ export default {
          * Отправить данные для фильтра
          */
         sendFilter: function () {
+            let price = this.typeOrder !== null ? this.typeOrder.price : null;
+            let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
             this.getOrderListForAdmin({
-                'price': this.typeOrder.price,
-                'typePrice': this.typeOrder.id,
+                'price': price,
+                'typePrice': typePrice,
                 'email': this.email,
                 'status': this.status,
                 'promoCode': this.promoCode,
