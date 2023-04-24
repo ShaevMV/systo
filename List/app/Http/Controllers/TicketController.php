@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessSendListTicketEmail;
 use App\Models\ListTicket;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -12,9 +13,14 @@ use Illuminate\Support\Facades\Bus;
 
 class TicketController extends Controller
 {
-    public function __construct()
+    private TicketService $ticketService;
+
+    public function __construct(
+        TicketService $ticketService
+    )
     {
         $this->middleware('auth');
+        $this->ticketService = $ticketService;
     }
 
     public function view()
@@ -44,6 +50,7 @@ class TicketController extends Controller
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
                 $ids['S' . $model->id] = $value;
+                $this->ticketService->pushTicket($model);
             }
 
             Bus::chain([
