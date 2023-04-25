@@ -2,16 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Ordering\OrderTicketModel;
-use Database\Seeders\TypeTicketsPriceSeeder;
-use Database\Seeders\TypeTicketsPriceThirdWaveSeeder;
+use Tickets\Shared\Domain\ValueObject\Uuid;
+use Carbon\Carbon;
+use Database\Seeders\TypeTicketsSeeder;
+use DB;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
-use Tickets\Order\OrderTicket\Inspectors\CheckStatusChangeInspector;
-use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Tickets\Shared\Domain\Criteria\FilterOperator;
-use Tickets\Shared\Domain\Criteria\Filters;
-use Tickets\Shared\Domain\ValueObject\Status;
 
 class AddPriceForTypeTicket extends Command
 {
@@ -20,7 +16,7 @@ class AddPriceForTypeTicket extends Command
      *
      * @var string
      */
-    protected $signature = 'tickets:price';
+    protected $signature = 'tickets:price {price1} {price2}';
 
     /**
      * The console command description.
@@ -29,11 +25,24 @@ class AddPriceForTypeTicket extends Command
      */
     protected $description = 'Добавить цены';
 
-    public function handle(
-        TypeTicketsPriceThirdWaveSeeder $typeTicketsPriceSeeder
-    ): int
+    public function handle(): int
     {
-        $typeTicketsPriceSeeder->run();
+        DB::table('ticket_type_price')->insert([
+            'id' => Uuid::random()->value(),
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+            'price' => $this->argument('price1'),
+            'before_date' => Carbon::yesterday(),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
+        DB::table('ticket_type_price')->insert([
+            'id' =>  Uuid::random()->value(),
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_REGIONS,
+            'price' => $this->argument('price2'),
+            'before_date' => Carbon::yesterday(),
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
 
         return CommandAlias::SUCCESS;
     }
