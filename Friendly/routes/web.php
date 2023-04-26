@@ -38,6 +38,6 @@ Route::middleware(['admin', 'verified'])->get('/admin/user/create', [AdminContro
 Route::middleware(['admin', 'verified'])->post('/admin/user/create', [AdminController::class, 'registerUser'])->name('registerUser');
 
 
-Route::middleware(['admin', 'verified'])->get('/admin/tickets', [AdminController::class, 'tickets'])->name('adminTickets');
-Route::middleware(['admin', 'verified'])->post('/admin/tickets', [AdminController::class, 'delTicket'])->name('delTicket');
-Route::middleware(['admin', 'verified'])->get('/admin/tickets/{id}', [AdminController::class, 'getPdf'])->name('getPdf');
+Route::middleware(['admin', 'verified'])->get('/admin/tickets', [TicketController::class, 'tickets'])->name('adminTickets');
+Route::middleware(['admin', 'verified'])->post('/admin/tickets', [TicketController::class, 'delTicket'])->name('delTicket');
+Route::middleware(['admin', 'verified'])->get('/admin/tickets/{id}', [TicketController::class, 'getPdf'])->name('getPdf');

@@ -99,32 +99,4 @@ class AdminController extends Controller
         return redirect()->route('adminUser');
     }
 
-    public function tickets()
-    {
-        $tickets = FriendlyTicket::where(
-            'id' , '>=' , 1000
-            )->get();
-
-        return view('admin.tickets', [
-            'tickets' => $tickets,
-        ]);
-    }
-
-    public function delTicket(Request $request): RedirectResponse
-    {
-        $id = $request->post('id');
-
-        FriendlyTicket::destroy($id);
-
-        return redirect()->route('adminTickets');
-    }
-
-    public function getPdf(int $id): Response
-    {
-        /** @var FriendlyTicket $ticket */
-        $ticket = FriendlyTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('f'.$id, $ticket->fio, $ticket->email);
-
-        return $pdf->download('Билет для '.$ticket->fio.'.pdf');
-    }
 }
