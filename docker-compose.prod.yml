@@ -39,7 +39,7 @@ services:
     build:
       context: ./Docker/php
       args:
-        - WITH_XDEBUG=true
+        - WITH_XDEBUG=false
     image: 'laravelapp'
     env_file:
       - ./Backend/.env
@@ -51,7 +51,7 @@ services:
     working_dir: /var/www/html
     user: user
     environment:
-      - WITH_XDEBUG=true
+      - WITH_XDEBUG=false
     networks:
       - backend
 
@@ -108,7 +108,7 @@ services:
       context: ./Docker/node
     working_dir: /var/app
     ports:
-      - "8081:8080"
+        - "8081:8080"
     container_name: node-solarSysto
     volumes:
       - ./FrontEnd:/var/app

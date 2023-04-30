@@ -1,7 +1,5 @@
 FROM php:8.0-fpm
 
-WORKDIR /var/www/html
-
 RUN apt-get update && apt-get install -y \
         libpng-dev \
         zlib1g-dev \
@@ -26,41 +24,29 @@ RUN apt-get update && apt-get install -y \
         && docker-php-ext-install sockets \
         && docker-php-source delete
 
-
-
-
-#ENV HOME /var/www/html
-#ENV DOCKER_PHP ${HOME}/docker/php
-
-#COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf
-#COPY custom.ini /usr/local/etc/php/conf.d/custom.ini
 
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 #xdebug
-#RUN pecl install xdebug \
-#    && docker-php-ext-enable xdebug
+ARG WITH_XDEBUG
+COPY xdebug.ini /tmp/xdebug.ini
+
+RUN if [ ${WITH_XDEBUG} = "true" ]; then \
+    pecl install xdebug \
+     && docker-php-ext-enable xdebug \
+;fi
 
 
 #Redis
 RUN pecl install redis && docker-php-ext-enable redis
-
-#rebbitMQ
-RUN apt-get install -y librabbitmq-dev
-RUN pecl install amqp && docker-php-ext-enable amqp
-
-#node
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-RUN node -v
 
 #
 RUN adduser --disabled-password --gecos "" user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 
