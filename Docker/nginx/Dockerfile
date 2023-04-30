@@ -14,3 +14,10 @@ RUN touch /var/run/nginx.pid \
     /var/log/nginx \
     /var/run/nginx.pid \
     /socket
+
+RUN chown -R user:user /etc/nginx/conf.d;
+RUN chmod -R 755 /etc/nginx/conf.d;
+
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]
