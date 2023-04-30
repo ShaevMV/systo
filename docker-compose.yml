@@ -9,7 +9,7 @@ services:
       - "80:8083"
       - "443:8443"
     volumes:
-      - ./Docker/nginx/default.conf:/etc/nginx/conf.d/default.conf.template
+      - ./Docker/nginx/default.dev.conf:/etc/nginx/conf.d/default.conf.template
       - ./Docker/nginx/ssl:/etc/nginx/ssl
       - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./Docker/nginx/proxy_params:/etc/nginx/proxy_params
@@ -36,60 +36,62 @@ services:
 
   php:
     hostname: php.org
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=true
-    image: 'laravelapp'
+    image: php:systo
     env_file:
       - ./Backend/.env
     container_name: php-solarSysto
     volumes:
       - ./Backend:/var/www/html
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
-      - ~/.ssh/id_rsa.pub:/home/user/.ssh/id_rsa.pub
     working_dir: /var/www/html
     user: user
     environment:
       - WITH_XDEBUG=true
+      - WORKING_DIR=/var/www/html
     networks:
       - backend
 
   phpBaza:
     hostname: php.vhod
-    build:
-      context: ./Docker/phpBaza
-    image: 'laravelbaza'
+    image: php:systo
     container_name: php-baza
     volumes:
       - ./Baza:/var/baza
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    working_dir: /var/baza
     user: user
+    environment:
+      - WITH_XDEBUG=true
+      - WORKING_DIR=/var/baza
     networks:
       - backend
 
   phpFriendly:
     hostname: php.drug
-    build:
-      context: ./Docker/phpFriendly
-    image: 'laravelfrendly'
+    image: php:systo
     container_name: php-friendly
     volumes:
       - ./Friendly:/var/friendly
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    working_dir: /var/friendly/html
+    environment:
+      - WITH_XDEBUG=true
+      - WORKING_DIR=/var/friendly
     user: user
     networks:
       - backend
 
   phpList:
     hostname: php.spisok
-    build:
-      context: ./Docker/phpList
-    image: 'laravellist'
+    image: php:systo
     container_name: php-list
     volumes:
       - ./List:/var/list
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+    working_dir: /var/list
+    environment:
+      - WITH_XDEBUG=true
+      - WORKING_DIR=/var/list
     user: user
     networks:
       - backend

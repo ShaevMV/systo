@@ -1,4 +1,6 @@
-up: ## Полная конфигурация, старт + миграции
+up-prod: ## Полная конфигурация, старт + миграции
 	docker-compose -f docker-compose.prod.yml up --build -d
-down:
+
+
+down-prod:
 	docker-compose -f docker-compose.prod.yml down

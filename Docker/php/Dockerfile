@@ -1,5 +1,9 @@
 FROM php:8.0-fpm
 
+
+ENV HOME ${WORKING_DIR}
+
+
 RUN apt-get update && apt-get install -y \
         libpng-dev \
         zlib1g-dev \
@@ -29,17 +33,13 @@ COPY vhost.conf /etc/apache2/sites-available/000-default.conf
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 #xdebug
-ARG WITH_XDEBUG
+ARG WITH_XDEBUG="false"
 COPY xdebug.ini /tmp/xdebug.ini
 
 RUN if [ ${WITH_XDEBUG} = "true" ]; then \
     pecl install xdebug \
      && docker-php-ext-enable xdebug \
 ;fi
-
-
-#Redis
-RUN pecl install redis && docker-php-ext-enable redis
 
 #
 RUN adduser --disabled-password --gecos "" user
