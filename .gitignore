@@ -3,3 +3,4 @@ Docker/mysqlFriendly/db/
 Docker/mysqlFriendly/log/*
 Docker/redis/data
 .idea/*
+.env
