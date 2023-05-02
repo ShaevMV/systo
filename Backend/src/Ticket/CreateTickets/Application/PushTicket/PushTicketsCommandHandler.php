@@ -20,10 +20,8 @@ class PushTicketsCommandHandler implements CommandHandler
     {
         $pushTicketsDto = $this->ticketsRepository->getTicket($command->getId());
 
-        foreach ($pushTicketsDto as $item) {
-            if (!$this->ticketsRepository->setInBaza($item)) {
-                throw new DomainException('При записи произошла ошибка');
-            };
-        }
+        if (!$this->ticketsRepository->setInBaza($pushTicketsDto)) {
+            throw new DomainException('При записи произошла ошибка');
+        };
     }
 }

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Repositories;
 
+use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use Carbon\Carbon;
 use DomainException;
 use Exception;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Throwable;
@@ -82,6 +84,20 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         return $result;
     }
 
+    /**
+     * Добавить поздзапрос на последний комментарий
+     *
+     * @return Builder
+     */
+    private function getSubQueryLastComment(): Builder
+    {
+        return CommentOrderTicketModel::select('comment')
+            ->whereColumn('order_tickets_id', $this->model::TABLE.'.order_ticket_id')
+            ->latest()
+            ->limit(1)
+            ->getQuery();
+    }
+
     public function getTicket(Uuid $ticketId): TicketResponse
     {
         $result = $this->model->where($this->model::TABLE . '.id', '=', $ticketId->value())
@@ -92,10 +108,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
                 OrderTicketModel::TABLE . '.phone',
+                OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
-            ])->first()?->toArray();
+            ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->first()?->toArray();
 
         if (is_null($result)) {
             throw new DomainException("Билет {$ticketId->value()} не найден");
@@ -105,9 +123,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['name'],
             $result['kilter'],
             new Uuid($result['id']),
+            $result['status'],
             $result['email'],
             $result['phone'],
             $result['city'],
+            $result['last_comment'],
             Carbon::parse($result['created_at'])
         );
     }
@@ -119,9 +139,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     {
         $data = $ticketsDto->toArray();
 
-        if (!$rawModel =
-            DB::connection('mysqlBaza')->table('el_tickets')
-            ->where('uuid', '=', $ticketsDto->getId()->value())
+        if ((!DB::connection('mysqlBaza')->table('el_tickets')
+            ->where('uuid', '=', $ticketsDto->getId()->value())->exists())
         ) {
             return DB::connection('mysqlBaza')
                 ->table('el_tickets')
@@ -130,6 +149,22 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 );
         }
 
-        return $rawModel->update($data) > 0;
+        return (DB::connection('mysqlBaza')->table('el_tickets')
+                ->where('uuid', '=', $ticketsDto->getId()->value()))->update($data) > 0;
+    }
+
+
+    /**
+     * @return Uuid[]
+     */
+    public function getAllTicketsId(): array
+    {
+        $rawResult = $this->model::all('id')->toArray();
+        $result = [];
+        foreach ($rawResult as $item) {
+            $result[]=new Uuid($item['id']);
+        }
+
+        return $result;
     }
 }

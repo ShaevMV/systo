@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command as CommandAlias;
 use Throwable;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
+use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicketCommand extends Command
 {
@@ -33,14 +34,24 @@ class PushTicketCommand extends Command
      * @throws JsonException
      */
     public function handle(
-        PushTicket $pushTicket
+        PushTicket                 $pushTicket,
+        TicketsRepositoryInterface $ticketsRepository
     ): int
     {
         try {
             $uuid = $this->argument('id') ?? null ? new Uuid($this->argument('id')) : null;
+            if (is_null($uuid)) {
+                $ids = $ticketsRepository->getAllTicketsId();
+                foreach ($ids as $id) {
+                    $pushTicket->pushTicket($id);
+                    $this->info('Удачно отправленные ' . $id->value());
+                }
+            } else {
+                $pushTicket->pushTicket($uuid);
+                $this->info('Удачно отправленные ' . $uuid->value());
+            }
 
-            $result = $pushTicket->pushTicket($uuid);
-            $this->info('Удачно отправленные ' . implode($result));
+
         } catch (Throwable $throwable) {
             $this->error($throwable->getMessage());
             throw $throwable;

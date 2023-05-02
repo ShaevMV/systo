@@ -45,7 +45,6 @@ class PushTickets extends Command
 
         foreach ($tickets as $ticket) {
             $r = $ticketService->pushTicket($ticket);
-            var_dump($r);
             $this->info('push '. $ticket->id);
         }
 

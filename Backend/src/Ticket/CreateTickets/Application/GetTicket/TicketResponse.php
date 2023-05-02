@@ -15,10 +15,12 @@ class TicketResponse extends AbstractionEntity implements Response
         protected string $name,
         protected int    $kilter,
         protected Uuid   $uuid,
+        protected string $status,
         protected string $email,
         protected string $phone,
         protected string $city,
-        protected Carbon $data_order,
+        protected ?string $comment,
+        protected Carbon $date_order,
     )
     {
     }
@@ -56,11 +58,4 @@ class TicketResponse extends AbstractionEntity implements Response
         return $this->city;
     }
 
-    /**
-     * @return Carbone
-     */
-    public function getDataOrder(): Carbone
-    {
-        return $this->dataOrder;
-    }
 }
