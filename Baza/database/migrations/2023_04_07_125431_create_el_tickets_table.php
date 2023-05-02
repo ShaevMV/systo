@@ -17,12 +17,14 @@ return new class extends Migration
             $table->id();
             $table->integer('kilter')->nullable(false);
             $table->uuid('uuid')->nullable(false);
+            $table->string('city')->nullable(false);
             $table->string('name')->nullable(false);
             $table->string('email')->nullable(false);
             $table->string('phone')->nullable(false);
             $table->dateTime('date_order')->nullable(false);
             $table->string('status')->nullable(false);
             $table->integer('change_id')->nullable();
+            $table->text('comment')->nullable();
             $table->dateTime('date_change')->nullable();
             $table->timestamps();
         });
