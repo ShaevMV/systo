@@ -158,6 +158,7 @@ services:
       - ./Backend:${ENV_ORG_BACKEND_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
       - ./List:${ENV_SPISOK_PATCH}
+      - ./Shared:${ENV_SHARED_PATCH}
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     user: user

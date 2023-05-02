@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
+use Shared\Services\TicketService;
 
 class AdminController extends Controller
 {
@@ -22,18 +23,21 @@ class AdminController extends Controller
     private $updateUserProfileInformation;
     private $updateUserPassword;
     private CreatingQrCodeService $creatingQrCodeService;
+    private TicketService $ticketService;
 
     public function __construct(
         CreateNewUser                $createNewUser,
         UpdateUserProfileInformation $updateUserProfileInformation,
         UpdateUserPassword           $updateUserPassword,
-        CreatingQrCodeService        $creatingQrCodeService
+        CreatingQrCodeService        $creatingQrCodeService,
+        TicketService $ticketService
     )
     {
         $this->createNewUser = $createNewUser;
         $this->updateUserProfileInformation = $updateUserProfileInformation;
         $this->updateUserPassword = $updateUserPassword;
         $this->creatingQrCodeService = $creatingQrCodeService;
+        $this->ticketService = $ticketService;
     }
 
     /**
@@ -109,6 +113,7 @@ class AdminController extends Controller
         $id = $request->post('id');
 
         ListTicket::destroy($id);
+        $this->ticketService->deleteTicketList($id);
 
         return redirect()->route('adminTickets');
     }

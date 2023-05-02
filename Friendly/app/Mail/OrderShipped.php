@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Services\CreatingQrCodeService;
+use Shared\Services\CreatingQrCodeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -41,7 +41,7 @@ class OrderShipped extends Mailable
         $mail = $this->from('ticket@solarsysto.ru', 'solarsysto')->view('emails.orders.orderToPaid');
 
         foreach ($this->ids as $id => $name) {
-            $contents = $service->createPdf($id, $name, $this->email);
+            $contents = $service->createPdf($id, $name, $this->email,'f');
             $mail->attachData($contents->output(), 'Билет ' . $name . '.pdf');
         }
 

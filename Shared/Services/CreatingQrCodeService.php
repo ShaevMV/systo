@@ -16,12 +16,12 @@ use Endroid\QrCode\Writer\Result\ResultInterface;
 
 class CreatingQrCodeService
 {
-    public function createQrCode(string $ticketId): ResultInterface
+    public function createQrCode(string $ticketId, string $prefix): ResultInterface
     {
         return Builder::create()
             ->writer(new PngWriter())
             ->writerOptions([])
-            ->data('http://baza.spaceofjoy.ru/search?q=f' . $ticketId)
+            ->data('http://baza.spaceofjoy.ru/search?q=' . $prefix . $ticketId)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(300)
@@ -35,9 +35,9 @@ class CreatingQrCodeService
             ->build();
     }
 
-    public function createPdf(string $id, string $name, string $email): \Barryvdh\DomPDF\PDF
+    public function createPdf(string $id, string $name, string $email, string $prefix): \Barryvdh\DomPDF\PDF
     {
-        $qrCode = $this->createQrCode($id);
+        $qrCode = $this->createQrCode($id, $prefix);
 
         return Pdf::loadView('pdf', [
             'url' => $qrCode->getDataUri(),

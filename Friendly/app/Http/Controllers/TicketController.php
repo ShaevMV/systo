@@ -101,7 +101,7 @@ class TicketController extends Controller
     {
         /** @var FriendlyTicket $ticket */
         $ticket = FriendlyTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('f' . $id, $ticket->fio_friendly, $ticket->email);
+        $pdf = $this->creatingQrCodeService->createPdf('f' . $id, $ticket->fio_friendly, $ticket->email, 'f');
 
         return $pdf->download('Билет для ' . $ticket->fio_friendly . '.pdf');
     }

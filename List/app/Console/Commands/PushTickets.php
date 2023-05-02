@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\ListTicket;
-use App\Services\TicketService;
+use Shared\Services\TicketService;
 use Illuminate\Console\Command;
 
 class PushTickets extends Command
@@ -44,7 +44,7 @@ class PushTickets extends Command
         $tickets = ListTicket::all();
 
         foreach ($tickets as $ticket) {
-            $r = $ticketService->pushTicket($ticket);
+            $ticketService->pushTicketList($ticket);
             $this->info('push '. $ticket->id);
         }
 
