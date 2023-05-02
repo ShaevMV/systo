@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 /**
  * Class FriendlyTicket
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $curator
  * @property int $user_id
  * @property string $comment
+ * @property Carbon $created_at
  *
  * @package App\Models
  */

@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessSendTicketEmail;
 use App\Models\FriendlyTicket;
-use App\Services\CreatingQrCodeService;
-use App\Services\TicketService;
+use Shared\Services\CreatingQrCodeService;
+use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -20,9 +20,8 @@ class TicketController extends Controller
     private CreatingQrCodeService $creatingQrCodeService;
 
     public function __construct(
-        TicketService $ticketService,
-        CreatingQrCodeService        $creatingQrCodeService
-
+        TicketService         $ticketService,
+        CreatingQrCodeService $creatingQrCodeService
     )
     {
         $this->middleware('auth');
@@ -32,8 +31,8 @@ class TicketController extends Controller
 
     public function view()
     {
-        return view('tickets/form',[
-            'user'=> Auth::user(),
+        return view('tickets/form', [
+            'user' => Auth::user(),
         ]);
     }
 
@@ -54,8 +53,8 @@ class TicketController extends Controller
 
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
-                $this->ticketService->pushTicket($model);
-                $ids['f' . $model->id] =  $value;
+                $this->ticketService->pushTicketFriendly($model);
+                $ids['f' . $model->id] = $value;
             }
 
             Bus::chain([
@@ -81,7 +80,7 @@ class TicketController extends Controller
     public function tickets()
     {
         $tickets = FriendlyTicket::where(
-            'id' , '>=' , 1000
+            'id', '>=', 1000
         )->get();
 
         return view('admin.tickets', [
@@ -94,6 +93,7 @@ class TicketController extends Controller
         $id = $request->post('id');
 
         FriendlyTicket::destroy($id);
+        $this->ticketService->deleteTicketFriendly($id);
         return redirect()->route('adminTickets');
     }
 
@@ -101,8 +101,8 @@ class TicketController extends Controller
     {
         /** @var FriendlyTicket $ticket */
         $ticket = FriendlyTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('f'.$id, $ticket->fio_friendly, $ticket->email);
+        $pdf = $this->creatingQrCodeService->createPdf('f' . $id, $ticket->fio_friendly, $ticket->email);
 
-        return $pdf->download('Билет для '.$ticket->fio_friendly.'.pdf');
+        return $pdf->download('Билет для ' . $ticket->fio_friendly . '.pdf');
     }
 }

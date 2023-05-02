@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\FriendlyTicket;
-use App\Services\TicketService;
+use Shared\Services\TicketService;
 use Illuminate\Console\Command;
 
 class PushTickets extends Command
@@ -44,8 +44,7 @@ class PushTickets extends Command
         $tickets = FriendlyTicket::all();
 
         foreach ($tickets as $ticket) {
-            $r = $ticketService->pushTicket($ticket);
-            var_dump($r);
+            $r = $ticketService->pushTicketFriendly($ticket);
             $this->info('push '. $ticket->id);
         }
 
