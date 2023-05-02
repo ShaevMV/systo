@@ -46,6 +46,8 @@ RUN if [ ${WITH_XDEBUG} = "true" ]; then \
 RUN adduser --disabled-password --gecos "" user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
+RUN chown -R user:user /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN chmod 777 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

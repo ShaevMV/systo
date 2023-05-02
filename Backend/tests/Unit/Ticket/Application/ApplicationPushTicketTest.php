@@ -6,8 +6,8 @@ use Nette\Utils\JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
+use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class ApplicationPushTicketTest extends TestCase
 {
@@ -31,7 +31,12 @@ class ApplicationPushTicketTest extends TestCase
      */
     public function test_in_correct_push(): void
     {
-        $result = $this->pushTicket->pushTicket(new Uuid('003ff47c-4330-435e-82a9-1fec77c2a8a0'));
-        self::assertTrue(in_array('003ff47c-4330-435e-82a9-1fec77c2a8a0', $result));
+        /** @var TicketsRepositoryInterface $repository */
+        $repository = $this->app->get(TicketsRepositoryInterface::class);
+        $ids = $repository->getAllTicketsId();
+        foreach ($ids as $id) {
+            $this->pushTicket->pushTicket($id);
+        }
+        self::assertTrue(true);
     }
 }

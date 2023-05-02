@@ -46,14 +46,18 @@ services:
 
   php:
     hostname: ${ENV_ORG_BACKEND_HOST}
-    image: php:systo
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=true
+    image: 'ogr_laravel'
     env_file:
       - ./Backend/.env
     container_name: php-solarSysto
     volumes:
       - ./Shared:${ENV_SHARED_PATCH}
-      - ./Backend:${ENV_ORG_BACKEND_PATCH}
-    working_dir: ${ENV_ORG_BACKEND_PATCH}
+      - ./Backend:/var/www/org
+    working_dir: /var/www/org
     user: user
     environment:
       - WITH_XDEBUG=true
@@ -78,8 +82,12 @@ services:
 
   phpBaza:
     hostname: ${ENV_VHOD_BACKEND_HOST}
-    image: php:systo
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=true
     container_name: php-baza
+    image: 'baza_laravel'
     env_file:
       - ./Baza/.env
     volumes:
@@ -95,8 +103,12 @@ services:
 
   phpFriendly:
     hostname: ${ENV_DRUG_BACKEND_HOST}
-    image: php:systo
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=true
     container_name: php-friendly
+    image: 'friendly_laravel'
     env_file:
       - ./Friendly/.env
     volumes:
@@ -112,8 +124,12 @@ services:
 
   phpList:
     hostname: ${ENV_SPISOK_BACKEND_HOST}
-    image: php:systo
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=true
     container_name: php-list
+    image: 'list_laravel'
     volumes:
       - ./List:${ENV_SPISOK_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
