@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('el_tickets', function (Blueprint $table) {
             $table->id();
             $table->integer('kilter')->nullable(false);
-            $table->uuid('uuid')->nullable(false);
+            $table->uuid('uuid')->nullable(false)->unique();;
             $table->string('city')->nullable(false);
             $table->string('name')->nullable(false);
             $table->string('email')->nullable(false);

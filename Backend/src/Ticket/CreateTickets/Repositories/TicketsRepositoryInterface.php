@@ -19,7 +19,7 @@ interface TicketsRepositoryInterface
      */
     public function getListIdByOrderId(Uuid $orderId): array;
 
-    public function getTicket(Uuid $ticketId): TicketResponse;
+    public function getTicket(Uuid $ticketId, bool $isShowDelete = false): TicketResponse;
 
     public function setInBaza(TicketResponse $ticketsDto): bool;
 

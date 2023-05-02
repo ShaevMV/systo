@@ -18,10 +18,10 @@ class PushTicketsCommandHandler implements CommandHandler
 
     public function __invoke(PushTicketsCommand $command): void
     {
-        $pushTicketsDto = $this->ticketsRepository->getTicket($command->getId());
+        $pushTicketsDto = $this->ticketsRepository->getTicket($command->getId(), true);
 
         if (!$this->ticketsRepository->setInBaza($pushTicketsDto)) {
-            throw new DomainException('При записи произошла ошибка');
+            throw new DomainException('При записи произошла ошибка '. $command->getId()->value());
         };
     }
 }

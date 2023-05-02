@@ -98,9 +98,15 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             ->getQuery();
     }
 
-    public function getTicket(Uuid $ticketId): TicketResponse
+    public function getTicket(Uuid $ticketId, bool $isShowDelete = false): TicketResponse
     {
-        $result = $this->model->where($this->model::TABLE . '.id', '=', $ticketId->value())
+        if(!$isShowDelete){
+            $result = $this->model;
+        } else {
+            $result = $this->model::withTrashed();
+        }
+
+        $result = $result->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->select([
@@ -148,9 +154,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     $data
                 );
         }
+        (DB::connection('mysqlBaza')->table('el_tickets')
+            ->where('uuid', '=', $ticketsDto->getId()->value()))->update($data);
 
-        return (DB::connection('mysqlBaza')->table('el_tickets')
-                ->where('uuid', '=', $ticketsDto->getId()->value()))->update($data) > 0;
+        return true;
     }
 
 
@@ -159,7 +166,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
      */
     public function getAllTicketsId(): array
     {
-        $rawResult = $this->model::all('id')->toArray();
+        $rawResult = $this->model::withTrashed()->get('id')->toArray();
         $result = [];
         foreach ($rawResult as $item) {
             $result[]=new Uuid($item['id']);
