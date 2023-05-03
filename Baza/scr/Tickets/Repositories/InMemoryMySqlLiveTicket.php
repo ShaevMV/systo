@@ -24,7 +24,7 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
     {
         $data = $this->liveTicketModel::whereKilter($kilter)->first()?->toArray();
 
-        if(is_null($data)) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -49,6 +49,27 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
         } catch (Throwable $throwable) {
             DB::rollBack();
             throw $throwable;
+        }
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function create(int $start, int $end): bool
+    {
+        DB::beginTransaction();
+        try {
+            for ($kilter = $start; $kilter < $end; $kilter++) {
+                $this->liveTicketModel::create([
+                    'kilter' => $kilter,
+                ]);
+            }
+            DB::commit();
+
+            return true;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
         }
     }
 }

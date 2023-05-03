@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $email
  * @property string $name
  * @property string $date_order
+ * @property string $status
  * @property int|null $change_id
  * @property string|null $date_change
  * @property Carbon|null $created_at
@@ -38,7 +39,6 @@ use Illuminate\Support\Carbon;
  */
 class FriendlyTicketModel extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'friendly_tickets';
 
@@ -46,6 +46,7 @@ class FriendlyTicketModel extends Model
         'kilter',
         'project',
         'name',
+        'status',
         'email',
         'phone',
         'date_order',

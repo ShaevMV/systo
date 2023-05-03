@@ -24,7 +24,7 @@ return new class extends Migration
             $table->dateTime('date_order')->nullable(false);
             $table->integer('change_id')->nullable();
             $table->dateTime('date_change')->nullable();
-            $table->softDeletes();
+            $table->string('status')->default('paid');
             $table->timestamps();
         });
     }

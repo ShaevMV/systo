@@ -11,9 +11,16 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
     public function loginPage(): View
     {
-        return view('auth.login');
+        return view('auth.login', [
+            'pageSlug' => null
+        ]);
     }
 
     public function registerPage(): View

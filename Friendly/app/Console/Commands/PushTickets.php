@@ -44,7 +44,7 @@ class PushTickets extends Command
         $tickets = FriendlyTicket::all();
 
         foreach ($tickets as $ticket) {
-            $r = $ticketService->pushTicketFriendly($ticket);
+            $ticketService->pushTicketFriendly($ticket);
             $this->info('push '. $ticket->id);
         }
 

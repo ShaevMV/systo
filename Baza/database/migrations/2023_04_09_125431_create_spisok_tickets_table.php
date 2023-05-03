@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('email')->nullable(false);
             $table->string('name')->nullable(false);
             $table->dateTime('date_order')->nullable(false);
-            $table->text('comment')->nullable(false);
+            $table->text('comment')->default(null);
+            $table->string('status')->default('paid');
             $table->integer('change_id')->nullable();
             $table->dateTime('date_change')->nullable();
-            $table->softDeletes();
             $table->timestamps();
         });
     }

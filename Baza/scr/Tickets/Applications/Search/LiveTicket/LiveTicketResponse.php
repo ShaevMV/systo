@@ -12,6 +12,7 @@ class LiveTicketResponse implements TicketResponseInterface
 {
     public function __construct(
         protected int     $kilter,
+        protected ?string $comment = null,
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null
     )
@@ -34,6 +35,7 @@ class LiveTicketResponse implements TicketResponseInterface
 
         return new self(
             $data['kilter'],
+            $data['comment'] ?? null,
             $data['change_id'] ?? null,
             $date_change
         );

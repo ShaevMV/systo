@@ -14,6 +14,8 @@ use Illuminate\Support\Carbon;
  *
  * @property int $id
  * @property int $kilter
+ * @property string $status
+ * @property string $comment
  * @property int|null $change_id
  * @property string|null $date_change
  * @property Carbon|null $created_at
@@ -35,6 +37,8 @@ class LiveTicketModel extends Model
 
     protected $fillable = [
         'kilter',
+        'comment',
+        'status',
         'change_id',
         'date_change',
     ];

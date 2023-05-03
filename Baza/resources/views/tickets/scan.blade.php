@@ -26,7 +26,8 @@
                     <p id="project"></p>
                     <b>Куратор: </b>
                     <p id="curator"></p>
-
+                    <b>Комментарий: </b>
+                    <p id="comment"></p>
 
                 </div>
                 <div class="card-footer">
@@ -38,7 +39,7 @@
             <div class="card">
                 <div class="card-body">
                     <div id="video-container">
-                        <video id="qr-video"></video>
+                        <video id="qr-video" style="display: none"></video>
                     </div>
                 </div>
                 <div class="card-footer">
@@ -168,6 +169,7 @@
         const dateOrderResult = document.getElementById('date-order');
         const phoneResult = document.getElementById('phone');
         const statusResult = document.getElementById('status');
+        const commentResult = document.getElementById('comment');
 
         function setSpisok(data) {
             if (data.date_change === null) {
@@ -200,6 +202,7 @@
             emailResult.textContent = data.email;
             phoneResult.textContent = data.phone;
             statusResult.textContent = data.status;
+            statusResult.textContent = data.comment;
             dateOrderResult.textContent = data.date_order;
         }
 
@@ -214,7 +217,7 @@
             curatorResult.textContent = '';
             emailResult.textContent = '';
             dateOrderResult.textContent = '';
-
+            commentResult.textContent = '';
             phoneResult.textContent = '';
             statusResult.textContent = '';
             idTicket = null;
@@ -294,14 +297,7 @@
             videoContainer.className = e.target.value;
             scanner._updateOverlay(); // reposition the highlight because style 2 sets position: relative
         });
-
-        document.getElementById('show-scan-region').addEventListener('change', (e) => {
-            const input = e.target;
-            const label = input.parentNode;
-            label.parentNode.insertBefore(scanner.$canvas, label.nextSibling);
-            scanner.$canvas.style.display = input.checked ? 'block' : 'none';
-        });
-
+        video.parentNode.insertBefore(scanner.$canvas, video.nextSibling);
         document.getElementById('inversion-mode-select').addEventListener('change', event => {
             scanner.setInversionMode(event.target.value);
         });

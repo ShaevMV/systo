@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Shared\Services;
 
 use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use DB;
-use Illuminate\Support\Carbon;
+use Shared\Domain\ValueObject\Status;
 
 class TicketService
 {
@@ -34,7 +36,8 @@ class TicketService
             'name' => $ticket->fio_friendly,
             'date_order' => $ticket->created_at,
             'email' => $ticket->email,
-        ]) > 0;
+            'comment' => $ticket->comment,
+        ]);
 
         return true;
     }
@@ -48,7 +51,7 @@ class TicketService
         }
 
         $rawModel->update([
-            'deleted_at' => Carbon::now()
+            'status' => Status::CANCEL
         ]);
     }
 
@@ -58,6 +61,7 @@ class TicketService
         $rawModel =
             DB::connection('mysqlBaza')->table('spisok_tickets')
                 ->where('kilter', '=', $ticket->id);
+
         if (!$rawModel->exists()) {
             return DB::connection('mysqlBaza')
                 ->table('spisok_tickets')
@@ -66,19 +70,21 @@ class TicketService
                     'project' => $ticket->project,
                     'curator' => $ticket->curator,
                     'name' => $ticket->fio,
+                    'comment' => $ticket->comment,
                     'date_order' => $ticket->created_at,
                     'email' => $ticket->email,
                 ]);
         }
 
         $rawModel->update([
-                'kilter' => $ticket->id,
-                'project' => $ticket->project,
-                'curator' => $ticket->curator,
-                'name' => $ticket->fio,
-                'date_order' => $ticket->created_at,
-                'email' => $ticket->email,
-            ]) > 0;
+            'kilter' => $ticket->id,
+            'project' => $ticket->project,
+            'curator' => $ticket->curator,
+            'name' => $ticket->fio,
+            'comment' => $ticket->comment,
+            'date_order' => $ticket->created_at,
+            'email' => $ticket->email,
+        ]);
 
         return true;
     }
@@ -92,7 +98,7 @@ class TicketService
         }
 
         $rawModel->update([
-            'deleted_at' => Carbon::now()
+            'status' => Status::CANCEL
         ]);
     }
 }

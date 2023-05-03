@@ -16,9 +16,10 @@ return new class extends Migration
         Schema::create('live_tickets', function (Blueprint $table) {
             $table->id();
             $table->integer('kilter');
-            $table->text('comment')->nullable(false);
+            $table->text('comment')->nullable();
             $table->integer('change_id')->nullable();
             $table->dateTime('date_change')->nullable();
+            $table->string('status')->default('paid');
             $table->timestamps();
         });
     }

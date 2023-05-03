@@ -17,6 +17,8 @@ use Illuminate\Support\Carbon;
  * @property string $curator
  * @property string $email
  * @property string $name
+ * @property string $comment
+ * @property string $status
  * @property string $date_order
  * @property int|null $change_id
  * @property string|null $date_change
@@ -40,7 +42,6 @@ use Illuminate\Support\Carbon;
  */
 class SpisokTicketModel extends Model
 {
-    use SoftDeletes;
 
     protected $table = 'spisok_tickets';
 
@@ -49,6 +50,8 @@ class SpisokTicketModel extends Model
         'curator',
         'project',
         'name',
+        'comment',
+        'status',
         'email',
         'phone',
         'date_order',

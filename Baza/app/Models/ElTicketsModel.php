@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string $phone
  * @property string $date_order
  * @property string $status
+ * @property string $comment
  * @property int|null $change_id
  * @property string|null $date_change
  * @property Carbon|null $created_at
@@ -51,6 +52,7 @@ class ElTicketsModel extends Model
         'name',
         'email',
         'phone',
+        'comment',
         'date_order',
         'status',
         'change_id',
