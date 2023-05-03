@@ -14,7 +14,7 @@ use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommand;
 use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommand;
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommandHandler;
-use Baza\Tickets\Applications\Search\DefineService;
+use Baza\Tickets\Services\DefineService;
 use Throwable;
 
 class EnterTicket
@@ -44,7 +44,7 @@ class EnterTicket
         $command = match ($type) {
             DefineService::SPISOK_TICKET => new SpisokTicketCommand($id, $userId),
             DefineService::ELECTRON_TICKET => new ElTicketCommand($id, $userId),
-            DefineService::FRIENDLY_TICKET => new DrugTicketCommand($id, $userId),
+            DefineService::DRUG_TICKET => new DrugTicketCommand($id, $userId),
             DefineService::LIVE_TICKET => new LiveTicketCommand($id, $userId),
             default => throw new \DomainException('Не верный тип ' . $type),
         };

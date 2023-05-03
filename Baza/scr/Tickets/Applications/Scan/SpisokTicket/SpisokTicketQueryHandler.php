@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\SpisokTicket;
+namespace Baza\Tickets\Applications\Scan\SpisokTicket;
 
 use Baza\Shared\Domain\Bus\Query\QueryHandler;
 use Baza\Tickets\Repositories\SpisokTicketsRepositoryInterface;
+use Baza\Tickets\Responses\SpisokTicketResponse;
 
 class SpisokTicketQueryHandler implements QueryHandler
 {

@@ -91,7 +91,7 @@ services:
     env_file:
       - ./Baza/.env
     volumes:
-      - ./Baza:${ENV_VHOD_PATCH}
+      - ./Baza:/var/www/vhod
       - ./Shared:${ENV_SHARED_PATCH}
     working_dir: ${ENV_VHOD_PATCH}
     user: user

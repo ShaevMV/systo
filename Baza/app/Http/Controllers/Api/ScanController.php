@@ -6,7 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Baza\Tickets\Applications\Enter\EnterTicket;
-use Baza\Tickets\Applications\Search\SearchEngine;
+use Baza\Tickets\Applications\Scan\SearchEngine;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 

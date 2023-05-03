@@ -2,12 +2,14 @@
 
 namespace Tests\Unit;
 
-use Baza\Tickets\Applications\Search\DefineService;
-use PHPUnit\Framework\TestCase;
 use Baza\Shared\Domain\ValueObject\Uuid;
+use Baza\Tickets\Services\DefineService;
+use PHPUnit\Framework\TestCase;
 
 class DefineServiceTest extends TestCase
 {
+    private DefineService $service;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,10 +41,10 @@ class DefineServiceTest extends TestCase
         self::assertEquals(50065, $result->getId());
 
         $result = $this->service->getTypeByReference('/search?q=ff30049');
-        self::assertEquals(DefineService::FRIENDLY_TICKET, $result->getType());
+        self::assertEquals(DefineService::DRUG_TICKET, $result->getType());
         self::assertEquals(30049, $result->getId());
         $result = $this->service->getTypeByReference('http://baza.spaceofjoy.ru/search?q=ff30049');
-        self::assertEquals(DefineService::FRIENDLY_TICKET, $result->getType());
+        self::assertEquals(DefineService::DRUG_TICKET, $result->getType());
         self::assertEquals(30049, $result->getId());
 
         $result = $this->service->getTypeByReference('/newTickets/ab5ad7e7-be27-47c3-9900-65e1e3ea8cd7');

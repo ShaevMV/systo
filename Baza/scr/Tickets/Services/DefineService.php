@@ -2,30 +2,31 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search;
+namespace Baza\Tickets\Services;
 
-use InvalidArgumentException;
 use Baza\Shared\Domain\ValueObject\Uuid;
+use Baza\Tickets\Applications\Scan\SearchDto;
+use InvalidArgumentException;
 
 class DefineService
 {
     public const ELECTRON_TICKET = 'electron';
     public const SPISOK_TICKET = 'spisok';
     public const LIVE_TICKET = 'live';
-    public const FRIENDLY_TICKET = 'friendly';
+    public const DRUG_TICKET = 'drug';
 
     public const HUMAN_LIST = [
         self::ELECTRON_TICKET => 'Электронный',
         self::SPISOK_TICKET => 'Список',
         self::LIVE_TICKET => 'Живой',
-        self::FRIENDLY_TICKET => 'Френдли',
+        self::DRUG_TICKET => 'Френдли',
     ];
 
     public const PREFIX_LIST = [
         self::ELECTRON_TICKET => 'E-',
         self::SPISOK_TICKET => 'S',
         self::LIVE_TICKET => '',
-        self::FRIENDLY_TICKET => 'f',
+        self::DRUG_TICKET => 'f',
     ];
 
     private const URL = [
@@ -51,7 +52,7 @@ class DefineService
             $type = self::SPISOK_TICKET;
             $id = $this->getOnlyNumber($link);
         } elseif (strripos($link, 'f') !== false) {
-            $type = self::FRIENDLY_TICKET;
+            $type = self::DRUG_TICKET;
             $id = $this->getOnlyNumber($link);
         } else {
             throw new InvalidArgumentException('Данная ссылка не опознана ' . $origLink);

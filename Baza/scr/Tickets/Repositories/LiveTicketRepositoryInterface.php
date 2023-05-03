@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Repositories;
 
-use Baza\Tickets\Applications\Search\LiveTicket\LiveTicketResponse;
+use Baza\Tickets\Responses\LiveTicketResponse;
 
 interface LiveTicketRepositoryInterface
 {

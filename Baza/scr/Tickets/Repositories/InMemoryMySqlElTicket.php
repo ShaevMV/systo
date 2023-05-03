@@ -4,7 +4,7 @@ namespace Baza\Tickets\Repositories;
 
 use App\Models\ElTicketsModel;
 use Baza\Shared\Domain\ValueObject\Uuid;
-use Baza\Tickets\Applications\Search\ElTicket\ElTicketResponse;
+use Baza\Tickets\Responses\ElTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
@@ -22,7 +22,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     {
         $data = $this->elTicketsModel::whereUuid($id->value())->first()?->toArray();
 
-        if(is_null($data)) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -49,5 +49,22 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
             DB::rollBack();
             throw $throwable;
         }
+    }
+
+    public function find(string $q): array
+    {
+        $resultRawList = $this->elTicketsModel->whereKilter((int)$q)
+            ->orWhere('name', 'like', '%' . $q . '%')
+            ->orWhere('email', 'like', '%' . $q . '%')
+            ->orWhere('phone', 'like', '%' . $q . '%')
+            ->orWhere('comment', 'like', '%' . $q . '%')
+            ->get()
+            ->toArray();
+        $result = [];
+        foreach ($resultRawList as $item) {
+            $result[] = ElTicketResponse::fromState($item);
+        }
+
+        return $result;
     }
 }

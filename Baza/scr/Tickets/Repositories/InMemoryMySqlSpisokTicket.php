@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\SpisokTicketModel;
-use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketResponse;
+use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
@@ -50,5 +50,22 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
             DB::rollBack();
             throw $throwable;
         }
+    }
+
+    public function find(string $q): array
+    {
+        $resultRawList = $this->spisokTicketModel::whereKilter((int)$q)
+            ->orWhere('curator','like','%'.$q.'%')
+            ->orWhere('project','like','%'.$q.'%')
+            ->orWhere('name','like','%'.$q.'%')
+            ->orWhere('comment','like','%'.$q.'%')
+            ->orWhere('email','like','%'.$q.'%')
+            ->get()->toArray();
+        $result = [];
+        foreach ($resultRawList as $item) {
+            $result[]= SpisokTicketResponse::fromState($item);
+        }
+
+        return $result;
     }
 }

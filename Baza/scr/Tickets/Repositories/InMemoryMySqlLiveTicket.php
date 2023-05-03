@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\LiveTicketModel;
-use Baza\Tickets\Applications\Search\LiveTicket\LiveTicketResponse;
+use Baza\Tickets\Responses\LiveTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;

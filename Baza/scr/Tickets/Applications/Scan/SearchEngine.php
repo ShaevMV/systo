@@ -2,18 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search;
+namespace Baza\Tickets\Applications\Scan;
 
 use Baza\Shared\Domain\Bus\Query\QueryBus;
 use Baza\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
-use Baza\Tickets\Applications\Search\ElTicket\ElTicketQuery;
-use Baza\Tickets\Applications\Search\ElTicket\ElTicketsQueryHandler;
-use Baza\Tickets\Applications\Search\FriendlyTicket\FriendlyTicketQuery;
-use Baza\Tickets\Applications\Search\FriendlyTicket\FriendlyTicketQueryHandler;
-use Baza\Tickets\Applications\Search\LiveTicket\LiveTicketQuery;
-use Baza\Tickets\Applications\Search\LiveTicket\LiveTicketQueryHandler;
-use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketQuery;
-use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketQueryHandler;
+use Baza\Tickets\Applications\Scan\ElTicket\ElTicketQuery;
+use Baza\Tickets\Applications\Scan\ElTicket\ElTicketsQueryHandler;
+use Baza\Tickets\Applications\Scan\FriendlyTicket\FriendlyTicketQuery;
+use Baza\Tickets\Applications\Scan\FriendlyTicket\FriendlyTicketQueryHandler;
+use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQuery;
+use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQueryHandler;
+use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQuery;
+use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQueryHandler;
+use Baza\Tickets\Services\DefineService;
 use DomainException;
 
 class SearchEngine
@@ -45,7 +46,7 @@ class SearchEngine
         $query = match ($searchDto->getType()) {
             DefineService::ELECTRON_TICKET => new ElTicketQuery($searchDto->getId()),
             DefineService::SPISOK_TICKET => new SpisokTicketQuery($searchDto->getId()),
-            DefineService::FRIENDLY_TICKET => new FriendlyTicketQuery($searchDto->getId()),
+            DefineService::DRUG_TICKET => new FriendlyTicketQuery($searchDto->getId()),
             DefineService::LIVE_TICKET => new LiveTicketQuery($searchDto->getId()),
             default => throw new DomainException('Не верный тип ' . $searchDto->getType()),
         };

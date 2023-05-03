@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search;
+namespace Baza\Tickets\Applications\Scan;
 
 use Baza\Shared\Domain\Bus\Query\Response;
 

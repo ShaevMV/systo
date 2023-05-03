@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\FriendlyTicketModel;
-use Baza\Tickets\Applications\Search\FriendlyTicket\FriendlyTicketResponse;
-use Baza\Tickets\Applications\Search\SpisokTicket\SpisokTicketResponse;
+use Baza\Tickets\Responses\FriendlyTicketResponse;
+use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
@@ -25,7 +25,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
     {
         $data = $this->friendlyTicketModel::whereKilter($kilter)->first()?->toArray();
 
-        if(is_null($data)) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -51,5 +51,23 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
             DB::rollBack();
             throw $throwable;
         }
+    }
+
+    public function find(string $q): array
+    {
+        $resultRawList = $this->friendlyTicketModel::whereKilter((int)$q)
+            ->orWhere('project', 'like', '%' . $q . '%')
+            ->orWhere('name', 'like', '%' . $q . '%')
+            ->orWhere('comment', 'like', '%' . $q . '%')
+            ->orWhere('email', 'like', '%' . $q . '%')
+            ->orWhere('seller', 'like', '%' . $q . '%')
+            ->get()->toArray();
+
+        $result = [];
+        foreach ($resultRawList as $item) {
+            $result[] = FriendlyTicketResponse::fromState($item);
+        }
+
+        return $result;
     }
 }

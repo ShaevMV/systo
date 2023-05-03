@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\FriendlyTicket;
+namespace Baza\Tickets\Applications\Scan\FriendlyTicket;
 
 use Baza\Shared\Domain\Bus\Query\QueryHandler;
 use Baza\Tickets\Repositories\FriendlyTicketRepositoryInterface;
-use Baza\Tickets\Repositories\SpisokTicketsRepositoryInterface;
+use Baza\Tickets\Responses\FriendlyTicketResponse;
 
 class FriendlyTicketQueryHandler implements QueryHandler
 {

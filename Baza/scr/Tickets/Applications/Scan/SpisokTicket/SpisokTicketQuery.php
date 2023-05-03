@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\FriendlyTicket;
+namespace Baza\Tickets\Applications\Scan\SpisokTicket;
 
 use Baza\Shared\Domain\Bus\Query\Query;
 
-class FriendlyTicketQuery implements Query
+class SpisokTicketQuery implements Query
 {
     public function __construct(
         private int $kilter

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\LiveTicket;
+namespace Baza\Tickets\Applications\Scan\LiveTicket;
 
 use Baza\Shared\Domain\Bus\Query\QueryHandler;
 use Baza\Tickets\Repositories\LiveTicketRepositoryInterface;
-use Baza\Tickets\Repositories\SpisokTicketsRepositoryInterface;
+use Baza\Tickets\Responses\LiveTicketResponse;
 
 class LiveTicketQueryHandler implements QueryHandler
 {

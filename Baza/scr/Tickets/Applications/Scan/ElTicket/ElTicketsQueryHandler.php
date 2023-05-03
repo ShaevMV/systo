@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Applications\Search\ElTicket;
+namespace Baza\Tickets\Applications\Scan\ElTicket;
 
 use Baza\Shared\Domain\Bus\Query\QueryHandler;
 use Baza\Tickets\Repositories\ElTicketsRepositoryInterface;
+use Baza\Tickets\Responses\ElTicketResponse;
 
 class ElTicketsQueryHandler implements QueryHandler
 {

@@ -53,7 +53,6 @@ class SpisokTicketModel extends Model
         'comment',
         'status',
         'email',
-        'phone',
         'date_order',
         'status',
         'change_id',
