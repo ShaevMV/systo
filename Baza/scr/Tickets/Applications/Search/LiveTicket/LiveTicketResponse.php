@@ -7,6 +7,7 @@ namespace Baza\Tickets\Applications\Search\LiveTicket;
 use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
+use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
 
 class LiveTicketResponse implements TicketResponseInterface
@@ -31,6 +32,7 @@ class LiveTicketResponse implements TicketResponseInterface
             'status' => (string)$this->status,
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
+            'color' => Color::COLOR_LIVE,
         ];
     }
 

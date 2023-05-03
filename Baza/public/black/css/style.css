@@ -10,7 +10,7 @@
     --c-green: rgb(30, 135, 28);
 }
 
-#prana{
+#prana {
     font-size: 12px;
     color: var(--c-red);
     bottom: 0;
@@ -20,7 +20,8 @@
     align-items: center;
     justify-content: center;
 }
-#prana::before{
+
+#prana::before {
     content: '';
     display: block;
     width: 25px;
@@ -30,4 +31,17 @@
     margin-right: 3px;
     position: relative;
     top: -2px;
+}
+
+.block-color {
+    width: 50px;
+    margin: auto;
+    overflow: hidden;
+    display: inline-block;
+}
+
+.block-color:before {
+    content: " ";
+    padding-top: 100%;
+    float: left;
 }

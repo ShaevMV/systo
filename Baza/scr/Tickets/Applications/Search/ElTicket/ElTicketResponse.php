@@ -7,6 +7,7 @@ namespace Baza\Tickets\Applications\Search\ElTicket;
 use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
+use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
 use Baza\Shared\Domain\ValueObject\Uuid;
 
@@ -42,6 +43,7 @@ class ElTicketResponse implements TicketResponseInterface
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
+            'color' => Color::COLOR_ELECTRON,
         ];
     }
 

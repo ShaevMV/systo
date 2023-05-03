@@ -10,6 +10,8 @@
                     <span id="massage-result" class="massage"></span>
                 </div>
                 <div class="card-body" id="scan-result" style="display: none;">
+                    <p><b>Цвет браслета:</b> <span id="color" class="block-color"></span></p>
+
                     <b>ID: </b>
                     <p id="kilter"></p>
                     <b>Имя: </b>
@@ -164,6 +166,7 @@
         const phoneResult = document.getElementById('phone');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
+        const colorResult = document.getElementById('color');
 
         function showResult(data) {
             if (data.date_change === null && data.status === 'paid') {
@@ -189,6 +192,7 @@
             emailResult.textContent = data.email;
             commentResult.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
+            colorResult.style.background = data.color || '';
         }
 
         function clearResult() {
@@ -208,6 +212,7 @@
             idTicket = null;
             typeTicket = null;
             errorResult.textContent = '';
+            colorResult.style.background = '';
         }
 
         enterResult.addEventListener('click', () => {
