@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Applications\Search\FriendlyTicket;
 
+use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
 use Carbon\Carbon;
@@ -16,6 +17,8 @@ class FriendlyTicketResponse implements TicketResponseInterface
         protected string  $project,
         protected string  $email,
         protected Carbon  $date_order,
+        protected Status  $status,
+        protected ?string $comment = null,
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null
     )
@@ -30,6 +33,9 @@ class FriendlyTicketResponse implements TicketResponseInterface
             'name' => $this->name,
             'email' => $this->email,
             'project' => $this->project,
+            'comment' => $this->comment,
+            'status_human' => $this->status->getHumanStatus(),
+            'status' => (string)$this->status,
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
@@ -46,6 +52,8 @@ class FriendlyTicketResponse implements TicketResponseInterface
             $data['project'],
             $data['email'],
             Carbon::parse($data['date_order']),
+            new Status($data['status']),
+            $data['comment'],
             $data['change_id'] ?? null,
             $date_change
         );

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Applications\Search\SpisokTicket;
 
+use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Tickets\Applications\Search\DefineService;
 use Baza\Tickets\Applications\Search\TicketResponseInterface;
 use Carbon\Carbon;
@@ -17,6 +18,8 @@ class SpisokTicketResponse implements TicketResponseInterface
         protected string  $curator,
         protected string  $email,
         protected Carbon  $date_order,
+        protected Status $status,
+        protected ?string $comment = null,
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null
     )
@@ -32,6 +35,9 @@ class SpisokTicketResponse implements TicketResponseInterface
             'email' => $this->email,
             'curator' => $this->curator,
             'project' => $this->project,
+            'status_human' => $this->status->getHumanStatus(),
+            'status' => (string)$this->status,
+            'comment' => $this->comment,
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
@@ -49,6 +55,8 @@ class SpisokTicketResponse implements TicketResponseInterface
             $data['curator'],
             $data['email'],
             Carbon::parse($data['date_order']),
+            new Status($data['status']),
+            $data['comment'] ?? null,
             $data['change_id'] ?? null,
             $date_change
         );

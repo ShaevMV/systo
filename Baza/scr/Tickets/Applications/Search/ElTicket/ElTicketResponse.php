@@ -20,6 +20,7 @@ class ElTicketResponse implements TicketResponseInterface
         protected string  $phone,
         protected Status  $status,
         protected Carbon  $date_order,
+        protected ?string $comment = null,
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null
     )
@@ -35,7 +36,9 @@ class ElTicketResponse implements TicketResponseInterface
             'name' => $this->name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'status' => $this->status->getHumanStatus(),
+            'comment' => $this->comment,
+            'status_human' => $this->status->getHumanStatus(),
+            'status' => (string)$this->status,
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
@@ -54,6 +57,7 @@ class ElTicketResponse implements TicketResponseInterface
             $data['phone'],
             new Status($data['status']),
             Carbon::parse($data['date_order']),
+            $data['comment'],
             $data['change_id'] ?? null,
             $date_change,
         );

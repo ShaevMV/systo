@@ -138,13 +138,7 @@
                     idTicket = data.kilter;
                     typeTicket = data.type;
                     massageResult.textContent = '';
-                    if (typeTicket === 'spisok') {
-                        setSpisok(data);
-                    }
-                    if (typeTicket === 'electron') {
-                        setElectron(data);
-                    }
-
+                    showResult(data);
                 },
                 error: function (data) {
                     console.error(data);
@@ -171,39 +165,30 @@
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
 
-        function setSpisok(data) {
-            if (data.date_change === null) {
+        function showResult(data) {
+            if (data.date_change === null && data.status === 'paid') {
                 enterResult.style.display = "block";
             } else {
-                alreadyPassedResult.style.display = "block";
-                alreadyPassedResult.textContent = "Был пропущен " + data.date_change;
-                idTicket = null;
-                typeTicket = null;
-            }
-            nameResult.textContent = data.name;
-            kilterResult.textContent = data.kilter;
-            projectResult.textContent = data.project;
-            curatorResult.textContent = data.curator;
-            emailResult.textContent = data.email;
-            dateOrderResult.textContent = data.date_order;
-        }
 
-        function setElectron(data) {
-            if (data.date_change === null) {
-                enterResult.style.display = "block";
-            } else {
                 alreadyPassedResult.style.display = "block";
-                alreadyPassedResult.textContent = "Был пропущен " + data.date_change;
+                if(data.date_change !== null) {
+                    alreadyPassedResult.textContent = "Был пропущен " + data.date_change;
+                } else {
+                    alreadyPassedResult.textContent = "Билет находиться в статусе " + data.status_human;
+                }
+
                 idTicket = null;
                 typeTicket = null;
             }
             nameResult.textContent = data.name;
-            kilterResult.textContent = data.kilter;
+            kilterResult.textContent = data.kilter || '';
+            projectResult.textContent = data.project || '';
+            curatorResult.textContent = data.curator || '';
+            phoneResult.textContent = data.phone || '';
+            statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
-            phoneResult.textContent = data.phone;
-            statusResult.textContent = data.status;
-            statusResult.textContent = data.comment;
-            dateOrderResult.textContent = data.date_order;
+            commentResult.textContent = data.comment;
+            dateOrderResult.textContent = data.date_order || '';
         }
 
         function clearResult() {

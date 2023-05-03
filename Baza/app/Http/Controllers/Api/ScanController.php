@@ -25,7 +25,8 @@ class ScanController extends Controller
         try {
             $link = $request->get('search');
             return response()->json(
-                $this->searchEngine->get($link)->toArray());
+                $this->searchEngine->get($link)->toArray()
+            );
         } catch (\DomainException|\InvalidArgumentException $exception) {
             return response()->json($exception->getMessage(), 422);
         }
