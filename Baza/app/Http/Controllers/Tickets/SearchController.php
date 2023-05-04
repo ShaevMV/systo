@@ -29,6 +29,7 @@ class SearchController extends Controller
         return view('tickets.search', [
             'result' => $result,
             'q' => $request->get('q'),
+            'tab' => $request->get('tab'),
         ]);
     }
 
@@ -44,6 +45,9 @@ class SearchController extends Controller
             \Auth::id(),
         );
 
-        return \Redirect::route('tickets.search', ['q' => $request->get('q')]);
+        return \Redirect::route('tickets.search', [
+            'q' => $request->get('q'),
+            'tab' => $request->get('type'),
+        ]);
     }
 }

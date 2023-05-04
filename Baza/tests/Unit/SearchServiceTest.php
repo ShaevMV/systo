@@ -24,7 +24,9 @@ class SearchServiceTest extends TestCase
      */
     public function test_in_correct_find(): void
     {
-        $result = $this->service->find('shaevmv');
+        $int = (int)'el-20066';
+
+        $result = $this->service->find('el-20066');
         $d = 4;
     }
 }

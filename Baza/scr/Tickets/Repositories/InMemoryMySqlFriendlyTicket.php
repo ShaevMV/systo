@@ -60,7 +60,6 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
             ->orWhere('name', 'like', '%' . $q . '%')
             ->orWhere('comment', 'like', '%' . $q . '%')
             ->orWhere('email', 'like', '%' . $q . '%')
-            ->orWhere('seller', 'like', '%' . $q . '%')
             ->get()->toArray();
 
         $result = [];

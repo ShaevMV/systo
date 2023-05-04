@@ -24,6 +24,7 @@ class SearchResponse implements TicketResponseInterface
 
     public function toArray(): array
     {
+        $result = [];
         foreach ($this->spisok as $item) {
             $result[DefineService::SPISOK_TICKET][] = $item->toArray();
         }

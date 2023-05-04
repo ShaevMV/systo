@@ -19,7 +19,7 @@ class SpisokTicketResponse implements TicketResponseInterface
         protected string  $curator,
         protected string  $email,
         protected Carbon  $date_order,
-        protected Status $status,
+        protected Status  $status,
         protected ?string $comment = null,
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null

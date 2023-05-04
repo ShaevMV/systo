@@ -15,8 +15,10 @@
                             <input type="text"
                                    name="q"
                                    class="form-control"
-                                   placeholder="{{ __('Поиск') }}">
-
+                                   placeholder="{{ __('Поиск') }}"
+                                   value="{{$q}}"
+                            >
+                            <b>Номер билета вводить только цифры без префикса в начале</b>
                         </div>
                     </div>
                     <div class="card-footer">
@@ -33,23 +35,28 @@
                     <div class="card">
                         <div class="card-header card-header-primary">
                             <ul class="nav nav-tabs">
-                                <!-- ЭЛЕКТРОННЫЕ БИЛЕТЫ (активная) -->
+                                <!-- ЭЛЕКТРОННЫЕ БИЛЕТЫ     -->
                                 @if (isset($result[DefineService::ELECTRON_TICKET]) && count($result[DefineService::ELECTRON_TICKET]) > 0 )
                                     <li class="nav-item">
-                                        <a class="nav-link" data-toggle="tab"
-                                           href="#description">ЭЛЕКТРОННЫЕ БИЛЕТЫ</a>
+                                        <a class="nav-link @if($tab === DefineService::ELECTRON_TICKET) active @endif"
+                                           data-toggle="tab"
+                                           href="#{{DefineService::ELECTRON_TICKET}}">ЭЛЕКТРОННЫЕ БИЛЕТЫ</a>
                                     </li>
                                 @endif
                                 <!-- СПИСКИ -->
                                 @if (isset($result[DefineService::SPISOK_TICKET]) && count($result[DefineService::SPISOK_TICKET]) > 0 )
                                     <li class="nav-item">
-                                        <a class="nav-link" data-toggle="tab" href="#characteristics">СПИСКИ</a>
+                                        <a class="nav-link @if($tab === DefineService::SPISOK_TICKET) active @endif"
+                                           data-toggle="tab"
+                                           href="#{{DefineService::SPISOK_TICKET}}">СПИСКИ</a>
                                     </li>
                                 @endif
                                 <!-- фРЕНДЛИ -->
                                 @if (isset($result[DefineService::DRUG_TICKET]) && count($result[DefineService::DRUG_TICKET]) > 0 )
                                     <li class="nav-item">
-                                        <a class="nav-link" data-toggle="tab" href="#drug">ФРЕНДЛИ</a>
+                                        <a class="nav-link @if($tab === DefineService::DRUG_TICKET) active @endif"
+                                           data-toggle="tab"
+                                           href="#{{DefineService::DRUG_TICKET}}">ФРЕНДЛИ</a>
                                     </li>
                                 @endif
                             </ul>
@@ -57,11 +64,16 @@
                         <div class="card-body">
                             <div class="tab-content">
                                 <!-- ЭЛЕКТРОННЫЕ БИЛЕТЫ  -->
-                                <div class="tab-pane fade" id="description">
+                                <div
+                                    class="tab-pane fade @if($tab === DefineService::ELECTRON_TICKET) show active @endif"
+                                    id="{{DefineService::ELECTRON_TICKET}}">
                                     <div class="table-responsive">
                                         @if (isset($result[DefineService::ELECTRON_TICKET]) && count($result[DefineService::ELECTRON_TICKET]) > 0 )
                                             <table class="table">
                                                 <thead class=" text-primary">
+                                                <th>
+                                                    Цвет браслета
+                                                </th>
                                                 <th>
                                                     ID
                                                 </th>
@@ -92,6 +104,8 @@
                                                 <tbody>
                                                 @foreach($result[DefineService::ELECTRON_TICKET] as $ticket)
                                                     <tr>
+                                                        <td style="background: {{ $ticket['color'] }}">
+                                                        </td>
                                                         <td>
                                                             {{$ticket['kilter']}}
                                                         </td>
@@ -118,7 +132,7 @@
                                                         </td>
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
-                                                                <form  method="post"
+                                                                <form method="post"
                                                                       action="{{ route('tickets.scan.enterForTable') }}">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
@@ -126,11 +140,14 @@
                                                                     <input type="hidden" name="type"
                                                                            value="{{DefineService::ELECTRON_TICKET}}">
                                                                     <input type="hidden" name="q" value="{{$q}}">
-                                                                    <button type="submit" class="btn btn-fill btn-primary">Пропустить</button>
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
                                                                 </form>
-                                                            @elseif($ticket['date_change'] != null) Был пропущен {{$ticket['date_change']}}
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
                                                             @else
-                                                                    Билдет находиться в статусе {{$ticket['status_human']}}
+                                                                Билет находиться в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -141,257 +158,183 @@
                                     </div>
                                 </div>
                                 <!-- СПИСКИ -->
-                                <div class="tab-pane fade" id="characteristics">
+                                <div class="tab-pane fade @if($tab === DefineService::SPISOK_TICKET) show active @endif"
+                                     id="{{DefineService::SPISOK_TICKET}}">
                                     <div class="table-responsive">
                                         <table class="table">
                                             <thead class=" text-primary">
                                             <th>
+                                                Цвет браслета
+                                            </th>
+                                            <th>
                                                 ID
                                             </th>
                                             <th>
-                                                Name
+                                                Имя
                                             </th>
                                             <th>
-                                                Country
+                                                Email
                                             </th>
                                             <th>
-                                                City
+                                                Проект
                                             </th>
                                             <th>
-                                                Salary
+                                                Куратор
+                                            </th>
+                                            <th>
+                                                Статус
+                                            </th>
+                                            <th>
+                                                Дата заказа
+                                            </th>
+                                            <th>
+                                                Комментарий
+                                            </th>
+                                            <th>
                                             </th>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>
-                                                    1
-                                                </td>
-                                                <td>
-                                                    Dakota Rice
-                                                </td>
-                                                <td>
-                                                    Niger
-                                                </td>
-                                                <td>
-                                                    Oud-Turnhout
-                                                </td>
-                                                <td class="text-primary">
-                                                    $36,738
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    2
-                                                </td>
-                                                <td>
-                                                    Minerva Hooper
-                                                </td>
-                                                <td>
-                                                    Curaçao
-                                                </td>
-                                                <td>
-                                                    Sinaai-Waas
-                                                </td>
-                                                <td class="text-primary">
-                                                    $23,789
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    3
-                                                </td>
-                                                <td>
-                                                    Sage Rodriguez
-                                                </td>
-                                                <td>
-                                                    Netherlands
-                                                </td>
-                                                <td>
-                                                    Baileux
-                                                </td>
-                                                <td class="text-primary">
-                                                    $56,142
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    4
-                                                </td>
-                                                <td>
-                                                    Philip Chaney
-                                                </td>
-                                                <td>
-                                                    Korea, South
-                                                </td>
-                                                <td>
-                                                    Overland Park
-                                                </td>
-                                                <td class="text-primary">
-                                                    $38,735
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    5
-                                                </td>
-                                                <td>
-                                                    Doris Greene
-                                                </td>
-                                                <td>
-                                                    Malawi
-                                                </td>
-                                                <td>
-                                                    Feldkirchen in Kärnten
-                                                </td>
-                                                <td class="text-primary">
-                                                    $63,542
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    6
-                                                </td>
-                                                <td>
-                                                    Mason Porter
-                                                </td>
-                                                <td>
-                                                    Chile
-                                                </td>
-                                                <td>
-                                                    Gloucester
-                                                </td>
-                                                <td class="text-primary">
-                                                    $78,615
-                                                </td>
-                                            </tr>
+                                            @foreach($result[DefineService::SPISOK_TICKET] as $ticket)
+                                                <tr>
+                                                    <td style="background: {{ $ticket['color'] }}">
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['kilter']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['name']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['email']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['project']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['curator']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['status_human']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['date_order']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['comment']}}
+                                                    </td>
+                                                    <td>
+                                                        @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            <form method="post"
+                                                                  action="{{ route('tickets.scan.enterForTable') }}">
+                                                                @csrf
+                                                                <input type="hidden" name="id"
+                                                                       value="{{$ticket['kilter']}}">
+                                                                <input type="hidden" name="type"
+                                                                       value="{{DefineService::SPISOK_TICKET}}">
+                                                                <input type="hidden" name="q" value="{{$q}}">
+                                                                <button type="submit"
+                                                                        class="btn btn-fill btn-primary">Пропустить
+                                                                </button>
+                                                            </form>
+                                                        @elseif($ticket['date_change'] != null)
+                                                            Был пропущен {{$ticket['date_change']}}
+                                                        @else
+                                                            Билет находиться в статусе {{$ticket['status_human']}}
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                                 <!-- ФРЕНДЛИ -->
-                                <div class="tab-pane fade" id="drug">
+                                <div class="tab-pane fade @if($tab === DefineService::DRUG_TICKET) show active @endif"
+                                     id="{{DefineService::DRUG_TICKET}}">
                                     <div class="table-responsive">
                                         <table class="table">
                                             <thead class=" text-primary">
                                             <th>
+                                                Цвет браслета
+                                            </th>
+                                            <th>
                                                 ID
                                             </th>
                                             <th>
-                                                Name
+                                                Имя
                                             </th>
                                             <th>
-                                                Country
+                                                Email
                                             </th>
                                             <th>
-                                                City
+                                                Проект
                                             </th>
                                             <th>
-                                                Salary
+                                                Продавец
+                                            </th>
+                                            <th>
+                                                Статус
+                                            </th>
+                                            <th>
+                                                Дата заказа
+                                            </th>
+                                            <th>
+                                                Комментарий
+                                            </th>
+                                            <th>
                                             </th>
                                             </thead>
                                             <tbody>
-                                            <tr>
-                                                <td>
-                                                    1
-                                                </td>
-                                                <td>
-                                                    Dakota Rice
-                                                </td>
-                                                <td>
-                                                    Niger
-                                                </td>
-                                                <td>
-                                                    Oud-Turnhout
-                                                </td>
-                                                <td class="text-primary">
-                                                    $36,738
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    2
-                                                </td>
-                                                <td>
-                                                    Minerva Hooper
-                                                </td>
-                                                <td>
-                                                    Curaçao
-                                                </td>
-                                                <td>
-                                                    Sinaai-Waas
-                                                </td>
-                                                <td class="text-primary">
-                                                    $23,789
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    3
-                                                </td>
-                                                <td>
-                                                    Sage Rodriguez
-                                                </td>
-                                                <td>
-                                                    Netherlands
-                                                </td>
-                                                <td>
-                                                    Baileux
-                                                </td>
-                                                <td class="text-primary">
-                                                    $56,142
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    4
-                                                </td>
-                                                <td>
-                                                    Philip Chaney
-                                                </td>
-                                                <td>
-                                                    Korea, South
-                                                </td>
-                                                <td>
-                                                    Overland Park
-                                                </td>
-                                                <td class="text-primary">
-                                                    $38,735
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    5
-                                                </td>
-                                                <td>
-                                                    Doris Greene
-                                                </td>
-                                                <td>
-                                                    Malawi
-                                                </td>
-                                                <td>
-                                                    Feldkirchen in Kärnten
-                                                </td>
-                                                <td class="text-primary">
-                                                    $63,542
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    6
-                                                </td>
-                                                <td>
-                                                    Mason Porter
-                                                </td>
-                                                <td>
-                                                    Chile
-                                                </td>
-                                                <td>
-                                                    Gloucester
-                                                </td>
-                                                <td class="text-primary">
-                                                    $78,615
-                                                </td>
-                                            </tr>
+                                            @foreach($result[DefineService::DRUG_TICKET] as $ticket)
+                                                <tr>
+                                                    <td style="background: {{ $ticket['color'] }}">
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['kilter']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['name']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['email']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['project']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['seller']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['status_human']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['date_order']}}
+                                                    </td>
+                                                    <td>
+                                                        {{$ticket['comment']}}
+                                                    </td>
+                                                    <td>
+                                                        @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            <form method="post"
+                                                                  action="{{ route('tickets.scan.enterForTable') }}">
+                                                                @csrf
+                                                                <input type="hidden" name="id"
+                                                                       value="{{$ticket['kilter']}}">
+                                                                <input type="hidden" name="type"
+                                                                       value="{{DefineService::SPISOK_TICKET}}">
+                                                                <input type="hidden" name="q" value="{{$q}}">
+                                                                <button type="submit"
+                                                                        class="btn btn-fill btn-primary">Пропустить
+                                                                </button>
+                                                            </form>
+                                                        @elseif($ticket['date_change'] != null)
+                                                            Был пропущен {{$ticket['date_change']}}
+                                                        @else
+                                                            Билет находиться в статусе {{$ticket['status_human']}}
+                                                        @endif
+                                                    </td>
+                                                </tr>
+                                            @endforeach
                                             </tbody>
                                         </table>
                                     </div>

@@ -17,6 +17,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
         protected string  $name,
         protected string  $project,
         protected string  $email,
+        protected string  $seller,
         protected Carbon  $date_order,
         protected Status  $status,
         protected ?string $comment = null,
@@ -40,6 +41,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
             'date_order' => $this->date_order->format('d M Y'),
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
+            'seller' => $this->seller,
             'color' => Color::COLOR_FRIENDLY,
         ];
     }
@@ -53,6 +55,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
             $data['name'],
             $data['project'],
             $data['email'],
+            $data['seller'],
             Carbon::parse($data['date_order']),
             new Status($data['status']),
             $data['comment'],
