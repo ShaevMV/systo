@@ -17,7 +17,6 @@ class ScanController extends Controller
         private EnterTicket  $enterTicket,
     )
     {
-
     }
 
     public function search(Request $request): JsonResponse
@@ -44,6 +43,5 @@ class ScanController extends Controller
         } catch (\Throwable $e) {
             return response()->json($e->getMessage(), 422);
         }
-
     }
 }

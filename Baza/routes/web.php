@@ -59,3 +59,4 @@ Route::get('/pages/notifications', [PageController::class, 'notifications'])->na
 // Scan
 Route::get('/scan', [ScanController::class, 'scanPage'])->name('tickets.scan');
 Route::get('/search', [SearchController::class, 'searchPage'])->name('tickets.search');
+Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name('tickets.scan.enterForTable');
