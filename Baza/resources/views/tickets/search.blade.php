@@ -161,98 +161,101 @@
                                 <div class="tab-pane fade @if($tab === DefineService::SPISOK_TICKET) show active @endif"
                                      id="{{DefineService::SPISOK_TICKET}}">
                                     <div class="table-responsive">
-                                        <table class="table">
-                                            <thead class=" text-primary">
-                                            <th>
-                                                Цвет браслета
-                                            </th>
-                                            <th>
-                                                ID
-                                            </th>
-                                            <th>
-                                                Имя
-                                            </th>
-                                            <th>
-                                                Email
-                                            </th>
-                                            <th>
-                                                Проект
-                                            </th>
-                                            <th>
-                                                Куратор
-                                            </th>
-                                            <th>
-                                                Статус
-                                            </th>
-                                            <th>
-                                                Дата заказа
-                                            </th>
-                                            <th>
-                                                Комментарий
-                                            </th>
-                                            <th>
-                                            </th>
-                                            </thead>
-                                            <tbody>
-                                            @foreach($result[DefineService::SPISOK_TICKET] as $ticket)
-                                                <tr>
-                                                    <td style="background: {{ $ticket['color'] }}">
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['kilter']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['name']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['email']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['project']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['curator']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['status_human']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['date_order']}}
-                                                    </td>
-                                                    <td>
-                                                        {{$ticket['comment']}}
-                                                    </td>
-                                                    <td>
-                                                        @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
-                                                            <form method="post"
-                                                                  action="{{ route('tickets.scan.enterForTable') }}">
-                                                                @csrf
-                                                                <input type="hidden" name="id"
-                                                                       value="{{$ticket['kilter']}}">
-                                                                <input type="hidden" name="type"
-                                                                       value="{{DefineService::SPISOK_TICKET}}">
-                                                                <input type="hidden" name="q" value="{{$q}}">
-                                                                <button type="submit"
-                                                                        class="btn btn-fill btn-primary">Пропустить
-                                                                </button>
-                                                            </form>
-                                                        @elseif($ticket['date_change'] != null)
-                                                            Был пропущен {{$ticket['date_change']}}
-                                                        @else
-                                                            Билет находиться в статусе {{$ticket['status_human']}}
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                            </tbody>
-                                        </table>
+                                        @if (isset($result[DefineService::SPISOK_TICKET]) && count($result[DefineService::SPISOK_TICKET]) > 0 )
+                                            <table class="table">
+                                                <thead class=" text-primary">
+                                                <th>
+                                                    Цвет браслета
+                                                </th>
+                                                <th>
+                                                    ID
+                                                </th>
+                                                <th>
+                                                    Имя
+                                                </th>
+                                                <th>
+                                                    Email
+                                                </th>
+                                                <th>
+                                                    Проект
+                                                </th>
+                                                <th>
+                                                    Куратор
+                                                </th>
+                                                <th>
+                                                    Статус
+                                                </th>
+                                                <th>
+                                                    Дата заказа
+                                                </th>
+                                                <th>
+                                                    Комментарий
+                                                </th>
+                                                <th>
+                                                </th>
+                                                </thead>
+                                                <tbody>
+                                                @foreach($result[DefineService::SPISOK_TICKET] as $ticket)
+                                                    <tr>
+                                                        <td style="background: {{ $ticket['color'] }}">
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['kilter']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['name']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['email']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['project']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['curator']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['status_human']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['date_order']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['comment']}}
+                                                        </td>
+                                                        <td>
+                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                                <form method="post"
+                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id"
+                                                                           value="{{$ticket['kilter']}}">
+                                                                    <input type="hidden" name="type"
+                                                                           value="{{DefineService::SPISOK_TICKET}}">
+                                                                    <input type="hidden" name="q" value="{{$q}}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
+                                                            @else
+                                                                Билет находиться в статусе {{$ticket['status_human']}}
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                                </tbody>
+                                            </table>
+                                        @endif
                                     </div>
                                 </div>
                                 <!-- ФРЕНДЛИ -->
                                 <div class="tab-pane fade @if($tab === DefineService::DRUG_TICKET) show active @endif"
                                      id="{{DefineService::DRUG_TICKET}}">
                                     <div class="table-responsive">
-                                        <table class="table">
+                                        @if (isset($result[DefineService::DRUG_TICKET]) && count($result[DefineService::DRUG_TICKET]) > 0 )
+                                            <table class="table">
                                             <thead class=" text-primary">
                                             <th>
                                                 Цвет браслета
@@ -337,6 +340,7 @@
                                             @endforeach
                                             </tbody>
                                         </table>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
