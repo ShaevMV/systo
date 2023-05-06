@@ -14,6 +14,7 @@ use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\Shared\Domain\ValueObject\Status;
+use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class ChanceStatusCommandHandler implements CommandHandler
 {
@@ -21,6 +22,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         private OrderTicketRepositoryInterface $orderTicketRepository,
         private Bus                            $bus,
         private AddComment                     $addComment,
+        private PushTicket                 $pushTicket,
     )
     {
     }
@@ -65,5 +67,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         );
 
         $this->bus::chain($list)->dispatch();
+
+        $this->pushTicket->pushByOrderId($command->getOrderId());
     }
 }
