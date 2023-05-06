@@ -30,7 +30,7 @@ class CreateLiveCommand extends Command
      */
     public function handle(LiveTicketRepositoryInterface $repository): int
     {
-        LiveTicketModel::all()->delete();
+        LiveTicketModel::truncate();
         if ($this->argument('start') > $this->argument('end')) {
             $this->error('Начало не может быть больше конца');
             return Command::FAILURE;
