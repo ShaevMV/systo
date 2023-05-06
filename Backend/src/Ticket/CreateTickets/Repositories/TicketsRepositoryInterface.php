@@ -17,7 +17,7 @@ interface TicketsRepositoryInterface
      * @param Uuid $orderId
      * @return Uuid[]
      */
-    public function getListIdByOrderId(Uuid $orderId): array;
+    public function getListIdByOrderId(Uuid $orderId, bool $isShowDelete = false): array;
 
     public function getTicket(Uuid $ticketId, bool $isShowDelete = false): TicketResponse;
 

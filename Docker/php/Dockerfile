@@ -48,9 +48,11 @@ RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 RUN if [ ${WITH_XDEBUG} = "true" ]; then \
     chown -R user:user /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-    chmod 777 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 ;fi
 
+RUN if [ ${WITH_XDEBUG} = "true" ]; then \
+    chmod 777 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+;fi
 
 COPY docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

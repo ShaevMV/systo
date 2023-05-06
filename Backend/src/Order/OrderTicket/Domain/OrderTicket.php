@@ -16,18 +16,19 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 final class OrderTicket extends AggregateRoot
 {
     /**
-     * @param  GuestsDto[]  $ticket
+     * @param GuestsDto[] $ticket
      */
     public function __construct(
-        protected Uuid $festival_id,
-        protected Uuid $user_id,
-        protected Uuid $types_of_payment_id,
+        protected Uuid     $festival_id,
+        protected Uuid     $user_id,
+        protected Uuid     $types_of_payment_id,
         protected PriceDto $price,
-        protected Status $status,
-        protected array $ticket,
-        protected Uuid $id,
-        protected ?string $promo_code = null,
-    ) {
+        protected Status   $status,
+        protected array    $ticket,
+        protected Uuid     $id,
+        protected ?string  $promo_code = null,
+    )
+    {
     }
 
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
@@ -47,8 +48,9 @@ final class OrderTicket extends AggregateRoot
 
     public static function create(
         OrderTicketDto $orderTicketDto,
-        int $kilter,
-    ): self {
+        int            $kilter,
+    ): self
+    {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
@@ -103,7 +105,7 @@ final class OrderTicket extends AggregateRoot
 
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
-        if(is_null($comment)) {
+        if (is_null($comment)) {
             throw new DomainException('Комментарий обязательный для смены статус "Возникли трудности"');
         }
 

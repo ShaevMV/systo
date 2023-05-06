@@ -168,6 +168,7 @@ class OrderTickets extends Controller
         $this->chanceStatus->chance(
             new Uuid($id),
             $status,
+            new Uuid(Auth::id()),
             $request->get('comment', null)
         );
 

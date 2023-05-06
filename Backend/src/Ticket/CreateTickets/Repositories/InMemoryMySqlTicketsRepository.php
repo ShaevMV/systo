@@ -67,13 +67,19 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 
     /**
      * @param Uuid $orderId
+     * @param bool $isShowDelete
      * @return Uuid[]
      */
-    public function getListIdByOrderId(Uuid $orderId): array
+    public function getListIdByOrderId(Uuid $orderId, bool $isShowDelete = false): array
     {
         $result = [];
+        if (!$isShowDelete) {
+            $model = $this->model;
+        } else {
+            $model = $this->model::withTrashed();
+        }
 
-        $listIds = $this->model::whereOrderTicketId($orderId->value())
+        $listIds = $model->whereOrderTicketId($orderId->value())
             ->get()
             ->toArray();
 
@@ -92,7 +98,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     private function getSubQueryLastComment(): Builder
     {
         return CommentOrderTicketModel::select('comment')
-            ->whereColumn('order_tickets_id', $this->model::TABLE.'.order_ticket_id')
+            ->whereColumn('order_tickets_id', $this->model::TABLE . '.order_ticket_id')
             ->latest()
             ->limit(1)
             ->getQuery();
@@ -100,7 +106,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 
     public function getTicket(Uuid $ticketId, bool $isShowDelete = false): TicketResponse
     {
-        if(!$isShowDelete){
+        if (!$isShowDelete) {
             $result = $this->model;
         } else {
             $result = $this->model::withTrashed();
@@ -169,7 +175,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $rawResult = $this->model::withTrashed()->get('id')->toArray();
         $result = [];
         foreach ($rawResult as $item) {
-            $result[]=new Uuid($item['id']);
+            $result[] = new Uuid($item['id']);
         }
 
         return $result;

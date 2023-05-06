@@ -2,7 +2,9 @@
 
 namespace Tests\Unit\Order\OrderTicket\Application\ChanceStatus;
 
+use App\Models\User;
 use Database\Seeders\OrderSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -47,7 +49,8 @@ class ChanceStatusTest extends TestCase
     {
         $this->chanceStatus->chance(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
-            new Status(Status::PAID)
+            new Status(Status::PAID),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
@@ -66,6 +69,7 @@ class ChanceStatusTest extends TestCase
         $this->chanceStatus->chance(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             new Status(Status::DIFFICULTIES_AROSE),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isdDifficultiesArose());
@@ -79,7 +83,8 @@ class ChanceStatusTest extends TestCase
     {
         $this->chanceStatus->chance(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
-            new Status(Status::CANCEL)
+            new Status(Status::CANCEL),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isCancel());

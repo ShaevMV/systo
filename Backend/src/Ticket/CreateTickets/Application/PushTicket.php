@@ -44,7 +44,7 @@ class PushTicket
      */
     public function pushByOrderId(Uuid $orderId): void
     {
-        $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId);
+        $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId, true);
         foreach ($idTickets as $id) {
             $this->pushTicket($id);
         }

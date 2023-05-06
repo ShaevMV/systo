@@ -22,7 +22,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         private OrderTicketRepositoryInterface $orderTicketRepository,
         private Bus                            $bus,
         private AddComment                     $addComment,
-        private PushTicket                 $pushTicket,
+        private PushTicket                     $pushTicket,
     )
     {
     }
