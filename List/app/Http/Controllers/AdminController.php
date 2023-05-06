@@ -7,7 +7,6 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\ListTicket;
 use App\Models\User;
-use App\Services\CreatingQrCodeService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -16,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 use Shared\Services\TicketService;
+use Shared\Services\CreatingQrCodeService;
 
 class AdminController extends Controller
 {

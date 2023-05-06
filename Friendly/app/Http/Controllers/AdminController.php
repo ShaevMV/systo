@@ -22,19 +22,15 @@ class AdminController extends Controller
     private $createNewUser;
     private $updateUserProfileInformation;
     private $updateUserPassword;
-    private CreatingQrCodeService $creatingQrCodeService;
-
     public function __construct(
         CreateNewUser $createNewUser,
         UpdateUserProfileInformation $updateUserProfileInformation,
-        UpdateUserPassword $updateUserPassword,
-        CreatingQrCodeService $creatingQrCodeService
+        UpdateUserPassword $updateUserPassword
     )
     {
         $this->createNewUser = $createNewUser;
         $this->updateUserProfileInformation = $updateUserProfileInformation;
         $this->updateUserPassword = $updateUserPassword;
-        $this->creatingQrCodeService = $creatingQrCodeService;
     }
 
     /**
