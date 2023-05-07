@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Baza\Tickets\Applications\Enter\SpisokTicket;
 
 use Baza\Shared\Domain\Bus\Command\CommandHandler;

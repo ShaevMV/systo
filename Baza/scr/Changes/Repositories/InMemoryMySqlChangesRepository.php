@@ -51,15 +51,17 @@ class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
         return $result->id;
     }
 
-    public function addTicket(string $typeTickets): bool
+    public function addTicket(string $columName, int $changeId): bool
     {
-        // TODO: Implement addTicket() method.
+        $result = $this->model::find($changeId);
+        $result->increment($columName);
+        return $result->save();
     }
 
     public function getChangeId(int $userId): ?int
     {
         $result = $this->model::whereUserId($userId)
-            ->whereEnd(null)
+            ->where('end', '=', null)
             ->first();
 
         return $result?->id;

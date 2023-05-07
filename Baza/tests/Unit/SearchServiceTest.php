@@ -2,19 +2,29 @@
 
 namespace Tests\Unit;
 
-use Baza\Tickets\Applications\Search\SearchService;
+use Baza\Changes\Applications\AddTicketsInReport\AddTicketsInReport;
+
+use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
 use Tests\TestCase;
 
 class SearchServiceTest extends TestCase
 {
-    private SearchService $service;
+
+    private AddTicketsInReport $addTicketsInReport;
+
+    private GetCurrentChanges $getCurrentChanges;
 
     protected function setUp(): void
     {
         parent::setUp();
-        /** @var SearchService $service */
-        $service = $this->app->get(SearchService::class);
-        $this->service = $service;
+        /** @var AddTicketsInReport $service */
+        $addTicketsInReport = $this->app->get(AddTicketsInReport::class);
+        $this->addTicketsInReport = $addTicketsInReport;
+
+
+        /** @var GetCurrentChanges $service */
+        $getCurrentChanges = $this->app->get(GetCurrentChanges::class);
+        $this->getCurrentChanges = $getCurrentChanges;
     }
 
     /**
@@ -22,11 +32,10 @@ class SearchServiceTest extends TestCase
      *
      * @return void
      */
-    public function test_in_correct_find(): void
+    public function test_get_changes_id(): void
     {
-        $int = (int)'el-20066';
+        $id = $this->getCurrentChanges->getId(1);
 
-        $result = $this->service->find('el-20066');
-        $d = 4;
+        self::assertEquals(2, $id);
     }
 }

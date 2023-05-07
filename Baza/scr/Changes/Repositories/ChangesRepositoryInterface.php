@@ -33,11 +33,11 @@ interface ChangesRepositoryInterface
     /**
      * Увеличить кол-во пропущенных билетов
      *
-     * @param string $typeTickets
+     * @param string $columName
+     * @param int $changeId
      * @return bool
      */
-    public function addTicket(string $typeTickets): bool;
-
+    public function addTicket(string $columName, int $changeId): bool;
 
     /**
      * Получить идентификатор текущей смены пользователя

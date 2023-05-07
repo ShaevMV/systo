@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Baza\Changes\Applications\AddTicketsInReport\AddTicketsInReport;
 use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Scan\SearchEngine;
@@ -17,6 +18,7 @@ class ScanController extends Controller
         private SearchEngine $searchEngine,
         private EnterTicket  $enterTicket,
         private GetCurrentChanges $getCurrentChanges,
+        private AddTicketsInReport $addTicketsInReport,
     )
     {
     }
@@ -37,7 +39,7 @@ class ScanController extends Controller
     {
         try {
             $changeId = $this->getCurrentChanges->getId((int)$request->get('user_id'));
-
+            $this->addTicketsInReport->increment($changeId, $request->get('type'));
             $this->enterTicket->skip(
                 $request->get('type'),
                 (int)$request->get('id'),

@@ -34,6 +34,13 @@ class DefineService
         '/search?q=',
     ];
 
+    public const TYPE_BY_COLONS_IN_CHANGES = [
+        self::ELECTRON_TICKET => 'count_el_tickets',
+        self::SPISOK_TICKET => 'count_spisok_tickets',
+        self::LIVE_TICKET => 'count_live_tickets',
+        self::DRUG_TICKET => 'count_drug_tickets',
+    ];
+
     private const ELECTRON_TICKET_URL = '/newTickets/';
     private const LIVE_TICKET_URL = '/live?id=';
 
