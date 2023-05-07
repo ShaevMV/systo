@@ -11,7 +11,6 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
-
     public function __construct(
         private ElTicketsModel $elTicketsModel
     )

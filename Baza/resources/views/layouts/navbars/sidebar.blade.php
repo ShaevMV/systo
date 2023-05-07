@@ -13,12 +13,14 @@
                     <p>{{ __('Сканер QR') }}</p>
                 </a>
             </li>
-            <li @if ($pageSlug == 'icons') class="active " @endif>
-                <a href="{{ route('pages.icons') }}">
-                    <i class="tim-icons icon-atom"></i>
-                    <p>{{ __('Icons') }}</p>
-                </a>
-            </li>
+            @if(Auth::user()->is_admin)
+                <li @if ($pageSlug == 'change') class="active " @endif>
+                    <a href="{{ route('user.index') }}">
+                        <i class="tim-icons icon-badge"></i>
+                        <p>{{ __('Смены') }}</p>
+                    </a>
+                </li>
+            @endif
         </ul>
     </div>
 </div>

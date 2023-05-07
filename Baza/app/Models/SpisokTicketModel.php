@@ -38,12 +38,15 @@ use Illuminate\Support\Carbon;
  * @method static Builder|SpisokTicketModel whereName($value)
  * @method static Builder|SpisokTicketModel whereProject($value)
  * @method static Builder|SpisokTicketModel whereUpdatedAt($value)
+ * @method static Builder|SpisokTicketModel whereComment($value)
+ * @method static Builder|SpisokTicketModel whereStatus($value)
  * @mixin Eloquent
  */
 class SpisokTicketModel extends Model
 {
+    protected $table = self::TABLE;
 
-    protected $table = 'spisok_tickets';
+    public const TABLE = 'spisok_tickets';
 
     protected $fillable = [
         'kilter',

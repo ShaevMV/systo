@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Scan\SearchEngine;
 use Illuminate\Http\Request;
@@ -15,6 +16,7 @@ class ScanController extends Controller
     public function __construct(
         private SearchEngine $searchEngine,
         private EnterTicket  $enterTicket,
+        private GetCurrentChanges $getCurrentChanges,
     )
     {
     }
@@ -34,10 +36,12 @@ class ScanController extends Controller
     public function enter(Request $request): JsonResponse
     {
         try {
+            $changeId = $this->getCurrentChanges->getId((int)$request->get('user_id'));
+
             $this->enterTicket->skip(
                 $request->get('type'),
                 (int)$request->get('id'),
-                (int)$request->get('user_id'),
+                $changeId,
             );
             return response()->json('OK');
         } catch (\Throwable $e) {

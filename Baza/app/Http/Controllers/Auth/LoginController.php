@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use Baza\Changes\Applications\OpenAndClose\OpenAndCloseChanges;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,9 +12,11 @@ use Illuminate\Support\Facades\Session;
 
 class LoginController extends Controller
 {
-    public function __construct()
+    public function __construct(
+        private OpenAndCloseChanges $openAndCloseChanges,
+    )
     {
-        $this->middleware('guest');
+        $this->middleware('guest')->except('logout');
     }
 
     public function loginPage(): View
@@ -28,6 +31,9 @@ class LoginController extends Controller
         return view('auth.register');
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function authenticate(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
@@ -37,8 +43,9 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $this->openAndCloseChanges->open(Auth::id());
 
-            return redirect()->intended('tickets.scan');
+            return redirect()->intended();
         }
 
         return back()->withErrors([
@@ -46,8 +53,12 @@ class LoginController extends Controller
         ]);
     }
 
+    /**
+     * @throws \Throwable
+     */
     public function logout(): RedirectResponse
     {
+        $this->openAndCloseChanges->close(Auth::id());
         Session::flush();
 
         Auth::logout();

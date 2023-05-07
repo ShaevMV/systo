@@ -16,6 +16,6 @@ class ElTicketCommandHandler implements CommandHandler
 
     public function __invoke(ElTicketCommand $command): void
     {
-        $this->repository->skip($command->getId(), $command->getUserId());
+        $this->repository->skip($command->getId(), $command->getChangeId());
     }
 }

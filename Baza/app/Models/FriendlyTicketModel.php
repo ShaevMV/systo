@@ -36,12 +36,17 @@ use Illuminate\Support\Carbon;
  * @method static Builder|FriendlyTicketModel whereName($value)
  * @method static Builder|FriendlyTicketModel whereProject($value)
  * @method static Builder|FriendlyTicketModel whereUpdatedAt($value)
+ * @property string $seller
+ * @method static Builder|FriendlyTicketModel whereComment($value)
+ * @method static Builder|FriendlyTicketModel whereSeller($value)
+ * @method static Builder|FriendlyTicketModel whereStatus($value)
  * @mixin Eloquent
  */
 class FriendlyTicketModel extends Model
 {
+    protected $table = self::TABLE;
 
-    protected $table = 'friendly_tickets';
+    public const TABLE = 'friendly_tickets';
 
     protected $fillable = [
         'kilter',

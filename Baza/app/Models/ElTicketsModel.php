@@ -40,11 +40,16 @@ use Illuminate\Support\Carbon;
  * @method static Builder|ElTicketsModel whereStatus($value)
  * @method static Builder|ElTicketsModel whereUpdatedAt($value)
  * @method static Builder|ElTicketsModel whereUuid($value)
+ * @property string $city
+ * @method static Builder|ElTicketsModel whereCity($value)
+ * @method static Builder|ElTicketsModel whereComment($value)
  * @mixin Eloquent
  */
 class ElTicketsModel extends Model
 {
-    protected $table = 'el_tickets';
+    protected $table = self::TABLE;
+
+    public const TABLE = 'el_tickets';
 
     protected $fillable = [
         'kilter',

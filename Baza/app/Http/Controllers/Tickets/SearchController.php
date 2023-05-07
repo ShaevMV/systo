@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Tickets;
 
 use App\Http\Controllers\Controller;
+use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Search\SearchService;
 use Illuminate\Contracts\View\View;
@@ -16,6 +17,7 @@ class SearchController extends Controller
     public function __construct(
         private SearchService $searchService,
         private EnterTicket   $enterTicket,
+        private GetCurrentChanges $getCurrentChanges,
     )
     {
         $this->middleware('auth');
@@ -39,10 +41,12 @@ class SearchController extends Controller
      */
     public function enterForTable(Request $request): RedirectResponse
     {
+        $changeId = $this->getCurrentChanges->getId(\Auth::id());
+
         $this->enterTicket->skip(
             $request->get('type'),
             (int)$request->get('id'),
-            \Auth::id(),
+            $changeId,
         );
 
         return \Redirect::route('tickets.search', [

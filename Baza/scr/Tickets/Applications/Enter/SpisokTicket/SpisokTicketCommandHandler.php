@@ -15,6 +15,6 @@ class SpisokTicketCommandHandler implements CommandHandler
 
     public function __invoke(SpisokTicketCommand $command): void
     {
-        $this->repository->skip($command->getId(), $command->getUserId());
+        $this->repository->skip($command->getId(), $command->getChangeId());
     }
 }

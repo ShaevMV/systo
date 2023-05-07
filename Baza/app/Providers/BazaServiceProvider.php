@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Baza\Changes\Repositories\ChangesRepositoryInterface;
+use Baza\Changes\Repositories\InMemoryMySqlChangesRepository;
 use Baza\Tickets\Repositories\ElTicketsRepositoryInterface;
 use Baza\Tickets\Repositories\FriendlyTicketRepositoryInterface;
 use Baza\Tickets\Repositories\InMemoryMySqlElTicket;
@@ -22,5 +24,6 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(SpisokTicketsRepositoryInterface::class, InMemoryMySqlSpisokTicket::class);
         $this->app->bind(FriendlyTicketRepositoryInterface::class, InMemoryMySqlFriendlyTicket::class);
         $this->app->bind(LiveTicketRepositoryInterface::class, InMemoryMySqlLiveTicket::class);
+        $this->app->bind(ChangesRepositoryInterface::class, InMemoryMySqlChangesRepository::class);
     }
 }

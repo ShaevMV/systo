@@ -17,6 +17,8 @@ class UserController extends Controller
      */
     public function index(User $model): View
     {
-        return view('users.index', ['users' => $model->paginate(15)]);
+        return view('change.index',
+            ['users' => $model->all()]
+        );
     }
 }

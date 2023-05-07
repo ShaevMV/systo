@@ -23,6 +23,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property boolean $is_admin
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
@@ -44,6 +45,9 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @method static Builder|User wherePassword($value)
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
+ * @property-read Collection<int, PersonalAccessToken> $tokens
+ * @method static Builder|User whereIsAdmin($value)
  * @mixin Eloquent
  */
 class User extends Authenticatable

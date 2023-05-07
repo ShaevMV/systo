@@ -39,13 +39,13 @@ class EnterTicket
     /**
      * @throws Throwable
      */
-    public function skip(string $type, int $id, int $userId): void
+    public function skip(string $type, int $id, int $changeId): void
     {
         $command = match ($type) {
-            DefineService::SPISOK_TICKET => new SpisokTicketCommand($id, $userId),
-            DefineService::ELECTRON_TICKET => new ElTicketCommand($id, $userId),
-            DefineService::DRUG_TICKET => new DrugTicketCommand($id, $userId),
-            DefineService::LIVE_TICKET => new LiveTicketCommand($id, $userId),
+            DefineService::SPISOK_TICKET => new SpisokTicketCommand($id, $changeId),
+            DefineService::ELECTRON_TICKET => new ElTicketCommand($id, $changeId),
+            DefineService::DRUG_TICKET => new DrugTicketCommand($id, $changeId),
+            DefineService::LIVE_TICKET => new LiveTicketCommand($id, $changeId),
             default => throw new \DomainException('Не верный тип ' . $type),
         };
 

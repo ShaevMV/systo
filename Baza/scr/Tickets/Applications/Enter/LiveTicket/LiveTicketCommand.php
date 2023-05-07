@@ -8,7 +8,7 @@ class LiveTicketCommand implements Command
 {
     public function __construct(
         private int $id,
-        private int $user_id,
+        private int $changeId,
     )
     {
     }
@@ -18,8 +18,8 @@ class LiveTicketCommand implements Command
         return $this->id;
     }
 
-    public function getUserId(): int
+    public function getChangeId(): int
     {
-        return $this->user_id;
+        return $this->changeId;
     }
 }

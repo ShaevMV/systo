@@ -29,11 +29,15 @@ use Illuminate\Support\Carbon;
  * @method static Builder|LiveTicketModel whereId($value)
  * @method static Builder|LiveTicketModel whereKilter($value)
  * @method static Builder|LiveTicketModel whereUpdatedAt($value)
+ * @method static Builder|LiveTicketModel whereComment($value)
+ * @method static Builder|LiveTicketModel whereStatus($value)
  * @mixin Eloquent
  */
 class LiveTicketModel extends Model
 {
-    protected $table = 'live_tickets';
+    protected $table = self::TABLE;
+
+    public const TABLE = 'live_tickets';
 
     protected $fillable = [
         'kilter',
