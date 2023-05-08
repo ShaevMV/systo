@@ -41,4 +41,6 @@ interface ChangesRepositoryInterface
     public function getChangeId(int $userId): ?int;
 
     public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool;
+
+    public function get(int $id): array;
 }

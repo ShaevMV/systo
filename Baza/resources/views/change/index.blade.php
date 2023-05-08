@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="{{ route('changes.add') }}"> Добавить смену </a>
+                    <a href="{{ route('changes.edit',null)}}"> Добавить смену </a>
                 </div>
             </div>
         </div>

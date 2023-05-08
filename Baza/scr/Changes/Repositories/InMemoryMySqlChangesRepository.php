@@ -8,7 +8,8 @@ use App\Models\ChangesModel;
 use Baza\Changes\Applications\Report\ReportForChangesDto;
 use Carbon\Carbon;
 use DB;
-use Psy\Util\Json;
+use Nette\Utils\Json;
+use Nette\Utils\JsonException;
 
 class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
 {
@@ -73,13 +74,22 @@ group by `changes`.`id`");
 
     public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool
     {
-        if(!is_null($id)) {
+        if (!is_null($id)) {
             $model = $this->model::find($id);
         } else {
             $model = $this->model;
         }
         $model->user_id = Json::encode($userList);
         $model->start = $start;
+
         return $model->save();
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function get(int $id): array
+    {
+        return $this->model::find($id)->toArray();
     }
 }
