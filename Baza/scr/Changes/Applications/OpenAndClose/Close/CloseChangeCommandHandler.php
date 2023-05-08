@@ -17,7 +17,7 @@ class CloseChangeCommandHandler implements CommandHandler
 
     public function __invoke(CloseChangeCommand $command): void
     {
-        if ($this->repository->close($command->getUserId()) > 0) {
+        if ($this->repository->close($command->getChangeId()) > 0) {
             return;
         }
 

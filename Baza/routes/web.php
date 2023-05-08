@@ -65,5 +65,5 @@ Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name(
 // changes
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware('admin');
 Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->name('changes.edit')->middleware('admin');
-Route::post('/change/close', [ChangesController::class, 'report'])->name('changes.close')->middleware('admin');
+Route::post('/change/close', [ChangesController::class, 'close'])->name('changes.close')->middleware('admin');
 Route::post('/change/save', [ChangesController::class, 'save'])->name('changes.save')->middleware('admin');

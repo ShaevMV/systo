@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Changes;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Baza\Changes\Applications\OpenAndClose\OpenAndCloseChanges;
 use Baza\Changes\Applications\Report\ReportForChanges;
 use Baza\Changes\Applications\SaveChange\SaveChange;
 use Baza\Changes\Repositories\ChangesRepositoryInterface;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
+use phpDocumentor\Reflection\Types\Integer;
 use Redirect;
 use Throwable;
 
@@ -24,6 +26,7 @@ class ChangesController extends Controller
         private ReportForChanges           $changes,
         private SaveChange                 $saveChange,
         private ChangesRepositoryInterface $repository,
+        private OpenAndCloseChanges $openAndCloseChanges,
     )
     {
     }
@@ -66,6 +69,14 @@ class ChangesController extends Controller
             Carbon::parse($request->get('start')),
             $id,
         );
+
+        return Redirect::route('changes.report');
+    }
+
+    public function close(Request $request): RedirectResponse
+    {
+        $id = (int)$request->get('id');
+        $this->openAndCloseChanges->close($id);
 
         return Redirect::route('changes.report');
     }

@@ -9,13 +9,13 @@ use Baza\Shared\Domain\Bus\Command\Command;
 class CloseChangeCommand implements Command
 {
     public function __construct(
-        private int $userId,
+        private int $changeId,
     )
     {
     }
 
-    public function getUserId(): int
+    public function getChangeId(): int
     {
-        return $this->userId;
+        return $this->changeId;
     }
 }

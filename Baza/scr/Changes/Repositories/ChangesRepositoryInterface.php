@@ -18,10 +18,10 @@ interface ChangesRepositoryInterface
     /**
      * Закрыть смену
      *
-     * @param int $userId
+     * @param int $changeId
      * @return int
      */
-    public function close(int $userId): int;
+    public function close(int $changeId): int;
 
     /**
      * Увеличить кол-во пропущенных билетов
