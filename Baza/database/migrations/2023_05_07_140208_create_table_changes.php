@@ -13,6 +13,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('changes');
+
         Schema::create('changes', function (Blueprint $table) {
             $table->id();
             $table->json('user_id')->nullable(false);
