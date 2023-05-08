@@ -67,3 +67,4 @@ Route::get('/report', [ChangesController::class, 'report'])->name('changes.repor
 Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->name('changes.edit')->middleware('admin');
 Route::post('/change/close', [ChangesController::class, 'close'])->name('changes.close')->middleware('admin');
 Route::post('/change/save', [ChangesController::class, 'save'])->name('changes.save')->middleware('admin');
+Route::post('/change/remove', [ChangesController::class, 'remove'])->name('changes.remove')->middleware('admin');

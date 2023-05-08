@@ -43,4 +43,6 @@ interface ChangesRepositoryInterface
     public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool;
 
     public function get(int $id): array;
+
+    public function remove(int $id): bool;
 }

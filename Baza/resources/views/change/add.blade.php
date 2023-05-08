@@ -29,6 +29,16 @@
                                 class="btn btn-fill btn-primary">@if(isset($findChange['id']))Сохранить @else Добавить@endif
                         </button>
                     </form>
+                    @if(isset($findChange['id']))
+                        <form class="form" method="post"
+                              action="{{ route('changes.remove') }}">
+                            @csrf
+                            <input name="id" value="{{$findChange['id']}}" type="hidden">
+                            <button type="submit"
+                                    class="btn btn-fill btn-primary">Удалить
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

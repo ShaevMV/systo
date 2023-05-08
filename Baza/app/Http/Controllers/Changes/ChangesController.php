@@ -80,4 +80,12 @@ class ChangesController extends Controller
 
         return Redirect::route('changes.report');
     }
+
+    public function remove(Request $request): RedirectResponse
+    {
+        $id = (int)$request->get('id');
+        $this->repository->remove($id);
+
+        return Redirect::route('changes.report');
+    }
 }

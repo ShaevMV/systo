@@ -92,4 +92,9 @@ group by `changes`.`id`");
     {
         return $this->model::find($id)->toArray();
     }
+
+    public function remove(int $id): bool
+    {
+        return $this->model::find($id)->delete($id);
+    }
 }
