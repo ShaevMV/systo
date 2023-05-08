@@ -12,7 +12,6 @@
       <sourceFolder url="file://$MODULE_DIR$/Friendly/database/seeders" isTestSource="false" packagePrefix="Database\Seeders\" />
       <sourceFolder url="file://$MODULE_DIR$/Friendly/tests" isTestSource="true" packagePrefix="Tests\" />
       <sourceFolder url="file://$MODULE_DIR$/Friendly/../Shared" isTestSource="false" packagePrefix="Shared\" />
-      <sourceFolder url="file://$MODULE_DIR$/Baza/scr" isTestSource="false" packagePrefix="Baza" />
       <sourceFolder url="file://$MODULE_DIR$/List/../Shared" isTestSource="false" packagePrefix="Shared\" />
       <sourceFolder url="file://$MODULE_DIR$/List/app" isTestSource="false" packagePrefix="App\" />
       <sourceFolder url="file://$MODULE_DIR$/List/database/factories" isTestSource="false" packagePrefix="Database\Factories\" />

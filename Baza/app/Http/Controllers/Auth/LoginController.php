@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Baza\Changes\Applications\OpenAndClose\OpenAndCloseChanges;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +14,7 @@ class LoginController extends Controller
     public function __construct(
     )
     {
-        $this->middleware('guest')->except('logout');
+        $this->middleware('guest')->except(['logout','registerPage']);
     }
 
     public function loginPage(): View
@@ -27,7 +26,9 @@ class LoginController extends Controller
 
     public function registerPage(): View
     {
-        return view('auth.register');
+        return view('auth.register',[
+            'pageSlug' => null
+        ]);
     }
 
     /**

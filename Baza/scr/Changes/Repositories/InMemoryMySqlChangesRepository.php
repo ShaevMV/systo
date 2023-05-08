@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Baza\Changes\Repositories;
 
 use App\Models\ChangesModel;
-use App\Models\User;
 use Baza\Changes\Applications\Report\ReportForChangesDto;
 use Carbon\Carbon;
 use DB;
-use Illuminate\Database\Query\JoinClause;
-use Nette\Utils\Json;
+use Psy\Util\Json;
 
 class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
 {
@@ -64,7 +62,6 @@ group by `changes`.`id`");
     public function getChangeId(int $userId): ?int
     {
         $time = Carbon::now();
-        $strTime = $time->format('d M Y H:i:s');
         $result = $this->model->whereJsonContains('user_id', $userId)
             ->where('end', '=', null)
             ->whereTime('start', '<', $time)
@@ -72,5 +69,17 @@ group by `changes`.`id`");
             ->first();
 
         return $result?->id;
+    }
+
+    public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool
+    {
+        if(!is_null($id)) {
+            $model = $this->model::find($id);
+        } else {
+            $model = $this->model;
+        }
+        $model->user_id = Json::encode($userList);
+        $model->start = $start;
+        return $model->save();
     }
 }

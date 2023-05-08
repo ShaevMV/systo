@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Baza\Changes\Repositories;
 
+use Carbon\Carbon;
+
 interface ChangesRepositoryInterface
 {
     /**
@@ -37,4 +39,6 @@ interface ChangesRepositoryInterface
      * @return int|null
      */
     public function getChangeId(int $userId): ?int;
+
+    public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool;
 }

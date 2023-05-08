@@ -39,7 +39,7 @@
                                 @foreach($report as $item)
                                     <tr>
                                         <td>
-                                            <a href="{{ route('changes.report.edit',['id'=>$item['id']]) }}">{{$item['id']}}
+                                            <a href="{{ route('changes.edit',['id'=>$item['id']]) }}">{{$item['id']}}
                                         </td>
                                         <td>
                                             {{$item['userName']}}
@@ -65,7 +65,7 @@
                                         <td>
                                             @if($item['end'] === null)
                                                 <form method="post"
-                                                      action="{{ route('changes.report.close') }}">
+                                                      action="{{ route('changes.close') }}">
                                                     @csrf
                                                     <input type="hidden" name="id"
                                                            value="{{$item['id']}}">
@@ -82,6 +82,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
+                    <a href="{{ route('changes.add') }}"> Добавить смену </a>
                 </div>
             </div>
         </div>
