@@ -48,11 +48,18 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @method static Builder|User whereIsAdmin($value)
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
+ * @property-read Collection<int, PersonalAccessToken> $tokens
+ * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
+ * @property-read Collection<int, PersonalAccessToken> $tokens
  * @mixin Eloquent
  */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected $table = self::TABLE;
+    public const TABLE = 'users';
 
     /**
      * The attributes that are mass assignable.

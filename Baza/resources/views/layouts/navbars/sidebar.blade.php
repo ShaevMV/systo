@@ -15,7 +15,7 @@
             </li>
             @if(Auth::user()->is_admin)
                 <li @if ($pageSlug == 'change') class="active " @endif>
-                    <a href="{{ route('user.index') }}">
+                    <a href="{{ route('changes.report') }}">
                         <i class="tim-icons icon-badge"></i>
                         <p>{{ __('Смены') }}</p>
                     </a>

@@ -19,7 +19,7 @@ class GetCurrentChangesQueryHandler implements QueryHandler
     {
         $id = $this->repository->getChangeId($query->getUserId());
 
-        if($id === null) {
+        if ($id === null) {
             return null;
         }
 

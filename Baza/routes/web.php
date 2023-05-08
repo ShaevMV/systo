@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Changes\ChangesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
@@ -60,3 +61,8 @@ Route::get('/pages/notifications', [PageController::class, 'notifications'])->na
 Route::get('/scan', [ScanController::class, 'scanPage'])->name('tickets.scan');
 Route::get('/search', [SearchController::class, 'searchPage'])->name('tickets.search');
 Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name('tickets.scan.enterForTable');
+
+// changes
+Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware('admin');
+Route::get('/report/edit/{id}', [ChangesController::class, 'report'])->name('changes.report.edit')->middleware('admin');
+Route::post('/report/close', [ChangesController::class, 'report'])->name('changes.report.close')->middleware('admin');

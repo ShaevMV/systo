@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Baza\Changes\Repositories;
 
-
 interface ChangesRepositoryInterface
 {
     /**
@@ -15,18 +14,10 @@ interface ChangesRepositoryInterface
     public function getAllReport(): array;
 
     /**
-     * Открыть смену
-     *
-     * @param int $userId
-     * @return bool
-     */
-    public function open(int $userId): int;
-
-    /**
      * Закрыть смену
      *
      * @param int $userId
-     * @return bool
+     * @return int
      */
     public function close(int $userId): int;
 
@@ -43,7 +34,7 @@ interface ChangesRepositoryInterface
      * Получить идентификатор текущей смены пользователя
      *
      * @param int $userId
-     * @return int
+     * @return int|null
      */
     public function getChangeId(int $userId): ?int;
 }

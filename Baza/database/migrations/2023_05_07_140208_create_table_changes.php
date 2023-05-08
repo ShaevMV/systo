@@ -11,11 +11,11 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('changes', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id')->nullable(false);
+            $table->json('user_id')->nullable(false);
             $table->integer('count_live_tickets')->default(0);
             $table->integer('count_el_tickets')->default(0);
             $table->integer('count_drug_tickets')->default(0);
@@ -31,7 +31,7 @@ return new class extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('changes');
     }

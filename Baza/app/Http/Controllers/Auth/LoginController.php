@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Session;
 class LoginController extends Controller
 {
     public function __construct(
-        private OpenAndCloseChanges $openAndCloseChanges,
     )
     {
         $this->middleware('guest')->except('logout');
@@ -43,7 +42,6 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            $this->openAndCloseChanges->open(Auth::id());
 
             return redirect()->intended();
         }
@@ -58,7 +56,6 @@ class LoginController extends Controller
      */
     public function logout(): RedirectResponse
     {
-        $this->openAndCloseChanges->close(Auth::id());
         Session::flush();
 
         Auth::logout();
