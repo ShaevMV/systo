@@ -1,6 +1,6 @@
 export const getError = state => type => {
-    if(state.dataError !== undefined && state.dataError[type] !== undefined){
-        if(typeof state.dataError[type] === "object"){
+    if (state.dataError !== undefined && state.dataError[type] !== undefined) {
+        if (typeof state.dataError[type] === "object") {
             return state.dataError[type][0];
         }
         return state.dataError[type];
@@ -46,7 +46,7 @@ export const getSelectTicketType = state => {
  * @returns {null|*}
  */
 export const getSelectTicketTypeId = state => {
-    if(state.selectTicketType.id !== null) {
+    if (state.selectTicketType.id !== null) {
         return state.selectTicketType.id;
     }
     return null;
@@ -59,7 +59,7 @@ export const getSelectTicketTypeId = state => {
  * @returns {null|*}
  */
 export const getSelectTicketTypeLimit = state => {
-    if(state.selectTicketType.groupLimit !== null) {
+    if (state.selectTicketType.groupLimit !== null) {
         return state.selectTicketType.groupLimit;
     }
     return null;
@@ -72,7 +72,7 @@ export const getSelectTicketTypeLimit = state => {
  * @returns {null|*}
  */
 export const getDiscountByPromoCode = state => {
-    if(state.promoCode.discount !== null) {
+    if (state.promoCode.discount !== null) {
         return state.promoCode.discount;
     }
     return null;
@@ -80,7 +80,7 @@ export const getDiscountByPromoCode = state => {
 
 
 export const getPromoCodeName = state => {
-    if(state.promoCode.name !== null) {
+    if (state.promoCode.name !== null) {
         return state.promoCode.name;
     }
 
@@ -90,6 +90,11 @@ export const getPromoCodeName = state => {
 /**
  * Проверка на соответсвие условием группавого типа билета
  */
-export const isAllowedGuest = (state,getters) => count => {
+export const isAllowedGuest = (state, getters) => count => {
     return state.selectTicketType.groupLimit === null || getters.getSelectTicketTypeLimit >= count;
+};
+
+
+export const isAllowedGuestMin = (state, getters) => count => {
+    return state.selectTicketType.groupLimit === null || getters.getSelectTicketTypeLimit === count;
 };
