@@ -10,7 +10,6 @@
                 <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
                     <div class="card-body">
                             @csrf
-                            @method('put')
 
                             @include('alerts.success')
 
