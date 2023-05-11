@@ -28,7 +28,7 @@ class GetCurrentChanges
 
 
         if (is_null($result)) {
-            throw new DomainException('Смена не найдена');
+            throw new DomainException('Ваша смена не найдена, обратитесь к Кристине');
         }
 
         return $result->getChangeId();

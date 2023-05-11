@@ -34,6 +34,7 @@ class SearchController extends Controller
             'result' => $result,
             'q' => $request->get('q'),
             'tab' => $request->get('tab'),
+            'error' => $request->get('error'),
         ]);
     }
 
@@ -43,18 +44,27 @@ class SearchController extends Controller
      */
     public function enterForTable(Request $request): RedirectResponse
     {
-        $changeId = $this->getCurrentChanges->getId((int)\Auth::id());
-        $this->addTicketsInReport->increment($changeId, $request->get('type'));
+        try {
+            $changeId = $this->getCurrentChanges->getId((int)\Auth::id());
+            $this->addTicketsInReport->increment($changeId, $request->get('type'));
 
-        $this->enterTicket->skip(
-            $request->get('type'),
-            (int)$request->get('id'),
-            $changeId,
-        );
+            $this->enterTicket->skip(
+                $request->get('type'),
+                (int)$request->get('id'),
+                $changeId,
+            );
 
-        return \Redirect::route('tickets.search', [
-            'q' => $request->get('q'),
-            'tab' => $request->get('type'),
-        ]);
+            return \Redirect::route('tickets.search', [
+                'q' => $request->get('q'),
+                'tab' => $request->get('type'),
+            ]);
+        } catch (\Throwable $exception) {
+            return \Redirect::route('tickets.search', [
+                'q' => $request->get('q'),
+                'tab' => $request->get('type'),
+                'error' => $exception->getMessage(),
+            ]);
+        }
+
     }
 }
