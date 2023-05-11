@@ -32,8 +32,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/register', [LoginController::class, 'registerPage'])->name('register');
 
 // PasswordRequest
-Route::get('/password-request', [LoginController::class, 'passwordRequestPage'])->name('password.request');
-Route::post('/password-request', [LoginController::class, 'passwordRequestPage'])->name('profile.password');
+Route::post('/password-request', [ProfileController::class, 'password'])->name('profile.password');
 
 
 //Home

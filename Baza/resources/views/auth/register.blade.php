@@ -2,48 +2,12 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-5 ml-auto">
-            <div class="info-area info-horizontal mt-5">
-                <div class="icon icon-warning">
-                    <i class="tim-icons icon-wifi"></i>
-                </div>
-                <div class="description">
-                    <h3 class="info-title">{{ __('Marketing') }}</h3>
-                    <p class="description">
-                        {{ __('We\'ve created the marketing campaign of the website. It was a very interesting collaboration.') }}
-                    </p>
-                </div>
-            </div>
-            <div class="info-area info-horizontal">
-                <div class="icon icon-primary">
-                    <i class="tim-icons icon-triangle-right-17"></i>
-                </div>
-                <div class="description">
-                    <h3 class="info-title">{{ __('Fully Coded in HTML5') }}</h3>
-                    <p class="description">
-                        {{ __('We\'ve developed the website with HTML5 and CSS3. The client has access to the code using GitHub.') }}
-                    </p>
-                </div>
-            </div>
-            <div class="info-area info-horizontal">
-                <div class="icon icon-info">
-                    <i class="tim-icons icon-trophy"></i>
-                </div>
-                <div class="description">
-                    <h3 class="info-title">{{ __('Built Audience') }}</h3>
-                    <p class="description">
-                        {{ __('There is also a Fully Customizable CMS Admin Dashboard for this product.') }}
-                    </p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-7 mr-auto">
+        <div class="col-md-12 mr-auto">
             <div class="card card-register card-white">
                 <div class="card-header">
-                    <img class="card-img" src="{{ asset('black') }}/img/card-primary.png" alt="Card image">
-                    <h4 class="card-title">{{ __('Register') }}</h4>
+                    <h4 class="card-title" style="color: #0a0c0d">{{ __('Register') }}</h4>
                 </div>
-                <form class="form" method="post" action="{{ route('register') }}">
+                <form class="form" method="post" action="{{ route('register.new.user') }}">
                     @csrf
 
                     <div class="card-body">
@@ -81,14 +45,6 @@
                                 </div>
                             </div>
                             <input type="password" name="password_confirmation" class="form-control" placeholder="{{ __('Confirm Password') }}">
-                        </div>
-                        <div class="form-check text-left">
-                            <label class="form-check-label">
-                                <input class="form-check-input" type="checkbox">
-                                <span class="form-check-sign"></span>
-                                {{ __('I agree to the') }}
-                                <a href="#">{{ __('terms and conditions') }}</a>.
-                            </label>
                         </div>
                     </div>
                     <div class="card-footer">
