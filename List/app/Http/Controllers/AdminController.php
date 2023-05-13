@@ -122,7 +122,8 @@ class AdminController extends Controller
     {
         /** @var ListTicket $ticket */
         $ticket = ListTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email, $ticket->project);
+
+        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email, 'S' ,$ticket->project);
 
         return $pdf->download('Билет для ' . $ticket->fio . '.pdf');
     }

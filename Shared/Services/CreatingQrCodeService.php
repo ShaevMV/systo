@@ -35,7 +35,7 @@ class CreatingQrCodeService
             ->build();
     }
 
-    public function createPdf(string $id, string $name, string $email, string $prefix): \Barryvdh\DomPDF\PDF
+    public function createPdf(string $id, string $name, string $email, string $prefix, ?string $project = null): \Barryvdh\DomPDF\PDF
     {
         $qrCode = $this->createQrCode($id, $prefix);
 
@@ -43,7 +43,8 @@ class CreatingQrCodeService
             'url' => $qrCode->getDataUri(),
             'name' => $name,
             'email' => $email,
-            'kilter' => $id
+            'kilter' => $id,
+            'project' => $project
         ]);
     }
 }
