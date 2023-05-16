@@ -6,7 +6,9 @@
             <div class="card">
                 <div class="card-header">
                     <h5 class="title">{{ __('Результат поиска') }}</h5>
-                    <span id="error-result" class="error"></span>
+                    <span id="error-result" class="error" style="
+    color: red;
+"></span>
                     <span id="massage-result" class="massage"></span>
                 </div>
                 <div class="card-body" id="scan-result" style="display: none;">
@@ -143,7 +145,7 @@
                     showResult(data);
                 },
                 error: function (data) {
-                    console.error(data);
+                    console.error(data.responseJSON);
                     errorResult.textContent = data.responseJSON;
                     //scanner.start();
                 }

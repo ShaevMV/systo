@@ -19,7 +19,9 @@
                                    value="{{$q}}"
                             >
                             <b>Номер билета вводить только цифры без префикса в начале</b>
-                            <h1 class="error">{{$error}}</h1>
+                            <h1 class="error" style="
+    color: red;
+">{{$error}}</h1>
                         </div>
                     </div>
                     <div class="card-footer">
