@@ -115,7 +115,6 @@
                                                 <tbody>
                                                 @foreach($result[DefineService::ELECTRON_TICKET] as $ticket)
                                                     <tr>
-
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
                                                                 <form method="post"
@@ -136,23 +135,22 @@
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
-
                                                         <td style="background: {{ $ticket['color'] }}">
                                                         </td>
                                                         <td>
                                                             {{$ticket['kilter']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['name']}}
+                                                            {!! $ticket['name'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['email']}}
+                                                            {!! $ticket['email'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['city']}}
+                                                            {!! $ticket['city'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['phone']}}
+                                                            {!! $ticket['phone'] !!}
                                                         </td>
                                                         <td>
                                                             {{$ticket['status_human']}}
@@ -161,7 +159,7 @@
                                                             {{$ticket['date_order']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['comment']}}
+                                                            {!! $ticket['comment'] !!}
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -237,16 +235,16 @@
                                                             {{$ticket['kilter']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['name']}}
+                                                            {!! $ticket['name'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['email']}}
+                                                            {!!  $ticket['email'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['project']}}
+                                                            {!! $ticket['project'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['curator']}}
+                                                            {!! $ticket['curator'] !!}
                                                         </td>
                                                         <td>
                                                             {{$ticket['status_human']}}
@@ -255,7 +253,7 @@
                                                             {{$ticket['date_order']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['comment']}}
+                                                            {!! $ticket['comment'] !!}
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -331,16 +329,16 @@
                                                             {{$ticket['kilter']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['name']}}
+                                                            {!! $ticket['name'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['email']}}
+                                                            {!! $ticket['email'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['project']}}
+                                                            {!! $ticket['project'] !!}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['seller']}}
+                                                            {!! $ticket['seller'] !!}
                                                         </td>
                                                         <td>
                                                             {{$ticket['status_human']}}
@@ -349,7 +347,7 @@
                                                             {{$ticket['date_order']}}
                                                         </td>
                                                         <td>
-                                                            {{$ticket['comment']}}
+                                                            {!! $ticket['comment'] !!}
                                                         </td>
                                                     </tr>
                                                 @endforeach
