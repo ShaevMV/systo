@@ -4,9 +4,9 @@ namespace Baza\Shared\Services;
 
 class ShowSearchWordService
 {
-    public static function insertTag(string $str, ?string $q = null): string
+    public static function insertTag(?string $str = null, ?string $q = null): ?string
     {
-        if(is_null($q)) {
+        if(is_null($q) || is_null($str)) {
             return $str;
         }
 
