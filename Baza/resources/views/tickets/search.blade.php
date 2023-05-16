@@ -327,7 +327,7 @@
                                                                 <input type="hidden" name="id"
                                                                        value="{{$ticket['kilter']}}">
                                                                 <input type="hidden" name="type"
-                                                                       value="{{DefineService::SPISOK_TICKET}}">
+                                                                       value="{{DefineService::DRUG_TICKET}}">
                                                                 <input type="hidden" name="q" value="{{$q}}">
                                                                 <button type="submit"
                                                                         class="btn btn-fill btn-primary">Пропустить
