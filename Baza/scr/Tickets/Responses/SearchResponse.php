@@ -13,11 +13,13 @@ class SearchResponse implements TicketResponseInterface
      * @param SpisokTicketResponse[] $spisok
      * @param ElTicketResponse[] $electron
      * @param FriendlyTicketResponse[] $drug
+     * @param LiveTicketResponse[] $live
      */
     public function __construct(
         private array $spisok,
         private array $electron,
         private array $drug,
+        private array $live,
     )
     {
     }
@@ -37,6 +39,10 @@ class SearchResponse implements TicketResponseInterface
             $result[DefineService::DRUG_TICKET][] = $item->toArray();
         }
 
+        foreach ($this->live as $item) {
+            $result[DefineService::LIVE_TICKET][] = $item->toArray();
+        }
+
         return $result;
     }
 
@@ -46,6 +52,7 @@ class SearchResponse implements TicketResponseInterface
             $data[DefineService::SPISOK_TICKET],
             $data[DefineService::ELECTRON_TICKET],
             $data[DefineService::DRUG_TICKET],
+            $data[DefineService::LIVE_TICKET]
         );
     }
 }

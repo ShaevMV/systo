@@ -6,6 +6,7 @@ namespace Baza\Tickets\Repositories;
 
 use App\Models\LiveTicketModel;
 use Baza\Tickets\Responses\LiveTicketResponse;
+use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
@@ -71,5 +72,18 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
             DB::rollBack();
             throw $exception;
         }
+    }
+
+    public function find(string $q): array
+    {
+        $resultRawList = $this->liveTicketModel::whereKilter((int)$q)
+            ->get()->toArray();
+
+        $result = [];
+        foreach ($resultRawList as $item) {
+            $result[] = LiveTicketResponse::fromState($item);
+        }
+
+        return $result;
     }
 }

@@ -62,13 +62,20 @@
                                            href="#{{DefineService::DRUG_TICKET}}">ФРЕНДЛИ</a>
                                     </li>
                                 @endif
+                                <!-- Живые -->
+                                @if (isset($result[DefineService::LIVE_TICKET]) && count($result[DefineService::LIVE_TICKET]) > 0 )
+                                    <li class="nav-item">
+                                        <a class="nav-link @if($tab === DefineService::LIVE_TICKET) active @endif"
+                                           data-toggle="tab"
+                                           href="#{{DefineService::LIVE_TICKET}}">Живые</a>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                         <div class="card-body">
                             <div class="tab-content">
                                 <!-- ЭЛЕКТРОННЫЕ БИЛЕТЫ  -->
-                                <div
-                                    class="tab-pane fade @if($tab === DefineService::ELECTRON_TICKET) show active @endif"
+                                <div class="tab-pane fade @if($tab === DefineService::ELECTRON_TICKET) show active @endif"
                                     id="{{DefineService::ELECTRON_TICKET}}">
                                     <div class="table-responsive">
                                         @if (isset($result[DefineService::ELECTRON_TICKET]) && count($result[DefineService::ELECTRON_TICKET]) > 0 )
@@ -222,7 +229,7 @@
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
-                                                        <td style="background: {{ $ticket['color'] }}">
+                                                        <td class="color-box" style="background: {{ $ticket['color'] }}">
                                                         </td>
                                                         <td>
                                                             {{$ticket['kilter']}}
@@ -315,7 +322,7 @@
                                                             Билет в статусе {{$ticket['status_human']}}
                                                         @endif
                                                     </td>
-                                                    <td style="background: {{ $ticket['color'] }}">
+                                                    <td class="color-box" style="background: {{ $ticket['color'] }}">
                                                     </td>
                                                     <td>
                                                         {{$ticket['kilter']}}
@@ -345,6 +352,69 @@
                                             @endforeach
                                             </tbody>
                                         </table>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- Живые -->
+                                <div class="tab-pane fade @if($tab === DefineService::LIVE_TICKET) show active @endif"
+                                     id="{{DefineService::LIVE_TICKET}}">
+                                    <div class="table-responsive">
+                                        @if (isset($result[DefineService::LIVE_TICKET]) && count($result[DefineService::LIVE_TICKET]) > 0 )
+                                            <table class="table">
+                                                <thead class=" text-primary">
+                                                <th>
+                                                </th>
+                                                <th>
+                                                    Цвет
+                                                </th>
+                                                <th>
+                                                    ID
+                                                </th>
+                                                <th>
+                                                    Статус
+                                                </th>
+                                                <th>
+                                                    Коммент
+                                                </th>
+                                                </thead>
+                                                <tbody>
+                                                @foreach($result[DefineService::LIVE_TICKET] as $ticket)
+                                                    <tr>
+                                                        <td>
+                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                                <form method="post"
+                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id"
+                                                                           value="{{$ticket['kilter']}}">
+                                                                    <input type="hidden" name="type"
+                                                                           value="{{DefineService::LIVE_TICKET}}">
+                                                                    <input type="hidden" name="q" value="{{$q}}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
+                                                            @else
+                                                                Билет в статусе {{$ticket['status_human']}}
+                                                            @endif
+                                                        </td>
+                                                        <td class="color-box" style="background: {{ $ticket['color'] }}">
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['kilter']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['status_human']}}
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['comment']}}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                                </tbody>
+                                            </table>
                                         @endif
                                     </div>
                                 </div>

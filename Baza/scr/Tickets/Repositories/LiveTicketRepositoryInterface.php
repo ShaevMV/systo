@@ -13,4 +13,10 @@ interface LiveTicketRepositoryInterface
     public function skip(int $id, int $userId): bool;
 
     public function create(int $start, int $end): bool;
+
+    /**
+     * @param string $q
+     * @return LiveTicketResponse[]
+     */
+    public function find(string $q): array;
 }
