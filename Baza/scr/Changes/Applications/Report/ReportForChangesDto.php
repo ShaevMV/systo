@@ -35,4 +35,24 @@ class ReportForChangesDto extends AbstractionEntity
             $end
         );
     }
+
+    public function getCountLiveTickets(): int
+    {
+        return $this->count_live_tickets;
+    }
+
+    public function getCountElTickets(): int
+    {
+        return $this->count_el_tickets;
+    }
+
+    public function getCountDrugTickets(): int
+    {
+        return $this->count_drug_tickets;
+    }
+
+    public function getCountSpisokTickets(): int
+    {
+        return $this->count_spisok_tickets;
+    }
 }

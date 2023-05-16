@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use phpDocumentor\Reflection\Types\Integer;
 use Redirect;
 use Throwable;
 
@@ -39,7 +38,8 @@ class ChangesController extends Controller
         $report = $this->changes->getReport();
 
         return view('change.index', [
-            'report' => $report->getReportList()
+            'report' => $report->getReportList(),
+            'total' => $report->getReportTotalDto()->toArray(),
         ]);
     }
 

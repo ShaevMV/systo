@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Baza\Tickets\Responses;
 
 use Baza\Shared\Domain\ValueObject\Status;
+use Baza\Shared\Services\DefineService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
-use Baza\Tickets\Services\DefineService;
 use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
 

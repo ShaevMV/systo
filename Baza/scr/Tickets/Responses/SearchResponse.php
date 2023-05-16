@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Responses;
 
+use Baza\Shared\Services\DefineService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
-use Baza\Tickets\Services\DefineService;
 
 class SearchResponse implements TicketResponseInterface
 {

@@ -3,7 +3,7 @@
 namespace Tests\Unit;
 
 use Baza\Shared\Domain\ValueObject\Uuid;
-use Baza\Tickets\Services\DefineService;
+use Baza\Shared\Services\DefineService;
 use PHPUnit\Framework\TestCase;
 
 class DefineServiceTest extends TestCase

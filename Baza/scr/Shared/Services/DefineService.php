@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Baza\Tickets\Services;
+namespace Baza\Shared\Services;
 
 use Baza\Shared\Domain\ValueObject\Uuid;
 use Baza\Tickets\Applications\Scan\SearchDto;

@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Baza\Tickets\Applications\Scan;
 
 use Baza\Shared\Domain\ValueObject\Uuid;
-use Baza\Tickets\Services\DefineService;
+use Baza\Shared\Services\DefineService;
+
 
 class SearchDto
 {

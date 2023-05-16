@@ -9,6 +9,9 @@ use Nette\Utils\JsonException;
 
 class ReportForChangesResponse implements Response
 {
+    private ReportTotalDto $reportTotalDto;
+
+
     /**
      * @param ReportForChangesDto[] $reportList
      */
@@ -16,10 +19,10 @@ class ReportForChangesResponse implements Response
         private array $reportList
     )
     {
+        $this->reportTotalDto = ReportTotalDto::fromList($reportList);
     }
 
     /**
-     * @return array
      * @throws JsonException
      */
     public function getReportList(): array
@@ -31,6 +34,11 @@ class ReportForChangesResponse implements Response
         }
 
         return $result;
+    }
+
+    public function getReportTotalDto(): ReportTotalDto
+    {
+        return $this->reportTotalDto;
     }
 
 }

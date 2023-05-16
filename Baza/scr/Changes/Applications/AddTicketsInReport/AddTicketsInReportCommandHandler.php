@@ -6,9 +6,9 @@ namespace Baza\Changes\Applications\AddTicketsInReport;
 
 use Baza\Changes\Repositories\ChangesRepositoryInterface;
 use Baza\Shared\Domain\Bus\Command\CommandHandler;
-use Baza\Tickets\Services\DefineService;
 use DomainException;
 use InvalidArgumentException;
+use Baza\Shared\Services\DefineService;
 
 class AddTicketsInReportCommandHandler implements CommandHandler
 {
