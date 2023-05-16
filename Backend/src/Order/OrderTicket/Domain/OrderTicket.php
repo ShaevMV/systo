@@ -55,7 +55,8 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
                 $orderTicketDto->getEmail(),
-                $kilter
+                $kilter,
+                $result->festival_id
             )
         );
 

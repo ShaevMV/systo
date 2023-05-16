@@ -11,7 +11,7 @@ use Illuminate\Database\Query\Builder;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-class InMemoryMySqlTicketType implements TicketTypeInterface
+class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {
     public function __construct(
         private TicketTypesModel $model,
@@ -74,5 +74,12 @@ class InMemoryMySqlTicketType implements TicketTypeInterface
         }
 
         return $result;
+    }
+
+    public function create(TicketTypeDto $typeDto): bool
+    {
+        $this->model::create($typeDto->toArray());
+
+        return true;
     }
 }

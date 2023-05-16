@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
-interface TicketTypeInterface
+interface TicketTypeInterfaceRepository
 {
     /**
      * @return TicketTypeDto[]
@@ -21,4 +21,6 @@ interface TicketTypeInterface
     ): TicketTypeDto;
 
     public function getListPrice(): array;
+
+    public function create(TicketTypeDto $typeDto): bool;
 }

@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
         private CommentSeeder $commentSeeder,
         private FestivalSeeder $festivalSeeder,
         private TypeTicketsPriceSeeder $typeTicketsPriceSeeder,
+        private TypeTicketsSecondFestivalSeeder $secondFestivalSeeder,
+        private TypeTicketsGroupSeeder $groupSeeder,
     ) {
     }
 
@@ -35,5 +37,7 @@ class DatabaseSeeder extends Seeder
         $this->orderSeeder->run();
         $this->commentSeeder->run();
         $this->typeTicketsPriceSeeder->run();
+        $this->secondFestivalSeeder->run();
+        $this->groupSeeder->run();
     }
 }

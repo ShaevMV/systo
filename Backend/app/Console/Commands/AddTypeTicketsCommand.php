@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Database\Seeders\TypeTicketsGroupSeeder;
+use Database\Seeders\TypeTicketsSecondFestivalSeeder;
 use Illuminate\Console\Command;
 
 class AddTypeTicketsCommand extends Command
@@ -24,14 +24,14 @@ class AddTypeTicketsCommand extends Command
     /**
      * Execute the console command.
      *
-     * @param TypeTicketsGroupSeeder $groupSeeder
+     * @param TypeTicketsSecondFestivalSeeder $festivalSeeder
      * @return int
      */
     public function handle(
-        TypeTicketsGroupSeeder $groupSeeder
+        TypeTicketsSecondFestivalSeeder $festivalSeeder
     ): int
     {
-        $groupSeeder->run();
+        $festivalSeeder->run();
 
         return Command::SUCCESS;
     }

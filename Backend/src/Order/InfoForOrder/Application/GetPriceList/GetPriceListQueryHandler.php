@@ -2,14 +2,14 @@
 
 namespace Tickets\Order\InfoForOrder\Application\GetPriceList;
 
-use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterface;
+use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
 use Tickets\Shared\Domain\Bus\Query\QueryHandler;
 
 class GetPriceListQueryHandler implements QueryHandler
 {
     public function __construct(
-        private TicketTypeInterface $ticketType
+        private TicketTypeInterfaceRepository $ticketType
     ){
     }
 
