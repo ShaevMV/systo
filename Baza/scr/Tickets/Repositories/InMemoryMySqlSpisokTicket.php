@@ -63,7 +63,7 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
             ->get()->toArray();
         $result = [];
         foreach ($resultRawList as $item) {
-            $result[]= SpisokTicketResponse::fromState($item);
+            $result[]= SpisokTicketResponse::fromState($item, $q);
         }
 
         return $result;

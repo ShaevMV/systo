@@ -64,7 +64,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
         $result = [];
         foreach ($resultRawList as $item) {
-            $result[] = FriendlyTicketResponse::fromState($item);
+            $result[] = FriendlyTicketResponse::fromState($item,$q);
         }
 
         return $result;

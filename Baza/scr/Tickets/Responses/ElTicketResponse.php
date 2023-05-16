@@ -7,6 +7,7 @@ namespace Baza\Tickets\Responses;
 use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Shared\Domain\ValueObject\Uuid;
 use Baza\Shared\Services\DefineService;
+use Baza\Shared\Services\ShowSearchWordService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
 use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ class ElTicketResponse implements TicketResponseInterface
         protected string  $name,
         protected string  $email,
         protected string  $phone,
-        protected string $city,
+        protected string  $city,
         protected Status  $status,
         protected Carbon  $date_order,
         protected ?string $comment = null,
@@ -49,20 +50,20 @@ class ElTicketResponse implements TicketResponseInterface
         ];
     }
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, ?string $q = null): self
     {
         $date_change = !is_null($data['date_change'] ?? null) ? Carbon::parse($data['date_change']) : null;
 
         return new self(
             $data['kilter'],
             new Uuid($data['uuid']),
-            $data['name'],
-            $data['email'],
-            $data['phone'],
+            ShowSearchWordService::insertTag($data['name'], $q),
+            ShowSearchWordService::insertTag($data['email'], $q),
+            ShowSearchWordService::insertTag($data['phone'], $q),
             $data['city'],
             new Status($data['status']),
             Carbon::parse($data['date_order']),
-            $data['comment'],
+            ShowSearchWordService::insertTag($data['comment'], $q),
             $data['change_id'] ?? null,
             $date_change,
         );

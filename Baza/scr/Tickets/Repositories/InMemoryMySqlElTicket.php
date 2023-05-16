@@ -61,7 +61,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
             ->toArray();
         $result = [];
         foreach ($resultRawList as $item) {
-            $result[] = ElTicketResponse::fromState($item);
+            $result[] = ElTicketResponse::fromState($item, $q);
         }
 
         return $result;

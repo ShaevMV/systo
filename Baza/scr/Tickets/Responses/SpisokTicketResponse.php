@@ -6,6 +6,7 @@ namespace Baza\Tickets\Responses;
 
 use Baza\Shared\Domain\ValueObject\Status;
 use Baza\Shared\Services\DefineService;
+use Baza\Shared\Services\ShowSearchWordService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
 use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
@@ -46,19 +47,19 @@ class SpisokTicketResponse implements TicketResponseInterface
         ];
     }
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, ?string $q = null): self
     {
         $date_change = !is_null($data['date_change'] ?? null) ? Carbon::parse($data['date_change']) : null;
 
         return new self(
             $data['kilter'],
-            $data['name'],
-            $data['project'],
-            $data['curator'],
-            $data['email'],
+            ShowSearchWordService::insertTag($data['name'], $q),
+            ShowSearchWordService::insertTag($data['project'], $q),
+            ShowSearchWordService::insertTag($data['curator'], $q),
+            ShowSearchWordService::insertTag($data['email'], $q),
             Carbon::parse($data['date_order']),
             new Status($data['status']),
-            $data['comment'] ?? null,
+            ShowSearchWordService::insertTag($data['comment'] ?? '', $q),
             $data['change_id'] ?? null,
             $date_change
         );
