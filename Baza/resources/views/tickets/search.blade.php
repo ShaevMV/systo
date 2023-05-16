@@ -75,6 +75,8 @@
                                             <table class="table">
                                                 <thead class=" text-primary">
                                                 <th>
+                                                </th>
+                                                <th>
                                                     Цвет
                                                 </th>
                                                 <th>
@@ -101,12 +103,32 @@
                                                 <th>
                                                     Коммент
                                                 </th>
-                                                <th>
-                                                </th>
                                                 </thead>
                                                 <tbody>
                                                 @foreach($result[DefineService::ELECTRON_TICKET] as $ticket)
                                                     <tr>
+
+                                                        <td>
+                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                                <form method="post"
+                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id"
+                                                                           value="{{$ticket['kilter']}}">
+                                                                    <input type="hidden" name="type"
+                                                                           value="{{DefineService::ELECTRON_TICKET}}">
+                                                                    <input type="hidden" name="q" value="{{$q}}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
+                                                            @else
+                                                                Билет в статусе {{$ticket['status_human']}}
+                                                            @endif
+                                                        </td>
+
                                                         <td style="background: {{ $ticket['color'] }}">
                                                         </td>
                                                         <td>
@@ -133,26 +155,6 @@
                                                         <td>
                                                             {{$ticket['comment']}}
                                                         </td>
-                                                        <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
-                                                                <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
-                                                                    @csrf
-                                                                    <input type="hidden" name="id"
-                                                                           value="{{$ticket['kilter']}}">
-                                                                    <input type="hidden" name="type"
-                                                                           value="{{DefineService::ELECTRON_TICKET}}">
-                                                                    <input type="hidden" name="q" value="{{$q}}">
-                                                                    <button type="submit"
-                                                                            class="btn btn-fill btn-primary">Пропустить
-                                                                    </button>
-                                                                </form>
-                                                            @elseif($ticket['date_change'] != null)
-                                                                Был пропущен {{$ticket['date_change']}}
-                                                            @else
-                                                                Билет в статусе {{$ticket['status_human']}}
-                                                            @endif
-                                                        </td>
                                                     </tr>
                                                 @endforeach
                                                 </tbody>
@@ -167,6 +169,8 @@
                                         @if (isset($result[DefineService::SPISOK_TICKET]) && count($result[DefineService::SPISOK_TICKET]) > 0 )
                                             <table class="table">
                                                 <thead class=" text-primary">
+                                                <th>
+                                                </th>
                                                 <th>
                                                     Цвет
                                                 </th>
@@ -194,12 +198,30 @@
                                                 <th>
                                                     Коммент
                                                 </th>
-                                                <th>
-                                                </th>
                                                 </thead>
                                                 <tbody>
                                                 @foreach($result[DefineService::SPISOK_TICKET] as $ticket)
                                                     <tr>
+                                                        <td>
+                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                                <form method="post"
+                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id"
+                                                                           value="{{$ticket['kilter']}}">
+                                                                    <input type="hidden" name="type"
+                                                                           value="{{DefineService::SPISOK_TICKET}}">
+                                                                    <input type="hidden" name="q" value="{{$q}}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
+                                                            @else
+                                                                Билет в статусе {{$ticket['status_human']}}
+                                                            @endif
+                                                        </td>
                                                         <td style="background: {{ $ticket['color'] }}">
                                                         </td>
                                                         <td>
@@ -226,26 +248,6 @@
                                                         <td>
                                                             {{$ticket['comment']}}
                                                         </td>
-                                                        <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
-                                                                <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
-                                                                    @csrf
-                                                                    <input type="hidden" name="id"
-                                                                           value="{{$ticket['kilter']}}">
-                                                                    <input type="hidden" name="type"
-                                                                           value="{{DefineService::SPISOK_TICKET}}">
-                                                                    <input type="hidden" name="q" value="{{$q}}">
-                                                                    <button type="submit"
-                                                                            class="btn btn-fill btn-primary">Пропустить
-                                                                    </button>
-                                                                </form>
-                                                            @elseif($ticket['date_change'] != null)
-                                                                Был пропущен {{$ticket['date_change']}}
-                                                            @else
-                                                                Билет в статусе {{$ticket['status_human']}}
-                                                            @endif
-                                                        </td>
                                                     </tr>
                                                 @endforeach
                                                 </tbody>
@@ -260,6 +262,8 @@
                                         @if (isset($result[DefineService::DRUG_TICKET]) && count($result[DefineService::DRUG_TICKET]) > 0 )
                                             <table class="table">
                                             <thead class=" text-primary">
+                                            <th>
+                                            </th>
                                             <th>
                                                 Цвет
                                             </th>
@@ -287,12 +291,30 @@
                                             <th>
                                                 Коммент
                                             </th>
-                                            <th>
-                                            </th>
                                             </thead>
                                             <tbody>
                                             @foreach($result[DefineService::DRUG_TICKET] as $ticket)
                                                 <tr>
+                                                    <td>
+                                                        @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            <form method="post"
+                                                                  action="{{ route('tickets.scan.enterForTable') }}">
+                                                                @csrf
+                                                                <input type="hidden" name="id"
+                                                                       value="{{$ticket['kilter']}}">
+                                                                <input type="hidden" name="type"
+                                                                       value="{{DefineService::DRUG_TICKET}}">
+                                                                <input type="hidden" name="q" value="{{$q}}">
+                                                                <button type="submit"
+                                                                        class="btn btn-fill btn-primary">Пропустить
+                                                                </button>
+                                                            </form>
+                                                        @elseif($ticket['date_change'] != null)
+                                                            Был пропущен {{$ticket['date_change']}}
+                                                        @else
+                                                            Билет в статусе {{$ticket['status_human']}}
+                                                        @endif
+                                                    </td>
                                                     <td style="background: {{ $ticket['color'] }}">
                                                     </td>
                                                     <td>
@@ -318,26 +340,6 @@
                                                     </td>
                                                     <td>
                                                         {{$ticket['comment']}}
-                                                    </td>
-                                                    <td>
-                                                        @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
-                                                            <form method="post"
-                                                                  action="{{ route('tickets.scan.enterForTable') }}">
-                                                                @csrf
-                                                                <input type="hidden" name="id"
-                                                                       value="{{$ticket['kilter']}}">
-                                                                <input type="hidden" name="type"
-                                                                       value="{{DefineService::DRUG_TICKET}}">
-                                                                <input type="hidden" name="q" value="{{$q}}">
-                                                                <button type="submit"
-                                                                        class="btn btn-fill btn-primary">Пропустить
-                                                                </button>
-                                                            </form>
-                                                        @elseif($ticket['date_change'] != null)
-                                                            Был пропущен {{$ticket['date_change']}}
-                                                        @else
-                                                            Билет в статусе {{$ticket['status_human']}}
-                                                        @endif
                                                     </td>
                                                 </tr>
                                             @endforeach
