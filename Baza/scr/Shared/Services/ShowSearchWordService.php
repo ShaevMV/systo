@@ -10,6 +10,6 @@ class ShowSearchWordService
             return $str;
         }
 
-        return str_replace($q, "<b>$q</b>", $str);
+        return str_ireplace($q, "<b>$q</b>", $str);
     }
 }
