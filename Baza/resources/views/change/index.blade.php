@@ -78,27 +78,27 @@
                                     </tr>
                                 @endforeach
                                 <tr>
-                                    <tb></tb>
-                                    <tb>
+                                    <td></td>
+                                    <td>
                                         Всего: <b>{{$total['total']}} </b>
-                                    </tb>
-                                    <tb>
+                                    </td>
+                                    <td>
                                         <b>{{$total['live']}} </b>
-                                    </tb>
-                                    <tb>
+                                    </td>
+                                    <td>
                                         <b>{{$total['el']}} </b>
-                                    </tb>
+                                    </td>
 
-                                    <tb>
+                                    <td>
                                         <b>{{$total['drug']}} </b>
-                                    </tb>
+                                    </td>
 
-                                    <tb>
+                                    <td>
                                         <b>{{$total['spisok']}} </b>
-                                    </tb>
-                                    <tb></tb>
-                                    <tb></tb>
-                                    <tb></tb>
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
                                 </tbody>
                             </table>
