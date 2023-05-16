@@ -60,7 +60,6 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     {
         $result = [];
         $rawResult = $this->model
-            ->where('active', '=', true)
             ->with('ticketTypePrice')
             ->orderBy('sort')
             ->get()
