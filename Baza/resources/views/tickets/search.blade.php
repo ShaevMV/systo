@@ -73,7 +73,7 @@
                                             <table class="table">
                                                 <thead class=" text-primary">
                                                 <th>
-                                                    Цвет браслета
+                                                    Цвет
                                                 </th>
                                                 <th>
                                                     ID
@@ -94,10 +94,10 @@
                                                     Статус
                                                 </th>
                                                 <th>
-                                                    Дата заказа
+                                                    Дата
                                                 </th>
                                                 <th>
-                                                    Комментарий
+                                                    Коммент
                                                 </th>
                                                 <th>
                                                 </th>
@@ -148,7 +148,7 @@
                                                             @elseif($ticket['date_change'] != null)
                                                                 Был пропущен {{$ticket['date_change']}}
                                                             @else
-                                                                Билет находиться в статусе {{$ticket['status_human']}}
+                                                                Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -166,7 +166,7 @@
                                             <table class="table">
                                                 <thead class=" text-primary">
                                                 <th>
-                                                    Цвет браслета
+                                                    Цвет
                                                 </th>
                                                 <th>
                                                     ID
@@ -187,10 +187,10 @@
                                                     Статус
                                                 </th>
                                                 <th>
-                                                    Дата заказа
+                                                    Дата
                                                 </th>
                                                 <th>
-                                                    Комментарий
+                                                    Коммент
                                                 </th>
                                                 <th>
                                                 </th>
@@ -241,7 +241,7 @@
                                                             @elseif($ticket['date_change'] != null)
                                                                 Был пропущен {{$ticket['date_change']}}
                                                             @else
-                                                                Билет находиться в статусе {{$ticket['status_human']}}
+                                                                Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
                                                     </tr>
@@ -259,7 +259,7 @@
                                             <table class="table">
                                             <thead class=" text-primary">
                                             <th>
-                                                Цвет браслета
+                                                Цвет
                                             </th>
                                             <th>
                                                 ID
@@ -280,10 +280,10 @@
                                                 Статус
                                             </th>
                                             <th>
-                                                Дата заказа
+                                                Дата
                                             </th>
                                             <th>
-                                                Комментарий
+                                                Коммент
                                             </th>
                                             <th>
                                             </th>
@@ -334,7 +334,7 @@
                                                         @elseif($ticket['date_change'] != null)
                                                             Был пропущен {{$ticket['date_change']}}
                                                         @else
-                                                            Билет находиться в статусе {{$ticket['status_human']}}
+                                                            Билет в статусе {{$ticket['status_human']}}
                                                         @endif
                                                     </td>
                                                 </tr>
