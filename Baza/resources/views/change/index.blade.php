@@ -80,7 +80,7 @@
                                 <tr>
                                     <tb></tb>
                                     <tb>
-                                        Всего: <b>{{$total['$total']}} </b>
+                                        Всего: <b>{{$total['total']}} </b>
                                     </tb>
                                     <tb>
                                         <b>{{$total['live']}} </b>
