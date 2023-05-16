@@ -25,6 +25,8 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 
         $data = $this->model::with('ticketTypePrice')
             ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')])
+            ->where('active', '=', true)
+            ->orderBy('sort')
             ->get()
             ->toArray();
 
@@ -44,7 +46,8 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
                 ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')]);
         }
 
-        $ticketType = $ticketType->first();
+        $ticketType = $ticketType
+            ->first();
 
         if (is_null($ticketType)) {
             throw new DomainException('Не найденн тип билета по id ' . $uuid->value());
@@ -57,7 +60,9 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     {
         $result = [];
         $rawResult = $this->model
+            ->where('active', '=', true)
             ->with('ticketTypePrice')
+            ->orderBy('sort')
             ->get()
             ->toArray();
 
