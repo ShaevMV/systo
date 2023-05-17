@@ -9,6 +9,6 @@ class FestivalHelper
 
     public static function isSpring($value):bool
     {
-        return $value === self::UUID_FESTIVAL;
+        return $value === self::UUID_SECOND_FESTIVAL;
     }
 }
