@@ -30,6 +30,10 @@ class ScanController extends Controller
     {
         try {
             $link = $request->get('search');
+            if (is_null($link)) {
+                throw new DomainException('Не опознанный билет просканируй снова!');
+            }
+
             return response()->json(
                 $this->searchEngine->get($link)->toArray()
             );
