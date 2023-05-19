@@ -65,7 +65,6 @@ group by `changes`.`id`");
         $time = Carbon::now();
         $result = $this->model->whereJsonContains('user_id', $userId)
             ->where('end', '=', null)
-            ->whereTime('start', '<', $time)
             ->orderBy('start')
             ->first();
 
