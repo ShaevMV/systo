@@ -34,8 +34,8 @@ class BanListCommand extends Command
 
         foreach ($idsArr as $item) {
             LiveTicketModel::find($item)->update([
-                'status' => Status::CANCEL,
-                'comment' => 'ВНИМАНИЕ! С этим билетом необходимо задержать человека и вызвать охранника Артема (Темыча)',
+                'status' => Status::PAID,
+                'comment' => '',
             ]);
         }
 
