@@ -12,7 +12,7 @@ class OrderToCancel extends Mailable
 
     public function __construct()
     {
-        $this->subject('Оргвзнос на Solar Systo Togathering ' . date('Y') . ' отменён');
+        $this->subject('Оргвзнос на Систо-Осень ' . date('Y') . ' отменён');
     }
 
     /**

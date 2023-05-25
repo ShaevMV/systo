@@ -26,7 +26,7 @@
         </div>
         <div class="text-center title-block">
             <h1>Форма подтверждения добровольного оргвзноса</h1>
-            <small class="form-text text-muted">на создание туристического слёта Солар Систо 2023 с 18 по 22 мая</small>
+            <small class="form-text text-muted">на создание туристического слёта Солар Систо 2023 с 8 по 11 сентября</small>
         </div>
         <div class="row" id="main-form">
             <div class="col-md-10 mx-auto">

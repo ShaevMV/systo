@@ -36,6 +36,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|PromoCodeModel whereActive($value)
  * @method static Builder|PromoCodeModel whereIsPercent($value)
  * @method static Builder|PromoCodeModel whereLimit($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|OrderTicketModel[] $orderTickets
+ * @property-read int|null $order_tickets_count
  */
 class PromoCodeModel extends Model
 {

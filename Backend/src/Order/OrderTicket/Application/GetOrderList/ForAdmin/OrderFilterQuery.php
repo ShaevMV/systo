@@ -16,6 +16,7 @@ class OrderFilterQuery implements Query
         private ?string $promoCode = null,
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
+        private ?string $active = null,
     ) {
     }
 
@@ -62,5 +63,10 @@ class OrderFilterQuery implements Query
     public function getTypeOrder(): ?Uuid
     {
         return $this->typeOrder;
+    }
+
+    public function getActive(): string
+    {
+        return $this->active ?? '1';
     }
 }

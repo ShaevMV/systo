@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Repositories;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
@@ -139,6 +140,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
                 '=',
                 TicketTypesModel::TABLE.'.id')
+            ->leftJoin(FestivalModel::TABLE, TicketTypesModel::TABLE.'.festival_id',
+                '=',
+                FestivalModel::TABLE.'.id')
             ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
                 '=',
                 TypesOfPaymentModel::TABLE.'.id')

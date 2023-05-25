@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
+use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
 use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 use App\Mail\SecondFestival\OrderToCreate as SecondOrderToCreate;
@@ -30,9 +31,9 @@ class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
 
     public function handle(): void
     {
-        $mail = FestivalHelper::isSpring($this->festival) ?
-            new OrderToCreate($this->kilter) :
-            new SecondOrderToCreate($this->kilter);
+        $mail = new OrderToCreate(
+            $this->kilter,
+        );
 
         Mail::to($this->email)
             ->send($mail);

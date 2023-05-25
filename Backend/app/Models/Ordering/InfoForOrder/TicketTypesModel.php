@@ -34,6 +34,12 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @mixin Eloquent
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Ordering\InfoForOrder\TicketTypesPriceModel[] $ticketTypePrice
  * @property-read int|null $ticket_type_price_count
+ * @property string $festival_id
+ * @property int $sort
+ * @property int $active
+ * @method static Builder|TicketTypesModel whereActive($value)
+ * @method static Builder|TicketTypesModel whereFestivalId($value)
+ * @method static Builder|TicketTypesModel whereSort($value)
  */
 class TicketTypesModel extends Model
 {

@@ -9,7 +9,9 @@ use Tickets\Order\InfoForOrder\Repositories\InMemoryMySqlTypesOfPayment;
 use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Repositories\TypesOfPaymentInterface;
 use Tickets\Order\OrderTicket\Repositories\CommentRepositoryInterface;
+use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlCommentRepository;
+use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlFestivalRepository;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\PromoCode\Repositories\InMemoryMySqlPromoCode;
@@ -37,5 +39,6 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(OrderTicketRepositoryInterface::class, InMemoryMySqlOrderTicketRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, InMemoryMySqlCommentRepository::class);
         $this->app->bind(TicketsRepositoryInterface::class, InMemoryMySqlTicketsRepository::class);
+        $this->app->bind(FestivalRepositoryInterface::class, InMemoryMySqlFestivalRepository::class);
     }
 }

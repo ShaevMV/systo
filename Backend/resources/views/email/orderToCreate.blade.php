@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на Solar Systo Togathering {{date('Y')}} создан</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на Систо-Осень 2023 создан</td>
                             </tr>
                         </table>
                     </td>
@@ -40,7 +40,7 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} создан и ожидает проверки ответственным организатором.  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В течение 3-4 дней на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на Solar Systo Togathering {{date('Y')}}! </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В течение 5 дней после получения средств на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на Систо-Осень 2023! </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
