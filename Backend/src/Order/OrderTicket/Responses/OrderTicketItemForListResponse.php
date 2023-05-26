@@ -24,7 +24,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected int $kilter,
         protected string $email,
         protected string $name,
-        protected float $price,
+        protected int $price,
         protected array $guests,
         protected string $typeOfPaymentName,
         protected Status $status,
@@ -75,7 +75,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         return $this->status;
     }
 
-    public function getPrice(): float
+    public function getPrice(): int
     {
         return $this->price;
     }
