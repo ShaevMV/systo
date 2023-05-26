@@ -34,6 +34,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected float $priceWithoutDiscount,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
+        protected int $discount = 0
     ) {
         $this->count = count($guests);
         $this->humanStatus = $this->status->getHumanStatus();
@@ -55,16 +56,17 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['kilter'],
             $data['email'],
             $data['name'],
-            (float) $data['price'] - (float) $data['discount'],
+            (int) $data['price'] - (int) $data['discount'],
             $guests,
             $data['payment_name'],
             $status,
             $data['date'],
             $status->getListNextStatus(),
             $data['id_buy'],
-            (float) $data['price'],
+            (int) $data['price'],
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
+            (int) $data['discount']
         );
     }
 
@@ -104,5 +106,10 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getPriceWithoutDiscount(): float
     {
         return $this->priceWithoutDiscount;
+    }
+
+    public function getDiscount(): int
+    {
+        return $this->discount;
     }
 }

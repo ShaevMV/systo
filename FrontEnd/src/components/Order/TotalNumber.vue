@@ -14,7 +14,9 @@
             <p class="col-md-4 text-center">
               <b>Всего билетов:</b><span> {{ getTotalCountTicket }} </span>
             </p>
-
+            <p class="col-md-4 text-center">
+              <b>Сумма скидок:</b><span> {{ getTotalDiscount }} </span>
+            </p>
         </div>
           </div>
       </div>
@@ -42,6 +44,9 @@ export default {
     },
     getTotalCountTicket: function () {
       return this.getTotalNumber.countTickets;
+    },
+    getTotalDiscount: function () {
+      return this.getTotalNumber.totalDiscount;
     }
   },
 }

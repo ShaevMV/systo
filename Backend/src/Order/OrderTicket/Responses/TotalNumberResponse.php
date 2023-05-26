@@ -11,7 +11,8 @@ class TotalNumberResponse extends AbstractionEntity implements Response
         protected int $totalCount = 0,
         protected int $totalCountToPaid = 0,
         protected int $countTickets = 0,
-        protected float $totalAmount = 0.00,
+        protected int $totalAmount = 0,
+        protected int $totalDiscount = 0,
     ) {
     }
 }

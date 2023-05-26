@@ -13,8 +13,9 @@ class TotalNumberQueryHandler implements QueryHandler
     {
         $totalCount = 0;
         $totalCountToPaid = 0;
-        $totalAmount = 0.00;
+        $totalAmount = 0;
         $totalCountTickets = 0;
+        $totalDiscount = 0;
 
         foreach ($numberQuery->getOrderList() as $itemForListResponse) {
             $totalCount++;
@@ -22,6 +23,7 @@ class TotalNumberQueryHandler implements QueryHandler
                 $totalCountToPaid++;
                 $totalAmount += $itemForListResponse->getPrice();
                 $totalCountTickets+= $itemForListResponse->getCount();
+                $totalDiscount += $itemForListResponse->getDiscount();
             }
         }
 
@@ -29,7 +31,8 @@ class TotalNumberQueryHandler implements QueryHandler
             $totalCount,
             $totalCountToPaid,
             $totalCountTickets,
-            $totalAmount
+            $totalAmount,
+            $totalDiscount
         );
     }
 }
