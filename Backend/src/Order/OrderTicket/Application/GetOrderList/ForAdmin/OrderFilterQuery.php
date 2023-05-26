@@ -16,7 +16,7 @@ class OrderFilterQuery implements Query
         private ?string $promoCode = null,
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
-        private ?string $active = null,
+        private ?Uuid $festivalId = null,
     ) {
     }
 
@@ -44,14 +44,15 @@ class OrderFilterQuery implements Query
     {
         $typesOfPayment = $data['typesOfPayment'] ?? null;
         $typePrice = $data['typePrice'] ?? null;
-
+        $festivalId = $data['festivalId'] ?? null;
         return new self(
             (null !== $typesOfPayment) ? new Uuid($data['typesOfPayment']) : null,
             $data['email'] ?? null,
             $data['status'] ?? null,
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
-            (null !== $typePrice) ? new Uuid($typePrice) : null,
+            (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
+            (null !== $festivalId) ? new Uuid($data['festivalId']) : null,
         );
     }
 
@@ -68,5 +69,10 @@ class OrderFilterQuery implements Query
     public function getActive(): string
     {
         return $this->active ?? '1';
+    }
+
+    public function getFestivalId(): ?Uuid
+    {
+        return $this->festivalId;
     }
 }

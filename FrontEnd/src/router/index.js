@@ -70,7 +70,7 @@ const routes = [
         }
     },
     {
-        path: '/orders',
+        path: '/orders/:id',
         name: 'AllOrders',
         component: OrderListForAdmin,
         meta: {

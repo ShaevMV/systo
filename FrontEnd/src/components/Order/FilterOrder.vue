@@ -88,6 +88,9 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
     name: "FilterOrder",
+    props: {
+      'festivalId': String
+    },
     data() {
         return {
             email: null,
@@ -135,6 +138,7 @@ export default {
                 'status': this.status,
                 'promoCode': this.promoCode,
                 'typesOfPayment': this.typesOfPayment,
+                'festivalId': this.festivalId,
             });
         },
         clearFilter: function () {

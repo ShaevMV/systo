@@ -32,7 +32,20 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{ name: 'AllOrders' }">Все оргвзносы
+          :to="{
+                  name: 'AllOrders',
+                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b2'}
+          }">Все оргвзносы (Весна)
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{
+                  name: 'AllOrders',
+                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'}
+          }">Все оргвзносы (Осень)
       </router-link>
     </li>
     <li class="nav-item" v-if="isAdmin && isAuth">

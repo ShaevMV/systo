@@ -1,5 +1,5 @@
 <template>
-      <filter-order/>
+      <filter-order :festival-id="id"/>
       <total-number/>
       <order-list :is-admin="true"/>
 </template>
@@ -12,8 +12,19 @@ import TotalNumber from "@/components/Order/TotalNumber.vue";
 export default {
   name: "OrderListForAdmin",
   components: {TotalNumber, FilterOrder, OrderList},
+  props: {
+    'id': String
+  },
   beforeRouteEnter: (to, from, next) => {
-    window.store.dispatch('appOrder/getOrderListForAdmin');
+    window.store.dispatch('appOrder/getOrderListForAdmin',{
+      festivalId: to.params.id
+    });
+    next();
+  },
+  beforeRouteUpdate: (to, from, next) => {
+    window.store.dispatch('appOrder/getOrderListForAdmin',{
+      festivalId: to.params.id
+    });
     next();
   },
   created() {

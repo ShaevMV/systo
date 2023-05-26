@@ -54,9 +54,9 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTypeOrder()?->value(),
             ],
             [
-                'field' => FestivalModel::TABLE . '.active',
+                'field' => OrderTicketModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getActive(),
+                'value' => $filterQuery->getFestivalId()?->value(),
             ],
         ]);
         $orderTicketItem = $this->orderTicketRepository->getList($filter);
