@@ -21,6 +21,7 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Shared\Domain\ValueObject\Status;
@@ -64,7 +65,7 @@ class OrderTickets extends Controller
             );
 
             $data = $createOrderTicketsRequest->toArray();
-            $data['festival_id'] = FestivalSeeder::ID_FOR_2023_FESTIVAL;
+            $data['festival_id'] = FestivalHelper::UUID_SECOND_FESTIVAL;
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
