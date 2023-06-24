@@ -26,6 +26,7 @@ class TicketService
                     'date_order' => $ticket->created_at,
                     'email' => $ticket->email,
                     'comment' => $ticket->comment,
+                    'festival_id' => $ticket->festival_id,
                 ]);
         }
 
@@ -37,6 +38,7 @@ class TicketService
             'date_order' => $ticket->created_at,
             'email' => $ticket->email,
             'comment' => $ticket->comment,
+            'festival_id' => $ticket->festival_id,
         ]);
 
         return true;

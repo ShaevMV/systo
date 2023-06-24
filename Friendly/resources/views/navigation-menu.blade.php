@@ -5,13 +5,27 @@
             <div class="flex">
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-jet-nav-link href="{{ route('adminUser') }}" :active="request()->routeIs('adminUser')">
-                        {{ __('Пользователи') }}
+                    <x-jet-nav-link
+                        href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
+                        :active="request()->path() == 'admin/user/9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
+                        {{ __('Пользователи Весна') }}
+                    </x-jet-nav-link>
+                    <x-jet-nav-link
+                        href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
+                        :active="request()->path() == 'admin/user/9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
+                        {{ __('Пользователи Осень') }}
                     </x-jet-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-jet-nav-link href="{{ route('adminTickets') }}" :active="request()->routeIs('adminTickets')">
-                        {{ __('Билеты') }}
+                    <x-jet-nav-link
+                        href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
+                        :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
+                        {{ __('Билеты Весна') }}
+                    </x-jet-nav-link>
+                    <x-jet-nav-link
+                        href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
+                        :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
+                        {{ __('Билеты Осень') }}
                     </x-jet-nav-link>
                 </div>
             </div>
@@ -22,16 +36,22 @@
                     <x-jet-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-                                <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
-                                    <img class="h-8 w-8 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                                <button
+                                    class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition duration-150 ease-in-out">
+                                    <img class="h-8 w-8 rounded-full object-cover"
+                                         src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}"/>
                                 </button>
                             @else
                                 <span class="inline-flex rounded-md">
-                                    <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+                                    <button type="button"
+                                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
                                         {{ Auth::user()->name }}
 
-                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                                             viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                                                  clip-rule="evenodd"/>
                                         </svg>
                                     </button>
                                 </span>
@@ -51,7 +71,7 @@
                                 @csrf
 
                                 <x-jet-dropdown-link href="{{ route('logout') }}"
-                                         onclick="event.preventDefault();
+                                                     onclick="event.preventDefault();
                                                 this.closest('form').submit();">
                                     {{ __('Выйти из системы') }}
                                 </x-jet-dropdown-link>
@@ -63,10 +83,14 @@
 
             <!-- Hamburger -->
             <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open"
+                        class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex"
+                              stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"/>
+                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round"
+                              stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
@@ -76,13 +100,27 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-jet-responsive-nav-link href="{{ route('adminUser') }}" :active="request()->routeIs('adminUser')">
-                {{ __('Пользователи') }}
+            <x-jet-responsive-nav-link
+                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
+                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2'])">
+                {{ __('Пользователи Весна') }}
+            </x-jet-responsive-nav-link>
+            <x-jet-responsive-nav-link
+                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
+                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'])">
+                {{ __('Пользователи Осень') }}
             </x-jet-responsive-nav-link>
         </div>
         <div class="pt-2 pb-3 space-y-1">
-            <x-jet-responsive-nav-link href="{{ route('adminTickets') }}" :active="request()->routeIs('adminTickets')">
-                {{ __('Билеты') }}
+            <x-jet-responsive-nav-link
+                href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
+                :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
+                {{ __('Билеты Весна') }}
+            </x-jet-responsive-nav-link>
+            <x-jet-responsive-nav-link
+                href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
+                :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
+                {{ __('Билеты Осень') }}
             </x-jet-responsive-nav-link>
         </div>
 
@@ -91,7 +129,8 @@
             <div class="flex items-center px-4">
                 @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                     <div class="flex-shrink-0 mr-3">
-                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}" alt="{{ Auth::user()->name }}" />
+                        <img class="h-10 w-10 rounded-full object-cover" src="{{ Auth::user()->profile_photo_url }}"
+                             alt="{{ Auth::user()->name }}"/>
                     </div>
                 @endif
 
@@ -106,7 +145,7 @@
                     @csrf
 
                     <x-jet-responsive-nav-link href="{{ route('logout') }}"
-                                   onclick="event.preventDefault();
+                                               onclick="event.preventDefault();
                                     this.closest('form').submit();">
                         {{ __('Log Out') }}
                     </x-jet-responsive-nav-link>

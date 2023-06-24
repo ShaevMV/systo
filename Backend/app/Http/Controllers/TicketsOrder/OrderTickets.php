@@ -33,15 +33,16 @@ use Tickets\User\Account\Dto\AccountDto;
 class OrderTickets extends Controller
 {
     public function __construct(
-        private CreateOrder $createOrder,
+        private CreateOrder        $createOrder,
         private AccountApplication $accountApplication,
-        private PriceService $priceService,
-        private GetOrder $getOrder,
-        private TotalNumber $totalNumber,
-        private ChanceStatus $chanceStatus,
-        private TicketApplication $ticketApplication,
-        private AddComment $addComment,
-    ) {
+        private PriceService       $priceService,
+        private GetOrder           $getOrder,
+        private TotalNumber        $totalNumber,
+        private ChanceStatus       $chanceStatus,
+        private TicketApplication  $ticketApplication,
+        private AddComment         $addComment,
+    )
+    {
     }
 
     /**
@@ -75,7 +76,7 @@ class OrderTickets extends Controller
 
             $this->createOrder->createAndSave($orderTicketDto);
             // Добавления комментария
-            if($createOrderTicketsRequest->comment) {
+            if ($createOrderTicketsRequest->comment) {
                 $this->addComment->send(
                     $orderTicketDto->getId(),
                     $userId,
@@ -157,7 +158,7 @@ class OrderTickets extends Controller
      */
     public function toChanceStatus(string $id, Request $request): JsonResponse
     {
-        if($request->get('status') === Status::DIFFICULTIES_AROSE) {
+        if ($request->get('status') === Status::DIFFICULTIES_AROSE) {
             $request->validate([
                 'comment' => 'required|string'
             ], [
@@ -186,7 +187,7 @@ class OrderTickets extends Controller
     /**
      * Получить список билетов в PDF
      *
-     * @param  string  $id
+     * @param string $id
      * @return JsonResponse
      */
     public function getUrlListForPdf(string $id): JsonResponse

@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
-use App\Models\FriendlyTicket;
 use App\Models\User;
-use App\Services\CreatingQrCodeService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -22,10 +20,11 @@ class AdminController extends Controller
     private $createNewUser;
     private $updateUserProfileInformation;
     private $updateUserPassword;
+
     public function __construct(
-        CreateNewUser $createNewUser,
+        CreateNewUser                $createNewUser,
         UpdateUserProfileInformation $updateUserProfileInformation,
-        UpdateUserPassword $updateUserPassword
+        UpdateUserPassword           $updateUserPassword
     )
     {
         $this->createNewUser = $createNewUser;
@@ -41,10 +40,12 @@ class AdminController extends Controller
         return view('admin.index');
     }
 
-    public function users()
+    public function users(string $festival_id): View
     {
-        $users = User::leftJoin('friendly_tickets', 'friendly_tickets.user_id', '=', 'users.id')
-            ->select(['users.*',
+        $users = User::leftJoin('friendly_tickets', function (JoinClause $join) use ($festival_id){
+            $join->on('friendly_tickets.user_id', '=', 'users.id')
+                ->where('friendly_tickets.festival_id', '=', $festival_id);
+        })->select(['users.*',
                 DB::raw('SUM(friendly_tickets.price) AS sum_price'),
                 DB::raw('COUNT(friendly_tickets.id) AS count_tickets')
             ])

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\ProcessSendTicketEmail;
 use App\Models\FriendlyTicket;
+use Illuminate\Contracts\View\View;
 use Shared\Services\CreatingQrCodeService;
 use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
@@ -50,6 +51,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
+                $model->festival_id = env('UUID_SECOND_FESTIVAL');
 
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
@@ -77,10 +79,12 @@ class TicketController extends Controller
     }
 
 
-    public function tickets()
+    public function tickets(string $festival_id): View
     {
         $tickets = FriendlyTicket::where(
             'id', '>=', 1000
+        )->where(
+            'festival_id', '=', $festival_id
         )->get();
 
         return view('admin.tickets', [

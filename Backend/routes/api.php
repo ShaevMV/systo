@@ -23,15 +23,19 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::prefix('v1/festival')->group(static function (): void {
+
     Route::get('/orderingTickets',
         [OrderingTicketsController::class, 'getInfoForOrder']);
+
     Route::post('/findPromoCode/{promoCode?}',
         [OrderingTicketsController::class, 'findPromoCode']);
+
     Route::get('/getListPromoCode',
         [OrderingTicketsController::class, 'getListPromoCode'])->middleware('auth:api')->middleware('admin');
 
     Route::get('/getItemPromoCode/{idPromoCode?}',
         [OrderingTicketsController::class, 'getItemPromoCode'])->middleware('auth:api')->middleware('admin');
+
     Route::post('/savePromoCode/{idPromoCode?}',
         [OrderingTicketsController::class, 'savePromoCode'])->middleware('auth:api')->middleware('admin');
 

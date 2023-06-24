@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float $price
  * @property int $user_id
  * @property string $comment
+ * @property string $festival_id
  * @property Carbon $created_at
  *
  * @package App\Models
