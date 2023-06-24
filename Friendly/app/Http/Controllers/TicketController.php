@@ -79,8 +79,10 @@ class TicketController extends Controller
     }
 
 
-    public function tickets(string $festival_id): View
+    public function tickets(Request $request): View
     {
+        $festival_id = $request->get('festival_id');
+
         $tickets = FriendlyTicket::where(
             'id', '>=', 1000
         )->where(

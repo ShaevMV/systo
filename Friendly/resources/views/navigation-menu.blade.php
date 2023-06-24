@@ -19,12 +19,12 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-jet-nav-link
                         href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
-                        :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
+                        :active="request()->path().'?festival_id='.request()->get('festival_id') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
                         {{ __('Билеты Весна') }}
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
-                        :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
+                        :active="request()->path().'?festival_id='.request()->get('festival_id') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
                         {{ __('Билеты Осень') }}
                     </x-jet-nav-link>
                 </div>
