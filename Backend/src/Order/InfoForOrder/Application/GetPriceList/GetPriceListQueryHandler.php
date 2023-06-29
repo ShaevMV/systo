@@ -15,6 +15,6 @@ class GetPriceListQueryHandler implements QueryHandler
 
     public function __invoke(GetPriceListQuery $query): ListTicketTypeDto
     {
-        return new ListTicketTypeDto($this->ticketType->getListPrice());
+        return new ListTicketTypeDto($this->ticketType->getListPrice($query->getFestivalId()));
     }
 }
