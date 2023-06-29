@@ -152,7 +152,7 @@ export default {
         }
     },
   async created() {
-    await this.loadDataForOrderingTickets();
+    await this.loadDataForOrderingTickets({festival_id:this.$route.params.id});
   },
 }
 </script>
