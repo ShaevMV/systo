@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Festival;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
+use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
@@ -34,10 +35,14 @@ class OrderingTicketsController extends Controller
     /**
      * @throws JsonException
      */
-    public function getInfoForOrder(): array
+    public function getInfoForOrder(Request $request): array
     {
+        if (is_null($request->get('festival_id'))) {
+            throw new DomainException('Не задан идентификатор фестиваля');
+        }
+
         return $this->allInfoForOrderingTicketsSearcher
-            ->getInfo()
+            ->getInfo(new Uuid($request->get('festival_id')))
             ->toArray();
     }
 
@@ -105,8 +110,12 @@ class OrderingTicketsController extends Controller
     /**
      * @throws JsonException
      */
-    public function getPriceList(): array
+    public function getPriceList(Request $request): array
     {
-        return $this->getPriceList->getAllPrice()->toArray();
+        if (is_null($request->get('festival_id'))) {
+            throw new DomainException('Не задан идентификатор фестиваля');
+        }
+
+        return $this->getPriceList->getAllPrice(new Uuid($request->get('festival_id')))->toArray();
     }
 }

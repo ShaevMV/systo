@@ -151,10 +151,6 @@ export default {
             this.getOrderListForAdmin();
         }
     },
-    async created() {
-        await this.loadDataForOrderingTickets();
-        await this.getListPriceFor();
-    },
 }
 </script>
 

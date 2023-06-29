@@ -21,7 +21,7 @@ final class GetAllInfoForOrderQueryHandler implements QueryHandler
     public function __invoke(GetAllInfoForOrderQuery $query): InfoForOrderingDto
     {
         return new InfoForOrderingDto(
-            $this->ticketType->getList(new Carbon()),
+            $this->ticketType->getList(new Carbon(), $query->getFestivalId()),
             $this->typesOfPayment->getList(),
         );
     }

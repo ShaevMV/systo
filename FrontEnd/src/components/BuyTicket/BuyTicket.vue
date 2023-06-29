@@ -600,7 +600,7 @@ export default {
         },
     },
     async created() {
-        await this.loadDataForOrderingTickets();
+        await this.loadDataForOrderingTickets({festival_id:'9d679bcf-b438-4ddb-ac04-023fa9bff4b3'});
         await this.clearError();
         if (this.isAuth) {
             let self = this;

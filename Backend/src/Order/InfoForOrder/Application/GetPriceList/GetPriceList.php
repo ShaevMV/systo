@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\InfoForOrder\Application\GetPriceList;
 
 use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
+use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 class GetPriceList
@@ -18,10 +19,10 @@ class GetPriceList
         ]);
     }
 
-    public function getAllPrice(): ListTicketTypeDto
+    public function getAllPrice(Uuid $festivalId): ListTicketTypeDto
     {
         /** @var ListTicketTypeDto $result */
-        $result = $this->queryBus->ask(new GetPriceListQuery());
+        $result = $this->queryBus->ask(new GetPriceListQuery($festivalId));
 
         return $result;
     }

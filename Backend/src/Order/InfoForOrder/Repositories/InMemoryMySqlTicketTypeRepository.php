@@ -7,7 +7,6 @@ namespace Tickets\Order\InfoForOrder\Repositories;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Carbon\Carbon;
 use DomainException;
-use Illuminate\Database\Query\Builder;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Tickets\Shared\Domain\ValueObject\Uuid;
 
@@ -19,13 +18,14 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     {
     }
 
-    public function getList(Carbon $afterDate): array
+    public function getList(Carbon $afterDate, Uuid $festivalId): array
     {
         $result = [];
 
         $data = $this->model::with('ticketTypePrice')
             ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')])
             ->where('active', '=', true)
+            ->where('festival_id', '=', $festivalId->value())
             ->orderBy('sort')
             ->get()
             ->toArray();
@@ -56,10 +56,11 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         return TicketTypeDto::fromState($ticketType->toArray());
     }
 
-    public function getListPrice(): array
+    public function getListPrice(Uuid $festivalId): array
     {
         $result = [];
         $rawResult = $this->model
+            ->where('festival_id', '=', $festivalId->value())
             ->with('ticketTypePrice')
             ->orderBy('sort')
             ->get()
