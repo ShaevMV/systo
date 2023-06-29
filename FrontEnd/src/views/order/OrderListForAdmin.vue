@@ -19,9 +19,6 @@ export default {
     window.store.dispatch('appOrder/getOrderListForAdmin',{
       festivalId: to.params.id
     });
-    window.store.dispatch('appFestivalTickets/loadDataForOrderingTickets',{
-      festival_id: to.params.id
-    });
     window.store.dispatch('appFestivalTickets/getListPriceFor',{
       festival_id: to.params.id
     });
@@ -30,9 +27,6 @@ export default {
   beforeRouteUpdate: (to, from, next) => {
     window.store.dispatch('appOrder/getOrderListForAdmin',{
       festivalId: to.params.id
-    });
-    window.store.dispatch('appFestivalTickets/loadDataForOrderingTickets',{
-      festival_id: to.params.id
     });
     window.store.dispatch('appFestivalTickets/getListPriceFor',{
       festival_id: to.params.id
