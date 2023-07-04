@@ -84,7 +84,7 @@ class AdminController extends Controller
             $this->createNewUser->create($request->post());
         }
 
-        return redirect()->route('adminUser');
+        return redirect()->route('adminView');
     }
 
     public function delUser(Request $request): RedirectResponse
