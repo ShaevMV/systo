@@ -34,7 +34,7 @@ Route::middleware(['admin', 'verified'])->get('/admin', [AdminController::class,
 Route::middleware(['admin', 'verified'])->get('/admin/user/{festival_id}', [AdminController::class, 'users'])->name('adminUser');
 Route::middleware(['admin', 'verified'])->get('/admin/user/edit/{id}', [AdminController::class, 'editUser'])->name('editUser');
 Route::middleware(['admin', 'verified'])->post('/admin/user', [AdminController::class, 'delUser'])->name('delUser');
-Route::middleware(['admin', 'verified'])->get('/admin/user/create', [AdminController::class, 'createUser'])->name('createUser');
+Route::middleware(['admin', 'verified'])->get('/admin/user_create', [AdminController::class, 'createUser'])->name('createUser');
 Route::middleware(['admin', 'verified'])->post('/admin/user/create', [AdminController::class, 'registerUser'])->name('registerUser');
 
 
