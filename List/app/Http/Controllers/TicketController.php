@@ -46,9 +46,10 @@ class TicketController extends Controller
                 $model->curator = $request->post('curator');
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
-
+                $model->festival_id = env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b3');
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
+
                 $ids['S' . $model->id] = $value;
                 $this->ticketService->pushTicketList($model);
             }

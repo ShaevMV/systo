@@ -30,7 +30,7 @@ class AdminController extends Controller
         UpdateUserProfileInformation $updateUserProfileInformation,
         UpdateUserPassword           $updateUserPassword,
         CreatingQrCodeService        $creatingQrCodeService,
-        TicketService $ticketService
+        TicketService                $ticketService
     )
     {
         $this->createNewUser = $createNewUser;
@@ -101,7 +101,8 @@ class AdminController extends Controller
     {
         $tickets = ListTicket::where(
             'id', '>=', 1000
-        )->get();
+        )->where('festival_id', '=', env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
+            ->get();
 
         return view('admin.tickets', [
             'tickets' => $tickets,
@@ -123,7 +124,7 @@ class AdminController extends Controller
         /** @var ListTicket $ticket */
         $ticket = ListTicket::whereId($id)->first();
 
-        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email, 'S' ,$ticket->project);
+        $pdf = $this->creatingQrCodeService->createPdf('S' . $id, $ticket->fio, $ticket->email, 'S', $ticket->project);
 
         return $pdf->download('Билет для ' . $ticket->fio . '.pdf');
     }

@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $curator
  * @property int $user_id
  * @property string $comment
+ * @property string $festival_id
  * @property Carbon $created_at
  *
  * @package App\Models
@@ -32,5 +33,6 @@ class ListTicket extends Model
         'user_id',
         'fio',
         'comment',
+        'festival_id'
     ];
 }
