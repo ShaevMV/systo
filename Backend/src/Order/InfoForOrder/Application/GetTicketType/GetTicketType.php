@@ -7,8 +7,8 @@ namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Response\PriceByTicketTypeResponse;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class GetTicketType
 {

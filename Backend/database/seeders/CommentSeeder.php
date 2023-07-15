@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use JsonException;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class CommentSeeder extends Seeder
 {

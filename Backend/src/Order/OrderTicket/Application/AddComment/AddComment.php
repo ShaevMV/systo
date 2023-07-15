@@ -5,8 +5,8 @@ declare(strict_types = 1);
 namespace Tickets\Order\OrderTicket\Application\AddComment;
 
 use Throwable;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 
 final class AddComment
 {

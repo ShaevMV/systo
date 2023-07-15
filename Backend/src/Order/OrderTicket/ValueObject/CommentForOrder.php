@@ -6,8 +6,8 @@ namespace Tickets\Order\OrderTicket\ValueObject;
 
 use Carbon\Carbon;
 use JsonException;
-use Tickets\Shared\Domain\Entity\EntityDataInterface;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\EntityDataInterface;
+use Shared\Domain\ValueObject\Uuid;
 
 final class CommentForOrder implements EntityDataInterface
 {

@@ -13,8 +13,8 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHan
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class CreateOrder
 {

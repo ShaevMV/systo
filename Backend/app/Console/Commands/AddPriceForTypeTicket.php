@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Carbon\Carbon;
 use Database\Seeders\TypeTicketsSeeder;
 use DB;

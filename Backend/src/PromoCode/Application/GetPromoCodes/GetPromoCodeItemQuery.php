@@ -2,8 +2,8 @@
 
 namespace Tickets\PromoCode\Application\GetPromoCodes;
 
-use Tickets\Shared\Domain\Bus\Query\Query;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Query;
+use Shared\Domain\ValueObject\Uuid;
 
 class GetPromoCodeItemQuery implements Query
 {

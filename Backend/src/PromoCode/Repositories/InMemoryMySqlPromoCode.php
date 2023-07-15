@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlPromoCode implements PromoCodeInterface
 {

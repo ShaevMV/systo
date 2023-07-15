@@ -4,7 +4,7 @@ namespace Tickets\Order\OrderTicket\Application\TotalNumber;
 
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Tickets\Shared\Domain\Bus\Query\Query;
+use Shared\Domain\Bus\Query\Query;
 
 class TotalNumberQuery implements Query
 {

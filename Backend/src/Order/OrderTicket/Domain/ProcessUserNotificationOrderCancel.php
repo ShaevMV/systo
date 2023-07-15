@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
 
 class ProcessUserNotificationOrderCancel implements ShouldQueue, DomainEvent
 {

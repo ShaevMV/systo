@@ -14,10 +14,10 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\TicketTypeDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\TypesOfPaymentDto;
 use Tickets\Order\OrderTicket\ValueObject\CommentForOrder;
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 
 final class OrderTicketDto extends AbstractionEntity implements Response
 {

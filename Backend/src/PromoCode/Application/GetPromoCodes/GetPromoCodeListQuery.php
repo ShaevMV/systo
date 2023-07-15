@@ -2,7 +2,7 @@
 
 namespace Tickets\PromoCode\Application\GetPromoCodes;
 
-use Tickets\Shared\Domain\Bus\Query\Query;
+use Shared\Domain\Bus\Query\Query;
 
 class GetPromoCodeListQuery implements Query
 {

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Order\InfoForOrder\Application\GetPriceList;
 
 use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 class GetPriceList
 {

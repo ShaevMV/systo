@@ -7,7 +7,7 @@ namespace Tickets\PromoCode\Application\SearchPromoCode;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 
 final class PromoCodeQueryHandler implements QueryHandler
 {

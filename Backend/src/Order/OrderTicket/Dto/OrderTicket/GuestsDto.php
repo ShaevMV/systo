@@ -6,8 +6,8 @@ namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use Tickets\Shared\Domain\Entity\EntityDataInterface;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\EntityDataInterface;
+use Shared\Domain\ValueObject\Uuid;
 
 final class GuestsDto implements EntityDataInterface
 {

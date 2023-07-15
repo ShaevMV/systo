@@ -1,6 +1,6 @@
 <?php
 
-namespace Tickets\Shared\Domain\Entity;
+namespace Shared\Domain\Entity;
 
 interface EntityDataInterface
 {

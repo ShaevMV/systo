@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class UserSeeder extends Seeder
 {

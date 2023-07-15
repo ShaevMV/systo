@@ -8,7 +8,7 @@ use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Carbon\Carbon;
 use DomainException;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {

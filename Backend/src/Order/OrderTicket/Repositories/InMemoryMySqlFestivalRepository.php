@@ -4,7 +4,7 @@ namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
 use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
 {

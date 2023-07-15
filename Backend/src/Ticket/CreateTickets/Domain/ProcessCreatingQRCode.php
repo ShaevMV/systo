@@ -9,7 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Log;
 use Throwable;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 

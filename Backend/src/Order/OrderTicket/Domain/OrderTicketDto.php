@@ -9,8 +9,8 @@ use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 
 class OrderTicketDto
 {

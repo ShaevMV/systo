@@ -21,10 +21,10 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Domain\Criteria\Filter;
-use Tickets\Shared\Domain\Criteria\Filters;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Criteria\Filter;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
 {

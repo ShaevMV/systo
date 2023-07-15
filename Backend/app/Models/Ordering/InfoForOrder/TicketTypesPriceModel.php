@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 /**
  * App\Models\Ordering\InfoForOrder\TicketTypesPriceModel

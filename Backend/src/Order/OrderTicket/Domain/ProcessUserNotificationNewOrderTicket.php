@@ -13,8 +13,8 @@ use Illuminate\Queue\SerializesModels;
 use Mail;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\ValueObject\Uuid;
 use App\Mail\SecondFestival\OrderToCreate as SecondOrderToCreate;
 
 class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent

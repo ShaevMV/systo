@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\TotalNumber;
 
 use Tickets\Order\OrderTicket\Responses\TotalNumberResponse;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 
 class TotalNumberQueryHandler implements QueryHandler
 {

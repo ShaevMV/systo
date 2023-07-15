@@ -12,9 +12,9 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHan
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\UserIdQuery;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Domain\Bus\Query\QueryBus;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Domain\Bus\Query\QueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 class GetOrder
 {

@@ -6,7 +6,7 @@ namespace Tickets\PromoCode\Application\SearchPromoCode;
 
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class IsCorrectPromoCode
 {

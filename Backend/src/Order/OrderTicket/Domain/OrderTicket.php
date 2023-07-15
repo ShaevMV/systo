@@ -7,9 +7,9 @@ namespace Tickets\Order\OrderTicket\Domain;
 use DomainException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
-use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 

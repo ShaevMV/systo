@@ -4,7 +4,7 @@ namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
 use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 
 class GetTicketTypeQueryHandler implements QueryHandler
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Application\GetPdf;
 
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
 

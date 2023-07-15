@@ -17,7 +17,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 
 /**

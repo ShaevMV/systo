@@ -12,7 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent

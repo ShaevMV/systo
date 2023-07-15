@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tickets\PromoCode\Response;
 
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 final class PromoCodeDto extends AbstractionEntity implements Response
 {

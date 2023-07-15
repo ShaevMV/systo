@@ -7,9 +7,9 @@ namespace Tickets\Order\OrderTicket\Repositories;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Domain\Criteria\Filters;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 
 interface OrderTicketRepositoryInterface
 {

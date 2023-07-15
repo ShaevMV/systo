@@ -3,8 +3,8 @@
 namespace Tickets\Order\OrderTicket\Dto\Festival;
 
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 class FestivalDto extends AbstractionEntity
 {

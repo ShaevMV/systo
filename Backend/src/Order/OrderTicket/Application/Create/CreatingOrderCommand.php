@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\Create;
 
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
-use Tickets\Shared\Domain\Bus\Command\Command;
+use Shared\Domain\Bus\Command\Command;
 
 final class CreatingOrderCommand implements Command
 {

@@ -10,7 +10,7 @@ use Auth;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class Comment extends Controller
 {

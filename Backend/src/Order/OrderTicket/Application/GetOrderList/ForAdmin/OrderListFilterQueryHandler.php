@@ -10,9 +10,9 @@ use App\Models\User;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
-use Tickets\Shared\Domain\Criteria\FilterOperator;
-use Tickets\Shared\Domain\Criteria\Filters;
+use Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Criteria\FilterOperator;
+use Shared\Domain\Criteria\Filters;
 
 class OrderListFilterQueryHandler implements QueryHandler
 {

@@ -12,8 +12,8 @@ use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
-use Tickets\Shared\Domain\ValueObject\Status;
+use Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\ValueObject\Status;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class ChanceStatusCommandHandler implements CommandHandler

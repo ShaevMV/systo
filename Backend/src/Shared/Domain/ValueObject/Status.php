@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Shared\Domain\ValueObject;
+namespace Shared\Domain\ValueObject;
 
 use InvalidArgumentException;
-use Tickets\Shared\Domain\Entity\EntityDataInterface;
+use Shared\Domain\Entity\EntityDataInterface;
 
 final class Status implements EntityDataInterface
 {

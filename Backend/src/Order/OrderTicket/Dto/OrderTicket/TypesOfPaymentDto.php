@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 final class TypesOfPaymentDto extends AbstractionEntity
 {

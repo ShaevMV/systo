@@ -7,10 +7,10 @@ namespace Tickets\Order\OrderTicket\Responses;
 use Carbon\Carbon;
 use Nette\Utils\Json;
 use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class OrderTicketItemResponse extends AbstractionEntity implements Response

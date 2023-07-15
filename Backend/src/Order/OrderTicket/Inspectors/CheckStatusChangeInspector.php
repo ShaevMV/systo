@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Inspectors;
 
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class CheckStatusChangeInspector
 {

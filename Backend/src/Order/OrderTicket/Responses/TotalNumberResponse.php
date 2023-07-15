@@ -2,8 +2,8 @@
 
 namespace Tickets\Order\OrderTicket\Responses;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
 
 class TotalNumberResponse extends AbstractionEntity implements Response
 {

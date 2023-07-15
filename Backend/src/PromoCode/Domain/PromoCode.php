@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\PromoCode\Domain;
 
 
-use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Uuid;
 
 class PromoCode extends AggregateRoot
 {

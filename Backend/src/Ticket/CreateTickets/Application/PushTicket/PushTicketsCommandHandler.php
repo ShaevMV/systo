@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 use DomainException;
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicketsCommandHandler implements CommandHandler

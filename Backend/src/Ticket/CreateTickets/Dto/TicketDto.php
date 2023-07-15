@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Dto;
 
 use Carbon\Carbon;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 class TicketDto extends AbstractionEntity
 {

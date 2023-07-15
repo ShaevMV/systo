@@ -7,9 +7,9 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tickets\Order\OrderTicket\Inspectors\CheckStatusChangeInspector;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Tickets\Shared\Domain\Criteria\FilterOperator;
-use Tickets\Shared\Domain\Criteria\Filters;
-use Tickets\Shared\Domain\ValueObject\Status;
+use Shared\Domain\Criteria\FilterOperator;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\ValueObject\Status;
 
 class CheckCreateTicket extends Command
 {

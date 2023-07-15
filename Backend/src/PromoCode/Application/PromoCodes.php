@@ -13,11 +13,11 @@ use Tickets\PromoCode\Application\GetPromoCodes\GetPromoCodeListQuery;
 use Tickets\PromoCode\Application\GetPromoCodes\GetPromoCodeListQueryHandler;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeListDto;
-use Tickets\Shared\Domain\Bus\Command\CommandBus;
-use Tickets\Shared\Domain\Bus\Query\QueryBus;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Domain\Bus\Command\CommandBus;
+use Shared\Domain\Bus\Query\QueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 class PromoCodes
 {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Response;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
 
 final class InfoForOrderingDto extends AbstractionEntity implements Response
 {

@@ -2,8 +2,8 @@
 
 namespace Tickets\Order\InfoForOrder\Response;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
 
 class ListTicketTypeDto extends AbstractionEntity implements Response
 {

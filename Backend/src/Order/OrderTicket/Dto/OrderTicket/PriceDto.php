@@ -2,7 +2,7 @@
 
 namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Entity\AbstractionEntity;
 
 class PriceDto extends AbstractionEntity
 {

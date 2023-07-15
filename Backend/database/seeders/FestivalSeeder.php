@@ -18,7 +18,18 @@ class FestivalSeeder extends Seeder
     public function run(): void
     {
         DB::table('festivals')->insert([
-            'id' => self::ID_FOR_2023_FESTIVAL,
+            'id' => env('UUID_FESTIVAL'),
+            'name'=> 'Весна',
+            'year' => 2023,
+            'active' => false,
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
+
+
+        DB::table('festivals')->insert([
+            'id' => env('UUID_SECOND_FESTIVAL'),
+            'name'=> 'Осень',
             'year' => 2023,
             'active' => true,
             'created_at' => new Carbon(),

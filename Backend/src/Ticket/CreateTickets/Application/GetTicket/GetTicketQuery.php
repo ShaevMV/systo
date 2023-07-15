@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Application\GetTicket;
 
-use Tickets\Shared\Domain\Bus\Query\Query;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Query;
+use Shared\Domain\ValueObject\Uuid;
 
 class GetTicketQuery implements Query
 {

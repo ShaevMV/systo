@@ -18,7 +18,7 @@ use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class OrderingTicketsController extends Controller
 {

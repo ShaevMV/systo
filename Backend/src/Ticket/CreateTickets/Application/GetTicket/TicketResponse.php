@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Application\GetTicket;
 
 use Carbon\Carbon;
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 class TicketResponse extends AbstractionEntity implements Response
 {

@@ -6,7 +6,7 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForUser;
 
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 
 class OrderItemQueryHandler implements QueryHandler
 {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Domain;
 
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class Ticket
 {

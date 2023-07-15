@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Dto;
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Entity\AbstractionEntity;
 
 class LimitPromoCodeDto extends AbstractionEntity
 {

@@ -15,7 +15,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use JsonException;
 use Throwable;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;

@@ -2,7 +2,7 @@
 
 namespace Tickets\Ticket\CreateTickets\Application\Create;
 
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class CreateTicketCommandHandler implements CommandHandler

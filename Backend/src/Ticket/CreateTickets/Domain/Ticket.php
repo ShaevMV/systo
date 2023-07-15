@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Domain;
 
-use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
 

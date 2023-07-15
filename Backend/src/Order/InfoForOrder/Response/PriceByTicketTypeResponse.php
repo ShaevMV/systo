@@ -2,7 +2,7 @@
 
 namespace Tickets\Order\InfoForOrder\Response;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Bus\Query\Response;
 
 class PriceByTicketTypeResponse implements Response
 {

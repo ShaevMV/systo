@@ -6,7 +6,7 @@ namespace Tickets\Order\InfoForOrder\Repositories;
 
 use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 interface TicketTypeInterfaceRepository
 {

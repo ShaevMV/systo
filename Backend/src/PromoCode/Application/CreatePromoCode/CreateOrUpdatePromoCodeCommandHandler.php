@@ -5,7 +5,7 @@ namespace Tickets\PromoCode\Application\CreatePromoCode;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 
 class CreateOrUpdatePromoCodeCommandHandler implements CommandHandler
 {

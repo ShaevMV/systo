@@ -10,7 +10,7 @@ use Exception;
 use Hash;
 use Illuminate\Support\Facades\DB;
 use Throwable;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
 

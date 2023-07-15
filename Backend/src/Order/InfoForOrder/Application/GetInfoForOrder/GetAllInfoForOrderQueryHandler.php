@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Repositories\TypesOfPaymentInterface;
 use Tickets\Order\InfoForOrder\Response\InfoForOrderingDto;
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 
 final class GetAllInfoForOrderQueryHandler implements QueryHandler
 {

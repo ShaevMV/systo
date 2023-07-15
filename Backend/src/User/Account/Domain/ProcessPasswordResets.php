@@ -14,8 +14,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Hash;
 use Mail;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\ValueObject\Uuid;
 
 class ProcessPasswordResets implements ShouldQueue, DomainEvent
 {

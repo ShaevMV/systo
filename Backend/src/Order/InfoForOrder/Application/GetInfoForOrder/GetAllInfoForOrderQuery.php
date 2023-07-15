@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetInfoForOrder;
 
-use Tickets\Shared\Domain\Bus\Query\Query;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Query;
+use Shared\Domain\ValueObject\Uuid;
 
 final class GetAllInfoForOrderQuery implements Query
 {

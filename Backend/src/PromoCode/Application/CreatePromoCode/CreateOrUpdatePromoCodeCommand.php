@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Application\CreatePromoCode;
 
-use Tickets\Shared\Domain\Bus\Command\Command;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Command\Command;
+use Shared\Domain\ValueObject\Uuid;
 
 class CreateOrUpdatePromoCodeCommand implements Command
 {

@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 
 /**

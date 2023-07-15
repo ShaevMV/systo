@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Domain;
 
 use Illuminate\Support\Str;
-use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\User\Account\Dto\AccountDto;
 
 class Account extends AggregateRoot

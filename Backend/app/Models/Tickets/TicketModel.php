@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 /**
  * App\Models\Tickets\TicketModel
