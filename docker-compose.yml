@@ -39,7 +39,6 @@ services:
     links:
       - mysql
       - node
-      - phpBaza
       - phpFriendly
       - phpList
       - php
