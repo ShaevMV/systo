@@ -49,15 +49,16 @@ class CORS
             'http://api.solarsysto.ru',
             'http://org.solarsysto.ru',
             'https://org.solarsysto.ru',
+            'http://org.solarsysto.ru',
             'https://api.solarsysto.ru',
             'http://org.tickets.loc/',
             'http://193.106.175.59',
         ];
-
+        $this->allowOrigins = array_merge(['http://localhost:8080',
+            'http://localhost:8081',
+            'http://localhost'], $this->allowOrigins);
         if (env('APP_DEBUG')) {
-            $this->allowOrigins = array_merge(['http://localhost:8080',
-                'http://localhost:8081',
-                'http://localhost'], $this->allowOrigins);
+
         }
     }
 
