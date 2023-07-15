@@ -1,6 +1,6 @@
-Docker/mysql/db/
-Docker/mysqlFriendly/db/
+Docker/mysql/db/*
 Docker/mysqlFriendly/log/*
+Docker/mysqlFriendly/db/*
 Docker/redis/data
 .idea/*
 .env
