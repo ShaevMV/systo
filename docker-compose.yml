@@ -79,27 +79,6 @@ services:
     networks:
       - backend
 
-  #phpBaza:
-  #  hostname: ${ENV_VHOD_BACKEND_HOST}
-  #  build:
-  #    context: ./Docker/php
-  #    args:
-  #      - WITH_XDEBUG=true
-  #  container_name: php-baza
-  #  image: 'baza_laravel'
-  #  env_file:
-  #    - ./Baza/.env
-  #  volumes:
-  #    - ./Baza:/var/www/vhod
-  #    - ./Shared:${ENV_SHARED_PATCH}
-  #  working_dir: ${ENV_VHOD_PATCH}
-  #  user: user
-  #  environment:
-  #    - WITH_XDEBUG=true
-  #    - WORKING_DIR=${ENV_VHOD_PATCH}
-  #  networks:
-  #    - backend
-
   phpFriendly:
     hostname: ${ENV_DRUG_BACKEND_HOST}
     build:
