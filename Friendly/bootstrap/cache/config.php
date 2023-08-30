@@ -550,11 +550,11 @@
       'smtp' => 
       array (
         'transport' => 'smtp',
-        'host' => 'smtp.go2.unisender.ru',
+        'host' => 'mail.solarsysto.ru',
         'port' => '465',
-        'encryption' => 'TLS',
-        'username' => '5802425',
-        'password' => '6fweopcmha3fnx7soajakti19zeodc66etkadc1a',
+        'encryption' => 'ssl',
+        'username' => 'ticket@solarsysto.ru',
+        'password' => '2457114qQ!',
         'timeout' => NULL,
         'auth_mode' => NULL,
         'stream' => 
