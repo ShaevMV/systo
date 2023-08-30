@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Shared\Services;
 
+use App\Models\Auto;
 use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use DB;
+use DomainException;
 use Shared\Domain\ValueObject\Status;
 
 class TicketService
@@ -49,7 +51,7 @@ class TicketService
         $rawModel = DB::connection('mysqlBaza')->table('friendly_tickets')
             ->where('kilter', '=', $id);
         if (!$rawModel->exists()) {
-            throw new \DomainException('Не найден билет f-' . $id);
+            throw new DomainException('Не найден билет f-' . $id);
         }
 
         $rawModel->update([
@@ -63,32 +65,38 @@ class TicketService
         $rawModel =
             DB::connection('mysqlBaza')->table('spisok_tickets')
                 ->where('kilter', '=', $ticket->id);
-
-        if (!$rawModel->exists()) {
-            return DB::connection('mysqlBaza')
-                ->table('spisok_tickets')
-                ->insert([
-                    'kilter' => $ticket->id,
-                    'project' => $ticket->project,
-                    'curator' => $ticket->curator,
-                    'name' => $ticket->fio,
-                    'comment' => $ticket->comment,
-                    'date_order' => $ticket->created_at,
-                    'email' => $ticket->email,
-                ]);
-        }
-
-        $rawModel->update([
+        $data = [
             'kilter' => $ticket->id,
             'project' => $ticket->project,
             'curator' => $ticket->curator,
             'name' => $ticket->fio,
             'comment' => $ticket->comment,
+            'type_member' => $ticket->type_member,
+            'festival_id' => $ticket->festival_id,
             'date_order' => $ticket->created_at,
             'email' => $ticket->email,
-        ]);
+        ];
+        if (!$rawModel->exists()) {
+            return DB::connection('mysqlBaza')
+                ->table('spisok_tickets')
+                ->insert($data);
+        }
+
+        $rawModel->update($data);
 
         return true;
+    }
+
+    public function pushAutoList(Auto $ticket): bool
+    {
+        return DB::connection('mysqlBaza')
+            ->table('auto')
+            ->insert([
+                'project' => $ticket->project,
+                'curator' => $ticket->curator,
+                'auto' => $ticket->auto,
+                'comment' => $ticket->comment,
+            ]);
     }
 
     public function deleteTicketList(int $id): void
@@ -96,7 +104,7 @@ class TicketService
         $rawModel = DB::connection('mysqlBaza')->table('spisok_tickets')
             ->where('kilter', '=', $id);
         if (!$rawModel->exists()) {
-            throw new \DomainException('Не найден билет s-' . $id);
+            throw new DomainException('Не найден билет s-' . $id);
         }
 
         $rawModel->update([

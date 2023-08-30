@@ -10,11 +10,9 @@ use Illuminate\Support\Carbon;
  * Class FriendlyTicket
  *
  * @property int $id
- * @property string $email
- * @property string $fio
  * @property string $project
  * @property string $curator
- * @property string $type_member
+ * @property string $auto
  * @property int $user_id
  * @property string $comment
  * @property string $festival_id
@@ -22,18 +20,17 @@ use Illuminate\Support\Carbon;
  *
  * @package App\Models
  */
-class ListTicket extends Model
+class Auto extends Model
 {
     use HasFactory;
 
+    protected $table = 'auto';
+
     protected $fillable = [
-        'email',
-        'fio',
         'project',
         'curator',
         'user_id',
-        'fio',
-        'type_member',
+        'auto',
         'comment',
         'festival_id'
     ];

@@ -35,13 +35,25 @@
                         <x-jet-label for="email" value="{{ __('Email покупателя') }}"/>
                         <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required/>
                     </div>
-
+                    <div class="mt-4">
+                        <x-jet-label for="type_member" value="{{ __('Тип участника') }}"/>
+                        <select class="form-select" name="type_member" aria-label="Default select example" id="type_member">
+                            <option selected value="artist">Артист</option>
+                            <option value="volunteer">Волонтер</option>
+                            <option value="team">Команда</option>
+                        </select>
+                    </div>
                     <div id="listFio">
                         <div class="mt-4" id="cloneFio">
                             <x-jet-label value="{{ __('Состав') }}"/>
                             <x-jet-label value="{{ __('Каждого участника проекта необходимо внести с новой строчки:') }}"/>
                             <textarea class="block mt-1 w-full" name="list" id="cloneFio" rows="5"></textarea>
                         </div>
+                    </div>
+                    <div class="mt-4">
+                        <x-jet-label value="{{ __('Автомобили') }}"/>
+                        <x-jet-label value="{{ __('При наличие автомобиля необходимо внести с новой строчки:') }}"/>
+                        <textarea class="block mt-1 w-full" name="auto" rows="5"></textarea>
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="comment" value="{{ __('Комментарий:') }}"/>

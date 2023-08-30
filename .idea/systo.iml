@@ -22,7 +22,7 @@
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/Baza/spec" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/Baza/tests" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/Backend/spec" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/Backend/../Shared" isTestSource="false" packagePrefix="Shared\" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/lines-of-code" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/complexity" />
       <excludeFolder url="file://$MODULE_DIR$/Backend/vendor/sebastian/diff" />

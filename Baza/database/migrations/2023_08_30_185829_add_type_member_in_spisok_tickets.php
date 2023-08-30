@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('spisok_tickets', function (Blueprint $table) {
-            $table->uuid('festival_id')->default('9d679bcf-b438-4ddb-ac04-023fa9bff4b2');
+            $table->string('type_member')->default('artist')->comment('тип участника');
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('spisok_tickets', function (Blueprint $table) {
-            $table->dropColumn('festival_id');
+            $table->dropColumn('type_member');
         });
     }
 };
