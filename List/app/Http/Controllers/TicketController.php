@@ -36,12 +36,11 @@ class TicketController extends Controller
         DB::beginTransaction();
         try {
             $ids = [];
-            $nameList = explode("\r\n", $request->post("list"));
             $nameAuto = explode("\r\n", $request->post("auto"));
-            if (count($nameList) === 0) {
-                throw new \Exception('Не указан состав');
-            }
             foreach ($nameAuto as $value) {
+                if(empty($value)) {
+                    continue;
+                }
                 $model = new Auto();
                 $model->auto = $value;
                 $model->project = $request->post('project');
@@ -52,6 +51,12 @@ class TicketController extends Controller
                 $model->saveOrFail();
                 $this->ticketService->pushAutoList($model);
             }
+
+            $nameList = explode("\r\n", $request->post("list"));
+            if (count($nameList) === 0) {
+                throw new \Exception('Не указан состав');
+            }
+
             foreach ($nameList as $value) {
                 $model = new ListTicket();
                 $model->fio = $value;
