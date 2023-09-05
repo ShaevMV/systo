@@ -173,9 +173,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     public function getAllTicketsId(): array
     {
         $rawResult = $this->model::withTrashed()
-            ->join('order_tickets', 'order_tickets.id','=', $this->model::TABLE.'.order_ticket_id')
-            ->where('order_tickets.festival_id','=',env('UUID_SECOND_FESTIVAL'))
-            ->get($this->model::TABLE.'.id')->toArray();
+            ->leftJoin('order_tickets', 'order_tickets.id','=', $this->model::TABLE.'.order_ticket_id')
+            ->where('order_tickets.festival_id','=',env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
+            ->get($this->model::TABLE.'.id')
+            ->toArray();
 
         $result = [];
         foreach ($rawResult as $item) {
