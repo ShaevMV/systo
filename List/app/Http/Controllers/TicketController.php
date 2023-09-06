@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\ProcessSendListTicketEmail;
 use App\Models\Auto;
 use App\Models\ListTicket;
+use Illuminate\Support\Facades\Log;
 use Shared\Services\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,9 +36,11 @@ class TicketController extends Controller
     {
         DB::beginTransaction();
         $massage = '';
+
         try {
 
             $nameAuto = explode("\r\n", $request->post("auto"));
+            Log::info(implode(',',$nameAuto));
             foreach ($nameAuto as $value) {
                 if(empty($value)) {
                     continue;
@@ -57,6 +60,7 @@ class TicketController extends Controller
 
             $ids = [];
             $nameList = explode("\r\n", $request->post("list"));
+            Log::info(implode(',',$nameList));
             if (count($nameList) === 0) {
                 throw new \Exception('Не указан состав');
             }
