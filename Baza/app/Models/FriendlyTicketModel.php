@@ -33,6 +33,7 @@ use Illuminate\Support\Carbon;
  * @method static Builder|FriendlyTicketModel whereEmail($value)
  * @method static Builder|FriendlyTicketModel whereId($value)
  * @method static Builder|FriendlyTicketModel whereKilter($value)
+ * @method static Builder|FriendlyTicketModel whereFestivalId($value)
  * @method static Builder|FriendlyTicketModel whereName($value)
  * @method static Builder|FriendlyTicketModel whereProject($value)
  * @method static Builder|FriendlyTicketModel whereUpdatedAt($value)
