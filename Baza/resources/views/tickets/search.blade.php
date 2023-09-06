@@ -70,6 +70,14 @@
                                            href="#{{DefineService::LIVE_TICKET}}">Живые</a>
                                     </li>
                                 @endif
+                                <!-- Auto -->
+                                @if (isset($result[DefineService::AUTO_TICKET]) && count($result[DefineService::AUTO_TICKET]) > 0 )
+                                    <li class="nav-item">
+                                        <a class="nav-link @if($tab === DefineService::AUTO_TICKET) active @endif"
+                                           data-toggle="tab"
+                                           href="#{{DefineService::AUTO_TICKET}}">Авто</a>
+                                    </li>
+                                @endif
                             </ul>
                         </div>
                         <div class="card-body">
@@ -412,6 +420,76 @@
                                                         </td>
                                                         <td>
                                                             {{$ticket['comment']}}
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                                </tbody>
+                                            </table>
+                                        @endif
+                                    </div>
+                                </div>
+                                <!-- AUTO -->
+                                <div class="tab-pane fade @if($tab === DefineService::AUTO_TICKET) show active @endif"
+                                     id="{{DefineService::AUTO_TICKET}}">
+                                    <div class="table-responsive">
+                                        @if (isset($result[DefineService::AUTO_TICKET]) && count($result[DefineService::AUTO_TICKET]) > 0 )
+                                            <table class="table">
+                                                <thead class=" text-primary">
+                                                <th>
+                                                </th>
+                                                <th>
+                                                    ID
+                                                </th>
+                                                <th>
+                                                    Номер авто
+                                                </th>
+                                                <th>
+                                                    Проект
+                                                </th>
+                                                <th>
+                                                    Куратор
+                                                </th>
+                                                <th>
+                                                    Коммент
+                                                </th>
+                                                </thead>
+                                                <tbody>
+                                                @foreach($result[DefineService::AUTO_TICKET] as $ticket)
+                                                    <tr>
+                                                        <td>
+                                                            @if($ticket['date_change'] === null)
+                                                                <form method="post"
+                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id"
+                                                                           value="{{$ticket['id']}}">
+                                                                    <input type="hidden" name="type"
+                                                                           value="{{DefineService::AUTO_TICKET}}">
+                                                                    <input type="hidden" name="q" value="{{$q}}">
+                                                                    <button type="submit"
+                                                                            class="btn btn-fill btn-primary">Пропустить
+                                                                    </button>
+                                                                </form>
+                                                            @elseif($ticket['date_change'] != null)
+                                                                Был пропущен {{$ticket['date_change']}}
+                                                            @else
+                                                                Билет в статусе {{$ticket['status_human']}}
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            {{$ticket['id']}}
+                                                        </td>
+                                                        <td>
+                                                            {!! $ticket['auto'] !!}
+                                                        </td>
+                                                        <td>
+                                                            {!! $ticket['project'] !!}
+                                                        </td>
+                                                        <td>
+                                                            {!! $ticket['curator'] !!}
+                                                        </td>
+                                                        <td>
+                                                            {!! $ticket['comment'] !!}
                                                         </td>
                                                     </tr>
                                                 @endforeach
