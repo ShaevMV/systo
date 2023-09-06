@@ -62,7 +62,7 @@ class TicketController extends Controller
             }
 
             foreach ($nameList as $value) {
-                if(empty($value)) {
+                if(empty(trim($value))) {
                     continue;
                 }
                 $model = new ListTicket();
