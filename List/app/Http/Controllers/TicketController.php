@@ -34,8 +34,9 @@ class TicketController extends Controller
     public function add(Request $request)
     {
         DB::beginTransaction();
+        $massage = '';
         try {
-            $ids = [];
+
             $nameAuto = explode("\r\n", $request->post("auto"));
             foreach ($nameAuto as $value) {
                 if(empty($value)) {
@@ -50,14 +51,20 @@ class TicketController extends Controller
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
                 $this->ticketService->pushAutoList($model);
+                $massage.="Автомабиль $value добавил
+                ";
             }
 
+            $ids = [];
             $nameList = explode("\r\n", $request->post("list"));
             if (count($nameList) === 0) {
                 throw new \Exception('Не указан состав');
             }
 
             foreach ($nameList as $value) {
+                if(empty($value)) {
+                    continue;
+                }
                 $model = new ListTicket();
                 $model->fio = $value;
                 $model->project = $request->post('project');
@@ -72,16 +79,20 @@ class TicketController extends Controller
                 $ids['S' . $model->id] = $value;
                 $this->ticketService->pushTicketList($model);
             }
-            Bus::chain([
-                new ProcessSendListTicketEmail(
-                    $request->post('email'),
-                    $ids,
-                    $request->post('project')
-                ),
-            ])->dispatch();
+            if(count($ids)>0) {
 
-            $massage = 'Ура! Всё получилось!
+                Bus::chain([
+                    new ProcessSendListTicketEmail(
+                        $request->post('email'),
+                        $ids,
+                        $request->post('project')
+                    ),
+                ])->dispatch();
+
+                $massage.= 'Ура! Всё получилось!
 Билеты отправлены на указанную почту!';
+            }
+
             DB::commit();
         } catch (Throwable $e) {
             DB::rollback();
