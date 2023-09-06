@@ -119,6 +119,19 @@ class AdminController extends Controller
         return redirect()->route('adminTickets');
     }
 
+    public function delTicketList(Request $request): RedirectResponse
+    {
+        $ids = explode(',', $request->post('ids'));
+
+        foreach ($ids as $id) {
+            ListTicket::destroy($id);
+            $this->ticketService->deleteTicketList($id);
+        }
+
+        return redirect()->route('adminTickets');
+    }
+
+
     public function getPdf(int $id): Response
     {
         /** @var ListTicket $ticket */

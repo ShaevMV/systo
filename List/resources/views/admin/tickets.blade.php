@@ -12,6 +12,7 @@
                     <th>{{ __('ФИО участника') }}</th>
                     <th>{{ __('Комментарий') }}</th>
                     <th>{{ __('Дата') }}</th>
+                    <th>{{ __('Отметить для удаления') }}</th>
                     <th>{{ __('Действие') }}</th>
                 </tr>
                 </thead>
@@ -25,7 +26,7 @@
                         <td>{{$ticket->fio}}</td>
                         <td title="{{$ticket->comment}}">{{mb_substr($ticket->comment ?? '',0,10)}}</td>
                         <td>{{$ticket->created_at}}</td>
-
+                        <td><input class="form-check-input checkbox check_tickets" type="checkbox" value="{{$ticket->id}}"></td>
                         <td>
                             <form method="POST" action="{{ route('delTicket') }}">
                                 @csrf
@@ -41,8 +42,31 @@
 
                 @endforeach
                 </tbody>
-
             </table>
+            <form method="POST" action="{{ route('delTicketList') }}" id="list_ids_for_delete">
+                @csrf
+                <input type="hidden" name="ids" id="list_ids" value="">
+            </form>
+            <button type="button" class="btn btn-danger" onclick="listIds()">Удалить выбранное</button>
         </div>
     </div>
+
+    <script>
+        var script = document.createElement('script');
+        script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js";
+        document.getElementsByTagName('head')[0].appendChild(script);
+
+        function listIds() {
+            let ids = [];
+            $('.check_tickets').each(function (i, elem) {
+                if ($(this).attr("checked") == 'checked') {
+                    ids.push($(this).attr("value"));
+                }
+            });
+            $('#list_ids').val(ids.join());
+            $('#list_ids_for_delete').submit();
+
+        }
+
+    </script>
 </x-app-layout>

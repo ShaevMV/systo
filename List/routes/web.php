@@ -40,4 +40,5 @@ Route::middleware(['admin', 'verified'])->post('/admin/user/create', [AdminContr
 
 Route::middleware(['admin', 'verified'])->get('/admin/tickets', [AdminController::class, 'tickets'])->name('adminTickets');
 Route::middleware(['admin', 'verified'])->post('/admin/tickets', [AdminController::class, 'delTicket'])->name('delTicket');
+Route::middleware(['admin', 'verified'])->post('/admin/ticketsList', [AdminController::class, 'delTicketList'])->name('delTicketList');
 Route::middleware(['admin', 'verified'])->get('/admin/tickets/{id}', [AdminController::class, 'getPdf'])->name('getPdf');
