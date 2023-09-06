@@ -6,7 +6,6 @@ namespace Baza\Tickets\Repositories;
 
 use App\Models\FriendlyTicketModel;
 use Baza\Tickets\Responses\FriendlyTicketResponse;
-use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
 use Throwable;
@@ -23,7 +22,9 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
     public function search(int $kilter): ?FriendlyTicketResponse
     {
-        $data = $this->friendlyTicketModel::whereKilter($kilter)->first()?->toArray();
+        $data = $this->friendlyTicketModel::whereKilter($kilter)
+            ->whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
+            ->first()?->toArray();
 
         if (is_null($data)) {
             return null;
@@ -37,7 +38,9 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->friendlyTicketModel::whereKilter($id)->first();
+        $rawData = $this->friendlyTicketModel::whereKilter($id)
+            ->whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
+            ->first();
 
         DB::beginTransaction();
         try {
@@ -55,11 +58,14 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->friendlyTicketModel::whereKilter((int)$q)
-            ->orWhere('project', 'like', '%' . $q . '%')
-            ->orWhere('name', 'like', '%' . $q . '%')
-            ->orWhere('comment', 'like', '%' . $q . '%')
-            ->orWhere('email', 'like', '%' . $q . '%')
+        $resultRawList = $this->friendlyTicketModel::whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
+                ->where(function($query) use ($q) {
+                    return $query->whereKilter((int)$q)
+                        ->orWhere('project', 'like', '%' . $q . '%')
+                        ->orWhere('name', 'like', '%' . $q . '%')
+                        ->orWhere('comment', 'like', '%' . $q . '%')
+                        ->orWhere('email', 'like', '%' . $q . '%');
+                })
             ->get()->toArray();
 
         $result = [];

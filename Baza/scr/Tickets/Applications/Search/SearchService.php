@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Applications\Search;
 
+use Baza\Tickets\Repositories\AutoTicketRepositoryInterface;
 use Baza\Tickets\Repositories\ElTicketsRepositoryInterface;
 use Baza\Tickets\Repositories\FriendlyTicketRepositoryInterface;
 use Baza\Tickets\Repositories\LiveTicketRepositoryInterface;
 use Baza\Tickets\Repositories\SpisokTicketsRepositoryInterface;
 use Baza\Tickets\Responses\SearchResponse;
-use Sentry\Laravel\Features\LivewirePackageIntegration;
 
 class SearchService
 {
@@ -18,6 +18,7 @@ class SearchService
         private ElTicketsRepositoryInterface      $elTicketsRepository,
         private FriendlyTicketRepositoryInterface $friendlyTicketRepository,
         private LiveTicketRepositoryInterface $liveTicketRepository,
+        private AutoTicketRepositoryInterface $autoTicketRepository,
     )
     {
     }
@@ -29,6 +30,7 @@ class SearchService
             $this->elTicketsRepository->find($q),
             $this->friendlyTicketRepository->find($q),
             $this->liveTicketRepository->find($q),
+            $this->autoTicketRepository->find($q),
         );
     }
 }

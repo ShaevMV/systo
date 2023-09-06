@@ -12,6 +12,8 @@ use Baza\Tickets\Applications\Search\SearchService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Redirect;
+use Throwable;
 
 class SearchController extends Controller
 {
@@ -40,7 +42,7 @@ class SearchController extends Controller
 
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function enterForTable(Request $request): RedirectResponse
     {
@@ -54,12 +56,12 @@ class SearchController extends Controller
                 $changeId,
             );
 
-            return \Redirect::route('tickets.search', [
+            return Redirect::route('tickets.search', [
                 'q' => $request->get('q'),
                 'tab' => $request->get('type'),
             ]);
-        } catch (\Throwable $exception) {
-            return \Redirect::route('tickets.search', [
+        } catch (Throwable $exception) {
+            return Redirect::route('tickets.search', [
                 'q' => $request->get('q'),
                 'tab' => $request->get('type'),
                 'error' => $exception->getMessage(),

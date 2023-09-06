@@ -6,12 +6,14 @@ namespace Baza\Tickets\ValueObject;
 
 class Color
 {
+    public const COLOR_AUTO = 'white';
     public const COLOR_ELECTRON = 'green';
     public const COLOR_SPISOK = 'blue';
     public const COLOR_LIVE = 'green';
     public const COLOR_FRIENDLY = 'green';
 
     private const COLORS = [
+        self::COLOR_AUTO,
         self::COLOR_ELECTRON,
         self::COLOR_SPISOK,
         self::COLOR_LIVE,

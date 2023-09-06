@@ -10,6 +10,7 @@ use InvalidArgumentException;
 
 class DefineService
 {
+    public const AUTO_TICKET = 'auto';
     public const ELECTRON_TICKET = 'electron';
     public const SPISOK_TICKET = 'spisok';
     public const LIVE_TICKET = 'live';
@@ -17,6 +18,7 @@ class DefineService
 
     public const HUMAN_LIST = [
         self::ELECTRON_TICKET => 'Электронный',
+        self::AUTO_TICKET => 'Автомобилишки',
         self::SPISOK_TICKET => 'Список',
         self::LIVE_TICKET => 'Живой',
         self::DRUG_TICKET => 'Френдли',
@@ -26,6 +28,7 @@ class DefineService
         self::ELECTRON_TICKET => 'E-',
         self::SPISOK_TICKET => 'S',
         self::LIVE_TICKET => '',
+        self::AUTO_TICKET => '',
         self::DRUG_TICKET => 'f',
     ];
 
@@ -35,6 +38,7 @@ class DefineService
     ];
 
     public const TYPE_BY_COLONS_IN_CHANGES = [
+        self::AUTO_TICKET => 'count_auto_tickets',
         self::ELECTRON_TICKET => 'count_el_tickets',
         self::SPISOK_TICKET => 'count_spisok_tickets',
         self::LIVE_TICKET => 'count_live_tickets',

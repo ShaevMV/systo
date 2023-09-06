@@ -20,6 +20,7 @@ class SearchResponse implements TicketResponseInterface
         private array $electron,
         private array $drug,
         private array $live,
+        private array $auto,
     )
     {
     }
@@ -43,6 +44,10 @@ class SearchResponse implements TicketResponseInterface
             $result[DefineService::LIVE_TICKET][] = $item->toArray();
         }
 
+        foreach ($this->auto as $item) {
+            $result[DefineService::AUTO_TICKET][] = $item->toArray();
+        }
+
         return $result;
     }
 
@@ -52,7 +57,8 @@ class SearchResponse implements TicketResponseInterface
             $data[DefineService::SPISOK_TICKET],
             $data[DefineService::ELECTRON_TICKET],
             $data[DefineService::DRUG_TICKET],
-            $data[DefineService::LIVE_TICKET]
+            $data[DefineService::LIVE_TICKET],
+            $data[DefineService::AUTO_TICKET]
         );
     }
 }

@@ -49,7 +49,7 @@ class OrderingTicketsController extends Controller
     /**
      * @throws JsonException
      */
-    public function findPromoCode(Request $request, ?string $promoCode): array
+    public function findPromoCode(Request $request, ?string $promoCode = null): array
     {
         $price = $this->getTicketType->getPrice(new Uuid($request->input('typeOrder')), new Carbon());
 
@@ -99,7 +99,7 @@ class OrderingTicketsController extends Controller
     ): JsonResponse
     {
         $id = $this->getPromoCodes->createOrUpdatePromoCode($createPromoCodeRequest->toArray());
-        $massage = $createPromoCodeRequest->id ? 'промокод обнавлён' : 'промокод добавлен';
+        $massage = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([
             'massage' => $massage,
