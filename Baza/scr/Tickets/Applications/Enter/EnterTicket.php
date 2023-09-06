@@ -8,13 +8,14 @@ use Baza\Shared\Domain\Bus\Command\CommandBus;
 use Baza\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Baza\Shared\Services\DefineService;
 use Baza\Tickets\Applications\Enter\AutoTicket\AutoTicketCommand;
+use Baza\Tickets\Applications\Enter\AutoTicket\AutoTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\DrugTicket\DrugTicketCommand;
 use Baza\Tickets\Applications\Enter\DrugTicket\DrugTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\ElTicket\ElTicketCommand;
 use Baza\Tickets\Applications\Enter\ElTicket\ElTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommand;
 use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommandHandler;
-use Baza\Tickets\Applications\Enter\SpisokTicket\AutoTicketCommandHandler;
+
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommand;
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommandHandler;
 
