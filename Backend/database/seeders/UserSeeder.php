@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
             'phone' => '+999999999',
             'city' => 'spb',
             'email' => self::EMAIL_ADMIN,
-            'password' => Hash::make('2457114soj'),
+            'password' => Hash::make('osenosen'),
             'is_admin' => true,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
