@@ -41,8 +41,9 @@ class TicketController extends Controller
 
             $nameAuto = explode("\r\n", $request->post("auto"));
             Log::info(implode(',',$nameAuto));
-            foreach ($nameAuto as $value) {
-                if(empty($value)) {
+            foreach ($nameAuto as $valueOld) {
+                $value = trim($valueOld);
+                if(empty(trim($value))) {
                     continue;
                 }
                 $model = new Auto();
@@ -65,7 +66,8 @@ class TicketController extends Controller
                 throw new \Exception('Не указан состав');
             }
 
-            foreach ($nameList as $value) {
+            foreach ($nameList as $valueOld) {
+                $value = trim($valueOld);
                 if(empty(trim($value))) {
                     continue;
                 }
