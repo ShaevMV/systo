@@ -27,6 +27,9 @@
                                     Списки
                                 </th>
                                 <th>
+                                    Авто
+                                </th>
+                                <th>
                                     Время начала смены
                                 </th>
                                 <th>
@@ -55,6 +58,9 @@
                                         </td>
                                         <td>
                                             {{$item['count_spisok_tickets']}}
+                                        </td>
+                                        <td>
+                                            {{$item['count_auto_tickets']}}
                                         </td>
                                         <td>
                                             {{$item['start']}}
