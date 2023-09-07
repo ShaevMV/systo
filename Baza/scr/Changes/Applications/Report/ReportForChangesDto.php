@@ -14,6 +14,7 @@ class ReportForChangesDto extends AbstractionEntity
         protected int     $count_el_tickets,
         protected int     $count_drug_tickets,
         protected int     $count_spisok_tickets,
+        protected int     $count_auto_tickets,
         protected Carbon  $start,
         protected ?Carbon $end = null,
     )
@@ -31,6 +32,7 @@ class ReportForChangesDto extends AbstractionEntity
             $data['count_el_tickets'],
             $data['count_drug_tickets'],
             $data['count_spisok_tickets'],
+            $data['count_auto_tickets'],
             Carbon::parse($data['start']),
             $end
         );
