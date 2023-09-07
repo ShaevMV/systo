@@ -57,4 +57,9 @@ class ReportForChangesDto extends AbstractionEntity
     {
         return $this->count_spisok_tickets;
     }
+
+    public function getCountAutoTickets(): int
+    {
+        return $this->count_auto_tickets;
+    }
 }

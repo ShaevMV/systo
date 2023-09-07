@@ -102,6 +102,9 @@
                                     <td>
                                         <b>{{$total['spisok']}} </b>
                                     </td>
+                                    <td>
+                                        <b>{{$total['auto']}} </b>
+                                    </td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
