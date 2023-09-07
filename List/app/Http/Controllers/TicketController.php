@@ -55,7 +55,7 @@ class TicketController extends Controller
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
                 $this->ticketService->pushAutoList($model);
-                $massage.="Автомабиль $value добавил
+                $massage.="Автомобилишка $value добавил
                 ";
             }
 
