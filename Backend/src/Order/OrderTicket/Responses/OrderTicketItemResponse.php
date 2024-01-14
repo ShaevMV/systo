@@ -6,7 +6,6 @@ namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
 use Nette\Utils\Json;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Status;

@@ -8,11 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use App\Models\User;
-use Database\Seeders\FestivalSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
@@ -20,12 +21,10 @@ use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Shared\Domain\ValueObject\Status;
-use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -64,7 +63,9 @@ class OrderTickets extends Controller
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
-
+            /**
+             * TODO: Фестивали получаем из фронта
+             */
             $data = $createOrderTicketsRequest->toArray();
             $data['festival_id'] = FestivalHelper::UUID_SECOND_FESTIVAL;
 

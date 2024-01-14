@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Seeder;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class FestivalSeeder extends Seeder
 {
@@ -18,7 +19,7 @@ class FestivalSeeder extends Seeder
     public function run(): void
     {
         DB::table('festivals')->insert([
-            'id' => env('UUID_FESTIVAL'),
+            'id' => FestivalHelper::UUID_FESTIVAL,
             'name'=> 'Весна',
             'year' => 2023,
             'active' => false,
@@ -28,7 +29,7 @@ class FestivalSeeder extends Seeder
 
 
         DB::table('festivals')->insert([
-            'id' => env('UUID_SECOND_FESTIVAL'),
+            'id' => FestivalHelper::UUID_SECOND_FESTIVAL,
             'name'=> 'Осень',
             'year' => 2023,
             'active' => true,

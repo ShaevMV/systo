@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class TypeTicketsSeeder extends Seeder
 {
@@ -20,19 +20,18 @@ class TypeTicketsSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ticket_type')->insert([
-            'id' => self::ID_FOR_FIRST_WAVE,
-            'name' => 'Оргвзнос',
-            'price' => self::DEFAULT_PRICE,
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
-        DB::table('ticket_type')->insert([
-            'id' => self::ID_FOR_REGIONS,
-            'name' => 'Оргвзнос для регионов',
-            'price' => '3600',
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::ID_FOR_FIRST_WAVE;
+        $ticketTypes->name = 'Оргвзнос';
+        $ticketTypes->price = self::DEFAULT_PRICE;
+        $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->save();
+
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::ID_FOR_REGIONS;
+        $ticketTypes->name = 'Оргвзнос для регионов';
+        $ticketTypes->price = '3600';
+        $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->save();
     }
 }

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models\Ordering\InfoForOrder;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
@@ -53,5 +55,16 @@ class TicketTypesModel extends Model
     public function ticketTypePrice(): HasMany
     {
         return $this->hasMany(TicketTypesPriceModel::class, 'ticket_type_id');
+    }
+
+
+    public function festival(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            FestivalModel::class,
+            'ticket_type_festival',
+            'festival_id',
+            'ticket_type_id'
+        );
     }
 }

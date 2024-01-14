@@ -4,12 +4,12 @@ declare(strict_types = 1);
 
 namespace Tickets\Order\OrderTicket\Repositories;
 
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
 interface OrderTicketRepositoryInterface
 {

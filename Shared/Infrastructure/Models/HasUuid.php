@@ -31,8 +31,10 @@ trait HasUuid
     public static function booted(): void
     {
         static::creating(static function (Model $model) {
-            // Set attribute for new model's primary key (ID) to an uuid.
-            $model->setAttribute($model->getKeyName(), Uuid::random());
+            if(empty($model->getAttribute($model->getKeyName()))) {
+                // Set attribute for new model's primary key (ID) to an uuid.
+                $model->setAttribute($model->getKeyName(), Uuid::random());
+            }
         });
     }
 }

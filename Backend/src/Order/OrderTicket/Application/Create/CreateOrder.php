@@ -7,14 +7,14 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 use Bus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class CreateOrder
 {

@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Ordering\InfoForOrder\TicketTypesPriceModel;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use JsonException;
 use Shared\Domain\ValueObject\Uuid;
 
 class TypeTicketsPriceThirdWaveSeeder extends Seeder
@@ -22,21 +22,29 @@ class TypeTicketsPriceThirdWaveSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ticket_type_price')->insert([
-            'id' => self::ID_FOR_WAVE,
-            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-            'price' => self::PRICE_FOR_SECOND_WAVE,
-            'before_date' => Carbon::yesterday(),
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
-        DB::table('ticket_type_price')->insert([
-            'id' => self::ID_FOR_REGIONS,
-            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_REGIONS,
-            'price' => self::PRICE_FOR_SECOND_FOR_REGIONS,
-            'before_date' => Carbon::yesterday(),
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        TicketTypesModel::find(TypeTicketsSeeder::ID_FOR_FIRST_WAVE)
+            ->ticketTypePrice()
+            ->saveMany([
+                new  TicketTypesPriceModel([
+                    'id' => self::ID_FOR_WAVE,
+                    'price' => self::PRICE_FOR_SECOND_WAVE,
+                    'before_date' => Carbon::yesterday(),
+                ]),
+                new TicketTypesPriceModel([
+                    'id' => Uuid::random()->value(),
+                    'price' => 4600,
+                    'before_date' => (new Carbon())->subDays(1),
+                ])
+            ]);
+
+        TicketTypesModel::find(TypeTicketsSeeder::ID_FOR_REGIONS)
+            ->ticketTypePrice()
+            ->saveMany([
+                new  TicketTypesPriceModel([
+                    'id' => self::ID_FOR_REGIONS,
+                    'price' => self::PRICE_FOR_SECOND_WAVE,
+                    'before_date' => Carbon::yesterday(),
+                ]),
+            ]);
     }
 }

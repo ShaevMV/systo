@@ -2,13 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Domain;
+namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
-use Illuminate\Support\Carbon;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 
@@ -31,7 +28,7 @@ class OrderTicketDto
      * @param string|null $promo_code
      * @param Uuid|null $id
      */
-    public function __construct(
+    private function __construct(
         protected Uuid     $festival_id,
         protected Uuid     $user_id,
         protected string   $email,

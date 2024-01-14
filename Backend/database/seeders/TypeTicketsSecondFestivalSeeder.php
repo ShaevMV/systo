@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use Carbon\Carbon;
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class TypeTicketsSecondFestivalSeeder extends Seeder
@@ -17,15 +16,13 @@ class TypeTicketsSecondFestivalSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ticket_type')->insert([
-            'id' => self::TYPE_TICKET_FOR_SECOND_FESTIVAL,
-            'name' => 'Оргвзнос на Систо-Осень 2023',
-            'price' => 3500,
-            'groupLimit' => null,
-            'sort' => 1,
-            'festival_id' => FestivalHelper::UUID_SECOND_FESTIVAL,
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::TYPE_TICKET_FOR_SECOND_FESTIVAL;
+        $ticketTypes->name = 'Оргвзнос';
+        $ticketTypes->sort = 1;
+        $ticketTypes->price = 3500;
+        $ticketTypes->festival()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
+        $ticketTypes->save();
+
     }
 }

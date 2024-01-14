@@ -13,7 +13,8 @@ final class TicketTypeDto extends AbstractionEntity
         protected Uuid $id,
         protected string $name,
         protected float $price,
-        protected ?int $gropeLimit = null
+        protected ?int $gropeLimit = null,
+        protected array $festivalList = [],
     ) {
     }
 
@@ -24,7 +25,8 @@ final class TicketTypeDto extends AbstractionEntity
             new Uuid($data['id']),
             $data['name'],
             (float)$data['price'],
-            $data['groupLimit']
+            $data['groupLimit'],
+            $data[]
         );
     }
 

@@ -13,10 +13,9 @@ use Tests\TestCase;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class CreateOrderTest extends TestCase
 {
@@ -49,7 +48,8 @@ class CreateOrderTest extends TestCase
     public function test_it_create(OrderTicketDto $orderTicketDto): void
     {
         $orderTicket = OrderTicket::create(
-            $orderTicketDto
+            $orderTicketDto,
+            1
         );
 
         $events = $orderTicket->pullDomainEvents();
@@ -93,7 +93,7 @@ class CreateOrderTest extends TestCase
         ', 1);
         $orderTicketDto = OrderTicketDto::fromState(
             $request,
-            new Uuid(UserSeeder::ID_FOR_USER_UUID),
+            new \Shared\Domain\ValueObject\Uuid(UserSeeder::ID_FOR_USER_UUID),
             new PriceDto(1000,
                 count($request['guests']) * 100
             ),

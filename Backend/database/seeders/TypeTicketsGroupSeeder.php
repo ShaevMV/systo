@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Shared\Domain\ValueObject\Uuid;
 
 class TypeTicketsGroupSeeder extends Seeder
 {
@@ -19,7 +18,7 @@ class TypeTicketsGroupSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('ticket_type')->insert([
+        DB::table(TicketTypesModel::TABLE)->insert([
             'id' => self::ID_FOR_FIRST_WAVE,
             'name' => 'Оргвзнос на День Победы на 5-х человек',
             'price' => self::DEFAULT_PRICE,
