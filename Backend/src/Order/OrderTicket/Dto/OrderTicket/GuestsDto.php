@@ -19,14 +19,14 @@ final class GuestsDto implements EntityDataInterface
     {
     }
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, Uuid $festivalId): self
     {
         $id = isset($data['id']) && !empty($data['id']) ? new Uuid($data['id']) : Uuid::random();
 
         return new self(
             $data['value'],
             $id,
-            $data['festivalId']
+            $festivalId
         );
     }
 

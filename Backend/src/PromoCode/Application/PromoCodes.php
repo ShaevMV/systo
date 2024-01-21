@@ -62,9 +62,9 @@ class PromoCodes
      */
     public function createOrUpdatePromoCode(array $request): Uuid
     {
-        $command = CreateOrUpdatePromoCodeCommand::fromState($request);
-        $this->commandBus->dispatch($command);
+        $promoCode = CreateOrUpdatePromoCodeCommand::fromState($request);
+        $this->commandBus->dispatch($promoCode);
 
-        return $command->getId();
+        return $promoCode->getId();
     }
 }

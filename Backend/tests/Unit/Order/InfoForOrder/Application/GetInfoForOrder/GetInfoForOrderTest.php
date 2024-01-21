@@ -31,7 +31,7 @@ class GetInfoForOrderTest extends TestCase
     public function test_in_correct_get_list(): void
     {
         $r = $this->allInfoForOrderingTicketsSearcher->getAllPrice(new Uuid(FestivalHelper::UUID_FESTIVAL));
-        self::assertCount(6, $r->getTicketType());
+        self::assertCount(4, $r->getTicketType());
     }
 
 

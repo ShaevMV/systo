@@ -6,6 +6,7 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
 use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\OrderTicketModel;
+use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
@@ -54,7 +55,7 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTypeOrder()?->value(),
             ],
             [
-                'field' => OrderTicketModel::TABLE . '.festival_id',
+                'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],

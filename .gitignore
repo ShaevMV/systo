@@ -4,3 +4,4 @@ Docker/mysqlFriendly/db/*
 Docker/redis/data
 .idea/*
 .env
+/Backend/phpunit.xml.dist

@@ -9,6 +9,7 @@ use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
+use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -140,12 +141,16 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
                 '=',
                 TicketTypesModel::TABLE.'.id')
-            ->leftJoin(FestivalModel::TABLE, TicketTypesModel::TABLE.'.festival_id',
+            ->leftJoin(TicketTypeFestivalModel::TABLE, TicketTypesModel::TABLE.'.id',
+                '=',
+                TicketTypeFestivalModel::TABLE.'.ticket_type_id')
+            ->leftJoin(FestivalModel::TABLE, TicketTypeFestivalModel::TABLE.'.festival_id',
                 '=',
                 FestivalModel::TABLE.'.id')
             ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
                 '=',
                 TypesOfPaymentModel::TABLE.'.id')
+
             ->select([
                 $this->model::TABLE.'.*',
                 User::TABLE.'.email',

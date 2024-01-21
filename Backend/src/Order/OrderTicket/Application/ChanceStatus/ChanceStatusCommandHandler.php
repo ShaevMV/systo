@@ -66,7 +66,14 @@ class ChanceStatusCommandHandler implements CommandHandler
             $orderTicket->getTicket()
         );
 
-        $this->bus::chain($list)->dispatch();
+        if($command->isNow()) {
+            $this->bus::chain($list)->onConnection('sync')->dispatch();
+
+        } else {
+            $this->bus::chain($list)->dispatch();
+
+        }
+
 
         $this->pushTicket->pushByOrderId($command->getOrderId());
     }

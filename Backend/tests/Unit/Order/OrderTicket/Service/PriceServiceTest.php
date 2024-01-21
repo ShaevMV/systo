@@ -8,9 +8,9 @@ use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class PriceServiceTest extends TestCase
 {
@@ -38,7 +38,7 @@ class PriceServiceTest extends TestCase
             2,
             PromoCodSeeder::NAME_FOR_SYSTO,
         );
-        self::assertEquals(TypeTicketsPriceSeeder::PRICE_FOR_SECOND_WAVE*2, $result->getPrice());
+        self::assertEquals(TypeTicketsPriceSeeder::PRICE_FOR_SECOND_WAVE * 2, $result->getPrice());
         self::assertNotEquals(TypeTicketsSeeder::DEFAULT_PRICE, $result->getPrice());
 
         self::assertEquals(

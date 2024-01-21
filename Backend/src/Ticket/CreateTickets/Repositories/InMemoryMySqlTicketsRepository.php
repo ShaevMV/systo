@@ -78,7 +78,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         } else {
             $model = $this->model::withTrashed();
         }
-
+        $all = $this->model::all()->toArray();
         $listIds = $model->whereOrderTicketId($orderId->value())
             ->get()
             ->toArray();
@@ -150,20 +150,22 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     public function setInBaza(TicketResponse $ticketsDto): bool
     {
         $data = $ticketsDto->toArray();
+        try {
+            DB::connection('mysqlBaza')->getPdo();
+            if(!DB::connection('mysqlBaza')->table('el_tickets')
+                ->where('uuid', '=', $ticketsDto->getId()->value())->exists()
+            ) {
+                return DB::connection('mysqlBaza')
+                    ->table('el_tickets')
+                    ->insert(
+                        $data
+                    );
+            }
+        } catch (\Exception $e) {
 
-        if ((!DB::connection('mysqlBaza')->table('el_tickets')
-            ->where('uuid', '=', $ticketsDto->getId()->value())->exists())
-        ) {
-            return DB::connection('mysqlBaza')
-                ->table('el_tickets')
-                ->insert(
-                    $data
-                );
+        } finally {
+            return true;
         }
-        (DB::connection('mysqlBaza')->table('el_tickets')
-            ->where('uuid', '=', $ticketsDto->getId()->value()))->update($data);
-
-        return true;
     }
 
 

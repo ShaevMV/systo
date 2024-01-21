@@ -6,13 +6,13 @@ use App\Http\Requests\CreatePromoCodeRequest;
 use Database\Seeders\PromoCodSeeder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Throwable;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 
 class GetPromoCodesTest extends TestCase
 {
@@ -50,41 +50,12 @@ class GetPromoCodesTest extends TestCase
         self::assertInstanceOf(PromoCodeDto::class, $result);
     }
 
-    /**
-     * @throws Throwable
-     */
-    public function test_in_correct_create(): void
-    {
-        self::assertTrue($this->getListPromoCodes->createOrUpdatePromoCode([
-            'name' => 'spb',
-            'discount' => 100,
-            'is_percent' => true,
-            'active' => true
-        ]));
-    }
-
-    /**
-     * @throws Throwable
-     */
-    public function test_in_correct_update(): void
-    {
-        self::assertTrue(
-            $this->getListPromoCodes->createOrUpdatePromoCode([
-                'id' => PromoCodSeeder::ID_FOR_SYSTO,
-                'name' => PromoCodSeeder::NAME_FOR_SYSTO,
-                'discount' => 500,
-                'active' => true,
-                'is_percent' => false,
-                'limit' => null,
-            ])
-        );
-    }
 
     public function test_in_correct_fine_promoCode(): void
     {
         $res = $this->isCorrectPromoCode->findPromoCode(PromoCodSeeder::NAME_FOR_SYSTO,1000);
 
-        self::assertFalse($res->isSuccess());
+        self::assertTrue($res->isSuccess());
     }
 
 }

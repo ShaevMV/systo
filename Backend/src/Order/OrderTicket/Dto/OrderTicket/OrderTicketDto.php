@@ -60,12 +60,13 @@ class OrderTicketDto
         $status = $data['status'] ?? Status::NEW;
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
+        $festivalId = new Uuid($data['festival_id']);
         foreach ($guests as $guest) {
-            $tickets[] = GuestsDto::fromState($guest);
+            $tickets[] = GuestsDto::fromState($guest, $festivalId);
         }
 
         return new self(
-            new Uuid($data['festival_id']),
+            $festivalId,
             $userId,
             $data['email'],
             $data['phone'],

@@ -28,7 +28,7 @@ class PromoCodSeeder extends Seeder
             'discount' => self::DISCOUNT_FOR_SYSTO,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
-            'active' => false
+            'active' => true
         ]);
 
         DB::table('promo_code')->insert([

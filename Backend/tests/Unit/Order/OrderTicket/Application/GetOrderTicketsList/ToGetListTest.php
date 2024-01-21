@@ -60,7 +60,7 @@ class ToGetListTest extends TestCase
                 null,
                 null,
                 null,
-                4200,
+                TypeTicketsSeeder::DEFAULT_PRICE,
                 new Uuid(TypeTicketsSeeder::ID_FOR_FIRST_WAVE),
             )
         );

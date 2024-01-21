@@ -6,7 +6,6 @@ namespace Tickets\Order\InfoForOrder\Response;
 
 use Tickets\Order\InfoForOrder\DTO\FestivalDto;
 use Tickets\Order\InfoForOrder\DTO\PriceDto;
-use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;

@@ -9,10 +9,11 @@ use Shared\Domain\ValueObject\Uuid;
 class ChanceStatusCommand implements Command
 {
     public function __construct(
-        private Uuid $orderId,
-        private Status $nextStatus,
-        private Uuid $userId,
-        private ?string $comment,
+        public Uuid $orderId,
+        public Status $nextStatus,
+        public Uuid $userId,
+        public ?string $comment = null,
+        public bool $now = false,
     ){
     }
 
@@ -34,5 +35,10 @@ class ChanceStatusCommand implements Command
     public function getUserId(): Uuid
     {
         return $this->userId;
+    }
+
+    public function isNow(): bool
+    {
+        return $this->now;
     }
 }
