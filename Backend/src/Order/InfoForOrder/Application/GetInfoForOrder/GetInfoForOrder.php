@@ -45,14 +45,10 @@ final class GetInfoForOrder
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */
         $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
-        $result=[];
+        $result = [];
         foreach ($listTicketTypeDto->getTicketType() as $item) {
-            $data = $item->toArray();
-            if (count($data['ticket_type_price']) > 0) {
-                foreach ($data['ticket_type_price'] as $value) {
-                    $data['price'] = $value['price'];
-                    $result[] = TicketTypeDto::fromState($data);
-                }
+            foreach ($item->getPriceList() as $priceDto) {
+                $result[] = $item->setPrice($priceDto->getPrice());
             }
         }
         return new ListTicketTypeDto($result);

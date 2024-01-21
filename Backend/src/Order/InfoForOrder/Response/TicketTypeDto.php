@@ -18,7 +18,8 @@ final class TicketTypeDto extends AbstractionEntity implements Response
      * @param string $name
      * @param float $price
      * @param int|null $groupLimit
-     * @param Uuid[] $festivalIdList
+     * @param FestivalDto[] $festivalList
+     * @param PriceDto[] $priceList
      * @param int $sort
      */
     public function __construct(
@@ -26,8 +27,8 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         protected string $name,
         protected float  $price,
         protected ?int   $groupLimit,
-        protected array  $festivalIdList,
-        protected array  $priceIdList,
+        protected array  $festivalList,
+        protected array  $priceList,
         protected int    $sort = 0,
     )
     {
@@ -51,11 +52,11 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         },$data['ticket_type_price'] ?? []);
 
 
-        $correctPrice = end($priceList);
+        $correctPrice = count($priceList) > 0 ? end($priceList)->getPrice() : $data['price'];
         return new self(
             new Uuid($data['id']),
             $data['name'],
-            $correctPrice->getPrice(),
+            $correctPrice,
             $groupLimit,
             $festivalIdList,
             $priceList,
@@ -73,8 +74,20 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         return $this->groupLimit;
     }
 
-    public function getFestivalIdList(): array
+    public function getFestivalList(): array
     {
-        return $this->festivalIdList;
+        return $this->festivalList;
+    }
+
+    public function getPriceList(): array
+    {
+        return $this->priceList;
+    }
+
+    public function setPrice(float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
     }
 }

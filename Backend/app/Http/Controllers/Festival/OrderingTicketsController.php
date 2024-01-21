@@ -116,6 +116,6 @@ class OrderingTicketsController extends Controller
             throw new DomainException('Не задан идентификатор фестиваля');
         }
 
-        return $this->getPriceList->getAllPrice(new Uuid($request->get('festival_id')))->toArray();
+        return $this->allInfoForOrderingTicketsSearcher->getAllPrice(new Uuid($request->get('festival_id')))->toArray();
     }
 }
