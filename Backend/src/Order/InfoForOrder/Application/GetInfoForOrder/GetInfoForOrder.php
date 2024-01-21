@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetInfoForOrder;
 
-use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceListQuery;
 use Tickets\Order\InfoForOrder\Response\InfoForOrderingDto;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
 use Tickets\Order\InfoForOrder\Response\ListTypesOfPaymentDto;
-use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 
 final class GetInfoForOrder
 {
@@ -47,9 +45,14 @@ final class GetInfoForOrder
         $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
         $result = [];
         foreach ($listTicketTypeDto->getTicketType() as $item) {
-            foreach ($item->getPriceList() as $priceDto) {
-                $result[] = $item->setPrice($priceDto->getPrice());
+            if(count($item->getPriceList()) > 0) {
+                foreach ($item->getPriceList() as $priceDto) {
+                    $result[] = $item->setPrice($priceDto->getPrice());
+                }
+            } else {
+                $result[] = $item;
             }
+
         }
         return new ListTicketTypeDto($result);
     }
