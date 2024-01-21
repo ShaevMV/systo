@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use JsonException;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class OrderSeeder extends Seeder
 {
@@ -76,7 +77,13 @@ class OrderSeeder extends Seeder
                 [
                     'value' => 'test',
                     'id' => self::ID_FOR_MULTI_FESTIVAL_TICKET,
-                ]
+                    'festival_id' => FestivalHelper::UUID_FESTIVAL
+                ],
+                [
+                    'value' => 'test',
+                    'id' => Uuid::random()->value(),
+                    'festival_id' => FestivalHelper::UUID_SECOND_FESTIVAL
+                ],
             ], JSON_THROW_ON_ERROR),
             'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
             'id_buy' => '2312',

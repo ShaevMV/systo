@@ -51,14 +51,14 @@ class TicketApplication
      * @return Ticket[]
      * @throws Throwable
      */
-    public function createList(Uuid $orderId, Uuid $festivalId, array $guests): array
+    public function createList(Uuid $orderId, array $guests): array
     {
         $tickets = [];
         foreach ($guests as $guest) {
             $ticketDto =  new TicketDto(
                 $orderId,
                 $guest->getValue(),
-                $festivalId,
+                $guest->getFestivalId(),
                 $guest->getId() ?? null,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(
