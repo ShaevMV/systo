@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string|null $email
  * @property string $date
  * @property string $id_buy
+ * @property string $festival_id
  * @property string $phone
  * @property string $city
  * @property string|null $comment

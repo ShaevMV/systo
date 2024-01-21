@@ -48,7 +48,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         /** @var PriceDto[] $priceList */
         $priceList = array_map(function ($dataPrice) {
             return PriceDto::fromState($dataPrice);
-        },$data['ticket_type_price'] ?? []);
+        }, $data['ticket_type_price'] ?? []);
 
 
         $correctPrice = count($priceList) > 0 ? end($priceList)->getPrice() : $data['price'];
@@ -73,9 +73,9 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         return $this->groupLimit;
     }
 
-    public function getFestivalList(): array
+    public function getFestivalListId(): array
     {
-        return $this->festivalList;
+        return array_map(fn(FestivalDto $festivalDto) => $festivalDto->getId(), $this->festivalList);
     }
 
     public function getPriceList(): array

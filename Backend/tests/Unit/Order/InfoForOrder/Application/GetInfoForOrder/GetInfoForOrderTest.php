@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Order\InfoForOrder\Application\GetInfoForOrder;
 
+use Database\Seeders\TypeTicketsPriceSeeder;
 use Database\Seeders\TypeTicketsSecondFestivalSeeder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -30,17 +31,20 @@ class GetInfoForOrderTest extends TestCase
 
     public function test_in_correct_get_list(): void
     {
-        $r = $this->allInfoForOrderingTicketsSearcher->getAllPrice(new Uuid(FestivalHelper::UUID_FESTIVAL));
-        self::assertCount(6, $r->getTicketType());
+        $r = $this->allInfoForOrderingTicketsSearcher
+            ->getAllPrice(
+                new Uuid(FestivalHelper::UUID_FESTIVAL)
+            );
+        self::assertCount(7, $r->getTicketType());
     }
 
 
     public function test_in_correct_get_price():void
     {
         $r = $this->allInfoForOrderingTicketsSearcher
-            ->getInfoForOrderingDto(new Uuid(FestivalHelper::UUID_SECOND_FESTIVAL))
+            ->getInfoForOrderingDto(new Uuid(FestivalHelper::UUID_FESTIVAL))
             ->getListTicketTypeDto();
 
-        self::assertEquals(TypeTicketsSecondFestivalSeeder::DEFAULT_PRICE, $r->getTicketType()[0]->getPrice());
+        self::assertEquals(TypeTicketsPriceSeeder::PRICE_FOR_SECOND_WAVE, $r->getTicketType()[0]->getPrice());
     }
 }

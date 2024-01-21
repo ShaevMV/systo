@@ -21,6 +21,7 @@ class TypeTicketsGroupSeeder extends Seeder
         $ticketTypes->id = self::ID_FOR_FIRST_WAVE;
         $ticketTypes->name = 'Оргвзнос для регионов';
         $ticketTypes->price = self::DEFAULT_PRICE;
+        $ticketTypes->sort = 5;
         $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
         $ticketTypes->save();
     }

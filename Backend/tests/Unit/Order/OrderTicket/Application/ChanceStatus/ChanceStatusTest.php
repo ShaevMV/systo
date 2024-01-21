@@ -66,6 +66,26 @@ class ChanceStatusTest extends TestCase
     /**
      * @throws Throwable
      */
+    public function test_is_correct_chance_status_to_buy_for_multi_festival(): void
+    {
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_MULTI_FESTIVAL_ORDER),
+            new Status(Status::PAID),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
+            now:true,
+        );
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isPaid());
+
+        self::assertCount(1, $idList);
+        self::assertTrue($orderDto->getTicket()[0]->getId()->equals($idList[0]));
+        self::assertTrue($orderDto->getTicket()[0]->getFestivalId()->equals(new Uuid(FestivalSeeder::ID_FOR_2023_FESTIVAL)));
+    }
+
+    /**
+     * @throws Throwable
+     */
     public function test_is_correct_chance_status_to_difficulties_arose(): void
     {
         $this->chanceStatus->chance(

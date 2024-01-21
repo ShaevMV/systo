@@ -48,7 +48,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         $guestsRaw = !is_array($data['guests']) ? Json::decode($data['guests'], 1) : $data['guests'];
         $guests = [];
         foreach ($guestsRaw as $guest) {
-            $guests[] = GuestsDto::fromState($guest, new Uuid($data['festival_id']));
+            $guests[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
         $status = new Status($data['status']);
         return new self(

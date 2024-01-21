@@ -27,4 +27,9 @@ class FestivalDto extends AbstractionEntity
             (bool) $data['active'],
         );
     }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
 }

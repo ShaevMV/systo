@@ -15,6 +15,7 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
@@ -25,6 +26,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
+use Tickets\Order\OrderTicket\Service\TicketService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -33,6 +35,8 @@ class OrderTickets extends Controller
 {
     public function __construct(
         private CreateOrder        $createOrder,
+        private GetTicketType      $getTicketType,
+        private TicketService $ticketService,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
         private GetOrder           $getOrder,
@@ -56,18 +60,22 @@ class OrderTickets extends Controller
             $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
                 AccountDto::fromState($createOrderTicketsRequest->toArray())
             )->value());
-
+            $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
-                new Uuid($createOrderTicketsRequest->ticket_type_id),
+                $ticketTypeId,
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
-            /**
-             * TODO: Фестивали получаем из фронта
-             */
+
+            $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
+
             $data = $createOrderTicketsRequest->toArray();
-            $data['festival_id'] = FestivalHelper::UUID_SECOND_FESTIVAL;
+
+            $data['guests'] = $this->ticketService->initFestivalId(
+                $createOrderTicketsRequest->guests,
+                $ticketType->getFestivalListId()
+            );
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,

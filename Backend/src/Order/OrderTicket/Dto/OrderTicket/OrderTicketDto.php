@@ -53,20 +53,19 @@ class OrderTicketDto
     public static function fromState(
         array    $data,
         Uuid     $userId,
-        PriceDto $priceDto
+        PriceDto $priceDto,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
         $status = $data['status'] ?? Status::NEW;
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
-        $festivalId = new Uuid($data['festival_id']);
         foreach ($guests as $guest) {
-            $tickets[] = GuestsDto::fromState($guest, $festivalId);
+            $tickets[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
 
         return new self(
-            $festivalId,
+            new Uuid($data['festival_id']),
             $userId,
             $data['email'],
             $data['phone'],
@@ -92,17 +91,17 @@ class OrderTicketDto
             $tickets[] = [
                 'value' => $item->getValue(),
                 'id' => $item->getId()->value(),
-                'festival'
+                'festival_id' => $item->getFestivalId()->value(),
             ];
         }
-
+        $jsonTickets = Json::encode($tickets);
         return [
             'id' => $this->id,
             'festival_id' => $this->festival_id,
             'user_id' => $this->user_id,
             'ticket_type_id' => $this->ticket_type_id,
             'types_of_payment_id' => $this->types_of_payment_id,
-            'guests' => Json::encode($tickets),
+            'guests' => $jsonTickets,
             'phone' => $this->phone,
             'price' => $this->priceDto->getPrice(),
             'discount' => $this->priceDto->getDiscount(),

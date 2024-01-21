@@ -81,7 +81,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE.'.*',
                 User::TABLE.'.email',
                 TicketTypesModel::TABLE.'.name',
-                TypesOfPaymentModel::TABLE.'.name as payment_name'
+                TypesOfPaymentModel::TABLE.'.name as payment_name',
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->orderBy($this->model::TABLE.'.kilter')
@@ -115,16 +115,20 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function findOrder(Uuid $uuid): ?OrderTicketDto
     {
+        /** @var OrderTicketModel $rawData */
         $rawData = $this->model::whereId($uuid->value())
-            ->with('users')
-            ->first()
-            ?->toArray();
-        $rawData['email'] = $rawData['users']['email'];
+            ->with([
+                'users'
+            ])
+            ->first();
 
-        return $rawData !== null ? OrderTicketDto::fromState(
-            $rawData,
+        $rawDataArr = $rawData->toArray();
+        $rawDataArr['email'] = $rawDataArr['users']['email'];
+
+        return $rawDataArr !== null ? OrderTicketDto::fromState(
+            $rawDataArr,
             new Uuid($rawData['users']['id']),
-            new PriceDto($rawData['price'], $rawData['discount'])
+            new PriceDto($rawData['price'], $rawData['discount']),
         ) : null;
     }
 
