@@ -26,5 +26,5 @@ interface TicketsRepositoryInterface
     /**
      * @return Uuid[]
      */
-    public function getAllTicketsId(): array;
+    public function getAllTicketsId(Uuid $festivalId): array;
 }

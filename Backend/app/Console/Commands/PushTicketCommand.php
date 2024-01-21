@@ -41,7 +41,7 @@ class PushTicketCommand extends Command
         try {
             $uuid = $this->argument('id') ?? null ? new Uuid($this->argument('id')) : null;
             if (is_null($uuid)) {
-                $ids = $ticketsRepository->getAllTicketsId();
+                $ids = $ticketsRepository->getAllTicketsId(new Uuid(env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b3')));
                 foreach ($ids as $id) {
                     $pushTicket->pushTicket($id);
                     $this->info('Удачно отправленные ' . $id->value());

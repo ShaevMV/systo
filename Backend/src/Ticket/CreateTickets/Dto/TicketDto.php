@@ -17,6 +17,7 @@ class TicketDto extends AbstractionEntity
     public function __construct(
         protected Uuid   $order_ticket_id,
         protected string $name,
+        protected Uuid   $festival_id,
         ?Uuid            $id = null,
         protected ?int   $kilter = null,
         ?Carbon          $created_at = null,
@@ -29,11 +30,12 @@ class TicketDto extends AbstractionEntity
     }
 
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, Uuid $festivalId): self
     {
         return new self(
             new Uuid($data['order_ticket_id']),
             $data['name'],
+            $festivalId,
             new Uuid($data['id']),
             $data['kilter'],
         );

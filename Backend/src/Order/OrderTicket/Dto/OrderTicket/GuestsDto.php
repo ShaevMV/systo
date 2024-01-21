@@ -60,4 +60,9 @@ final class GuestsDto implements EntityDataInterface
     {
         return $this->id;
     }
+
+    public function getFestivalId(): Uuid
+    {
+        return $this->festivalId;
+    }
 }

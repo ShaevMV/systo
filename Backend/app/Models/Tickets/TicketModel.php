@@ -2,10 +2,13 @@
 
 namespace App\Models\Tickets;
 
+use App\Models\Ordering\OrderTicketModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
@@ -19,6 +22,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @mixin Eloquent
  * @property int $id
  * @property string $order_ticket_id
+ * @property string $festival_id
  * @property int $number
  * @property string $name
  * @property string $status
@@ -50,4 +54,13 @@ class TicketModel extends Model
     protected $fillable = [
         'id', 'order_ticket_id', 'number', 'name', 'status'
     ];
+
+    public function orderTicket():HasOne
+    {
+        return $this->hasOne(
+            OrderTicketModel::class,
+            'id',
+            'order_ticket_id',
+        );
+    }
 }

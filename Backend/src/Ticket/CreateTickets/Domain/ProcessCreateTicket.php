@@ -21,6 +21,7 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
 
     public function __construct(
         private Uuid  $orderId,
+        private Uuid $festivalId,
         private array $quests
     )
     {
@@ -34,7 +35,7 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
         PushTicket        $pushTicket,
     ): void
     {
-        $tickets = $application->createList($this->orderId, $this->quests);
+        $tickets = $application->createList($this->orderId, $this->festivalId, $this->quests);
 
         foreach ($tickets as $ticket) {
             $pushTicket->pushTicket($ticket->getId());

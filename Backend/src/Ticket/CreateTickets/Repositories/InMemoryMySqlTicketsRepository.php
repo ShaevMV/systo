@@ -17,7 +17,6 @@ use JsonException;
 use Throwable;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
-use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
@@ -152,7 +151,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $data = $ticketsDto->toArray();
         try {
             DB::connection('mysqlBaza')->getPdo();
-            if(!DB::connection('mysqlBaza')->table('el_tickets')
+            if (!DB::connection('mysqlBaza')->table('el_tickets')
                 ->where('uuid', '=', $ticketsDto->getId()->value())->exists()
             ) {
                 return DB::connection('mysqlBaza')
@@ -172,12 +171,14 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     /**
      * @return Uuid[]
      */
-    public function getAllTicketsId(): array
+    public function getAllTicketsId(?Uuid $festivalId = null): array
     {
         $rawResult = $this->model::withTrashed()
-            ->leftJoin('order_tickets', 'order_tickets.id','=', $this->model::TABLE.'.order_ticket_id')
-            ->where('order_tickets.festival_id','=',env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b3'))
-            ->get($this->model::TABLE.'.id')
+            ->leftJoin('order_tickets', 'order_tickets.id', '=', $this->model::TABLE . '.order_ticket_id');
+        if (null !== $festivalId) {
+            $rawResult->where('order_tickets.festival_id', '=', $festivalId->value());
+        }
+        $rawResult->get($this->model::TABLE . '.id')
             ->toArray();
 
         $result = [];

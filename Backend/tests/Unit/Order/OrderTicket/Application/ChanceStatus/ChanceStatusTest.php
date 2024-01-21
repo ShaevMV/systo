@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Order\OrderTicket\Application\ChanceStatus;
 
-use App\Models\User;
+use Database\Seeders\FestivalSeeder;
 use Database\Seeders\OrderSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -59,6 +59,7 @@ class ChanceStatusTest extends TestCase
 
         self::assertCount(1, $idList);
         self::assertTrue($orderDto->getTicket()[0]->getId()->equals($idList[0]));
+        self::assertTrue($orderDto->getTicket()[0]->getFestivalId()->equals(new Uuid(FestivalSeeder::ID_FOR_2023_FESTIVAL)));
     }
 
 

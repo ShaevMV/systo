@@ -60,7 +60,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
         foreach ($data['tickets'] as $ticket) {
-            $tickets[] = TicketDto::fromState($ticket);
+            $tickets[] = TicketDto::fromState($ticket, new Uuid($data['festival_id']));
         }
 
         return new self(

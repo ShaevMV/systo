@@ -40,6 +40,7 @@ class ApplicationTicketTest extends TestCase
     {
         $tickets = $this->TicketApplication->createList(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
+            new Uuid(FestivalSeeder::ID_FOR_2023_FESTIVAL),
             [
                 new GuestsDto(
                     'test',
