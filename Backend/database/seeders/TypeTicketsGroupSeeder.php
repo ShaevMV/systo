@@ -6,6 +6,7 @@ use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class TypeTicketsGroupSeeder extends Seeder
 {
@@ -18,13 +19,11 @@ class TypeTicketsGroupSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table(TicketTypesModel::TABLE)->insert([
-            'id' => self::ID_FOR_FIRST_WAVE,
-            'name' => 'Оргвзнос на День Победы на 5-х человек',
-            'price' => self::DEFAULT_PRICE,
-            'groupLimit' => 5,
-            'created_at' => new Carbon(),
-            'updated_at' => new Carbon(),
-        ]);
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::ID_FOR_FIRST_WAVE;
+        $ticketTypes->name = 'Оргвзнос для регионов';
+        $ticketTypes->price = self::DEFAULT_PRICE;
+        $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->save();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Response\PriceByTicketTypeResponse;
 

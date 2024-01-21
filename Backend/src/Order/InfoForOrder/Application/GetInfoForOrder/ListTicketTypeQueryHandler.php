@@ -9,20 +9,19 @@ use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Repositories\TypesOfPaymentInterface;
 use Tickets\Order\InfoForOrder\Response\InfoForOrderingDto;
 use Shared\Domain\Bus\Query\QueryHandler;
+use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
 
-final class GetAllInfoForOrderQueryHandler implements QueryHandler
+final class ListTicketTypeQueryHandler implements QueryHandler
 {
     public function __construct(
         private TicketTypeInterfaceRepository $ticketType,
-        private TypesOfPaymentInterface       $typesOfPayment,
     ) {
     }
 
-    public function __invoke(GetAllInfoForOrderQuery $query): InfoForOrderingDto
+    public function __invoke(ListTicketTypeQuery $query): ListTicketTypeDto
     {
-        return new InfoForOrderingDto(
-            $this->ticketType->getList(new Carbon(), $query->getFestivalId()),
-            $this->typesOfPayment->getList(),
+        return new ListTicketTypeDto(
+            $this->ticketType->getList($query->getFestivalId())
         );
     }
 }

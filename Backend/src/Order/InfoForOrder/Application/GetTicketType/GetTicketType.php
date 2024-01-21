@@ -42,4 +42,12 @@ final class GetTicketType
 
         return $result->getGroupLimit() !== null;
     }
+
+    public function getTicketsTypeByUuid(Uuid $ticketsTypeId): TicketTypeDto
+    {
+        /** @var TicketTypeDto $result */
+        $result = $this->queryBus->ask(new GetTicketTypeQuery($ticketsTypeId));
+
+        return $result;
+    }
 }

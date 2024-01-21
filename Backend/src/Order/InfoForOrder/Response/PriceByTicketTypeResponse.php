@@ -3,6 +3,7 @@
 namespace Tickets\Order\InfoForOrder\Response;
 
 use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\ValueObject\Uuid;
 
 class PriceByTicketTypeResponse implements Response
 {

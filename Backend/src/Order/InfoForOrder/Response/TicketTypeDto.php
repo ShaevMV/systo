@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Response;
 
+use Tickets\Order\InfoForOrder\DTO\FestivalDto;
+use Tickets\Order\InfoForOrder\DTO\PriceDto;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
@@ -11,19 +13,26 @@ use Shared\Domain\ValueObject\Uuid;
 
 final class TicketTypeDto extends AbstractionEntity implements Response
 {
-    protected Uuid $festivalId;
-
+    /**
+     * @param Uuid $id
+     * @param string $name
+     * @param float $price
+     * @param int|null $groupLimit
+     * @param Uuid[] $festivalIdList
+     * @param int $sort
+     */
     public function __construct(
         protected Uuid   $id,
         protected string $name,
         protected float  $price,
-        protected ?int   $groupLimit = null,
-        ?Uuid            $festivalId = null,
+        protected ?int   $groupLimit,
+        protected array  $festivalIdList,
+        protected array  $priceIdList,
         protected int    $sort = 0,
     )
     {
-        $this->festivalId = $festivalId ?? new Uuid(FestivalHelper::UUID_FESTIVAL);
     }
+
 
     public static function fromState(array $data): self
     {
@@ -31,15 +40,25 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             (int)$data['groupLimit'] :
             null;
 
-        $price = !isset($data['ticket_type_price']) || count($data['ticket_type_price']) == 0 ? $data['price'] : end($data['ticket_type_price'])['price'];
-        $festivalId = !isset($data['festival_id']) ? null : new Uuid($data['festival_id']);
 
+        $festivalIdList = array_map(function (array $dataFestival) {
+            return FestivalDto::fromState($dataFestival);
+        }, $data['festival'] ?? []);
+
+        /** @var PriceDto[] $priceList */
+        $priceList = array_map(function ($dataPrice) {
+            return PriceDto::fromState($dataPrice);
+        },$data['ticket_type_price'] ?? []);
+
+
+        $correctPrice = end($priceList);
         return new self(
             new Uuid($data['id']),
             $data['name'],
-            (float)$price,
+            $correctPrice->getPrice(),
             $groupLimit,
-            $festivalId,
+            $festivalIdList,
+            $priceList,
             $data['sort'],
         );
     }
@@ -52,5 +71,10 @@ final class TicketTypeDto extends AbstractionEntity implements Response
     public function getGroupLimit(): ?int
     {
         return $this->groupLimit;
+    }
+
+    public function getFestivalIdList(): array
+    {
+        return $this->festivalIdList;
     }
 }

@@ -11,11 +11,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+
 
 class ToGetListTest extends TestCase
 {

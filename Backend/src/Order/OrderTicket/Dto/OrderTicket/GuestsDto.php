@@ -13,7 +13,8 @@ final class GuestsDto implements EntityDataInterface
 {
     public function __construct(
         protected string $value,
-        protected Uuid   $id
+        protected Uuid   $id,
+        protected Uuid   $festivalId,
     )
     {
     }
@@ -25,6 +26,7 @@ final class GuestsDto implements EntityDataInterface
         return new self(
             $data['value'],
             $id,
+            $data['festivalId']
         );
     }
 

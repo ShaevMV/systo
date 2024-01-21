@@ -7,7 +7,7 @@ namespace Tickets\Order\InfoForOrder\Application\GetInfoForOrder;
 use Shared\Domain\Bus\Query\Query;
 use Shared\Domain\ValueObject\Uuid;
 
-final class GetAllInfoForOrderQuery implements Query
+final class ListTicketTypeQuery implements Query
 {
     public function __construct(
         private Uuid $festivalId

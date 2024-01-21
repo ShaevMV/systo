@@ -7,6 +7,9 @@ use Shared\Domain\Entity\AbstractionEntity;
 
 class ListTicketTypeDto extends AbstractionEntity implements Response
 {
+    /**
+     * @param TicketTypeDto[] $ticketType
+     */
     public function __construct(
         protected array $ticketType,
     ){

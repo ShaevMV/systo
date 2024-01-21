@@ -12,7 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Throwable;
-use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\AllInfoForOrderingTicketsSearcher;
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceList;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\PromoCode\Application\PromoCodes;
@@ -23,11 +23,11 @@ use Shared\Domain\ValueObject\Uuid;
 class OrderingTicketsController extends Controller
 {
     public function __construct(
-        private AllInfoForOrderingTicketsSearcher $allInfoForOrderingTicketsSearcher,
-        private IsCorrectPromoCode                $isCorrectPromoCode,
-        private GetTicketType                     $getTicketType,
-        private GetPriceList                      $getPriceList,
-        private PromoCodes                        $getPromoCodes,
+        private GetInfoForOrder    $allInfoForOrderingTicketsSearcher,
+        private IsCorrectPromoCode $isCorrectPromoCode,
+        private GetTicketType      $getTicketType,
+        private GetPriceList       $getPriceList,
+        private PromoCodes         $getPromoCodes,
     )
     {
     }
@@ -42,7 +42,7 @@ class OrderingTicketsController extends Controller
         }
 
         return $this->allInfoForOrderingTicketsSearcher
-            ->getInfo(new Uuid($request->get('festival_id')))
+            ->getInfoForOrderingDto(new Uuid($request->get('festival_id')))
             ->toArray();
     }
 

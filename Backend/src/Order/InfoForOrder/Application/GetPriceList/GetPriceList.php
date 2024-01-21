@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetPriceList;
 
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\ListTicketTypeQuery;
+use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\ListTicketTypeQueryHandler;
 use Tickets\Order\InfoForOrder\Response\ListTicketTypeDto;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
@@ -12,10 +14,10 @@ class GetPriceList
 {
     private InMemorySymfonyQueryBus $queryBus;
 
-    public function __construct(GetPriceListQueryHandler $getPriceLIstQueryHandler)
+    public function __construct(ListTicketTypeQueryHandler $getAllInfoForOrderQueryHandler)
     {
         $this->queryBus = new InMemorySymfonyQueryBus([
-            GetPriceListQuery::class => $getPriceLIstQueryHandler
+            ListTicketTypeQuery::class => $getAllInfoForOrderQueryHandler
         ]);
     }
 

@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Repositories;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Ordering\InfoForOrder\TicketTypesPriceModel;
+use App\Models\Ordering\TicketTypeFestivalModel;
 use Carbon\Carbon;
 use DomainException;
+use Illuminate\Database\Query\JoinClause;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Shared\Domain\ValueObject\Uuid;
+use Illuminate\Database\Eloquent\Builder;
 
 class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {
@@ -18,15 +23,11 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     {
     }
 
-    public function getList(Carbon $afterDate, Uuid $festivalId): array
+    public function getList(Uuid $festivalId, ?Carbon $afterDate = null): array
     {
         $result = [];
 
-        $data = $this->model::with('ticketTypePrice')
-            ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')])
-            ->where('active', '=', true)
-            ->where('festival_id', '=', $festivalId->value())
-            ->orderBy('sort')
+        $data = $this->joinFestival($festivalId, $afterDate)
             ->get()
             ->toArray();
 
@@ -37,10 +38,33 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         return $result;
     }
 
+    private function joinFestival(Uuid $festivalId, ?Carbon $afterDate = null): Builder
+    {
+        return $this->model
+            ->leftJoin(TicketTypeFestivalModel::TABLE, function (JoinClause $join) {
+                $join->on(
+                    TicketTypeFestivalModel::TABLE . '.ticket_type_id',
+                    '=',
+                    $this->model::TABLE . '.id'
+                );
+            })->with([
+                'ticketTypePrice' => fn($query) => $query
+                    ->where('before_date', '<=', $afterDate ?? new Carbon())
+                    ->orderBy('before_date'),
+                'festival',
+            ])
+            ->where(TicketTypeFestivalModel::TABLE . '.festival_id', '=', $festivalId->value())
+            ->select([
+                $this->model::TABLE . '.*'
+            ])
+            ->orderBy($this->model::TABLE . '.sort');
+    }
+
     public function getById(Uuid $uuid, ?Carbon $afterDate = null): TicketTypeDto
     {
         $ticketType = $this->model
-            ::whereId($uuid->value());
+            ::whereId($uuid->value())
+            ->with('festival');
         if (!is_null($afterDate)) {
             $ticketType = $ticketType
                 ->with(['ticketTypePrice' => fn($query) => $query->where('before_date', '<=', $afterDate)->orderBy('before_date')]);
@@ -59,23 +83,12 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     public function getListPrice(Uuid $festivalId): array
     {
         $result = [];
-        $rawResult = $this->model
-            ->where('festival_id', '=', $festivalId->value())
-            ->with('ticketTypePrice')
-            ->orderBy('sort')
+        $rawResult = $this->joinFestival($festivalId)
             ->get()
             ->toArray();
 
         foreach ($rawResult as $item) {
-            $data = $item;
-            unset($data['ticket_type_price']);
-            $result[] = TicketTypeDto::fromState($data);
-            if (count($item['ticket_type_price']) > 0) {
-                foreach ($item['ticket_type_price'] as $value) {
-                    $data['price'] = $value['price'];
-                    $result[] = TicketTypeDto::fromState($data);
-                }
-            }
+
         }
 
         return $result;

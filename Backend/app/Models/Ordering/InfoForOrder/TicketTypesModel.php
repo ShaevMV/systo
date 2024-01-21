@@ -6,6 +6,7 @@ namespace App\Models\Ordering\InfoForOrder;
 
 use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
+use App\Models\Ordering\TicketTypeFestivalModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -62,9 +63,9 @@ class TicketTypesModel extends Model
     {
         return $this->belongsToMany(
             FestivalModel::class,
-            'ticket_type_festival',
-            'festival_id',
-            'ticket_type_id'
+            TicketTypeFestivalModel::TABLE,
+            'ticket_type_id',
+            'festival_id'
         );
     }
 }

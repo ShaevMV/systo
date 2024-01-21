@@ -9,31 +9,17 @@ use Shared\Domain\Entity\AbstractionEntity;
 
 final class InfoForOrderingDto extends AbstractionEntity implements Response
 {
-    /**
-     * @param  TicketTypeDto[]  $ticketType
-     * @param  TypesOfPaymentDto[]  $typesOfPayment
-     */
     public function __construct(
-        protected array $ticketType,
-        protected array $typesOfPayment,
+        protected ListTicketTypeDto $listTicketTypeDto,
+        protected ListTypesOfPaymentDto $listTypesOfPaymentDto,
     ) {
     }
 
-    public static function fromState(array $data): self
+    /**
+     * @return ListTicketTypeDto
+     */
+    public function getListTicketTypeDto(): ListTicketTypeDto
     {
-        $ticketType = [];
-        foreach ($data['ticketType'] as $datum) {
-            $ticketType[] = TicketTypeDto::fromState($datum);
-        }
-
-        $typesOfPayment = [];
-        foreach ($data['typesOfPayment'] as $datum) {
-            $typesOfPayment[] = TypesOfPaymentDto::fromState($datum);
-        }
-
-        return new self(
-            $ticketType,
-            $typesOfPayment
-        );
+        return $this->listTicketTypeDto;
     }
 }

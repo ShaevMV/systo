@@ -13,10 +13,10 @@ interface TicketTypeInterfaceRepository
     /**
      * @return TicketTypeDto[]
      */
-    public function getList(Carbon $afterDate, Uuid $festivalId): array;
+    public function getList(Uuid $festivalId, ?Carbon $afterDate = null): array;
 
     public function getById(
-        Uuid $uuid,
+        Uuid    $uuid,
         ?Carbon $afterDate = null,
     ): TicketTypeDto;
 
