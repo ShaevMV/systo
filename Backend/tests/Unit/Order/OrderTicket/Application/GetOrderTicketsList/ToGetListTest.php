@@ -98,6 +98,6 @@ class ToGetListTest extends TestCase
         );
 
 
-        self::assertEmpty($result?->toArray());
+        self::assertNotEmpty($result?->toArray());
     }
 }
