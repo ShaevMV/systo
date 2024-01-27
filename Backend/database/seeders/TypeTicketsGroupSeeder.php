@@ -22,7 +22,7 @@ class TypeTicketsGroupSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос для регионов';
         $ticketTypes->price = self::DEFAULT_PRICE;
         $ticketTypes->sort = 5;
-        $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
         $ticketTypes->save();
     }
 }

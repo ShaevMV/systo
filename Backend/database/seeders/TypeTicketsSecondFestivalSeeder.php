@@ -22,7 +22,7 @@ class TypeTicketsSecondFestivalSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос';
         $ticketTypes->sort = 6;
         $ticketTypes->price = self::DEFAULT_PRICE;
-        $ticketTypes->festival()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
         $ticketTypes->save();
 
     }

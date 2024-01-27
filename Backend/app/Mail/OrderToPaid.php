@@ -20,7 +20,7 @@ class OrderToPaid extends Mailable
         private array $tickets
     )
     {
-        $this->subject('Билеты на Систо-Осень ' . date('Y'));
+        $this->subject('Билеты на Систо ' . date('Y'));
     }
 
     /**

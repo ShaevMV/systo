@@ -58,8 +58,7 @@ class TicketTypesModel extends Model
         return $this->hasMany(TicketTypesPriceModel::class, 'ticket_type_id');
     }
 
-
-    public function festival(): BelongsToMany
+    public function festivals(): BelongsToMany
     {
         return $this->belongsToMany(
             FestivalModel::class,

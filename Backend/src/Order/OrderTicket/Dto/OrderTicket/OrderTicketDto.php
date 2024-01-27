@@ -159,19 +159,18 @@ class OrderTicketDto
         return $this->id;
     }
 
-    /**
-     * @return PriceDto
-     */
     public function getPriceDto(): PriceDto
     {
         return $this->priceDto;
     }
 
-    /**
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function getTicketTypeId(): Uuid
+    {
+        return $this->ticket_type_id;
     }
 }

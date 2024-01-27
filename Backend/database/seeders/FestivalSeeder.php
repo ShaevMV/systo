@@ -18,8 +18,8 @@ class FestivalSeeder extends Seeder
     {
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_FESTIVAL,
-            'name'=> 'Весна',
-            'year' => 2023,
+            'name'=> 'весну',
+            'year' => date('Y'),
             'active' => false,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
@@ -28,8 +28,8 @@ class FestivalSeeder extends Seeder
 
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_SECOND_FESTIVAL,
-            'name'=> 'Осень',
-            'year' => 2023,
+            'name'=> 'осень',
+            'year' => date('Y'),
             'active' => true,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),

@@ -50,7 +50,7 @@ final class CreateOrder
             /** @var OrderTicketItemResponse $orderTicketItem */
             $orderTicketItem = $this->queryBus->ask(new OrderIdQuery($orderTicketDto->getId()));
             if (is_null($orderTicketItem)) {
-                throw new DomainException('Не получины данные о заказе ' . $orderTicketDto->getId()->value());
+                throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
             }
             DB::commit();
         } catch (Throwable $throwable) {

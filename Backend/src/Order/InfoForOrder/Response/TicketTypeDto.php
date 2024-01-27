@@ -43,7 +43,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
 
         $festivalIdList = array_map(function (array $dataFestival) {
             return FestivalDto::fromState($dataFestival);
-        }, $data['festival'] ?? []);
+        }, $data['festivals'] ?? []);
 
         /** @var PriceDto[] $priceList */
         $priceList = array_map(function ($dataPrice) {

@@ -14,7 +14,7 @@ class OrderToCreate extends Mailable
         private int $kilter,
     )
     {
-        $this->subject('Оргвзнос на Систо-Осень ' . date('Y'));
+        $this->subject('Оргвзнос на Систо ' . date('Y'));
     }
 
     /**

@@ -10,4 +10,9 @@ use Shared\Domain\ValueObject\Uuid;
 interface FestivalRepositoryInterface
 {
     public function get(Uuid $id): FestivalDto;
+
+    /**
+     * @return FestivalDto[]
+     */
+    public function getFestivalByTicketTypeId(Uuid $ticketTypeId): array;
 }

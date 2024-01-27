@@ -15,7 +15,7 @@ class OrderToDifficultiesArose extends Mailable
     public function __construct(
         private string $comment
     ){
-        $this->subject('Возникли трудности с подтверждением оргвзноса на Систо-Осень  ' . date('Y'));
+        $this->subject('Возникли трудности с подтверждением оргвзноса на Систо ' . date('Y'));
     }
 
     /**
