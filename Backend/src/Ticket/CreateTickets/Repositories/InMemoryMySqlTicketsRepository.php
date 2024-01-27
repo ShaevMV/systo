@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Repositories;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
@@ -114,10 +115,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $result = $result->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
+            ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
+                FestivalModel::TABLE . '.view',
                 OrderTicketModel::TABLE . '.phone',
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
@@ -139,7 +142,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['phone'],
             $result['city'],
             $result['last_comment'],
-            Carbon::parse($result['created_at'])
+            Carbon::parse($result['created_at']),
+            $result['view'],
         );
     }
 

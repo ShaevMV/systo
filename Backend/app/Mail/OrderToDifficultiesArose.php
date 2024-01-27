@@ -7,6 +7,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class OrderToDifficultiesArose extends Mailable
 {
@@ -15,7 +16,7 @@ class OrderToDifficultiesArose extends Mailable
     public function __construct(
         private string $comment
     ){
-        $this->subject('Возникли трудности с подтверждением оргвзноса на Систо ' . date('Y'));
+        $this->subject('Возникли трудности с подтверждением оргвзноса на ' . FestivalHelper::getNameFestival());
     }
 
     /**

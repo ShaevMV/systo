@@ -40,7 +40,7 @@ class CreatingQrCodeService
     {
         $qrCode = $this->createQrCode($dataInfoForPdf->getId()->value());
 
-        return Pdf::loadView('pdf', [
+        return Pdf::loadView($dataInfoForPdf->getFestivalView() ?? 'pdf', [
             'url' => $qrCode->getDataUri(),
             'name' => $dataInfoForPdf->getName(),
             'email' => $dataInfoForPdf->getEmail(),

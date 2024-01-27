@@ -18,17 +18,18 @@ class FestivalSeeder extends Seeder
     {
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_FESTIVAL,
-            'name'=> 'весну',
+            'name' => 'весну',
             'year' => date('Y'),
+            'view' => 'pdf',
             'active' => false,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
         ]);
 
-
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_SECOND_FESTIVAL,
-            'name'=> 'осень',
+            'name' => 'осень',
+            'view' => 'pdf2',
             'year' => date('Y'),
             'active' => true,
             'created_at' => new Carbon(),

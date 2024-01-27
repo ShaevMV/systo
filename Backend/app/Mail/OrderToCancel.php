@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class OrderToCancel extends Mailable
 {
@@ -12,7 +13,7 @@ class OrderToCancel extends Mailable
 
     public function __construct()
     {
-        $this->subject('Оргвзнос на Систо' . date('Y') . ' отменён');
+        $this->subject('Оргвзнос на ' . FestivalHelper::getNameFestival() . ' отменён');
     }
 
     /**

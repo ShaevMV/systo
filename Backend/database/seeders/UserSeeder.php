@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
 {
     public const ID_FOR_ADMIN_UUID = 'b9df62af-252a-4890-afd7-73c2a356c259';
     public const ID_FOR_USER_UUID = 'b9df62af-252a-4890-afd7-73c2a356c260';
-    public const EMAIL_USER = 'user@user.ru';
+    public const EMAIL_USER = 'shaevmv@gmail.com';
     public const EMAIL_ADMIN = 'admin@spaceofjoy.ru';
     public const PASSWORD_ADMIN = 'osenosen';
 

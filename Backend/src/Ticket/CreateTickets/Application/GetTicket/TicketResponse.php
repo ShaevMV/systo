@@ -21,6 +21,7 @@ class TicketResponse extends AbstractionEntity implements Response
         protected string $city,
         protected ?string $comment,
         protected Carbon $date_order,
+        protected ?string $festivalView,
     )
     {
     }
@@ -58,4 +59,8 @@ class TicketResponse extends AbstractionEntity implements Response
         return $this->city;
     }
 
+    public function getFestivalView(): ?string
+    {
+        return $this->festivalView;
+    }
 }
