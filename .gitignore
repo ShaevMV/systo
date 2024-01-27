@@ -1,7 +1,7 @@
-Docker/mysql/db/*
-Docker/mysqlFriendly/log/*
-Docker/mysqlFriendly/db/*
-Docker/redis/data
+/Docker/redis/data
 .idea/*
 .env
 /Backend/phpunit.xml.dist
+/Docker/mysqlFriendly/db/
+/Docker/mysqlFriendly/log/
+/Docker/mysql/db/
