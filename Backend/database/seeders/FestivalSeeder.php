@@ -9,8 +9,6 @@ use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class FestivalSeeder extends Seeder
 {
-    public const ID_FOR_2023_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b2';
-
     /**
      * Run the database seeds.
      *

@@ -37,7 +37,7 @@ class OrderSeeder extends Seeder
                     'id' => self::ID_FOR_FIRST_TICKET,
                 ]
             ], JSON_THROW_ON_ERROR),
-            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
             'id_buy' => '2312',
             'phone' => '+9999999999',
             'user_id' => UserSeeder::ID_FOR_USER_UUID,
@@ -59,7 +59,7 @@ class OrderSeeder extends Seeder
                     'id' => self::ID_FOR_SECOND_TICKET,
                 ]
             ], JSON_THROW_ON_ERROR),
-            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
             'id_buy' => '2312',
             'phone' => '+9999999999',
             'user_id' => UserSeeder::ID_FOR_USER_UUID,
@@ -85,7 +85,7 @@ class OrderSeeder extends Seeder
                     'festival_id' => FestivalHelper::UUID_SECOND_FESTIVAL
                 ],
             ], JSON_THROW_ON_ERROR),
-            'festival_id' => FestivalSeeder::ID_FOR_2023_FESTIVAL,
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
             'id_buy' => '2312',
             'phone' => '+9999999999',
             'user_id' => UserSeeder::ID_FOR_USER_UUID,

@@ -26,7 +26,6 @@ class OrderingTicketsController extends Controller
         private GetInfoForOrder    $allInfoForOrderingTicketsSearcher,
         private IsCorrectPromoCode $isCorrectPromoCode,
         private GetTicketType      $getTicketType,
-        private GetPriceList       $getPriceList,
         private PromoCodes         $getPromoCodes,
     )
     {

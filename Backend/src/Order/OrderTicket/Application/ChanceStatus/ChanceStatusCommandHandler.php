@@ -68,7 +68,6 @@ class ChanceStatusCommandHandler implements CommandHandler
 
         if($command->isNow()) {
             $this->bus::chain($list)->onConnection('sync')->dispatch();
-
         } else {
             $this->bus::chain($list)->dispatch();
 

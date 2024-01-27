@@ -22,4 +22,12 @@ final class InfoForOrderingDto extends AbstractionEntity implements Response
     {
         return $this->listTicketTypeDto;
     }
+
+    public function toArray(): array
+    {
+        return [
+            'ticketType' => $this->listTicketTypeDto->toArray()['ticketType'] ?? [],
+            'typesOfPayment' => $this->listTypesOfPaymentDto->toArray()['typesOfPaymentDto'] ?? [],
+        ];
+    }
 }

@@ -13,6 +13,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 
@@ -59,7 +60,7 @@ class ChanceStatusTest extends TestCase
 
         self::assertCount(1, $idList);
         self::assertTrue($orderDto->getTicket()[0]->getId()->equals($idList[0]));
-        self::assertTrue($orderDto->getTicket()[0]->getFestivalId()->equals(new Uuid(FestivalSeeder::ID_FOR_2023_FESTIVAL)));
+        self::assertTrue($orderDto->getTicket()[0]->getFestivalId()->equals(new Uuid(FestivalHelper::UUID_FESTIVAL)));
     }
 
 

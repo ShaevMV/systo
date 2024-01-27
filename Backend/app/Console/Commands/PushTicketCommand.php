@@ -9,6 +9,7 @@ use Nette\Utils\JsonException;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Throwable;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
@@ -41,7 +42,7 @@ class PushTicketCommand extends Command
         try {
             $uuid = $this->argument('id') ?? null ? new Uuid($this->argument('id')) : null;
             if (is_null($uuid)) {
-                $ids = $ticketsRepository->getAllTicketsId(new Uuid(env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b3')));
+                $ids = $ticketsRepository->getAllTicketsId(new Uuid(FestivalHelper::UUID_FESTIVAL));
                 foreach ($ids as $id) {
                     $pushTicket->pushTicket($id);
                     $this->info('Удачно отправленные ' . $id->value());
