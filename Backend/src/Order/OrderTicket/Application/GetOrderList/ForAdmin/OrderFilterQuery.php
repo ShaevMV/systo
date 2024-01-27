@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
+use InvalidArgumentException;
 use Shared\Domain\Bus\Query\Query;
 use Shared\Domain\ValueObject\Uuid;
 
 class OrderFilterQuery implements Query
 {
     public function __construct(
+        private Uuid $festivalId,
         private ?Uuid $typesOfPayment = null,
         private ?string $email = null,
         private ?string $status = null,
         private ?string $promoCode = null,
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
-        private ?Uuid $festivalId = null,
     ) {
     }
 
@@ -42,17 +43,20 @@ class OrderFilterQuery implements Query
 
     public static function fromState(array $data): self
     {
+        if(!isset($data['festivalId'])) {
+            throw new InvalidArgumentException('festivalId обязательное поле!');
+        }
+
         $typesOfPayment = $data['typesOfPayment'] ?? null;
         $typePrice = $data['typePrice'] ?? null;
-        $festivalId = $data['festivalId'] ?? null;
         return new self(
+            new Uuid($data['festivalId']),
             (null !== $typesOfPayment) ? new Uuid($data['typesOfPayment']) : null,
             $data['email'] ?? null,
             $data['status'] ?? null,
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
             (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
-            (null !== $festivalId) ? new Uuid($data['festivalId']) : null,
         );
     }
 

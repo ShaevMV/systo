@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
-use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
@@ -63,7 +63,7 @@ class OrderListFilterQueryHandler implements QueryHandler
         $orderTicketItem = $this->orderTicketRepository->getList($filter);
 
         if (!is_null($filterQuery->getPrice())) {
-            $orderTicketItem = $this->filterByPrice($filterQuery->getPrice(), $orderTicketItem);
+            $orderTicketItem = $this->filterByPrice($filterQuery->getPrice(), $orderTicketItem, $filterQuery->getFestivalId());
         }
 
         return count($orderTicketItem) > 0 ? new ListResponse($orderTicketItem) : null;
@@ -71,16 +71,19 @@ class OrderListFilterQueryHandler implements QueryHandler
 
 
     /**
-     * @param float $price
      * @param OrderTicketItemForListResponse[] $orderTicketItem
-     * @return array
+     * @return OrderTicketItemForListResponse[]
      */
-    private function filterByPrice(float $price, array $orderTicketItem): array
+    private function filterByPrice(
+        float $price,
+        array $orderTicketItem,
+        Uuid $festivalId,
+    ): array
     {
         $result = [];
 
         foreach ($orderTicketItem as $item) {
-            if (($item->getPriceWithoutDiscount() / count($item->getGuests()) === $price)) {
+            if (($item->getPriceWithoutDiscount() / count($item->getGuestsByFestivalId($festivalId)) === $price)) {
                 $result[] = $item;
             }
         }

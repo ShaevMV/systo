@@ -40,6 +40,7 @@ export const getOrderListForUser = (context) => {
  * @param payload
  */
 export const getOrderListForAdmin = (context, payload) => {
+    console.log(payload);
     let promise = axios.post('/api/v1/festival/ticketsOrder/getList', payload);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);

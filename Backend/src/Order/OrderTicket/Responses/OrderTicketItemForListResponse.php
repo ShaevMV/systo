@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Responses;
 
@@ -19,23 +19,41 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     protected int $count;
     protected string $humanStatus;
 
+    /**
+     * @param Uuid $id
+     * @param int $kilter
+     * @param string $email
+     * @param string $name
+     * @param int $price
+     * @param GuestsDto[] $guests
+     * @param string $typeOfPaymentName
+     * @param Status $status
+     * @param string $dateBuy
+     * @param array $listCorrectNextStatus
+     * @param string $idBuy
+     * @param float $priceWithoutDiscount
+     * @param string|null $lastComment
+     * @param string|null $promoCode
+     * @param int $discount
+     */
     public function __construct(
-        protected Uuid $id,
-        protected int $kilter,
-        protected string $email,
-        protected string $name,
-        protected int $price,
-        protected array $guests,
-        protected string $typeOfPaymentName,
-        protected Status $status,
-        protected string $dateBuy,
-        protected array $listCorrectNextStatus,
-        protected string $idBuy,
-        protected float $priceWithoutDiscount,
+        protected Uuid    $id,
+        protected int     $kilter,
+        protected string  $email,
+        protected string  $name,
+        protected int     $price,
+        protected array   $guests,
+        protected string  $typeOfPaymentName,
+        protected Status  $status,
+        protected string  $dateBuy,
+        protected array   $listCorrectNextStatus,
+        protected string  $idBuy,
+        protected float   $priceWithoutDiscount,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
-        protected int $discount = 0
-    ) {
+        protected int     $discount = 0
+    )
+    {
         $this->count = count($guests);
         $this->humanStatus = $this->status->getHumanStatus();
     }
@@ -56,17 +74,17 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['kilter'],
             $data['email'],
             $data['name'],
-            (int) $data['price'] - (int) $data['discount'],
+            (int)$data['price'] - (int)$data['discount'],
             $guests,
             $data['payment_name'],
             $status,
             $data['date'],
             $status->getListNextStatus(),
             $data['id_buy'],
-            (int) $data['price'],
+            (int)$data['price'],
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
-            (int) $data['discount']
+            (int)$data['discount']
         );
     }
 
@@ -91,6 +109,18 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getGuests(): array
     {
         return $this->guests;
+    }
+
+    public function getGuestsByFestivalId(Uuid $festivalId): array
+    {
+        $result = [];
+        foreach ($this->guests as $guest) {
+            if ($guest->getFestivalId()->equals($festivalId)) {
+                $result[] = $guest;
+            }
+        }
+
+        return $result;
     }
 
     public function getId(): Uuid

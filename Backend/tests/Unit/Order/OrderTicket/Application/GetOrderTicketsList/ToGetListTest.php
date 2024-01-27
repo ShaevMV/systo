@@ -15,6 +15,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 
 class ToGetListTest extends TestCase
@@ -56,6 +57,7 @@ class ToGetListTest extends TestCase
     {
         $result = $this->toGetList->listByFilter(
             new OrderFilterQuery(
+                new Uuid(FestivalHelper::UUID_FESTIVAL),
                 null,
                 null,
                 null,
@@ -72,6 +74,29 @@ class ToGetListTest extends TestCase
                 Uuid::random(),
             )
         );
+
+        self::assertEmpty($result?->toArray());
+    }
+
+
+    /**
+     * @throws JsonException
+     * @throws \Nette\Utils\JsonException
+     */
+    public function test_is_filter_for_multi_festival(): void
+    {
+        $result = $this->toGetList->listByFilter(
+            new OrderFilterQuery(
+                new Uuid(FestivalHelper::UUID_FESTIVAL),
+                null,
+                null,
+                null,
+                null,
+                TypeTicketsSeeder::DEFAULT_MULTI_FESTIVAL_PRICE,
+                new Uuid(TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL),
+            )
+        );
+
 
         self::assertEmpty($result?->toArray());
     }
