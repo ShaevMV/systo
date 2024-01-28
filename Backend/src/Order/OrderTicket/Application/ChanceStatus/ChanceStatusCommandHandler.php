@@ -46,8 +46,9 @@ class ChanceStatusCommandHandler implements CommandHandler
         $orderTicket = match ((string)$command->getNextStatus()) {
             Status::PAID => OrderTicket::toPaid($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
+            Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),
-            default => throw new DomainException('Не коректнный статус' . $command->getNextStatus()),
+            default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),
         };
 
         if ($command->getNextStatus()->isdDifficultiesArose()) {
@@ -72,7 +73,6 @@ class ChanceStatusCommandHandler implements CommandHandler
             $this->bus::chain($list)->dispatch();
 
         }
-
 
         $this->pushTicket->pushByOrderId($command->getOrderId());
     }

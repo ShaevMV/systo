@@ -100,6 +100,22 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    public static function toLiveIssued(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+        $result->record(new ProcessCancelTicket(
+            $result->id,
+        ));
+
+        $result->record(new ProcessUserNotificationOrderLiveTicketIssued(
+                $orderTicketDto->getEmail(),
+            )
+        );
+
+        return $result;
+    }
+
     private function updateIdTicket(): void
     {
         foreach ($this->ticket as &$guestsDto) {

@@ -13,11 +13,14 @@ final class Status implements EntityDataInterface
     public const PAID = 'paid';
     public const CANCEL = 'cancel';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
+    public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
+
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
         self::CANCEL => 'Отменён',
         self::PAID => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
+        self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
     ];
 
     private const ROLE_CHANCE_STATUS = [
@@ -28,12 +31,14 @@ final class Status implements EntityDataInterface
         ],
         self::PAID => [
             self::DIFFICULTIES_AROSE,
+            self::LIVE_TICKET_ISSUED,
         ],
         self::DIFFICULTIES_AROSE => [
             self::CANCEL,
             self::PAID,
         ],
         self::CANCEL => [],
+        self::LIVE_TICKET_ISSUED => [],
     ];
 
     public function __construct(
@@ -70,7 +75,6 @@ final class Status implements EntityDataInterface
     {
         $strNextStatus = (string)$nextStatus;
         $role = self::ROLE_CHANCE_STATUS[$this->name];
-        $result = in_array($strNextStatus, $role, true);
 
         return in_array($strNextStatus, $role, true);
     }
@@ -99,5 +103,10 @@ final class Status implements EntityDataInterface
     public function isdDifficultiesArose(): bool
     {
         return $this->name === self::DIFFICULTIES_AROSE;
+    }
+
+    public function isLiveIssued(): bool
+    {
+        return $this->name === self::LIVE_TICKET_ISSUED;
     }
 }

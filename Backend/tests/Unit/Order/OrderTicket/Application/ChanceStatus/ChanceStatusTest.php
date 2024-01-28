@@ -116,4 +116,23 @@ class ChanceStatusTest extends TestCase
         self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function test_is_correct_chance_status_to_live_ticket_issued(): void
+    {
+        $this->test_is_correct_chance_status_to_buy();
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isPaid());
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
+            new Status(Status::LIVE_TICKET_ISSUED),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
+            now: true
+        );
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
+        self::assertTrue($orderDto->getStatus()->isLiveIssued());
+        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+    }
+
 }
