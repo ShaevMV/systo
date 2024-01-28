@@ -24,7 +24,7 @@ class FestivalHelper
         $nameFestival = [];
         $year = date('Y');
         foreach ($festivalList as $festivalDto) {
-            $nameFestival[] = 'на ' . $festivalDto->getName();
+            $nameFestival[] = $festivalDto->getName();
         }
 
         $bracketClose = '';
