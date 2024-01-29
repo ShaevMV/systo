@@ -19,7 +19,7 @@ services:
       - ./Baza:${ENV_VHOD_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
       - ./List:${ENV_SPISOK_PATCH}
-      - ./Docker/nginx/ssl:/etc/nginx/auth.basic
+      - ./Docker/nginx/auth.basic:/etc/nginx/auth.basic
     user: user
     environment:
       - ENV_ORG_BACKEND_HOST=${ENV_ORG_BACKEND_HOST}
