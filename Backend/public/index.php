@@ -52,4 +52,16 @@ $response = $kernel->handle(
     $request = Request::capture()
 )->send();
 
+$mysecretkey='pointop';
+
+$seckey = $_COOKIE['secretkey'];
+
+
+if ($seckey !== $mysecretkey)
+{
+    header('Location: https://google.com/');
+    exit;
+}
+
+
 $kernel->terminate($request, $response);
