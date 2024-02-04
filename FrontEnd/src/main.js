@@ -10,10 +10,10 @@ window.store = store;
 
 axios.defaults.baseURL = 'https://api.solarsysto.ru/'
 axios.defaults.withCredentials = true
-
+/*
 if (localStorage['secret'] !== 'XyzWar') {
     window.location.href = 'https://ya.ru/';
-}
+}*/
 
 
 // добавить токент клиента
