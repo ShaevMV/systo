@@ -1,9 +1,7 @@
 <template>
   <div id="left-logo">
     <a href="/">
-    <img src="/assets/img/logo.png" alt="main logo" class="left-logo">
-    <img src="/assets/img/systo-title-red.png" alt="main title" class="sub-logo">
-    <img src="/assets/img/dataz.png" alt="main title" class="sub-logo dataz">
+    <img src="/assets/img/logo-main.png" alt="main logo" class="left-logo">
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
