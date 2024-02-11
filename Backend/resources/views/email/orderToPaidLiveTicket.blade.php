@@ -39,11 +39,12 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на Билеты на {{$festivalName}} потдверждён</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на {{$festivalName}} потдверждён</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создании общего праздника!</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Прийди и забери их в Лесистой!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ты можете получить свой "живой билет" в виде подарочной карты со стикером в пространстве "Лесистое" в Санкт-Петербурге по адресу: м.Петроградская, Большой Проспект П.С., 79 (цокольный этаж возле вывески Maze, левая дверь)<br>
+                            Пространство открыто с 14.00 до 22.00. <br>Телефон +7 (906) 274-27-98. <br>https://vk.com/lesystoe</p>
                         <br/>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">"Живой билет" необходимо будет предъявить на входе на фестиваль! Не забывайте его дома!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
