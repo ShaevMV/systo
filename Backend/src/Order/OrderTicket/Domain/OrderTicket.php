@@ -108,6 +108,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessUserNotificationOrderCancel(
                 $orderTicketDto->getEmail(),
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 
@@ -124,6 +125,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessUserNotificationOrderLiveTicketIssued(
                 $orderTicketDto->getEmail(),
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 
@@ -152,7 +154,8 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessUserNotificationOrderDifficultiesArose(
                 $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
-                $comment
+                $comment,
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 

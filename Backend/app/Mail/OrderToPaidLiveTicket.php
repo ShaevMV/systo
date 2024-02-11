@@ -6,9 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Service\FestivalService;
-use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
 class OrderToPaidLiveTicket extends Mailable
 {
@@ -18,7 +16,7 @@ class OrderToPaidLiveTicket extends Mailable
         private Uuid $ticketTypeId,
     )
     {
-        $this->subject('Билеты на '. FestivalHelper::getNameFestival() . ' вы можете забрать в Лесной');
+
     }
 
     /**
@@ -31,8 +29,11 @@ class OrderToPaidLiveTicket extends Mailable
     ): static
     {
         ini_set('memory_limit', '-1');
+        $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
+
+        $this->subject('Ваш оргвзнос на Систо '.date('Y').' подтверждён');
         $mail = $this->view('email.orderToPaidLiveTicket',[
-            'festivalName' => $festivalService->getFestivalNameByTicketType($this->ticketTypeId),
+            'festivalName' => $festivalName
         ]);
 
         return $mail;

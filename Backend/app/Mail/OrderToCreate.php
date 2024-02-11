@@ -16,11 +16,13 @@ class OrderToCreate extends Mailable
         private string $festivalName,
     )
     {
-        $this->subject('Оргвзнос на '. FestivalHelper::getNameFestival());
+
     }
 
     public function build(): static
     {
+        $this->subject('Оргвзнос на '. $this->festivalName);
+
         return $this->view('email.orderToCreate', [
             'kilter' => $this->kilter,
             'festivalShortName' => FestivalHelper::getNameFestival(),

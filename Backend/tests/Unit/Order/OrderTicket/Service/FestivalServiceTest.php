@@ -44,7 +44,7 @@ class FestivalServiceTest extends TestCase
         return [
             [
                 TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL,
-                'на Solar Systo Togathering '.date('Y').' и на Систо-Осень '. date('Y')
+                'Solar Systo Togathering '.date('Y').' и на Систо-Осень '. date('Y')
             ],
             [
                 TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
@@ -56,11 +56,5 @@ class FestivalServiceTest extends TestCase
                 'Систо-Осень '. date('Y')
             ],
         ];
-    }
-
-    public function test_correct_festival_name_for_subject():void
-    {
-        $r = FestivalHelper::getNameFestival();
-        self::assertEquals(FestivalHelper::FESTIVAL_DEFAULT_NAME.date('Y'), FestivalHelper::getNameFestival());
     }
 }

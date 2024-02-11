@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\ValueObject\Uuid;
 
 class ProcessUserNotificationOrderCancel implements ShouldQueue, DomainEvent
 {
@@ -19,12 +20,15 @@ class ProcessUserNotificationOrderCancel implements ShouldQueue, DomainEvent
 
     public function __construct(
         private string $email,
+        private Uuid $ticketTypeId,
     ) {
     }
 
     public function handle(): void
     {
         Mail::to($this->email)
-            ->send(new OrderToCancel());
+            ->send(new OrderToCancel(
+                $this->ticketTypeId
+            ));
     }
 }

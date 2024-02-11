@@ -23,7 +23,6 @@ class OrderToPaid extends Mailable
         private Uuid $ticketTypeId,
     )
     {
-        $this->subject('Билеты на '. FestivalHelper::getNameFestival());
     }
 
     /**
@@ -37,8 +36,11 @@ class OrderToPaid extends Mailable
     ): static
     {
         ini_set('memory_limit', '-1');
+        $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
+
+        $this->subject('Ваш оргвзнос на Систо '.date('Y').' подтверждён');
         $mail = $this->view('email.orderToPaid',[
-            'festivalName' => $festivalService->getFestivalNameByTicketType($this->ticketTypeId),
+            'festivalName' => $festivalName,
         ]);
 
         foreach ($this->tickets as $ticket) {

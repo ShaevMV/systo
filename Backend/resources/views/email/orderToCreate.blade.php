@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на {{\Tickets\Order\OrderTicket\Helpers\FestivalHelper::getNameFestival()}} создан</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Ваш заказ №{{$kilter}} на {{$festivalName}} создан</td>
                             </tr>
                         </table>
                     </td>

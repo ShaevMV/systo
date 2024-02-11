@@ -21,12 +21,16 @@ class ProcessUserNotificationOrderDifficultiesArose implements ShouldQueue, Doma
         private Uuid $orderId,
         private string $email,
         private string $comment,
+        private Uuid $ticketTypeId,
     ) {
     }
 
     public function handle(): void
     {
         Mail::to($this->email)
-            ->send(new OrderToDifficultiesArose($this->comment));
+            ->send(new OrderToDifficultiesArose(
+                $this->comment,
+                $this->ticketTypeId
+            ));
     }
 }

@@ -22,16 +22,11 @@ class FestivalHelper
     public static function getNameFestival(array $festivalList = []): string
     {
         $nameFestival = [];
-        $year = date('Y');
         foreach ($festivalList as $festivalDto) {
             $nameFestival[] = $festivalDto->getName() . ' ' . $festivalDto->getYear();
         }
 
-        $bracketOpen = '';
-        if (count($nameFestival) > 1) {
-            $bracketOpen = 'на ';
-        }
 
-        return trim( $bracketOpen . implode(' и на ', $nameFestival));
+        return trim(implode(' и на ', $nameFestival));
     }
 }
