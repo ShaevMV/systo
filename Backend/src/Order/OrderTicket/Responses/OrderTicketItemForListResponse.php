@@ -142,4 +142,11 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     {
         return $this->discount;
     }
+
+    public function setGuests(array $guests): self
+    {
+        $this->guests = $guests;
+        $this->count = count($guests);
+        return $this;
+    }
 }

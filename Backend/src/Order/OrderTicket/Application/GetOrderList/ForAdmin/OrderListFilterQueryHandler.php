@@ -73,7 +73,14 @@ class OrderListFilterQueryHandler implements QueryHandler
             $orderTicketItem = $this->filterByPrice($filterQuery->getPrice(), $orderTicketItem, $filterQuery->getFestivalId());
         }
 
-        return count($orderTicketItem) > 0 ? new ListResponse($orderTicketItem) : null;
+        $result = [];
+
+        foreach ($orderTicketItem as $value) {
+            $result[] = $value->setGuests($value->getGuestsByFestivalId($filterQuery->getFestivalId()));
+        }
+
+
+        return count($result) > 0 ? new ListResponse($result) : null;
     }
 
 
