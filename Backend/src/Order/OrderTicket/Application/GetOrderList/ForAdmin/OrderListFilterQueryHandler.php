@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
@@ -59,7 +60,13 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],
+            [
+                'field' => TicketTypesModel::TABLE . '.is_live_ticket',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->isManager() ? '1' : null,
+            ],
         ]);
+
         $orderTicketItem = $this->orderTicketRepository->getList($filter);
 
         if (!is_null($filterQuery->getPrice())) {
@@ -77,7 +84,7 @@ class OrderListFilterQueryHandler implements QueryHandler
     private function filterByPrice(
         float $price,
         array $orderTicketItem,
-        Uuid $festivalId,
+        Uuid  $festivalId,
     ): array
     {
         $result = [];

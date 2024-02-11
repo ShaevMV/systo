@@ -156,7 +156,6 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
                 '=',
                 TypesOfPaymentModel::TABLE.'.id')
-
             ->select([
                 $this->model::TABLE.'.*',
                 User::TABLE.'.email',

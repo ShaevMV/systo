@@ -18,6 +18,7 @@ class OrderFilterQuery implements Query
         private ?string $promoCode = null,
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
+        private bool $isManager = false,
     ) {
     }
 
@@ -41,7 +42,7 @@ class OrderFilterQuery implements Query
         return null !== $this->promoCode ? '%'.$this->promoCode.'%' : null;
     }
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, bool $isManager): self
     {
         if(!isset($data['festivalId'])) {
             throw new InvalidArgumentException('festivalId обязательное поле!');
@@ -57,6 +58,7 @@ class OrderFilterQuery implements Query
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
             (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
+            $isManager
         );
     }
 
@@ -78,5 +80,10 @@ class OrderFilterQuery implements Query
     public function getFestivalId(): ?Uuid
     {
         return $this->festivalId;
+    }
+
+    public function isManager(): bool
+    {
+        return $this->isManager;
     }
 }

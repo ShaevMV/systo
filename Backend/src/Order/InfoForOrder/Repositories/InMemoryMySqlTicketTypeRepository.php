@@ -23,12 +23,16 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     {
     }
 
-    public function getList(Uuid $festivalId, ?Carbon $afterDate = null): array
+    public function getList(
+        Uuid    $festivalId,
+        ?Carbon $afterDate = null
+    ): array
     {
         $result = [];
 
         $data = $this->joinFestival($festivalId, $afterDate)
-            ->get()
+            ->where('active', '=', 1);
+        $data = $data->get()
             ->toArray();
 
         foreach ($data as $item) {
@@ -86,10 +90,6 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $rawResult = $this->joinFestival($festivalId)
             ->get()
             ->toArray();
-
-        foreach ($rawResult as $item) {
-
-        }
 
         return $result;
     }

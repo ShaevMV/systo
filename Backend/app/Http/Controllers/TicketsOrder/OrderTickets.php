@@ -129,7 +129,10 @@ class OrderTickets extends Controller
     public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
         $listResponse = $this->getOrder->listByFilter(
-            OrderFilterQuery::fromState($filterForTicketOrder->toArray())
+            OrderFilterQuery::fromState(
+                $filterForTicketOrder->toArray(),
+                Auth::user()->isManager() ?? false
+            )
         ) ?? new ListResponse();
 
         return response()->json(

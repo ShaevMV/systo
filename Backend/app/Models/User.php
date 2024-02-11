@@ -50,6 +50,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User create(array $toArray)
  * @mixin Eloquent
  * @property bool $is_admin
+ * @property bool $is_manager
  * @method static Builder|User whereIsAdmin($value)
  * @property string|null $phone
  * @property string|null $city
@@ -104,5 +105,13 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isManager(): bool
+    {
+        return (bool) $this->is_manager;
     }
 }
