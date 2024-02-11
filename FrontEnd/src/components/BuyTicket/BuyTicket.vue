@@ -26,7 +26,7 @@
     </div>
     <div class="text-center title-block">
       <h1>Форма подтверждения добровольного оргвзноса</h1>
-      <small class="form-text text-muted">на создание туристического слёта Солар Систо 2024</small>
+      <small class="form-text text-muted">на создание туристического слёта на Solar Systo Togathering 2024</small>
     </div>
     <div class="row" id="main-form">
       <div class="col-md-10 mx-auto">
@@ -328,8 +328,7 @@
                   <div class="after-order">
                     <p>
                       После оплаты в течение 3-4 дней на твой e-mail придет подтверждение
-                      оргвзноса и <br><strong>электронный билет с QR-кодом</strong> для входа на
-                      Солар Систо 2024!
+                      оргвзноса и <br><strong>электронный билет с QR-кодом</strong> для входа на Solar Systo Togathering 2024!
                     </p>
                     <p>
                       <b>Внимание!</b> В случае приобретения "живого билета" сперва дождитесь одобрения оплаты на почту,
