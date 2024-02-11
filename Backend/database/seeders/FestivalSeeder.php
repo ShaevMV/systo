@@ -18,7 +18,7 @@ class FestivalSeeder extends Seeder
     {
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_FESTIVAL,
-            'name' => 'Весна',
+            'name' => 'Solar Systo Togathering',
             'year' => date('Y'),
             'view' => 'pdf',
             'active' => false,
@@ -28,7 +28,7 @@ class FestivalSeeder extends Seeder
 
         DB::table('festivals')->insert([
             'id' => FestivalHelper::UUID_SECOND_FESTIVAL,
-            'name' => 'Осень',
+            'name' => 'Систо-Осень',
             'view' => 'pdf2',
             'year' => date('Y'),
             'active' => true,
