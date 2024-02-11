@@ -44,16 +44,16 @@ class FestivalServiceTest extends TestCase
         return [
             [
                 TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL,
-                "Систо ".date('Y')." (Весна и Осень)"
+                'на Solar Systo Togathering '.date('Y').' и на Систо-Осень '. date('Y')
             ],
             [
                 TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-                "Систо ".date('Y')." (Весна)"
+                'Solar Systo Togathering '.date('Y')
             ],
 
             [
                 TypeTicketsSeeder::ID_FOR_NEXT_FESTIVAL,
-                "Систо ".date('Y')." (Осень)"
+                'Систо-Осень '. date('Y')
             ],
         ];
     }
