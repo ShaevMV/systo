@@ -30,7 +30,7 @@
             background-color: #fff;
             z-index: 3;
             position: absolute;
-            border-bottom: 2px solid #86201c;
+            border-bottom: 2px solid #152035;
             z-index: 5;
         }
 
@@ -104,7 +104,7 @@
             width: 720px;
             bottom: 0;
             height: 40px;
-            background-color: #86201c;
+            background-color: #152035;
             z-index: 5;
         }
 
@@ -118,7 +118,7 @@
 <img src="https://api.solarsysto.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Систо-Весна {{date('Y')}}!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}

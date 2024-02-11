@@ -16,6 +16,10 @@ class TypeTicketsSeeder extends Seeder
 
     public const ID_FOR_MULTI_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf99';
     public const ID_FOR_NEXT_FESTIVAL = '37c6b8d8-e01e-4bc4-b7b8-fcaa422ab25f';
+
+    PUBLIC CONST ID_LIVE_FOR_MULTI_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf00';
+    PUBLIC CONST ID_LIVE_FOR_NEXT_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
+
     public const DEFAULT_MULTI_FESTIVAL_PRICE = 7600;
     /**
      * Run the database seeds.
@@ -55,6 +59,25 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->price = '4000';
         $ticketTypes->sort = 4;
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
+        $ticketTypes->save();
+
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::ID_LIVE_FOR_MULTI_FESTIVAL;
+        $ticketTypes->name = 'Оргвзнос Живой билет лесная карта';
+        $ticketTypes->price = self::DEFAULT_MULTI_FESTIVAL_PRICE;
+        $ticketTypes->sort = 5;
+        $ticketTypes->is_live_ticket = true;
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
+        $ticketTypes->save();
+
+        $ticketTypes = new TicketTypesModel();
+        $ticketTypes->id = self::ID_LIVE_FOR_NEXT_FESTIVAL;
+        $ticketTypes->name = 'Оргвзнос Живой билет';
+        $ticketTypes->price = self::DEFAULT_PRICE;
+        $ticketTypes->sort = 6;
+        $ticketTypes->is_live_ticket = true;
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
         $ticketTypes->save();
     }
 }

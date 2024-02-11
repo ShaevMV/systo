@@ -81,6 +81,7 @@ class OrderTickets extends Controller
                 $data,
                 $userId,
                 $priceDto,
+                $ticketType->isLiveTicket(),
             );
 
             $this->createOrder->createAndSave($orderTicketDto);

@@ -135,4 +135,30 @@ class ChanceStatusTest extends TestCase
         self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function test_is_correct_chance_status_for_live_ticket_to_buy(): void
+    {
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER));
+        self::assertTrue($orderDto->getStatus()->isNewForLive());
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER),
+            new Status(Status::PAID_FOR_LIVE),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
+            now:true,
+        );
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER));
+        self::assertTrue($orderDto->getStatus()->isPaidForLive());
+        $this->chanceStatus->chance(
+            new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER),
+            new Status(Status::LIVE_TICKET_ISSUED),
+            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
+            now: true
+        );
+        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER));
+        self::assertTrue($orderDto->getStatus()->isLiveIssued());
+        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+    }
+
 }

@@ -26,6 +26,7 @@ class OrderTicketDto
      * @param string $datePay
      * @param Status|null $status
      * @param string|null $promo_code
+     * @param bool $is_live_ticket
      * @param Uuid|null $id
      */
     private function __construct(
@@ -41,6 +42,7 @@ class OrderTicketDto
         protected string   $datePay,
         protected ?Status  $status,
         protected ?string  $promo_code = null,
+        protected bool     $is_live_ticket = false,
         ?Uuid              $id = null,
     )
     {
@@ -54,10 +56,11 @@ class OrderTicketDto
         array    $data,
         Uuid     $userId,
         PriceDto $priceDto,
+        bool     $isLiveTicket = false,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
-        $status = $data['status'] ?? Status::NEW;
+        $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::NEW_FOR_LIVE);
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
         foreach ($guests as $guest) {
@@ -77,7 +80,8 @@ class OrderTicketDto
             $data['date'],
             new Status($status),
             $data['promo_code'],
-            $id
+            $isLiveTicket,
+            $id,
         );
     }
 
@@ -172,5 +176,10 @@ class OrderTicketDto
     public function getTicketTypeId(): Uuid
     {
         return $this->ticket_type_id;
+    }
+
+    public function isIsLiveTicket(): bool
+    {
+        return $this->is_live_ticket;
     }
 }

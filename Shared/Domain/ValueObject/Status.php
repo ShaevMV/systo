@@ -10,15 +10,19 @@ use Shared\Domain\Entity\EntityDataInterface;
 final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
+    public const NEW_FOR_LIVE = 'new_for_live';
     public const PAID = 'paid';
+    public const PAID_FOR_LIVE = 'paid_for_live';
     public const CANCEL = 'cancel';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
     public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
 
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
+        self::NEW_FOR_LIVE => 'Ожидает проверки',
         self::CANCEL => 'Отменён',
         self::PAID => 'Подверждён',
+        self::PAID_FOR_LIVE => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
         self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
     ];
@@ -27,6 +31,15 @@ final class Status implements EntityDataInterface
         self::NEW => [
             self::CANCEL,
             self::PAID,
+            self::DIFFICULTIES_AROSE,
+        ],
+        self::NEW_FOR_LIVE => [
+            self::CANCEL,
+            self::PAID_FOR_LIVE,
+            self::DIFFICULTIES_AROSE,
+        ],
+        self::PAID_FOR_LIVE => [
+            self::LIVE_TICKET_ISSUED,
             self::DIFFICULTIES_AROSE,
         ],
         self::PAID => [
@@ -108,5 +121,15 @@ final class Status implements EntityDataInterface
     public function isLiveIssued(): bool
     {
         return $this->name === self::LIVE_TICKET_ISSUED;
+    }
+
+    public function isNewForLive(): bool
+    {
+        return $this->name === self::NEW_FOR_LIVE;
+    }
+
+    public function isPaidForLive(): bool
+    {
+        return $this->name === self::PAID_FOR_LIVE;
     }
 }

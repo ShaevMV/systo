@@ -24,10 +24,10 @@ class DefineServiceTest extends TestCase
      */
     public function test_in_correct_type(): void
     {
-        $result = $this->service->getTypeByReference('http://baza.spaceofjoy.ru/live?id=0020');
+        $result = $this->service->getTypeByReference('0020');
         self::assertEquals(DefineService::LIVE_TICKET, $result->getType());
         self::assertEquals(20, $result->getId());
-        $result = $this->service->getTypeByReference('/live?id=0020');
+        $result = $this->service->getTypeByReference('0020');
         self::assertEquals(DefineService::LIVE_TICKET, $result->getType());
         self::assertEquals(20, $result->getId());
 

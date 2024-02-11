@@ -22,7 +22,7 @@ class CreatingQrCodeService
         return Builder::create()
             ->writer(new PngWriter())
             ->writerOptions([])
-            ->data('http://baza.spaceofjoy.ru/newTickets/'.$ticketId)
+            ->data('/newTickets/'.$ticketId)
             ->encoding(new Encoding('UTF-8'))
             ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
             ->size(300)

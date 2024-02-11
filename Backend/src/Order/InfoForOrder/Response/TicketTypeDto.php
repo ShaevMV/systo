@@ -20,6 +20,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
      * @param FestivalDto[] $festivalList
      * @param PriceDto[] $priceList
      * @param int $sort
+     * @param bool $isLiveTicket
      */
     public function __construct(
         protected Uuid   $id,
@@ -29,6 +30,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         protected array  $festivalList,
         protected array  $priceList,
         protected int    $sort = 0,
+        protected bool   $isLiveTicket = false,
     )
     {
     }
@@ -52,6 +54,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
 
 
         $correctPrice = count($priceList) > 0 ? end($priceList)->getPrice() : $data['price'];
+
         return new self(
             new Uuid($data['id']),
             $data['name'],
@@ -60,6 +63,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             $festivalIdList,
             $priceList,
             $data['sort'],
+            (bool)$data['is_live_ticket'],
         );
     }
 
@@ -88,5 +92,10 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         $this->price = $price;
 
         return $this;
+    }
+
+    public function isLiveTicket(): bool
+    {
+        return $this->isLiveTicket;
     }
 }

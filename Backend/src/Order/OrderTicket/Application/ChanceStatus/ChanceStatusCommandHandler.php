@@ -45,6 +45,7 @@ class ChanceStatusCommandHandler implements CommandHandler
 
         $orderTicket = match ((string)$command->getNextStatus()) {
             Status::PAID => OrderTicket::toPaid($orderTicketDto),
+            Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),

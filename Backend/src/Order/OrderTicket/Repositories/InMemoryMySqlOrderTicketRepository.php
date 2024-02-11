@@ -118,7 +118,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         /** @var OrderTicketModel $rawData */
         $rawData = $this->model::whereId($uuid->value())
             ->with([
-                'users'
+                'users',
+                'ticketType'
             ])
             ->first();
 
@@ -129,6 +130,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             $rawDataArr,
             new Uuid($rawData['users']['id']),
             new PriceDto($rawData['price'], $rawData['discount']),
+            (bool)$rawData['ticketType']['is_live_ticket'],
         ) : null;
     }
 

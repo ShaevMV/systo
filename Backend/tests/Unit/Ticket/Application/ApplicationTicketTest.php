@@ -2,9 +2,7 @@
 
 namespace Tests\Unit\Ticket\Application;
 
-use Database\Seeders\FestivalSeeder;
 use Database\Seeders\OrderSeeder;
-use Endroid\QrCode\Exception\ValidationException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -64,17 +62,13 @@ class ApplicationTicketTest extends TestCase
         );
     }
 
-
-    /**
-     * @throws ValidationException     *
-     */
     public function test_in_create_QR_code(): void
     {
         $this->expectNotToPerformAssertions();
         /*$service = new CreatingQrCodeService();
-        for($i = 1;$i<=2500;$i++) {
+        for($i = 5001;$i<=5500;$i++) {
             $number = $this->addZero($i);
-            $qrCode = $service->createQrCode($number);
+            $qrCode = $service->createQrCode($number,'');
             $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");
         }*/
     }

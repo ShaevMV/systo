@@ -5,8 +5,8 @@ namespace Database\Seeders;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use JsonException;
+use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
@@ -20,6 +20,9 @@ class OrderSeeder extends Seeder
 
     public const ID_FOR_MULTI_FESTIVAL_ORDER = '222abc0c-fc8e-4a1d-a4b0-d345cafacf00';
     public const ID_FOR_MULTI_FESTIVAL_TICKET = '56f04400-02ab-4cbe-bfd4-4f7dda23d670';
+
+    public const ID_FOR_LIVE_MULTI_FESTIVAL_ORDER = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
+    public const ID_FOR_LIVE_FESTIVAL_ORDER = '56f04400-02ab-4cbe-bfd4-4f7dda23d671';
 
     /**
      * Run the database seeds.
@@ -95,6 +98,46 @@ class OrderSeeder extends Seeder
             'date' => '2022-12-16 18:24:00',
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
+        ]);
+
+        DB::table('order_tickets')->insert([
+            'id' => self::ID_FOR_LIVE_MULTI_FESTIVAL_ORDER,
+            'guests' => json_encode([ [
+                'value' => 'test',
+                'id' => self::ID_FOR_MULTI_FESTIVAL_TICKET,
+                'festival_id' => FestivalHelper::UUID_FESTIVAL
+            ]], JSON_THROW_ON_ERROR),
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
+            'id_buy' => '2312',
+            'phone' => '+9999999999',
+            'user_id' => UserSeeder::ID_FOR_USER_UUID,
+            'ticket_type_id' => TypeTicketsSeeder::ID_LIVE_FOR_MULTI_FESTIVAL,
+            'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
+            'price' => TypeTicketsSeeder::DEFAULT_MULTI_FESTIVAL_PRICE,
+            'date' => '2022-12-16 18:24:00',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+            'status' => Status::NEW_FOR_LIVE,
+        ]);
+
+        DB::table('order_tickets')->insert([
+            'id' => self::ID_FOR_LIVE_FESTIVAL_ORDER,
+            'guests' => json_encode( [[
+                'value' => 'test',
+                'id' => self::ID_FOR_MULTI_FESTIVAL_TICKET,
+                'festival_id' => FestivalHelper::UUID_FESTIVAL
+            ]], JSON_THROW_ON_ERROR),
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
+            'id_buy' => '2312',
+            'phone' => '+9999999999',
+            'user_id' => UserSeeder::ID_FOR_USER_UUID,
+            'ticket_type_id' => TypeTicketsSeeder::ID_LIVE_FOR_NEXT_FESTIVAL,
+            'types_of_payment_id' => TypesOfPaymentSeeder::ID_FOR_YANDEX,
+            'price' => TypeTicketsSeeder::DEFAULT_PRICE,
+            'date' => '2022-12-16 18:24:00',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+            'status' => Status::NEW_FOR_LIVE,
         ]);
 
     }

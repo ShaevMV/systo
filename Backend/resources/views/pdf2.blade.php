@@ -30,7 +30,7 @@
             background-color: #fff;
             z-index: 3;
             position: absolute;
-            border-bottom: 2px solid #86201c;
+            border-bottom: 2px solid #152035;
             z-index: 5;
         }
 
@@ -104,7 +104,7 @@
             width: 720px;
             bottom: 0;
             height: 40px;
-            background-color: #86201c;
+            background-color: #152035;
             z-index: 5;
         }
 
