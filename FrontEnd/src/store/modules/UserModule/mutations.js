@@ -33,6 +33,7 @@ export const setUserInfo = async (state, payload) => {
     await localStorage.setItem('user.email', payload.email);
     await localStorage.setItem('user.id', payload.id);
     await localStorage.setItem('user.isAdmin', payload.admin);
+    await localStorage.setItem('user.isManager', payload.manager);
 };
 
 export const setUserData = (state, payload) => {

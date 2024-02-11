@@ -46,7 +46,7 @@
           }">Все оргвзносы (Осень)
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
+    <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
       <router-link
           class="nav-link"
           active-class="active"
@@ -92,7 +92,8 @@ export default {
   computed: {
     ...mapGetters('appUser', [
       'isAuth',
-      'isAdmin'
+      'isAdmin',
+      'isManager'
     ]),
   },
   methods: {

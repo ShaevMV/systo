@@ -16,6 +16,7 @@ final class UserInfoDto extends AbstractionEntity implements Response
         protected string $city,
         protected string $phone,
         protected bool $admin,
+        protected bool $manager,
         protected ?string $name = null,
     ) {
     }
@@ -28,6 +29,7 @@ final class UserInfoDto extends AbstractionEntity implements Response
             $data['city'],
             $data['phone'],
             (bool) $data['is_admin'],
+            (bool) $data['is_manager'],
             $data['name'] ?? null
         );
     }
