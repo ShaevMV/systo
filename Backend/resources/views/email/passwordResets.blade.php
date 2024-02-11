@@ -50,7 +50,7 @@
                         <table style="border: none; width: 100%; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td style="max-width: 250px;" class="footer-td">
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—2023, Solar Systo Togathering 2023.</p>
+                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—{{date('Y')}}, Solar Systo Togathering {{date('Y')}}.</p>
                                     <p style="font-size: 14px; font-family: Tahoma, sans-serif;">Все права защищены. Использование материалов сайта только с согласия правообладателей.
                                     <p>
                                 </td>
