@@ -765,6 +765,7 @@
   <component name="PhpUnit">
     <phpunit_settings>
       <phpunit_by_interpreter interpreter_id="c1d1337f-dddf-4f80-8449-2a933e94ef5e" configuration_file_path="/var/www/org/phpunit.xml" custom_loader_path="/var/www/org/vendor/autolod.php" phpunit_phar_path="" use_configuration_file="true" />
+      <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/Baza/vendor/autoload.php" />
     </phpunit_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
