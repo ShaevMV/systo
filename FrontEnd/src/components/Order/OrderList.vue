@@ -144,6 +144,7 @@ export default {
       'getError'
     ]),
   },
+  // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
       'sendToChanceStatus'
@@ -182,6 +183,10 @@ export default {
       let color = '#86201c';
       if (status === 'paid') {
         color = '#1e871c';
+      }
+
+      if (status === 'difficulties_arose') {
+        color = '#d0ba27';
       }
 
       return color
@@ -228,6 +233,7 @@ export default {
       this.sendToChanceStatus({
         'id': this.selectId,
         'status': 'difficulties_arose',
+        'color': '#d0ba27',
         'comment': this.comment,
         'callback': function () {
           document.getElementById('closeModal').click();
