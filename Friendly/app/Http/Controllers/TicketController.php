@@ -96,12 +96,12 @@ class TicketController extends Controller
             foreach ($request->post('kilter') as $value) {
                 $model = new LiveTicket();
                 if((int)$value < 1 || (int)$value > 5500) {
-                    throw new Exception("Билет с номером $value выходит с допустимого диапазона!");
+                    throw new Exception("Билет с номером $value выходит из допустимого диапазона!");
                 }
 
                 if (LiveTicket::where('kilter',(int)$value)->exists()) {
                     throw new Exception("
-                    Билет с номером $value уже зарегистрирован, проверти правильность номеров и попробуйте снова!
+                    Билет с номером $value уже зарегистрирован, проверьте правильность номеров и попробуйте снова!
                     Или свяжитесь с администратором!");
                 }
                 $model->fio_friendly = $request->post('fio');;
