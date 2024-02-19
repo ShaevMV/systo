@@ -22,7 +22,7 @@
                 <h2><a href="{{ route('viewLiveTickets') }}">Регистрациия живого билета</a></h2>
                 <form method="POST" action="{{ route('addTickets') }}">
                     @csrf
-                    <h1>Продать билет по дружеской цене</h1>
+                    <h1>Продать электронный френдли билет</h1>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца') }}"/>
                         <x-jet-input id="password"  readonly class="block mt-1 w-full" type="text" name="seller" required autocomplete="Seller" value="{{$user->name }}"/>

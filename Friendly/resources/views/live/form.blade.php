@@ -19,7 +19,7 @@
                         <hr>
                     </div>
                 @endif
-                <h2><a href="{{ route('viewAddTickets') }}">Продать билет по дружеской цене</a></h2>
+                <h2><a href="{{ route('viewAddTickets') }}">Продать электронный френдли билет</a></h2>
                 <form method="POST" action="{{ route('addLiveTicket') }}">
                     @csrf
                     <h1>Зарегистрировать живой билет</h1>
