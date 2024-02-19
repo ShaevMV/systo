@@ -6,6 +6,7 @@ use App\Jobs\ProcessSendLiveTicketEmail;
 use App\Jobs\ProcessSendTicketEmail;
 use App\Models\FriendlyTicket;
 use App\Models\LiveTicket;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Shared\Services\CreatingQrCodeService;
 use Shared\Services\TicketService;
@@ -94,6 +95,15 @@ class TicketController extends Controller
         try {
             foreach ($request->post('kilter') as $value) {
                 $model = new LiveTicket();
+                if((int)$value < 1 || (int)$value > 5500) {
+                    throw new Exception("Билет с номером $value выходит с допустимого диапазона!");
+                }
+
+                if (LiveTicket::where('kilter',(int)$value)->exists()) {
+                    throw new Exception("
+                    Билет с номером $value уже зарегистрирован, проверти правильность номеров и попробуйте снова!
+                    Или свяжитесь с администратором!");
+                }
                 $model->fio_friendly = $request->post('fio');;
                 $model->fio = $request->post('fio_seller');
                 $model->seller = $request->post('seller');
@@ -103,9 +113,8 @@ class TicketController extends Controller
                 $model->festival_id = env('UUID_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
-                $model->kilter = $value;
+                $model->kilter = (int)$value;
                 $model->saveOrFail();
-
             }
 
             Bus::chain([

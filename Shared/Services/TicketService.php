@@ -111,4 +111,20 @@ class TicketService
             'status' => Status::CANCEL
         ]);
     }
+
+    public static function getZeroForKilter(int $kilter): string
+    {
+        if($kilter < 10) {
+            return '000'.$kilter;
+        }
+
+        if($kilter < 100) {
+            return '00'.$kilter;
+        }
+        if($kilter < 1000) {
+            return '0'.$kilter;
+        }
+
+        return (string)$kilter;
+    }
 }

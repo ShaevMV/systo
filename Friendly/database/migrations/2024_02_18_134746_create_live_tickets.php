@@ -15,7 +15,7 @@ class CreateLiveTickets extends Migration
     {
         Schema::create('live_tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('kilter');
+            $table->integer('kilter');
             $table->string('email');
             $table->string('fio');
             $table->string('seller');
