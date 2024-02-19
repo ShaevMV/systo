@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessSendLiveTicketEmail;
 use App\Jobs\ProcessSendTicketEmail;
 use App\Models\FriendlyTicket;
+use App\Models\LiveTicket;
 use Illuminate\Contracts\View\View;
 use Shared\Services\CreatingQrCodeService;
 use Shared\Services\TicketService;
@@ -37,6 +39,13 @@ class TicketController extends Controller
         ]);
     }
 
+    public function viewLive()
+    {
+        return view('live/form', [
+            'user' => Auth::user(),
+        ]);
+    }
+
     public function add(Request $request)
     {
         $price = $request->post('price') / $request->post('count');
@@ -51,8 +60,8 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b3');
-
+                $model->festival_id = env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
                 $this->ticketService->pushTicketFriendly($model);
@@ -78,28 +87,74 @@ class TicketController extends Controller
             ->with('status', $massage);
     }
 
+    public function addLiveTicket(Request $request)
+    {
+        $price = $request->post('price') / $request->post('count');
+        DB::beginTransaction();
+        try {
+            foreach ($request->post('kilter') as $value) {
+                $model = new LiveTicket();
+                $model->fio_friendly = $request->post('fio');;
+                $model->fio = $request->post('fio_seller');
+                $model->seller = $request->post('seller');
+                $model->email = $request->post('email');
+                $model->comment = $request->post('comment') ?? '';
+                $model->price = $price;
+                $model->festival_id = env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->phone = $request->post('phone') ?? '';
+                $model->user_id = Auth::id();
+                $model->kilter = $value;
+                $model->saveOrFail();
+
+            }
+
+            Bus::chain([
+                new ProcessSendLiveTicketEmail(
+                    $request->post('email')
+                ),
+            ])->dispatch();
+
+            $massage = 'Ура! Всё получилось! Живые билеты зарегистрированы';
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollback();
+            $massage = $e->getMessage();
+        }
+
+        return redirect('/live')
+            ->with('status', $massage);
+    }
+
 
     public function tickets(Request $request): View
     {
         $festival_id = $request->get('festival_id');
-
-        $tickets = FriendlyTicket::where(
-            'id', '>=', 1000
-        )->where(
-            'festival_id', '=', $festival_id
-        )->get();
+        if($request->get('type') === 'friendly_tickets') {
+            $tickets = FriendlyTicket::where(
+                'festival_id', '=', $festival_id
+            )->get();
+        } else {
+            $tickets = LiveTicket::where(
+                'festival_id', '=', $festival_id
+            )->get();
+        }
 
         return view('admin.tickets', [
             'tickets' => $tickets,
+            'type' => $request->get('type'),
         ]);
     }
 
     public function delTicket(Request $request): RedirectResponse
     {
         $id = $request->post('id');
+        if ($request->post('type') === 'friendly_tickets') {
+            FriendlyTicket::destroy($id);
+            $this->ticketService->deleteTicketFriendly($id);
+        } else {
+            LiveTicket::destroy($id);
+        }
 
-        FriendlyTicket::destroy($id);
-        $this->ticketService->deleteTicketFriendly($id);
         return redirect()->route('adminTickets');
     }
 

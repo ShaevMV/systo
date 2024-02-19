@@ -19,17 +19,17 @@
                         <hr>
                     </div>
                 @endif
-                <h2><a href="{{ route('viewLiveTickets') }}">Регистрациия живого билета</a></h2>
-                <form method="POST" action="{{ route('addTickets') }}">
+                <h2><a href="{{ route('viewAddTickets') }}">Продать билет по дружеской цене</a></h2>
+                <form method="POST" action="{{ route('addLiveTicket') }}">
                     @csrf
-                    <h1>Продать билет по дружеской цене</h1>
+                    <h1>Зарегистрировать живой билет</h1>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца') }}"/>
-                        <x-jet-input id="password"  readonly class="block mt-1 w-full" type="text" name="seller" required autocomplete="Seller" value="{{$user->name }}"/>
+                        <x-jet-input id="password"  readonly class="block mt-1 w-full" type="text" name="seller" required autocomplete="Seller" value="{{$user->name}}"/>
                     </div>
                     <div>
                         <x-jet-label for="name" value="{{ __('Проект (или с кем договорился о френдли)') }}"/>
-                        <x-jet-input id="name" readonly class="block mt-1 w-full" type="text" name="fio_seller" value="{{$user->project }}" required autofocus autocomplete="fio_seller"/>
+                        <x-jet-input id="name" readonly class="block mt-1 w-full" type="text" name="fio_seller" value="{{$user->project}}" required autofocus autocomplete="fio_seller"/>
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="email" value="{{ __('Email покупателя') }}"/>
@@ -50,12 +50,17 @@
                         <x-jet-label value="{{ __('Телефон покупателя:') }}"/>
                         <x-jet-input class="block mt-1 w-full" type="tel" name="phone" required/>
                     </div>
+                    <div class="mt-4">
+                        <x-jet-label value="{{ __('Фамилия Имя покупателя:') }}"/>
+                        <x-jet-input class="block mt-1 w-full fio" type="text" name="fio" required/>
+                    </div>
                     <div id="listFio">
                         <div class="mt-4" id="cloneFio">
-                            <x-jet-label value="{{ __('Фамилия Имя покупателя:') }}"/>
-                            <x-jet-input class="block mt-1 w-full fio" type="text" name="fio[]" required/>
+                            <x-jet-label value="{{ __('Номера карточек:') }}"/>
+                            <x-jet-input class="block mt-1 w-full fio" type="text" name="kilter[]" required/>
                         </div>
                     </div>
+
                     <div class="mt-4">
                         <x-jet-label for="price" value="{{ __('Сумма, полученная за билеты:') }}"/>
                         <x-jet-input id="price" class="block mt-1 w-full" type="number" name="price" required autocomplete="price"/>

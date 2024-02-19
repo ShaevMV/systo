@@ -42,9 +42,9 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на Solar Systo Togathering {{date('Y')}} потдверждён</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создании общего праздника!</p>
                         <br/>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с qr-кодом на каждого гостя прикреплены к этому письму.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">При входе на мероприятие каждый гость должен будет показать карточку с QR-кодом..</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Не забывайте карточку дома! Вход возможно только при предъявлении оригинальной карточки (скриншоты с телефонов работать не будут).</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>

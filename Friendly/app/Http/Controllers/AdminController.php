@@ -45,9 +45,14 @@ class AdminController extends Controller
         $users = User::leftJoin('friendly_tickets', function (JoinClause $join) use ($festival_id){
             $join->on('friendly_tickets.user_id', '=', 'users.id')
                 ->where('friendly_tickets.festival_id', '=', $festival_id);
+        })->leftJoin('live_tickets', function (JoinClause $join) use ($festival_id){
+            $join->on('live_tickets.user_id', '=', 'users.id')
+                ->where('live_tickets.festival_id', '=', $festival_id);
         })->select(['users.*',
-                DB::raw('SUM(friendly_tickets.price) AS sum_price'),
-                DB::raw('COUNT(friendly_tickets.id) AS count_tickets')
+                DB::raw('SUM(friendly_tickets.price) AS sum_price_friendly'),
+                DB::raw('COUNT(friendly_tickets.id) AS count_tickets_friendly'),
+                DB::raw('SUM(live_tickets.price) AS sum_price_live'),
+                DB::raw('COUNT(live_tickets.id) AS count_tickets_live'),
             ])
             ->groupBy('users.id')
             ->get();

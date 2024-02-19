@@ -26,6 +26,9 @@ Route::get('/register', function () {
 });
 
 Route::middleware(['auth', 'verified'])->get('/', [TicketController::class, 'view'])->name('viewAddTickets');
+Route::middleware(['auth', 'verified'])->get('/live', [TicketController::class, 'viewLive'])->name('viewLiveTickets');
+Route::middleware(['auth', 'verified'])->post('/live', [TicketController::class, 'addLiveTicket'])->name('addLiveTicket');
+
 Route::middleware(['auth', 'verified'])->post('/', [TicketController::class, 'add'])->name('addTickets');
 
 
