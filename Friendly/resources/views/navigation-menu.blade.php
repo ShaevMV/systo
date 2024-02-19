@@ -107,26 +107,32 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-jet-responsive-nav-link
-                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
-                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2'])">
+                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4']) }}"
+                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'])">
                 {{ __('Пользователи Весна') }}
             </x-jet-responsive-nav-link>
-            <x-jet-responsive-nav-link
+            {{--<x-jet-responsive-nav-link
                 href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
-                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3'])">
+                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5'])">
                 {{ __('Пользователи Осень') }}
-            </x-jet-responsive-nav-link>
+            </x-jet-responsive-nav-link>--}}
         </div>
         <div class="pt-2 pb-3 space-y-1">
             <x-jet-responsive-nav-link
-                href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b2']) }}"
-                :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b2'">
-                {{ __('Билеты Весна') }}
+                href="{{ route('adminTickets',[
+                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+                            'type' => 'friendly_tickets'
+                            ]) }}"
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=friendly_tickets'">
+                {{ __('Электронные билеты Весна') }}
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
-                href="{{ route('adminTickets',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b3']) }}"
-                :active="request()->path() == 'admin/tickets/9d679bcf-b438-4ddb-ac04-023fa9bff4b3'">
-                {{ __('Билеты Осень') }}
+                href="{{ route('adminTickets',[
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+                                'type' => 'live_tickets'
+                                ]) }}"
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=live_tickets'">
+                {{ __('Живые билеты Весна') }}
             </x-jet-responsive-nav-link>
         </div>
 
