@@ -44,7 +44,7 @@
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">При входе на мероприятие каждый гость должен будет показать карточку с QR-кодом..</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Не забывайте карточку дома! Вход возможно только при предъявлении оригинальной карточки (скриншоты с телефонов работать не будут).</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Не забывайте карточку дома! Вход возможен только при предъявлении оригинальной карточки (скриншоты с телефонов работать не будут)</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
