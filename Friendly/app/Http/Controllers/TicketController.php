@@ -60,7 +60,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = env('UUID_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
@@ -100,7 +100,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_SECOND_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = env('UUID_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->kilter = $value;
