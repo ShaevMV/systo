@@ -163,6 +163,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->insert(
                         $data
                     );
+            } else {
+                DB::connection('mysqlBaza')->table('el_tickets')
+                    ->where('uuid', '=', $ticketsDto->getId()->value())->update([
+                        'status' => $data['status']
+                    ]);
             }
         } catch (\Exception $e) {
             return false;
