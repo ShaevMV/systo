@@ -113,7 +113,6 @@ class AdminController extends Controller
 
         User::destroy($id);
 
-        return redirect()->route('adminUser');
+        return redirect()->route('adminUser',[env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4')]);
     }
-
 }
