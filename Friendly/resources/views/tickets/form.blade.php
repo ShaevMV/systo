@@ -1,25 +1,26 @@
 <x-guest-layout>
-    <div class="pt-4 bg-gray-100">
+    <div class="pt-4" id="fon">
+        <form method="POST" action="{{ route('logout') }}" class="exit-sys">
+            @csrf
 
+            <x-jet-dropdown-link href="{{ route('logout') }}"
+                                 onclick="event.preventDefault();
+                                                this.closest('form').submit();">
+                {{ __('Выйти из системы') }}
+            </x-jet-dropdown-link>
+        </form>
         <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
 
             <div class="w-full sm:max-w-2xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-
-                    <x-jet-dropdown-link href="{{ route('logout') }}"
-                                         onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                        {{ __('Выйти из системы') }}
-                    </x-jet-dropdown-link>
-                </form>
                 @if (session('status'))
                     <div class="alert alert-success" role="alert">
                         <p>{{ session('status') }}</p>
                         <hr>
                     </div>
                 @endif
-                <h2><a href="{{ route('viewLiveTickets') }}">Регистрациия живого билета</a></h2>
+                <div class="buttonz">
+                <a href="{{ route('viewLiveTickets') }}" class="btnx">Регистрациия живого билета</a>
+                </div>
                 <form method="POST" action="{{ route('addTickets') }}">
                     @csrf
                     <h1>Продать электронный френдли билет</h1>

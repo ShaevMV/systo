@@ -1,3 +1,82 @@
-body  {
-    background: #0a0c0d;
+@font-face {
+    font-family: istok;
+    src: url('istok-r.ttf');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: istok;
+    src: url('istok-b.ttf');
+    font-weight: bold;
+    font-display: swap;
+}
+
+:root{
+    --c-blue: #1e1e38;
+    --c-green: rgb(30, 135, 28);
+    --transition: all 0.5s 0.03s ease;
+    --radius: 10px;
+}
+
+body{
+    font-family: "istok", sans-serif;
+}
+
+.font-sans{
+    font-family: "istok", sans-serif;
+}
+
+#fon{
+    background: url('../images/main-bg.jpg') center no-repeat;
+    background-size: cover;
+    position: relative;
+}
+
+.buttonz{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2vw;
+    margin-bottom: 1vw;
+}
+
+.btnx{
+    box-sizing: border-box;
+    text-decoration: none !important;
+    display: block;
+    width: 48%;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: var(--c-blue);
+    color: #fff !important;
+    transition: all 0.3s;
+    border-radius: var(--radius);
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.btnx:hover{
+    background-color: var(--c-green);
+}
+
+.prose h1{
+    font-family: 'istok';
+    font-weight: bold;
+    font-size: 30px;
+}
+
+.exit-sys{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.exit-sys a{
+    background-color: var(--c-blue);
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: bold;
 }
