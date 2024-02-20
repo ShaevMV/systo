@@ -78,7 +78,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         } else {
             $model = $this->model::withTrashed();
         }
-        $all = $this->model::all()->toArray();
+
         $listIds = $model->whereOrderTicketId($orderId->value())
             ->get()
             ->toArray();

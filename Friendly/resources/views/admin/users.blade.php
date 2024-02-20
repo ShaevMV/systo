@@ -18,19 +18,19 @@
                 <tbody>
                 @foreach ($users as $user)
                     <tr>
-                        <td>{{$user->id}}</td>
-                        <td>{{$user->email}}</td>
-                        <td>{{$user->name}}</td>
-                        <td>{{$user->project}}</td>
-                        <td>{{$user->sum_price_friendly ?? 0}}</td>
-                        <td>{{$user->count_tickets_friendly ?? 0}}</td>
-                        <td>{{$user->sum_price_live ?? 0}}</td>
-                        <td>{{$user->count_tickets_live ?? 0}}</td>
+                        <td>{{$user['id']}}</td>
+                        <td>{{$user['email']}}</td>
+                        <td>{{$user['name']}}</td>
+                        <td>{{$user['project']}}</td>
+                        <td>{{$user['sum_price_friendly'] ?? 0}}</td>
+                        <td>{{$user['count_tickets_friendly'] ?? 0}}</td>
+                        <td>{{$user['sum_price_live'] ?? 0}}</td>
+                        <td>{{$user['count_tickets_live'] ?? 0}}</td>
                         <td>
-                            <a href="{{ route('editUser',['id' => $user->id]) }}">{{ __('Edit') }}</a>
+                            <a href="{{ route('editUser',['id' => $user['id']]) }}">{{ __('Edit') }}</a>
                             <form method="POST" action="{{ route('delUser') }}">
                                 @csrf
-                                <input type="hidden" name="id" value="{{$user->id}}">
+                                <input type="hidden" name="id" value="{{$user['id']}}">
                                 <x-jet-responsive-nav-link href="{{ route('delUser') }}"
                                                            onclick="event.preventDefault();
                                     this.closest('form').submit();">
