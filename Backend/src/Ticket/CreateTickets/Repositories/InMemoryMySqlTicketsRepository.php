@@ -152,7 +152,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
      */
     public function setInBaza(TicketResponse $ticketsDto): bool
     {
-        $data = $ticketsDto->toArray();
+        $data = $ticketsDto->toArrayForBaza();
         try {
             DB::connection('mysqlBaza')->getPdo();
             if (!DB::connection('mysqlBaza')->table('el_tickets')
@@ -165,7 +165,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     );
             }
         } catch (\Exception $e) {
-
+            return false;
         } finally {
             return true;
         }
@@ -182,7 +182,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         if (null !== $festivalId) {
             $rawResult->where('order_tickets.festival_id', '=', $festivalId->value());
         }
-        $rawResult->get($this->model::TABLE . '.id')
+        $rawResult = $rawResult->get($this->model::TABLE . '.id')
             ->toArray();
 
         $result = [];

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Application\GetTicket;
 
 use Carbon\Carbon;
+use Nette\Utils\JsonException;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;
@@ -62,5 +63,16 @@ class TicketResponse extends AbstractionEntity implements Response
     public function getFestivalView(): ?string
     {
         return $this->festivalView;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function toArrayForBaza(): array
+    {
+        $result = parent::toArray();
+        unset($result['festivalView']);
+
+        return $result;
     }
 }
