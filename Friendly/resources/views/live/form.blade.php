@@ -19,12 +19,13 @@
                     </div>
                 @endif
                 <div class="buttonz">
-                    <a href="{{ route('viewAddTickets') }}" class="btnx">Продажа френдли билета</a>
-                    <a href="#" class="btnx active">Регистрациия живого билета</a>
+                    <a href="{{ route('viewAddTickets') }}" class="btnx">ЭЛЕКТРОННЫЙ</a>
+                    <a href="#" class="btnx active">ЖИВОЙ БИЛЕТ</a>
                 </div>
                 <form method="POST" action="{{ route('addLiveTicket') }}" id="main-former">
                     @csrf
-                    <h1>Зарегистрировать живой билет</h1>
+                    <h2>Форма продажи живого билета</h2>
+                    <small>Гость должен получить от вас конверт с карточкой лично в руки, либо забрать его в Лесистой.</small>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца:') }}"/>
                         <x-jet-input id="password" readonly class="block mt-1 w-full" type="text" name="seller" required
@@ -62,7 +63,7 @@
                     </div>
                     <div id="listFio">
                         <div class="mt-4" id="cloneFio">
-                            <x-jet-label value="{{ __('Номера карточек:') }}"/>
+                            <x-jet-label value="{{ __('Номер билет (один номер в одной строке!)') }}"/>
                             <x-jet-input class="block mt-1 w-full fio" type="text" name="kilter[]" required/>
                         </div>
                     </div>

@@ -1643,12 +1643,12 @@ select.form-select::after{
 }
 
 .in-choice > div:nth-of-type(2) span{
-    background-image: url('../img/icon-qiwi.png');
+    background-image: url('../img/icon-umoney.png');
     background-size: 25px;
 }
 
 .in-choice > div:last-of-type span{
-    background-image: url('../img/icon-umoney.png');
+    background-image: url('../img/sticker.webp');
     background-size: 25px;
 }
 
@@ -2325,7 +2325,6 @@ input[readonly]{
         font-size: 11px;
         padding-top: 16px;
         padding-bottom: 13px;
-        accent-color: ;
     }
 
     .form-control:not(textarea) {

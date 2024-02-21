@@ -19,12 +19,13 @@
                     </div>
                 @endif
                 <div class="buttonz">
-                    <a href="#" class="btnx active">Продажа френдли билета</a>
-                    <a href="{{ route('viewLiveTickets') }}" class="btnx">Регистрациия живого билета</a>
+                    <a href="#" class="btnx active">ЭЛЕКТРОННЫЙ</a>
+                    <a href="{{ route('viewLiveTickets') }}" class="btnx">ЖИВОЙ БИЛЕТ</a>
                 </div>
                 <form method="POST" action="{{ route('addTickets') }}" id="main-former">
                     @csrf
-                    <h1>Продать электронный френдли билет</h1>
+                    <h2>Форма продажи электронного Френдли-билета</h2>
+                    <small> Гость получит pdf-файлы с qr-кодом на почту после нажать на кнопку Продать </small>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца') }}"/>
                         <x-jet-input id="password" readonly class="block mt-1 w-full" type="text" name="seller" required
