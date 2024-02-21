@@ -20,7 +20,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     </head>
     <body>
-        <div id="wrap-bg" class="font-sans text-gray-900 antialiased">
+        <div id="fon" class="font-sans text-gray-900 antialiased">
             {{ $slot }}
         </div>
     </body>

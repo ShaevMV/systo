@@ -1,10 +1,9 @@
 <x-guest-layout>
     <x-jet-authentication-card>
         <x-slot name="logo">
-             <img src="/images/logo-main.png" width="64" height="64">
-
+             <img src="/images/logo-main.png" width="150" height="150" class="main-logo">
+            <h1 class="log-h1">ФРЕНДЛИ БИЛЕТЫ</h1>
         </x-slot>
-        <h1>ФРЕНДЛИ БИЛЕТЫ</h1>
         <x-jet-validation-errors class="mb-4" />
 
         @if (session('status'))
@@ -33,7 +32,7 @@
                 </label>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
+            <div id="main-btn">
                 <x-jet-button class="ml-4">
                     {{ __('Войти') }}
                 </x-jet-button>
