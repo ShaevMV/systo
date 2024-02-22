@@ -163,7 +163,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TypesOfPaymentModel::TABLE.'.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
-            ->orderBy($this->model::TABLE.'.kilter');
+            ->orderBy($this->model::TABLE.'.kilter', 'DESC');
 
         /** @var Filter $filter */
         foreach ($filters as $filter) {
@@ -175,8 +175,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 );
             }
         }
-        $sql = $builder->toSql();
-        $rawData = $builder->get()
+        //$sql = $builder->toSql();
+        $rawData = $builder
+            ->get()
             ->toArray();
 
         $result = [];
