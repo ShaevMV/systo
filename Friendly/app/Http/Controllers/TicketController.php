@@ -33,18 +33,50 @@ class TicketController extends Controller
         $this->creatingQrCodeService = $creatingQrCodeService;
     }
 
-    public function view()
+    public function view(Request $request)
     {
         return view('tickets/form', [
             'user' => Auth::user(),
+            'success' => $this->getHumanSuccessForEl($request->get('success', null))
         ]);
     }
 
-    public function viewLive()
+    private function getHumanSuccessForEl(?string $success): ?string
+    {
+        if (null === $success) {
+            return null;
+        }
+
+        return $success ? 'Ура! Всё получилось!
+Билеты отправлены на указанную почту!' : 'К сожалению что то пошло не так(!';
+    }
+
+
+    public function viewLive(Request $request)
     {
         return view('live/form', [
             'user' => Auth::user(),
+            'success' => $this->getHumanSuccessForLive(
+                $request->get('success', null),
+                $request->get('value', null)
+            )
         ]);
+    }
+
+
+    private function getHumanSuccessForLive(?string $success, ?string $value): ?string
+    {
+        if (null === $success) {
+            return null;
+        }
+
+        return match ($success) {
+            '0' => 'К сожалению что то пошло не так(!',
+            '-1' => "Билет с номером $value выходит из допустимого диапазона!",
+            '-2' => "Билет с номером $value уже зарегистрирован, проверьте правильность номеров и попробуйте снова! Или свяжитесь с администратором!",
+            '1' => 'Ура! Всё получилось! Живые билеты зарегистрированы',
+            default => null,
+        };
     }
 
     public function add(Request $request)
@@ -61,7 +93,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
@@ -76,33 +108,32 @@ class TicketController extends Controller
                 ),
             ])->dispatch();
 
-            $massage = 'Ура! Всё получилось!
-Билеты отправлены на указанную почту!';
+            $success = true;
             DB::commit();
         } catch (Throwable $e) {
             DB::rollback();
-            $massage = $e->getMessage();
+            $success = false;
         }
 
-        return redirect('/')
-            ->with('status', $massage);
+        return \Redirect::route('viewAddTickets', ['success' => $success]);
     }
 
     public function addLiveTicket(Request $request)
     {
         $price = $request->post('price') / $request->post('count');
+        $success = 1;
+
         DB::beginTransaction();
         try {
             foreach ($request->post('kilter') as $value) {
                 $model = new LiveTicket();
-                if((int)$value < 1 || (int)$value > 5500) {
-                    throw new Exception("Билет с номером $value выходит из допустимого диапазона!");
+
+                if ((int)$value < 1 || (int)$value > 5500) {
+                    $success = -1;
                 }
 
-                if (LiveTicket::where('kilter',(int)$value)->exists()) {
-                    throw new Exception("
-                    Билет с номером $value уже зарегистрирован, проверьте правильность номеров и попробуйте снова!
-                    Или свяжитесь с администратором!");
+                if (LiveTicket::where('kilter', (int)$value)->exists()) {
+                    $success = -2;
                 }
                 $model->fio_friendly = $request->post('fio');;
                 $model->fio = $request->post('fio_seller');
@@ -110,7 +141,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_FESTIVAL','9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->kilter = (int)$value;
@@ -123,22 +154,23 @@ class TicketController extends Controller
                 ),
             ])->dispatch();
 
-            $massage = 'Ура! Всё получилось! Живые билеты зарегистрированы';
             DB::commit();
         } catch (Throwable $e) {
             DB::rollback();
-            $massage = $e->getMessage();
+            $success = 0;
         }
 
-        return redirect('/live')
-            ->with('status', $massage);
+        return \Redirect::route('viewLiveTickets', [
+            'success' => $success,
+            'value' => $value ?? null,
+        ]);
     }
 
 
     public function tickets(Request $request): View
     {
         $festival_id = $request->get('festival_id');
-        if($request->get('type') === 'friendly_tickets') {
+        if ($request->get('type') === 'friendly_tickets') {
             $tickets = FriendlyTicket::where(
                 'festival_id', '=', $festival_id
             )->get();
