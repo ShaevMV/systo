@@ -118,7 +118,7 @@
 <img src="https://api.solarsysto.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Систо-Осень 2023!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на на Solar Systo Togathering {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}
