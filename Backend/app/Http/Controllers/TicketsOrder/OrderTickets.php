@@ -36,7 +36,7 @@ class OrderTickets extends Controller
     public function __construct(
         private CreateOrder        $createOrder,
         private GetTicketType      $getTicketType,
-        private TicketService $ticketService,
+        private TicketService      $ticketService,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
         private GetOrder           $getOrder,
@@ -171,7 +171,10 @@ class OrderTickets extends Controller
      */
     public function toChanceStatus(string $id, Request $request): JsonResponse
     {
-        if ($request->get('status') === Status::DIFFICULTIES_AROSE) {
+        if (in_array($request->get('status'), [
+            Status::DIFFICULTIES_AROSE,
+            Status::LIVE_TICKET_ISSUED
+        ])) {
             $request->validate([
                 'comment' => 'required|string'
             ], [

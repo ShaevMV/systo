@@ -51,7 +51,9 @@ final class Status implements EntityDataInterface
             self::PAID,
         ],
         self::CANCEL => [],
-        self::LIVE_TICKET_ISSUED => [],
+        self::LIVE_TICKET_ISSUED => [
+            self::CANCEL
+        ],
     ];
 
     public function __construct(

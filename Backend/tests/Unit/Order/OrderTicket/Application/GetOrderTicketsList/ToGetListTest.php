@@ -100,4 +100,21 @@ class ToGetListTest extends TestCase
 
         self::assertNotEmpty($result?->toArray());
     }
+
+    /**
+     * @throws JsonException
+     * @throws \Nette\Utils\JsonException
+     */
+    public function test_is_filter_for_manager(): void
+    {
+        $result = $this->toGetList->listByFilter(
+            new OrderFilterQuery(
+                festivalId: new Uuid(FestivalHelper::UUID_FESTIVAL),
+                isManager: true,
+            )
+        );
+
+
+        self::assertNotEmpty($result?->toArray());
+    }
 }

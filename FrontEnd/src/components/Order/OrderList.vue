@@ -96,7 +96,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Сообщения для пользователя</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Номер живого билета или комментарий для пользователя</h5>
             <button type="button" class="close"
                     data-dismiss="modal"
                     id="closeModal"
@@ -112,7 +112,7 @@
           <div class="modal-footer">
             <button type="button"
                     @click="sendDifficultiesArose"
-                    class="btn btn-secondary">Сменить статус на возникли трудности
+                    class="btn btn-secondary">Сменить статус
             </button>
           </div>
         </div>
@@ -130,6 +130,7 @@ export default {
     return {
       comment: null,
       selectId: null,
+      selectStatus: null,
     }
   },
   props: {
@@ -150,26 +151,8 @@ export default {
       'sendToChanceStatus'
     ]),
     styleObject: function (status) {
-      let color = 'black';
-      switch (status) {
-        case 'new':
-          color = '#333333';
-          break;
-        case 'paid':
-          color = '#1e871c';
-          break;
-        case 'cancel':
-          color = '#86201c';
-          break;
-        case 'difficulties_arose':
-          color = '#d0ba27';
-          break;
-        default:
-          color = 'black';
-      }
-
       return {
-        color: color,
+        color: this.activeColor(status),
       }
     },
     goItemOrderForUser(idOrderItem, status) {
@@ -181,12 +164,23 @@ export default {
     },
     activeColor: function (status) {
       let color = '#86201c';
-      if (status === 'paid') {
-        color = '#1e871c';
-      }
 
-      if (status === 'difficulties_arose') {
-        color = '#d0ba27';
+      switch (status) {
+        case 'new':
+          color = '#333333';
+          break;
+        case 'paid':
+          color = '#1e871c';
+          break;
+        case 'cancel':
+          color = '#86201c';
+          break;
+        case 'live_ticket_issued':
+        case 'difficulties_arose':
+          color = '#d0ba27';
+          break;
+        default:
+          color = 'red';
       }
 
       return color
@@ -194,8 +188,8 @@ export default {
     getListQuests: function (quests, isAll = true) {
       let result = '';
       let max = isAll ? quests.length : 3;
-      quests.forEach(function(item, i) {
-        if(i < max) {
+      quests.forEach(function (item, i) {
+        if (i < max) {
           result = result + item.value + " ";
         }
       });
@@ -203,8 +197,8 @@ export default {
       return result;
     },
     cuttedText: function (text) {
-      if(text !== null && text.length > 25) {
-        return text.slice(0,25) + "...";
+      if (text !== null && text.length > 25) {
+        return text.slice(0, 25) + "...";
       }
       return text
     },
@@ -214,8 +208,10 @@ export default {
      * @param id
      */
     chanceStatus(status, id) {
-      if (status === 'difficulties_arose') {
-        this.selectId = id;
+      this.selectId = id;
+      this.selectStatus = status;
+
+      if (['difficulties_arose', 'live_ticket_issued'].includes(status)) {
         document.getElementById('modalOpenBtn').click();
       } else {
         this.sendToChanceStatus({
@@ -232,17 +228,15 @@ export default {
       let self = this;
       this.sendToChanceStatus({
         'id': this.selectId,
-        'status': 'difficulties_arose',
-        'color': '#d0ba27',
+        'status': this.selectStatus,
         'comment': this.comment,
         'callback': function () {
           document.getElementById('closeModal').click();
           self.selectId = null;
+          self.selectStatus = null;
           self.comment = null;
         }
       });
-
-
     }
   }
 }

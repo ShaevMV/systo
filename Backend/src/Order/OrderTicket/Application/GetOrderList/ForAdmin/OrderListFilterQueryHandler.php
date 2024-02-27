@@ -8,6 +8,7 @@ use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
+use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
@@ -26,7 +27,28 @@ class OrderListFilterQueryHandler implements QueryHandler
 
     public function __invoke(OrderFilterQuery $filterQuery): ?ListResponse
     {
-        $filter = Filters::fromValues([
+        $filter = Filters::fromValues($this->getFilterValues($filterQuery));
+
+        $orderTicketItem = $this->orderTicketRepository->getList($filter);
+
+        if (!is_null($filterQuery->getPrice())) {
+            $orderTicketItem = $this->filterByPrice($filterQuery->getPrice(), $orderTicketItem, $filterQuery->getFestivalId());
+        }
+
+        $result = [];
+
+        foreach ($orderTicketItem as $value) {
+            $result[] = $value->setGuests($value->getGuestsByFestivalId($filterQuery->getFestivalId()));
+        }
+
+
+        return count($result) > 0 ? new ListResponse($result) : null;
+    }
+
+
+    private function getFilterValues(OrderFilterQuery $filterQuery): array
+    {
+        $result = [
             // email
             [
                 'field' => User::TABLE . '.email',
@@ -60,27 +82,17 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],
-            [
-                'field' => TicketTypesModel::TABLE . '.is_live_ticket',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->isManager() ? '1' : null,
-            ],
-        ]);
+        ];
 
-        $orderTicketItem = $this->orderTicketRepository->getList($filter);
-
-        if (!is_null($filterQuery->getPrice())) {
-            $orderTicketItem = $this->filterByPrice($filterQuery->getPrice(), $orderTicketItem, $filterQuery->getFestivalId());
+        if ($filterQuery->isManager()) {
+            $result[] = [
+                'field' => OrderTicketModel::TABLE . '.status',
+                'operator' => FilterOperator::NOT_EQUAL,
+                'value' => Status::NEW,
+            ];
         }
 
-        $result = [];
-
-        foreach ($orderTicketItem as $value) {
-            $result[] = $value->setGuests($value->getGuestsByFestivalId($filterQuery->getFestivalId()));
-        }
-
-
-        return count($result) > 0 ? new ListResponse($result) : null;
+        return $result;
     }
 
 
