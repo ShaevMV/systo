@@ -42,18 +42,18 @@ final class GetInfoForOrder
     public function getAllPrice(Uuid $festivalId): ListTicketTypeDto
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */
-        $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
+        $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId, true));
         $result = [];
         foreach ($listTicketTypeDto->getTicketType() as $item) {
+            $result[] = $item;
             if(count($item->getPriceList()) > 0) {
                 foreach ($item->getPriceList() as $priceDto) {
-                    $result[] = $item->setPrice($priceDto->getPrice());
+                    $itemClone = clone $item;
+                    $result[] = $itemClone->setPrice($priceDto->getPrice());
                 }
-            } else {
-                $result[] = $item;
             }
-
         }
+
         return new ListTicketTypeDto($result);
     }
 }

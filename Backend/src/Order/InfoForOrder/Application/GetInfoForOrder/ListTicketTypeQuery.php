@@ -10,7 +10,8 @@ use Shared\Domain\ValueObject\Uuid;
 final class ListTicketTypeQuery implements Query
 {
     public function __construct(
-        private Uuid $festivalId
+        private Uuid $festivalId,
+        private bool $isAllPrice = false,
     )
     {
     }
@@ -18,5 +19,10 @@ final class ListTicketTypeQuery implements Query
     public function getFestivalId(): Uuid
     {
         return $this->festivalId;
+    }
+
+    public function isAllPrice(): bool
+    {
+        return $this->isAllPrice;
     }
 }

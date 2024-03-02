@@ -36,7 +36,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
     }
 
 
-    public static function fromState(array $data): self
+    public static function fromState(array $data, $isAllPrice = false): self
     {
         $groupLimit = isset($data['groupLimit']) && !empty($data['groupLimit']) ?
             (int)$data['groupLimit'] :
@@ -52,8 +52,11 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             return PriceDto::fromState($dataPrice);
         }, $data['ticket_type_price'] ?? []);
 
-
-        $correctPrice = count($priceList) > 0 ? end($priceList)->getPrice() : $data['price'];
+        if (!$isAllPrice) {
+            $correctPrice = count($priceList) > 0 ? end($priceList)->getPrice() : $data['price'];
+        } else {
+            $correctPrice = $data['price'];
+        }
 
         return new self(
             new Uuid($data['id']),

@@ -21,7 +21,10 @@ final class ListTicketTypeQueryHandler implements QueryHandler
     public function __invoke(ListTicketTypeQuery $query): ListTicketTypeDto
     {
         return new ListTicketTypeDto(
-            $this->ticketType->getList($query->getFestivalId())
+            $this->ticketType->getList(
+                $query->getFestivalId(),
+                $query->isAllPrice(),
+            )
         );
     }
 }

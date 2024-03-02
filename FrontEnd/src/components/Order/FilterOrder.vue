@@ -14,7 +14,7 @@
                 <option value=null>Выберите тип оргвзноса</option>
                 <option v-for="(typeTickets) in getTicketType"
                         v-bind:key="typeTickets.price"
-                        v-bind:value="typeTickets">{{ typeTickets.name }} /
+                        v-bind:value="typeTickets.id + '/' + typeTickets.price ">{{ typeTickets.name }} /
                   {{ typeTickets.price }} руб.
                 </option>
               </select>

@@ -25,6 +25,7 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 
     public function getList(
         Uuid    $festivalId,
+        bool $isAllPrice = false,
         ?Carbon $afterDate = null
     ): array
     {
@@ -36,7 +37,7 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
             ->toArray();
 
         foreach ($data as $item) {
-            $result[] = TicketTypeDto::fromState($item);
+            $result[] = TicketTypeDto::fromState($item, $isAllPrice);
         }
 
         return $result;

@@ -13,7 +13,7 @@ interface TicketTypeInterfaceRepository
     /**
      * @return TicketTypeDto[]
      */
-    public function getList(Uuid $festivalId, ?Carbon $afterDate = null): array;
+    public function getList(Uuid $festivalId, bool $isAllPrice = false, ?Carbon $afterDate = null): array;
 
     public function getById(
         Uuid    $uuid,
