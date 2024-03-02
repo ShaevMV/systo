@@ -19,7 +19,7 @@ class TotalNumberQueryHandler implements QueryHandler
 
         foreach ($numberQuery->getOrderList() as $itemForListResponse) {
             $totalCount++;
-            if ($itemForListResponse->getStatus()->isPaid()) {
+            if ($itemForListResponse->getStatus()->isPaid() || $itemForListResponse->getStatus()->isLiveIssued()) {
                 $totalCountToPaid++;
                 $totalAmount += $itemForListResponse->getPrice();
                 $totalCountTickets+= $itemForListResponse->getCount();
