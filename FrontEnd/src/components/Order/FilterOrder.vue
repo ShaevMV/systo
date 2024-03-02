@@ -14,7 +14,7 @@
                 <option value=null>Выберите тип оргвзноса</option>
                 <option v-for="(typeTickets) in getTicketType"
                         v-bind:key="typeTickets.price"
-                        v-bind:value="typeTickets.id + '/' + typeTickets.price ">{{ typeTickets.name }} /
+                        v-bind:value="typeTickets">{{ typeTickets.name }} /
                   {{ typeTickets.price }} руб.
                 </option>
               </select>
@@ -48,7 +48,7 @@
               <select class="form-select"
                       v-model="status"
                       id="validationDefault01">
-                <option value=null>Выберите статус заказа</option>
+                <option value="">Выберите статус заказа</option>
                 <option value="new">Новый</option>
                 <option value="paid">Оплаченный</option>
                 <option value="cancel">Отменёный</option>
@@ -95,7 +95,7 @@ export default {
     return {
       email: null,
       typeOrder: null,
-      status: null,
+      status: '',
       promoCode: null,
       typesOfPayment: null,
     }
@@ -119,7 +119,7 @@ export default {
   },
   methods: {
     ...mapActions('appFestivalTickets', [
-      'loadDataForOrderingTickets',
+      'getListTypesOfPayment',
       'getListPriceFor',
     ]),
     ...mapActions('appOrder', [
@@ -147,7 +147,7 @@ export default {
       this.typePrice = null;
       this.price = null;
       this.email = null;
-      this.status = null;
+      this.status = '';
       this.promoCode = null;
       this.typesOfPayment = null;
       this.typeOrder = null;
@@ -158,7 +158,7 @@ export default {
     }
   },
   async created() {
-    await this.loadDataForOrderingTickets({festival_id: this.$route.params.id});
+    await this.getListTypesOfPayment({festival_id: this.$route.params.id});
   },
 }
 </script>

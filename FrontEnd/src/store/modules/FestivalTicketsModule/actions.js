@@ -7,7 +7,6 @@ import axios from 'axios';
  * @param payload
  */
 export const loadDataForOrderingTickets = (context, payload) => {
-    console.log(payload.festival_id);
     let promise = axios.get('/api/v1/festival/orderingTickets',
         {params: {festival_id: payload.festival_id}});
     promise.then(function (response) {
@@ -23,6 +22,14 @@ export const getListPriceFor = (context, payload) => {
         {params: {festival_id: payload.festival_id}});
     promise.then(function (response) {
         context.commit('setTicketType', response.data.ticketType);
+    })
+};
+
+export const getListTypesOfPayment = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/orderingTickets',
+        {params: {festival_id: payload.festival_id}});
+    promise.then(function (response) {
+        context.commit('setTypesOfPayment', response.data.typesOfPayment);
     })
 };
 
