@@ -22,12 +22,15 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
+        $input['is_list'] = (bool)($input['is_list'] ?? false);
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => $this->passwordRules(),
             'terms' => Jetstream::hasTermsAndPrivacyPolicyFeature() ? ['required', 'accepted'] : '',
             'project' => ['required', 'string', 'max:255'],
+            'is_list' => ['boolean'],
         ])->validate();
 
         return User::create([
@@ -35,6 +38,7 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
             'project' => $input['project'],
+            'is_list' => $input['is_list']
         ]);
     }
 }

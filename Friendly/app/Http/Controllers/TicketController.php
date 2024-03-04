@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessSendListTicketEmail;
 use App\Jobs\ProcessSendLiveTicketEmail;
 use App\Jobs\ProcessSendTicketEmail;
+use App\Models\Auto;
 use App\Models\FriendlyTicket;
+use App\Models\ListTicket;
 use App\Models\LiveTicket;
-use Exception;
+use App\Models\User;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Log;
 use Shared\Services\CreatingQrCodeService;
 use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
@@ -35,8 +41,14 @@ class TicketController extends Controller
 
     public function view(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        if ($user->is_list && !$user->is_admin) {
+            return \Redirect::route('viewListTickets');
+        }
+
         return view('tickets/form', [
-            'user' => Auth::user(),
+            'user' => $user,
             'success' => $this->getHumanSuccessForEl($request->get('success', null))
         ]);
     }
@@ -54,8 +66,14 @@ class TicketController extends Controller
 
     public function viewLive(Request $request)
     {
+        /** @var User $user */
+        $user = Auth::user();
+        if ($user->is_list && !$user->is_admin) {
+            return \Redirect::route('viewListTickets');
+        }
+
         return view('live/form', [
-            'user' => Auth::user(),
+            'user' => $user,
             'success' => $this->getHumanSuccessForLive(
                 $request->get('success', null),
                 $request->get('value', null)
@@ -64,7 +82,97 @@ class TicketController extends Controller
     }
 
 
-    private function getHumanSuccessForLive(?string $success, ?string $value): ?string
+    public function viewList(Request $request): Factory|View|Application|RedirectResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        if (!$user->is_list && !$user->is_admin) {
+            return \Redirect::route('view');
+        }
+
+        return view('list/form', [
+            'user' => $user,
+            'success' => $this->getHumanSuccessForLive(
+                $request->get('success', null)
+            )
+        ]);
+    }
+
+    public function addListTicket(Request $request)
+    {
+        DB::beginTransaction();
+        $massage = '';
+
+        try {
+
+            $nameAuto = explode("\r\n", $request->post("auto"));
+            Log::info(implode(',', $nameAuto));
+            foreach ($nameAuto as $valueOld) {
+                $value = trim($valueOld);
+                if (empty(trim($value))) {
+                    continue;
+                }
+                $model = new Auto();
+                $model->auto = $value;
+                $model->project = $request->post('project');
+                $model->curator = $request->post('curator');
+                $model->comment = $request->post('comment') ?? '';
+                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->user_id = Auth::id();
+                $model->saveOrFail();
+                $this->ticketService->pushAutoList($model);
+            }
+
+            $ids = [];
+            $nameList = explode("\r\n", $request->post("list"));
+            Log::info(implode(',', $nameList));
+            if (count($nameList) === 0) {
+                throw new \Exception('Не указан состав');
+            }
+
+            foreach ($nameList as $valueOld) {
+                $value = trim($valueOld);
+                if (empty(trim($value))) {
+                    continue;
+                }
+                $model = new ListTicket();
+                $model->fio = $value;
+                $model->project = $request->post('project');
+                $model->curator = $request->post('curator');
+                $model->email = $request->post('email');
+                $model->comment = $request->post('comment') ?? '';
+                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->user_id = Auth::id();
+                $model->phone = $request->post('phone');
+                $model->saveOrFail();
+
+                $ids['S' . $model->id] = $value;
+                $this->ticketService->pushTicketList($model);
+            }
+            if (count($ids) > 0) {
+                Bus::chain([
+                    new ProcessSendListTicketEmail(
+                        $request->post('email'),
+                        $ids,
+                        $request->post('project')
+                    ),
+                ])->dispatch();
+
+                $success = 1;
+            }
+
+            DB::commit();
+        } catch (Throwable $e) {
+            DB::rollback();
+            $success = 0;
+        }
+
+        return \Redirect::route('viewListTickets', [
+            'success' => $success,
+        ]);
+    }
+
+    private function getHumanSuccessForLive(?string $success, ?string $value = null): ?string
     {
         if (null === $success) {
             return null;
@@ -74,7 +182,7 @@ class TicketController extends Controller
             '0' => 'К сожалению что то пошло не так(!',
             '-1' => "Билет с номером $value выходит из допустимого диапазона!",
             '-2' => "Билет с номером $value уже зарегистрирован, проверьте правильность номеров и попробуйте снова! Или свяжитесь с администратором!",
-            '1' => 'Ура! Всё получилось! Живые билеты зарегистрированы',
+            '1' => 'Ура! Всё получилось! Билеты зарегистрированы',
             default => null,
         };
     }
@@ -122,7 +230,7 @@ class TicketController extends Controller
     {
         $price = $request->post('price') / $request->post('count');
         $success = 1;
-
+        $errorValue = null;
         DB::beginTransaction();
         try {
             foreach ($request->post('kilter') as $value) {
@@ -134,6 +242,7 @@ class TicketController extends Controller
 
                 if (LiveTicket::where('kilter', (int)$value)->exists()) {
                     $success = -2;
+                    $errorValue = $value;
                 }
                 $model->fio_friendly = $request->post('fio');;
                 $model->fio = $request->post('fio_seller');
@@ -162,7 +271,7 @@ class TicketController extends Controller
 
         return \Redirect::route('viewLiveTickets', [
             'success' => $success,
-            'value' => $value ?? null,
+            'value' => $errorValue,
         ]);
     }
 
@@ -170,15 +279,17 @@ class TicketController extends Controller
     public function tickets(Request $request): View
     {
         $festival_id = $request->get('festival_id');
-        if ($request->get('type') === 'friendly_tickets') {
-            $tickets = FriendlyTicket::where(
+        $tickets = match ($request->get('type')) {
+            'friendly_tickets' => FriendlyTicket::where(
                 'festival_id', '=', $festival_id
-            )->get();
-        } else {
-            $tickets = LiveTicket::where(
+            )->get(),
+            'live_tickets' => LiveTicket::where(
                 'festival_id', '=', $festival_id
-            )->get();
-        }
+            )->get(),
+            'list_tickets' => ListTicket::where(
+                'festival_id', '=', $festival_id
+            )->get(),
+        };
 
         return view('admin.tickets', [
             'tickets' => $tickets,
@@ -189,22 +300,42 @@ class TicketController extends Controller
     public function delTicket(Request $request): RedirectResponse
     {
         $id = $request->post('id');
-        if ($request->post('type') === 'friendly_tickets') {
-            FriendlyTicket::destroy($id);
-            $this->ticketService->deleteTicketFriendly($id);
-        } else {
-            LiveTicket::destroy($id);
+        switch ($request->post('type')) {
+            case 'friendly_tickets':
+                FriendlyTicket::destroy($id);
+                $this->ticketService->deleteTicketFriendly($id);
+                break;
+            case 'live_tickets':
+                LiveTicket::destroy($id);
+                break;
+            case 'list_tickets':
+                ListTicket::destroy($id);
+                $this->ticketService->deleteTicketList($id);
+                break;
         }
 
-        return redirect()->route('adminTickets');
+        return redirect()->route('adminTickets',[
+            'festival_id' => env('9d679bcf-b438-4ddb-ac04-023fa9bff4b4'),
+            'type' => $request->get('type'),
+        ]);
     }
 
-    public function getPdf(int $id): Response
+    public function getPdf(string $id): Response
     {
-        /** @var FriendlyTicket $ticket */
-        $ticket = FriendlyTicket::whereId($id)->first();
-        $pdf = $this->creatingQrCodeService->createPdf('f' . $id, $ticket->fio_friendly, $ticket->email, 'f');
+        $idInt = preg_replace("/[^,.0-9]/", '', $id);
+        if (strripos($id, 'f') !== false) {
+            /** @var FriendlyTicket $ticket */
+            $ticket = FriendlyTicket::whereId($idInt)->first();
+            $pdf = $this->creatingQrCodeService->createPdf($id, $ticket->fio_friendly, $ticket->email, '');
+            $fio = $ticket->fio_friendly;
+        } else {
+            /** @var ListTicket $ticket */
+            $ticket = ListTicket::whereId($idInt)->first();
+            $pdf = $this->creatingQrCodeService->createPdf($id, $ticket->fio, $ticket->email, '');
+            $fio = $ticket->fio;
+        }
 
-        return $pdf->download('Билет для ' . $ticket->fio_friendly . '.pdf');
+
+        return $pdf->download('Билет для ' . $fio . '.pdf');
     }
 }

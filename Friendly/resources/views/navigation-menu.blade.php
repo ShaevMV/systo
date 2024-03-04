@@ -33,7 +33,16 @@
                         :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=live_tickets'">
                         {{ __('Живые билеты Весна') }}
                     </x-jet-nav-link>
+                    <x-jet-nav-link
+                        href="{{ route('adminTickets',[
+                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+                            'type' => 'list_tickets'
+                            ]) }}"
+                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=list_tickets'">
+                        {{ __('Списки Весна') }}
+                    </x-jet-nav-link>
                 </div>
+
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
@@ -133,6 +142,14 @@
                                 ]) }}"
                 :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=live_tickets'">
                 {{ __('Живые билеты Весна') }}
+            </x-jet-responsive-nav-link>
+            <x-jet-responsive-nav-link
+                href="{{ route('adminTickets',[
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+                                'type' => 'list_tickets'
+                                ]) }}"
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=list_tickets'">
+                {{ __('Списки Весна') }}
             </x-jet-responsive-nav-link>
         </div>
 

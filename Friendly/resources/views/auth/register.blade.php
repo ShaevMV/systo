@@ -39,6 +39,10 @@
                 <x-jet-input id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" autocomplete="new-password" />
             </div>
 
+            <div class="mt-4">
+                <x-jet-label for="is_list" value="{{ __('Имеет права вводить списки') }}" />
+                <input id="is_list" class="block mt-1 w-full" type="checkbox" name="is_list" autocomplete="is_list" value="1" {{$user->is_list ? 'checked' : ''}}/>
+            </div>
             <div class="flex items-center justify-end mt-4">
                 <x-jet-button class="ml-4">
                     @if (!isset($user->id))

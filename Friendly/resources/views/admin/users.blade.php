@@ -8,10 +8,12 @@
                     <th>{{ __('Email') }}</th>
                     <th>{{ __('Имя') }}</th>
                     <th>{{ __('Проект') }}</th>
+                    <th>{{ __('Имеет права вводить списки') }}</th>
                     <th>{{ __('Сумма за френдли') }}</th>
                     <th>{{ __('Кол-во за френдли') }}</th>
                     <th>{{ __('Сумма за живые') }}</th>
                     <th>{{ __('Кол-во за живые') }}</th>
+                    <th>{{ __('Кол-во за списки') }}</th>
                     <th>{{ __('Действие') }}</th>
                 </tr>
                 </thead>
@@ -22,10 +24,12 @@
                         <td>{{$user['email']}}</td>
                         <td>{{$user['name']}}</td>
                         <td>{{$user['project']}}</td>
+                        <td>{{($user['is_list'] || $user['is_admin'])? 'да' : 'нет'}}</td>
                         <td>{{$user['sum_price_friendly'] ?? 0}}</td>
                         <td>{{$user['count_tickets_friendly'] ?? 0}}</td>
                         <td>{{$user['sum_price_live'] ?? 0}}</td>
                         <td>{{$user['count_tickets_live'] ?? 0}}</td>
+                        <td>{{$user['count_tickets_list'] ?? 0}}</td>
                         <td>
                             <a href="{{ route('editUser',['id' => $user['id']]) }}">{{ __('Edit') }}</a>
                             <form method="POST" action="{{ route('delUser') }}">

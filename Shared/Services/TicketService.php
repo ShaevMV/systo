@@ -71,7 +71,6 @@ class TicketService
             'curator' => $ticket->curator,
             'name' => $ticket->fio,
             'comment' => $ticket->comment,
-            'type_member' => $ticket->type_member,
             'festival_id' => $ticket->festival_id,
             'date_order' => $ticket->created_at,
             'email' => $ticket->email,

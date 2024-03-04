@@ -13,7 +13,7 @@ use Laravel\Sanctum\HasApiTokens;
  * Class User
  *
  * @property bool $is_admin
- *
+ * @property bool $is_list
  * @package App\Models
  */
 class User extends Authenticatable
@@ -35,6 +35,7 @@ class User extends Authenticatable
         'password',
         'is_admin',
         'project',
+        'is_list'
     ];
 
     /**

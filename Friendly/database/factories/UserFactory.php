@@ -31,6 +31,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'project' => 'SystoTeam',
             'is_admin' => true,
+            'is_list' => true,
         ];
     }
 

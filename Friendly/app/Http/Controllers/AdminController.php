@@ -63,9 +63,24 @@ class AdminController extends Controller
             ->groupBy('users.id')
             ->get()
             ->toArray();
+
+        $usersList = User::leftJoin('list_tickets', function (JoinClause $join) use ($festival_id){
+            $join->on('list_tickets.user_id', '=', 'users.id')
+                ->where('list_tickets.festival_id', '=', $festival_id);
+        })->select(['users.*',
+            DB::raw('COUNT(list_tickets.id) AS count_tickets_list'),
+        ])
+            ->groupBy('users.id')
+            ->get()
+            ->toArray();
+
         $users = [];
         foreach ($usersFriendly as $value) {
             $users[$value['id']] = $value;
+        }
+
+        foreach ($usersList as $value) {
+            $users[$value['id']] = array_merge($users[$value['id']], $value);
         }
 
         foreach ($usersLive as $value) {
