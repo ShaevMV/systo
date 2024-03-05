@@ -18,7 +18,7 @@ class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface
     public function getList(): array
     {
         $result = [];
-        foreach ($this->model::all() as $item) {
+        foreach ($this->model::where('active','=',true)->get() as $item) {
             $result[] = TypesOfPaymentDto::fromState($item->toArray());
         }
 
