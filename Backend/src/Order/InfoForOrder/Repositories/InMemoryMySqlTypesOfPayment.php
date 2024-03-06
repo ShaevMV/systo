@@ -11,14 +11,24 @@ class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface
 {
     public function __construct(
         private TypesOfPaymentModel $model
-    ) {
+    )
+    {
     }
 
 
-    public function getList(): array
+    public function getList(bool $isAdmin = false): array
     {
         $result = [];
-        foreach ($this->model::where('active','=',true)->get() as $item) {
+        if (!$isAdmin) {
+            $typesOfPayments = $this->model::where('active', '=', true);
+        } else {
+            $typesOfPayments = $this->model;
+        }
+
+        $typesOfPayments = $typesOfPayments->orderBy('sort')
+            ->get();
+
+        foreach ($typesOfPayments as $item) {
             $result[] = TypesOfPaymentDto::fromState($item->toArray());
         }
 

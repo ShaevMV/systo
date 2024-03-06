@@ -25,13 +25,13 @@ final class GetInfoForOrder
         ]);
     }
 
-    public function getInfoForOrderingDto(Uuid $festivalId): InfoForOrderingDto
+    public function getInfoForOrderingDto(Uuid $festivalId, bool $isAdmin = false): InfoForOrderingDto
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */
         $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
 
         /** @var ListTypesOfPaymentDto $listTypesOfPaymentDto */
-        $listTypesOfPaymentDto = $this->queryBus->ask(new TypesOfPaymentQuery());
+        $listTypesOfPaymentDto = $this->queryBus->ask(new TypesOfPaymentQuery($isAdmin));
 
         return new InfoForOrderingDto(
             $listTicketTypeDto,

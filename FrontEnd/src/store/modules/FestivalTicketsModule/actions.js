@@ -27,7 +27,10 @@ export const getListPriceFor = (context, payload) => {
 
 export const getListTypesOfPayment = (context, payload) => {
     let promise = axios.get('/api/v1/festival/orderingTickets',
-        {params: {festival_id: payload.festival_id}});
+        {params: {
+            festival_id: payload.festival_id,
+            is_admin: true,
+        }});
     promise.then(function (response) {
         context.commit('setTypesOfPayment', response.data.typesOfPayment);
     })
