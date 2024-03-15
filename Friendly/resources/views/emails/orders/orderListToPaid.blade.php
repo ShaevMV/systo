@@ -38,9 +38,9 @@
                 </tr>
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Привет, дорогой друг. Бесплатные билеты с qr-кодом на каждого участника прикреплены к этому письму.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Привет, дорогой друг. Билеты с qr-кодом на каждого участника прикреплены к этому письму.</p>
                         <br/>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Данные билеты НЕ ПОДЛЕЖАТ ОБМЕНУ И ПРОДАЖИ.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Данные билеты не подлежат ПЕРЕПРОДАЖЕ.</p>
 
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Прежняя система с ID и фамилией работать не будет. Без QR-кода Вас не пропустят! До встречи, на фестивале!</p> <br/>

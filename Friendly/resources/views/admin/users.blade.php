@@ -1,6 +1,11 @@
 <x-app-layout>
     <div class="pt-4 bg-gray-100">
         <div class="min-h-screen flex flex-col items-center pt-6 sm:pt-0">
+            <div class="flex items-center justify-end mt-4">
+                <x-jet-responsive-nav-link href="{{ route('createUser') }}" class="ml-4">
+                    {{ __('Создать пользователя') }}
+                </x-jet-responsive-nav-link>
+            </div>
             <table class="table">
                 <thead>
                 <tr>
@@ -49,11 +54,7 @@
                 </tbody>
 
             </table>
-            <div class="flex items-center justify-end mt-4">
-                <x-jet-responsive-nav-link href="{{ route('createUser') }}" class="ml-4">
-                    {{ __('Создать пользователя') }}
-                </x-jet-responsive-nav-link>
-            </div>
+
         </div>
     </div>
 </x-app-layout>
