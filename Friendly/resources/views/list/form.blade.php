@@ -38,7 +38,7 @@
 
                     <div class="mt-4">
                         <x-jet-label for="email" value="{{ __('Телефон') }}"/>
-                        <x-jet-input id="email" class="block mt-1 w-full" type="tel" name="phone" :value="old('phone')" required/>
+                        <x-jet-input id="email" class="block mt-1 w-full" type="tel" name="phone" :value="old('phone')"/>
                     </div>
 
                     <div id="listFio">
