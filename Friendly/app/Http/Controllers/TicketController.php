@@ -143,7 +143,7 @@ class TicketController extends Controller
                 $model->comment = $request->post('comment') ?? '';
                 $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
                 $model->user_id = Auth::id();
-                $model->phone = $request->post('phone', '');
+                $model->phone = $request->post('phone') ?? '';
                 $model->saveOrFail();
 
                 $ids['S' . $model->id] = $value;
