@@ -47,3 +47,14 @@ Route::middleware(['admin', 'verified'])->post('/admin/user/create', [AdminContr
 Route::middleware(['admin', 'verified'])->get('/admin/tickets', [TicketController::class, 'tickets'])->name('adminTickets');
 Route::middleware(['admin', 'verified'])->post('/admin/tickets', [TicketController::class, 'delTicket'])->name('delTicket');
 Route::middleware(['admin', 'verified'])->get('/admin/tickets/{id}', [TicketController::class, 'getPdf'])->name('getPdf');
+
+Route::get('/clear', function() {
+    Artisan::call('config:cache');
+    Artisan::call('cache:clear');
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('route:clear');
+    exec('rm -f ' . storage_path('logs/.log'));
+    exec('rm -f ' . base_path('.log'));
+    return "Cache is cleared";
+})->name('clear.cache');
