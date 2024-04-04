@@ -7,25 +7,25 @@
 
         <form method="POST" action="{{ route('registerUser') }}">
             @csrf
-            <input name="id" type="hidden" value="{{$user ?? ''->id ?? ''}}">
+            <input name="id" type="hidden" value="{{$user->id ?? ''}}">
             <div>
                 <x-jet-label for="name" value="{{ __('Name') }}"/>
                 <x-jet-input id="name" class="block mt-1 w-full"
                              type="text"
                              name="name"
-                             value="{{$user ?? ''->name ?? ''}}" required
+                             value="{{$user->name ?? ''}}" required
                              autofocus autocomplete="name"/>
             </div>
 
             <div class="mt-4">
                 <x-jet-label for="email" value="{{ __('Email') }}"/>
-                <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" value="{{$user ?? ''->email ?? ''}}"
+                <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" value="{{$user->email ?? ''}}"
                              required/>
             </div>
 
             <div class="mt-4">
                 <x-jet-label for="project" value="{{ __('Проект') }}"/>
-                <x-jet-input id="project" class="block mt-1 w-full" type="text" name="project" value="{{$user ?? ''->project ?? ''}}"
+                <x-jet-input id="project" class="block mt-1 w-full" type="text" name="project" value="{{$user->project ?? ''}}"
                              required/>
             </div>
 
