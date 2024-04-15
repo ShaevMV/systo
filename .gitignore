@@ -2,6 +2,7 @@
 .idea/*
 .env
 /Backend/phpunit.xml.dist
+/List/*
 /Docker/mysqlFriendly/db/
 /Docker/mysqlFriendly/log/
 /Docker/mysql/db/
