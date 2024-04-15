@@ -24,11 +24,9 @@
                             <th>#</th>
                             <th>{{ __('Email') }}</th>
                             <th>{{ __('Имя') }}</th>
-                            <th>{{ __('Проект (или с кем договорился о френдли)') }}</th>
                             <th>{{ __('Телефон') }}</th>
                             <th>{{ __('ФИО покупателя') }}</th>
                             <th>{{ __('Стоимость') }}</th>
-                            <th>{{ __('Комментарий') }}</th>
                             <th>{{ __('Дата') }}</th>
                             <th>{{ __('Действие') }}</th>
                         </tr>
@@ -38,12 +36,9 @@
                             <tr>
                                 <td><a href="/admin/tickets/f{{$ticket->id}}" target="_blank" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">f{{$ticket->id}}</a></td>
                                 <td>{{$ticket->email}}</td>
-                                <td>{{$ticket->fio}}</td>
-                                <td>{{$ticket->seller}}</td>
                                 <td>{{$ticket->phone}}</td>
                                     <td>{{$ticket->fio_friendly}}</td>
                                     <td>{{$ticket->price}}</td>
-                                <td title="{{$ticket->comment}}">{{mb_substr($ticket->comment ?? '',0,10)}}</td>
                                 <td>{{$ticket->created_at}}</td>
 
                                 <td>
@@ -51,7 +46,7 @@
                                         @csrf
                                         <input type="hidden" name="id" value="{{$ticket->id}}">
                                         <input type="hidden" name="type" value="friendly_tickets">
-                                        <input type="url" name="type" value="/profile">
+                                        <input type="hidden" name="url" value="/profile">
                                         <x-jet-responsive-nav-link href="{{ route('delTicket') }}"
                                                                    onclick="event.preventDefault();
                                     this.closest('form').submit();">
@@ -73,12 +68,9 @@
                             <tr>
                                 <th>#</th>
                                 <th>{{ __('Email') }}</th>
-                                <th>{{ __('Имя') }}</th>
-                                <th>{{ __('Продавец') }}</th>
                                 <th>{{ __('Телефон') }}</th>
                                 <th>{{ __('ФИО покупателя') }}</th>
                                 <th>{{ __('Стоимость') }}</th>
-                                <th>{{ __('Комментарий') }}</th>
                                 <th>{{ __('Дата') }}</th>
                                 <th>{{ __('Действие') }}</th>
                             </tr>
@@ -88,12 +80,10 @@
                                 <tr>
                                     <td>{{\Shared\Services\TicketService::getZeroForKilter($ticket->kilter)}}</td>
                                     <td>{{$ticket->email}}</td>
-                                    <td>{{$ticket->fio}}</td>
                                     <td>{{$ticket->seller}}</td>
                                     <td>{{$ticket->phone}}</td>
                                     <td>{{$ticket->fio_friendly}}</td>
                                     <td>{{$ticket->price}}</td>
-                                    <td title="{{$ticket->comment}}">{{mb_substr($ticket->comment ?? '',0,10)}}</td>
                                     <td>{{$ticket->created_at}}</td>
 
                                     <td>
@@ -101,7 +91,7 @@
                                             @csrf
                                             <input type="hidden" name="id" value="{{$ticket->id}}">
                                             <input type="hidden" name="type" value="live_tickets">
-                                            <input type="url" name="type" value="/profile">
+                                            <input type="hidden" name="hidden" value="/profile">
                                             <x-jet-responsive-nav-link href="{{ route('delTicket') }}"
                                                                        onclick="event.preventDefault();
                                     this.closest('form').submit();">
@@ -124,10 +114,8 @@
                                 <th>#</th>
                                 <th>{{ __('Email') }}</th>
                                 <th>{{ __('Имя') }}</th>
-                                <th>{{ __('Куратор') }}</th>
                                 <th>{{ __('Проект') }}</th>
                                 <th>{{ __('Телефон') }}</th>
-                                <th>{{ __('Комментарий') }}</th>
                                 <th>{{ __('Дата') }}</th>
                                 <th>{{ __('Действие') }}</th>
                             </tr>
@@ -138,10 +126,8 @@
                                     <td><a href="/admin/tickets/s{{$ticket->id}}" target="_blank" class="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium leading-5 text-gray-500 hover:text-gray-700 hover:border-gray-300 focus:outline-none focus:text-gray-700 focus:border-gray-300 transition duration-150 ease-in-out">s{{$ticket->id}}</a></td>
                                     <td>{{$ticket->email}}</td>
                                     <td>{{$ticket->fio}}</td>
-                                    <td>{{$ticket->seller ?? $ticket->curator}}</td>
                                     <td>{{$ticket->project}}</td>
                                     <td>{{$ticket->phone}}</td>
-                                    <td title="{{$ticket->comment}}">{{mb_substr($ticket->comment ?? '',0,10)}}</td>
                                     <td>{{$ticket->created_at}}</td>
 
                                     <td>
@@ -149,7 +135,7 @@
                                             @csrf
                                             <input type="hidden" name="id" value="{{$ticket->id}}">
                                             <input type="hidden" name="type" value="list_tickets">
-                                            <input type="url" name="type" value="/profile">
+                                            <input type="hidden" name="url" value="/profile">
                                             <x-jet-responsive-nav-link href="{{ route('delTicket') }}"
                                                                        onclick="event.preventDefault();
                                     this.closest('form').submit();">
