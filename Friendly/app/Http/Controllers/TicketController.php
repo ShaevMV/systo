@@ -28,6 +28,7 @@ class TicketController extends Controller
 {
     private TicketService $ticketService;
     private CreatingQrCodeService $creatingQrCodeService;
+    private string $festivalId;
 
     public function __construct(
         TicketService         $ticketService,
@@ -37,6 +38,7 @@ class TicketController extends Controller
         $this->middleware('auth');
         $this->ticketService = $ticketService;
         $this->creatingQrCodeService = $creatingQrCodeService;
+        $this->festivalId = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
     }
 
     public function view(Request $request)
@@ -117,7 +119,7 @@ class TicketController extends Controller
                 $model->project = $request->post('project');
                 $model->curator = $request->post('curator');
                 $model->comment = $request->post('comment') ?? '';
-                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = $this->festivalId;
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
                 $this->ticketService->pushAutoList($model);
@@ -141,7 +143,7 @@ class TicketController extends Controller
                 $model->curator = $request->post('curator');
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
-                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = $this->festivalId;
                 $model->user_id = Auth::id();
                 $model->phone = $request->post('phone') ?? '';
                 $model->saveOrFail();
@@ -201,7 +203,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = $this->festivalId;
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
@@ -250,7 +252,7 @@ class TicketController extends Controller
                 $model->email = $request->post('email');
                 $model->comment = $request->post('comment') ?? '';
                 $model->price = $price;
-                $model->festival_id = env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
+                $model->festival_id = $this->festivalId;
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->kilter = (int)$value;
@@ -297,6 +299,33 @@ class TicketController extends Controller
         ]);
     }
 
+    public function profile(Request $request): View
+    {
+        $el =  FriendlyTicket::where([
+                'festival_id' => $this->festivalId,
+                'user_id' => Auth::id()
+
+        ])->get();
+
+        $live =  LiveTicket::where([
+            'festival_id' => $this->festivalId,
+            'user_id' => Auth::id()
+        ])->get();
+
+        $list =  ListTicket::where([
+            'festival_id' => $this->festivalId,
+            'user_id' => Auth::id()
+        ])->get();
+
+        return view('tickets.profile', [
+            'ticketsEl' => $el,
+            'ticketsLive' => $live,
+            'ticketsList' => $list
+        ]);
+    }
+
+
+
     public function delTicket(Request $request): RedirectResponse
     {
         $id = $request->post('id');
@@ -314,8 +343,12 @@ class TicketController extends Controller
                 break;
         }
 
+        if($request->post('url', null)) {
+            return redirect($request->post('url'));
+        }
+
         return redirect()->route('adminTickets',[
-            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+            'festival_id' => $this->festivalId,
             'type' => $request->get('type'),
         ]);
     }
