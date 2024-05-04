@@ -304,7 +304,6 @@ class TicketController extends Controller
         $el =  FriendlyTicket::where([
                 'festival_id' => $this->festivalId,
                 'user_id' => Auth::id()
-
         ])->get();
 
         $live =  LiveTicket::where([
