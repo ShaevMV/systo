@@ -160,3 +160,175 @@ body{
     font-family: 'istok';
     font-weight: bold;
 }
+
+.full-btnx{
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold !important;
+    background-color: #f7a000;
+}
+
+#red-form label{
+    display: inline-block;
+}
+
+.red-span{
+    color: red;
+}
+
+
+.w-full{
+    max-width: 70rem !important;
+}
+
+.x-warn{
+    font-weight: 500 !important;
+    font-size: 16px;
+}
+
+@media(max-width: 805px){
+    .prose thead th{
+        font-size: 13px;
+    }
+
+    .prose h1{
+        font-size: 27px;
+        margin-top: 18px;
+        margin-bottom: 10px;
+    }
+
+    .prose table{
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+
+
+    .prose tbody td, .prose tbody td a.text-sm{
+        line-height: 1.2;
+        font-size: 12px;
+    }
+
+    .prose thead th, .prose tbody td{
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+}
+
+@media(max-width: 705px){
+    .prose thead th{
+        font-size: 12px;
+    }
+
+    .prose table {
+        margin-top: 17px;
+        margin-bottom: 23px;
+    }
+
+    .prose h1 {
+        font-size: 23px;
+        margin-top: 14px;
+        margin-bottom: 7px;
+    }
+
+    .prose tbody td{
+        font-size: 11px;
+        word-break: break-all;
+    }
+}
+
+
+@media(max-width: 605px){
+    .prose thead th{
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .prose h1 {
+        font-size: 22px;
+        margin-top: 3px;
+        margin-bottom: 6px;
+    }
+
+    .prose tbody td, .prose tbody td a.text-sm{
+        font-size: 10px;
+    }
+
+
+    .prose tbody td a.block{
+        padding-left: 5px;
+        padding-right: 5px;
+        border-left: none;
+    }
+
+    .prose thead th:last-of-type{
+        font-size: 0;
+    }
+
+    .prose tbody td a.block {
+        padding-left: 3px;
+        padding-right: 5px;
+        border-left: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-size: 14px;
+    }
+}
+
+@media(max-width: 455px){
+    .prose tbody td, .prose tbody td a.text-sm {
+        font-size: 9px;
+    }
+
+    .prose tbody td a.text-sm{
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .prose tbody td{
+        padding-left: 1px;
+        padding-right: 0;
+    }
+
+    .p-6{
+        padding: 0.5rem;
+    }
+
+    .prose table {
+        margin-top: 9px;
+    }
+
+    .prose h1 {
+        font-size: 20px;
+        margin-top: 1px;
+        margin-bottom: 3px;
+    }
+
+    .prose .x-warn{
+        font-size: 14px;
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+
+    .prose thead th {
+        font-size: 10px;
+    }
+
+    .prose tbody td a.block {
+        padding-left: 2px;
+        padding-right: 4px;
+        border-left: none;
+        padding-top: 2px;
+        padding-bottom: 3px;
+        font-size: 13px;
+    }
+}
+
+
+@media(max-width: 405px){
+    .prose h1 {
+        font-size: 18px;
+        margin-top: 0px;
+        margin-bottom: 2px;
+    }
+}

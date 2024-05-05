@@ -22,6 +22,7 @@
                     <a href="#" class="btnx active">ЭЛЕКТРОННЫЙ</a>
                     <a href="{{ route('viewLiveTickets') }}" class="btnx">ЖИВОЙ БИЛЕТ</a>
                 </div>
+                    <a href="/profile" class="btnx full-btnx" target="_blank">Все мои билеты</a>
                 <form method="POST" action="{{ route('addTickets') }}" id="main-former">
                     @csrf
                     <h2>Форма продажи электронного Френдли-билета</h2>
@@ -36,8 +37,8 @@
                         <x-jet-input id="name" readonly class="block mt-1 w-full" type="text" name="fio_seller"
                                      value="{{$user->project }}" required autofocus autocomplete="fio_seller"/>
                     </div>
-                    <div class="mt-4">
-                        <x-jet-label for="email" value="{{ __('Email покупателя') }}"/>
+                    <div class="mt-4" id="red-form">
+                        <x-jet-label for="email" value="{{ __('Email покупателя') }}"/><span class="red-span">(Внимание! Не используйте почту @icloud.com)</span>
                         <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email"
                                      :value="old('email')" required/>
                     </div>

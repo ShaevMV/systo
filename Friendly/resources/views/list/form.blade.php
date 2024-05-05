@@ -31,8 +31,8 @@
                         <x-jet-label for="project" value="{{ __('Проект') }}"/>
                         <x-jet-input id="project" name="project" class="block mt-1 w-full" type="text" :value="old('project')" required/>
                     </div>
-                    <div class="mt-4">
-                        <x-jet-label for="email" value="{{ __('Email куда придут билеты') }}"/>
+                    <div class="mt-4" id="red-form">
+                        <x-jet-label for="email" value="{{ __('Email куда придут билеты') }}"/><span class="red-span">(Внимание! Не используйте почту @icloud.com)</span>
                         <x-jet-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required/>
                     </div>
 

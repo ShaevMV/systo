@@ -13,9 +13,9 @@
 
             <div class="w-full sm:max-w-2xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose">
                 <div class="buttonz">
-                    <a href="#" class="btnx active">ЭЛЕКТРОННЫЙ</a>
-                    <a href="{{ route('viewLiveTickets') }}" class="btnx">ЖИВОЙ БИЛЕТ</a>
+                    <a href="/" class="btnx full-btnx">Назад</a>
                 </div>
+                <h4 class="x-warn">Чтобы скачать билет нажмите на его ID в первом столбце таблицы. Чтобы удалить билет нажмите Х (крестик) в последнем столбце таблицы</h4>
                     <div>
                         <h1> Электронные </h1>
                         <table class="table">
@@ -59,14 +59,15 @@
                     </table>
                     </div>
                     <div>
-                        <h1> Живые </h1>
+                        <h1>Живые</h1>
                         <table class="table">
                             <thead>
                             <tr>
                                 <th>#</th>
                                 <th>{{ __('Email') }}</th>
-                                <th>{{ __('Телефон') }}</th>
                                 <th>{{ __('ФИО покупателя') }}</th>
+                                <th>{{ __('Телефон') }}</th>
+                                <th>{{ __('Комментарий') }}</th>
                                 <th>{{ __('Стоимость') }}</th>
                                 <th>{{ __('Дата') }}</th>
                                 <th>{{ __('Действие') }}</th>
