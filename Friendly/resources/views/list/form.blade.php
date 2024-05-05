@@ -21,6 +21,14 @@
                         <hr>
                     </div>
                 @endif
+                <div class="buttonz">
+                    <a href="{{ route('viewAddTickets') }}" class="btnx">ЭЛЕКТРОННЫЙ</a>
+                    <a href="{{ route('viewLiveTickets') }}" class="btnx">ЖИВОЙ БИЛЕТ</a>
+                    @if (Auth::user()?->is_list || Auth::user()?->is_admin)
+                        <a href="#" class="btnx active">СПИСОК</a>
+                    @endif
+                </div>
+                <a href="/profile" class="btnx full-btnx" target="_blank">Все мои билеты</a>
                 <form method="POST" action="{{ route('addListTicket') }}">
                     @csrf
                     <div>

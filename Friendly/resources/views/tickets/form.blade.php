@@ -21,6 +21,9 @@
                 <div class="buttonz">
                     <a href="#" class="btnx active">ЭЛЕКТРОННЫЙ</a>
                     <a href="{{ route('viewLiveTickets') }}" class="btnx">ЖИВОЙ БИЛЕТ</a>
+                    @if (Auth::user()?->is_list || Auth::user()?->is_admin)
+                        <a href="{{ route('viewListTickets') }}" class="btnx">СПИСОК</a>
+                    @endif
                 </div>
                     <a href="/profile" class="btnx full-btnx" target="_blank">Все мои билеты</a>
                 <form method="POST" action="{{ route('addTickets') }}" id="main-former">

@@ -14,6 +14,9 @@
             <div class="w-full sm:max-w-2xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose">
                 <div class="buttonz">
                     <a href="/" class="btnx full-btnx">Назад</a>
+                    @if (Auth::user()?->is_list || Auth::user()?->is_admin)
+                        <a href="{{ route('viewListTickets') }}" class="btnx">СПИСОК</a>
+                    @endif
                 </div>
                 <h4 class="x-warn">Чтобы скачать билет нажмите на его ID в первом столбце таблицы. Чтобы удалить билет нажмите Х (крестик) в последнем столбце таблицы</h4>
                     <div>
