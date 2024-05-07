@@ -10,10 +10,12 @@ use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\LiveTicket;
 use App\Models\User;
+use App\Services\CsvFileService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use Redirect;
 use Shared\Services\CreatingQrCodeService;
 use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
@@ -21,6 +23,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\Translation\Loader\CsvFileLoader;
 use Throwable;
 use Illuminate\Support\Facades\Bus;
 
@@ -31,8 +34,9 @@ class TicketController extends Controller
     private string $festivalId;
 
     public function __construct(
-        TicketService         $ticketService,
-        CreatingQrCodeService $creatingQrCodeService
+        TicketService          $ticketService,
+        CreatingQrCodeService  $creatingQrCodeService,
+        private CsvFileService $csvFileService,
     )
     {
         $this->middleware('auth');
@@ -46,7 +50,7 @@ class TicketController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if ($user->is_list && !$user->is_admin) {
-            return \Redirect::route('viewListTickets');
+            return Redirect::route('viewListTickets');
         }
 
         return view('tickets/form', [
@@ -71,7 +75,7 @@ class TicketController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if ($user->is_list && !$user->is_admin) {
-            return \Redirect::route('viewListTickets');
+            return Redirect::route('viewListTickets');
         }
 
         return view('live/form', [
@@ -89,7 +93,7 @@ class TicketController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if (!$user->is_list && !$user->is_admin) {
-            return \Redirect::route('view');
+            return Redirect::route('view');
         }
 
         return view('list/form', [
@@ -169,7 +173,7 @@ class TicketController extends Controller
             $success = 0;
         }
 
-        return \Redirect::route('viewListTickets', [
+        return Redirect::route('viewListTickets', [
             'success' => $success,
         ]);
     }
@@ -225,7 +229,7 @@ class TicketController extends Controller
             $success = false;
         }
 
-        return \Redirect::route('viewAddTickets', ['success' => $success]);
+        return Redirect::route('viewAddTickets', ['success' => $success]);
     }
 
     public function addLiveTicket(Request $request)
@@ -271,7 +275,7 @@ class TicketController extends Controller
             $success = 0;
         }
 
-        return \Redirect::route('viewLiveTickets', [
+        return Redirect::route('viewLiveTickets', [
             'success' => $success,
             'value' => $errorValue,
         ]);
@@ -301,17 +305,17 @@ class TicketController extends Controller
 
     public function profile(Request $request): View
     {
-        $el =  FriendlyTicket::where([
-                'festival_id' => $this->festivalId,
-                'user_id' => Auth::id()
-        ])->get();
-
-        $live =  LiveTicket::where([
+        $el = FriendlyTicket::where([
             'festival_id' => $this->festivalId,
             'user_id' => Auth::id()
         ])->get();
 
-        $list =  ListTicket::where([
+        $live = LiveTicket::where([
+            'festival_id' => $this->festivalId,
+            'user_id' => Auth::id()
+        ])->get();
+
+        $list = ListTicket::where([
             'festival_id' => $this->festivalId,
             'user_id' => Auth::id()
         ])->get();
@@ -322,7 +326,6 @@ class TicketController extends Controller
             'ticketsList' => $list
         ]);
     }
-
 
 
     public function delTicket(Request $request): RedirectResponse
@@ -342,11 +345,11 @@ class TicketController extends Controller
                 break;
         }
 
-        if($request->post('url', null)) {
+        if ($request->post('url', null)) {
             return redirect($request->post('url'));
         }
 
-        return redirect()->route('adminTickets',[
+        return redirect()->route('adminTickets', [
             'festival_id' => $this->festivalId,
             'type' => $request->get('type'),
         ]);
@@ -369,5 +372,19 @@ class TicketController extends Controller
 
 
         return $pdf->download('Билет для ' . $fio . '.pdf');
+    }
+
+
+    /**
+     * @throws Throwable
+     */
+    public function addListTicketInFile(Request $request)
+    {
+        $file = $request->file('listFile');
+        $success = (int)$this->csvFileService->insertListInFile($file, $this->festivalId, \Auth::id());
+
+        return Redirect::route('viewListTickets', [
+            'success' => $success,
+        ]);
     }
 }

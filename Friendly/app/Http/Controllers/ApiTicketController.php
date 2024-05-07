@@ -39,6 +39,5 @@ class ApiTicketController extends Controller
             'success' => $this->ticketService->create($createApiTicketDTO),
             'error' => null,
         ]);
-
     }
 }

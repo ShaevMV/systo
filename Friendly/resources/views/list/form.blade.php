@@ -72,6 +72,17 @@
                     </div>
 
                 </form>
+                @if (Auth::user()?->is_admin)
+                    <form method="POST" action="{{ route('addListTicketInFile') }}" enctype="multipart/form-data">
+                        @csrf
+                        <input type="file" name="listFile" accept=".csv" />
+                        <div class="flex items-center justify-end mt-4">
+                            <x-jet-button class="ml-4">
+                                {{ __('Отправить') }}
+                            </x-jet-button>
+                        </div>
+                    </form>
+                @endif
             </div>
         </div>
     </div>

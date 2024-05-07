@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->post('/live', [TicketController::class,
 
 Route::middleware(['auth', 'verified'])->get('/list', [TicketController::class, 'viewList'])->name('viewListTickets');
 Route::middleware(['auth', 'verified'])->post('/list', [TicketController::class, 'addListTicket'])->name('addListTicket');
+Route::middleware(['auth', 'verified'])->post('/listFile', [TicketController::class, 'addListTicketInFile'])->name('addListTicketInFile');
 Route::middleware(['auth', 'verified'])->get('/profile', [TicketController::class, 'profile'])->name('profile');
 
 
