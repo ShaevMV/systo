@@ -68,6 +68,11 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTypesOfPayment()?->value(),
             ],
             [
+                'field' => User::TABLE . '.city',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getCity(),
+            ],
+            [
                 'field' => OrderTicketModel::TABLE . '.promo_code',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getPromoCode(),

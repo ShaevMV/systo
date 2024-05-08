@@ -19,6 +19,7 @@ class OrderFilterQuery implements Query
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
         private bool $isManager = false,
+        private ?string $city = null,
     ) {
     }
 
@@ -58,7 +59,8 @@ class OrderFilterQuery implements Query
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
             (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
-            $isManager
+            $isManager,
+            $data['city'] ?? null,
         );
     }
 
@@ -85,5 +87,10 @@ class OrderFilterQuery implements Query
     public function isManager(): bool
     {
         return $this->isManager;
+    }
+
+    public function getCity(): ?string
+    {
+        return null !== $this->city ? '%'.$this->city.'%' : null;
     }
 }

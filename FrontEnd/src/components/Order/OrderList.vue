@@ -24,6 +24,7 @@
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
               <th scope="col" class="mobile">Статус</th>
+              <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
             </tr>
@@ -66,8 +67,10 @@
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
                 {{ itemOrder.humanStatus }}
               </td>
+              <td v-if="isAdmin">
+                {{ itemOrder.city }}
+              </td>
               <td v-if="isAdmin" :title="itemOrder.lastComment">
-
                 {{ cuttedText(itemOrder.lastComment) }}
               </td>
               <td v-if="isAdmin" class="mobile" style="text-align: left;">

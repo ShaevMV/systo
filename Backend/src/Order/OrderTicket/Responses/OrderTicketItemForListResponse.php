@@ -35,6 +35,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
      * @param string|null $lastComment
      * @param string|null $promoCode
      * @param int $discount
+     * @param string|null $city
      */
     public function __construct(
         protected Uuid    $id,
@@ -51,7 +52,8 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected float   $priceWithoutDiscount,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
-        protected int     $discount = 0
+        protected int     $discount = 0,
+        protected ?string $city = null,
     )
     {
         $this->count = count($guests);
@@ -84,7 +86,8 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             (int)$data['price'],
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
-            (int)$data['discount']
+            (int)$data['discount'],
+            $data['city']
         );
     }
 

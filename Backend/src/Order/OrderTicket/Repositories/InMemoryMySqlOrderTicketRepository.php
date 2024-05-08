@@ -31,7 +31,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 {
     public function __construct(
         private OrderTicketModel $model,
-    ) {
+    )
+    {
     }
 
     /**
@@ -45,8 +46,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             $this->model->insert(
                 array_merge($data,
                     [
-                        'created_at' => (string) (new Carbon()),
-                        'updated_at' => (string) (new Carbon()),
+                        'created_at' => (string)(new Carbon()),
+                        'updated_at' => (string)(new Carbon()),
                     ]
                 ));
             DB::commit();
@@ -58,7 +59,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
-     * @param  Uuid  $userId
+     * @param Uuid $userId
      *
      * @return OrderTicketItemForListResponse[]
      * @throws JsonException
@@ -66,25 +67,26 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     public function getUserList(Uuid $userId): array
     {
         $rawData = $this->model::whereUserId($userId->value())
-            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
                 '=',
-                TicketTypesModel::TABLE.'.id')
-            ->leftJoin(User::TABLE, $this->model::TABLE.'.user_id',
+                TicketTypesModel::TABLE . '.id')
+            ->leftJoin(User::TABLE, $this->model::TABLE . '.user_id',
                 '=',
-                User::TABLE.'.id'
+                User::TABLE . '.id'
             )
-            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
+            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE . '.types_of_payment_id',
                 '=',
-                TypesOfPaymentModel::TABLE.'.id'
+                TypesOfPaymentModel::TABLE . '.id'
             )
             ->select([
-                $this->model::TABLE.'.*',
-                User::TABLE.'.email',
-                TicketTypesModel::TABLE.'.name',
-                TypesOfPaymentModel::TABLE.'.name as payment_name',
+                $this->model::TABLE . '.*',
+                User::TABLE . '.email',
+                User::TABLE . '.city',
+                TicketTypesModel::TABLE . '.name',
+                TypesOfPaymentModel::TABLE . '.name as payment_name',
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
-            ->orderBy($this->model::TABLE.'.kilter')
+            ->orderBy($this->model::TABLE . '.kilter')
             ->get()
             ->toArray();
 
@@ -104,7 +106,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     private function getSubQueryLastComment(): Builder
     {
         return CommentOrderTicketModel::select('comment')
-            ->whereColumn('order_tickets_id', $this->model::TABLE.'.id')
+            ->whereColumn('order_tickets_id', $this->model::TABLE . '.id')
             ->latest()
             ->limit(1)
             ->getQuery();
@@ -141,29 +143,30 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     public function getList(Filters $filters): array
     {
         $builder = $this->model::leftJoin(
-            User::TABLE, $this->model::TABLE.'.user_id',
+            User::TABLE, $this->model::TABLE . '.user_id',
             '=',
-            User::TABLE.'.id')
-            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE.'.ticket_type_id',
+            User::TABLE . '.id')
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
                 '=',
-                TicketTypesModel::TABLE.'.id')
-            ->leftJoin(TicketTypeFestivalModel::TABLE, TicketTypesModel::TABLE.'.id',
+                TicketTypesModel::TABLE . '.id')
+            ->leftJoin(TicketTypeFestivalModel::TABLE, TicketTypesModel::TABLE . '.id',
                 '=',
-                TicketTypeFestivalModel::TABLE.'.ticket_type_id')
-            ->leftJoin(FestivalModel::TABLE, TicketTypeFestivalModel::TABLE.'.festival_id',
+                TicketTypeFestivalModel::TABLE . '.ticket_type_id')
+            ->leftJoin(FestivalModel::TABLE, TicketTypeFestivalModel::TABLE . '.festival_id',
                 '=',
-                FestivalModel::TABLE.'.id')
-            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE.'.types_of_payment_id',
+                FestivalModel::TABLE . '.id')
+            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE . '.types_of_payment_id',
                 '=',
-                TypesOfPaymentModel::TABLE.'.id')
+                TypesOfPaymentModel::TABLE . '.id')
             ->select([
-                $this->model::TABLE.'.*',
-                User::TABLE.'.email',
-                TicketTypesModel::TABLE.'.name',
-                TypesOfPaymentModel::TABLE.'.name as payment_name'
+                $this->model::TABLE . '.*',
+                User::TABLE . '.email',
+                User::TABLE . '.city',
+                TicketTypesModel::TABLE . '.name',
+                TypesOfPaymentModel::TABLE . '.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
-            ->orderBy($this->model::TABLE.'.kilter', 'DESC');
+            ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
         /** @var Filter $filter */
         foreach ($filters as $filter) {
@@ -201,7 +204,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         DB::beginTransaction();
         $arrGuests = [];
         foreach ($guests as $guest) {
-            $arrGuests[]=[
+            $arrGuests[] = [
                 'value' => $guest->getValue(),
                 'id' => $guest->getId()->value(),
             ];
@@ -209,7 +212,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         try {
             $order = $this->model::find($orderId->value());
-            $order->status = (string) $newStatus;
+            $order->status = (string)$newStatus;
             $order->guests = $arrGuests;
             $order->save();
             DB::commit();

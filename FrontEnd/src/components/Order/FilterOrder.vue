@@ -64,6 +64,13 @@
                      class="form-control"
                      id="validationDefault03">
             </div>
+            <div class="col-md-4">
+              <label for="validationDefault04" class="form-label">Город</label>
+              <input type="text"
+                     v-model="city"
+                     class="form-control"
+                     id="validationDefault04">
+            </div>
           </div>
 
           <div class="row b-row mt-2">
@@ -98,6 +105,7 @@ export default {
       status: '',
       promoCode: null,
       typesOfPayment: null,
+      city: null,
     }
   },
   computed: {
@@ -141,6 +149,7 @@ export default {
         'promoCode': self.promoCode,
         'typesOfPayment': self.typesOfPayment,
         'festivalId': festivalId,
+        'city': self.city,
       });
     },
     clearFilter: function () {
@@ -151,6 +160,7 @@ export default {
       this.promoCode = null;
       this.typesOfPayment = null;
       this.typeOrder = null;
+      this.city = null;
       let festivalId = this.$route.params.id
       this.getOrderListForAdmin({
         'festivalId': festivalId,
