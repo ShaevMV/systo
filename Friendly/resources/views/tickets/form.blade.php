@@ -14,7 +14,7 @@
             <div class="w-full sm:max-w-2xl mt-6 p-6 bg-white shadow-md overflow-hidden sm:rounded-lg prose">
                 @if (null !== $success)
                     <div class="alert alert-success" role="alert">
-                        <p>{{ $success }}</p>
+                        <h1>{{ $success }}</h1>
                         <hr>
                     </div>
                 @endif
