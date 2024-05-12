@@ -132,9 +132,9 @@ class TicketController extends Controller
             $ids = [];
             $nameList = explode("\r\n", $request->post("list"));
             Log::info(implode(',', $nameList));
-            if (count($nameList) === 0) {
+            /*if (count($nameList) === 0) {
                 throw new \Exception('Не указан состав');
-            }
+            }*/
 
             foreach ($nameList as $valueOld) {
                 $value = trim($valueOld);
