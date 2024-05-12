@@ -164,9 +164,9 @@ class TicketController extends Controller
                     ),
                 ])->dispatch();
 
-                $success = 1;
-            }
 
+            }
+            $success = 1;
             DB::commit();
         } catch (Throwable $e) {
             DB::rollback();
