@@ -25,7 +25,7 @@ class OrderShipped extends Mailable
     public function __construct(array $ids, string $email)
     {
         $this->ids = $ids;
-        $this->email = $email;
+        $this->email = trim($email);
         $this->subject('Билеты на Solar Systo Togathering ' . date('Y'));
     }
 

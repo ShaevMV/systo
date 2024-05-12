@@ -26,7 +26,7 @@ class OrderShippedList extends Mailable
     public function __construct(array $ids, string $email, string $project)
     {
         $this->ids = $ids;
-        $this->email = $email;
+        $this->email = trim($email);
         $this->project = $project;
         $this->subject('Ваше участие в Solar Systo Togathering '.date('Y').' подтверждено ');
     }
