@@ -23,7 +23,6 @@ class SearchEngine
 
     public function __construct(
         private DefineService     $defineService,
-
         ElTicketsQueryHandler      $elSearchQueryHandler,
         SpisokTicketQueryHandler   $spisokTicketQueryHandler,
         FriendlyTicketQueryHandler $friendlyTicketQueryHandler,

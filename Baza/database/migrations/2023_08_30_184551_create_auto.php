@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('project');
             $table->string('auto');
             $table->text('comment')->nullable();
-            $table->uuid('festival_id')->default('9d679bcf-b438-4ddb-ac04-023fa9bff4b3');
+            $table->uuid('festival_id')->default('9d679bcf-b438-4ddb-ac04-023fa9bff4b4');
             $table->integer('change_id')->nullable();
             $table->dateTime('date_change')->nullable();
             $table->timestamps();
