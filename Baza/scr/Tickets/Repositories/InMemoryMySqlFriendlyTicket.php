@@ -8,11 +8,12 @@ use App\Models\FriendlyTicketModel;
 use Baza\Tickets\Responses\FriendlyTicketResponse;
 use Carbon\Carbon;
 use DB;
-use Shared\Constant\FestivalConstant;
 use Throwable;
 
 class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 {
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+
 
     public function __construct(
         private FriendlyTicketModel $friendlyTicketModel
@@ -24,7 +25,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
     public function search(int $kilter): ?FriendlyTicketResponse
     {
         $data = $this->friendlyTicketModel::whereKilter($kilter)
-            ->whereFestivalId(FestivalConstant::UUID_FESTIVAL)
+            ->whereFestivalId(self::UUID_FESTIVAL)
             ->first()?->toArray();
 
         if (is_null($data)) {
@@ -40,7 +41,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
     public function skip(int $id, int $userId): bool
     {
         $rawData = $this->friendlyTicketModel::whereKilter($id)
-            ->whereFestivalId(FestivalConstant::UUID_FESTIVAL)
+            ->whereFestivalId(self::UUID_FESTIVAL)
             ->first();
 
         DB::beginTransaction();
@@ -59,7 +60,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->friendlyTicketModel::whereFestivalId(FestivalConstant::UUID_FESTIVAL)
+        $resultRawList = $this->friendlyTicketModel::whereFestivalId(self::UUID_FESTIVAL)
                 ->where(function($query) use ($q) {
                     return $query->whereKilter((int)$q)
                         ->orWhere('project', 'like', '%' . $q . '%')
