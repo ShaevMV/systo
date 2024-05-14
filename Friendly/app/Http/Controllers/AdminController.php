@@ -134,7 +134,7 @@ class AdminController extends Controller
 
     public function getAuto(): View|Factory|Application
     {
-        return view('admin.index',[
+        return view('admin.auto',[
             'tickets' => Auto::all()
         ]);
     }
