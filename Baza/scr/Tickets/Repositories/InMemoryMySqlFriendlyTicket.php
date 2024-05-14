@@ -39,7 +39,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
     public function skip(int $id, int $userId): bool
     {
         $rawData = $this->friendlyTicketModel::whereKilter($id)
-            ->whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
+            ->whereFestivalId(env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
             ->first();
 
         DB::beginTransaction();
@@ -58,7 +58,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->friendlyTicketModel::whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
+        $resultRawList = $this->friendlyTicketModel::whereFestivalId(env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
                 ->where(function($query) use ($q) {
                     return $query->whereKilter((int)$q)
                         ->orWhere('project', 'like', '%' . $q . '%')
