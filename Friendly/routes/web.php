@@ -45,6 +45,8 @@ Route::middleware(['admin', 'verified'])->post('/admin/user', [AdminController::
 Route::middleware(['admin', 'verified'])->get('/admin/user_create', [AdminController::class, 'createUser'])->name('createUser');
 Route::middleware(['admin', 'verified'])->post('/admin/user/create', [AdminController::class, 'registerUser'])->name('registerUser');
 
+Route::middleware(['admin', 'verified'])->get('/admin/auto', [AdminController::class, 'getAuto'])->name('getAuto');
+Route::middleware(['admin', 'verified'])->post('/admin/auto', [AdminController::class, 'delAuto'])->name('delAuto');
 
 Route::middleware(['admin', 'verified'])->get('/admin/tickets', [TicketController::class, 'tickets'])->name('adminTickets');
 Route::middleware(['verified'])->post('/admin/tickets', [TicketController::class, 'delTicket'])->name('delTicket');

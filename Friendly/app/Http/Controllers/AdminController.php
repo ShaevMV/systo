@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Models\Auto;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -129,5 +130,21 @@ class AdminController extends Controller
         User::destroy($id);
 
         return redirect()->route('adminUser',[env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4')]);
+    }
+
+    public function getAuto(): View|Factory|Application
+    {
+        return view('admin.index',[
+            'tickets' => Auto::all()
+        ]);
+    }
+
+    public function delAuto(Request $request)
+    {
+        $id = $request->post('id');
+
+        Auto::destroy($id);
+
+        return redirect()->route('getAuto');
     }
 }

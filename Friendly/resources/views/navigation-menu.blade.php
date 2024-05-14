@@ -41,6 +41,11 @@
                         :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b4&type=list_tickets'">
                         {{ __('Списки Весна') }}
                     </x-jet-nav-link>
+                    <x-jet-nav-link
+                        href="{{ route('getAuto') }}"
+                        :active="request()->path() == 'admin/auto'">
+                        {{ __('Автомобили') }}
+                    </x-jet-nav-link>
                 </div>
 
             </div>
