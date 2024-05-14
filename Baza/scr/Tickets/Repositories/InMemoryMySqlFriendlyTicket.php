@@ -23,7 +23,7 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
     public function search(int $kilter): ?FriendlyTicketResponse
     {
         $data = $this->friendlyTicketModel::whereKilter($kilter)
-            ->whereFestivalId(env('UUID_SECOND_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
+            ->whereFestivalId(env('UUID_FESTIVAL', '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'))
             ->first()?->toArray();
 
         if (is_null($data)) {
