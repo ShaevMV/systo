@@ -11,6 +11,8 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+
     public function __construct(
         private ElTicketsModel $elTicketsModel
     )
@@ -19,7 +21,8 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
     public function search(Uuid $id): ?ElTicketResponse
     {
-        $data = $this->elTicketsModel::whereUuid($id->value())->first()?->toArray();
+        $data = $this->elTicketsModel::whereFestivalId(self::UUID_FESTIVAL)
+            ->whereUuid($id->value())->first()?->toArray();
 
         if (is_null($data)) {
             return null;
@@ -52,13 +55,16 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->elTicketsModel->whereKilter((int)$q)
-            ->orWhere('name', 'like', '%' . $q . '%')
-            ->orWhere('email', 'like', '%' . $q . '%')
-            ->orWhere('phone', 'like', '%' . $q . '%')
-            ->orWhere('comment', 'like', '%' . $q . '%')
-            ->get()
-            ->toArray();
+        $resultRawList = $this->elTicketsModel::whereFestivalId(self::UUID_FESTIVAL)
+            ->where(function($query) use ($q) {
+                return $query->whereKilter((int)$q)
+                    ->orWhere('name', 'like', '%' . $q . '%')
+                    ->orWhere('email', 'like', '%' . $q . '%')
+                    ->orWhere('phone', 'like', '%' . $q . '%')
+                    ->orWhere('comment', 'like', '%' . $q . '%');
+            })
+            ->get()->toArray();
+
         $result = [];
         foreach ($resultRawList as $item) {
             $result[] = ElTicketResponse::fromState($item, $q);
