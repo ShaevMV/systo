@@ -23,6 +23,7 @@ class TicketResponse extends AbstractionEntity implements Response
         protected ?string $comment,
         protected Carbon $date_order,
         protected ?string $festivalView,
+        protected ?Uuid $festival_id = null
     )
     {
     }
@@ -74,5 +75,10 @@ class TicketResponse extends AbstractionEntity implements Response
         unset($result['festivalView']);
 
         return $result;
+    }
+
+    public function getFestivalId(): ?Uuid
+    {
+        return $this->festival_id;
     }
 }

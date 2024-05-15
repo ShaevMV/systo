@@ -48,6 +48,7 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
                     ->orWhere('curator', 'like', '%' . $q . '%')
                     ->orWhere('comment', 'like', '%' . $q . '%');
             })
+            ->where('id' ,'>' , 448)
             ->get()->toArray();
 
         $result = [];
