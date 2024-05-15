@@ -48,7 +48,7 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
                     ->orWhere('curator', 'like', '%' . $q . '%')
                     ->orWhere('comment', 'like', '%' . $q . '%');
             })
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+            ->andWhere('festival_id', '=', self::UUID_FESTIVAL)
             ->get()->toArray();
 
         $result = [];
