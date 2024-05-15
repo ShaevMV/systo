@@ -13,11 +13,15 @@ final class Status implements EntityDataInterface
     public const PAID = 'paid';
     public const CANCEL = 'cancel';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
+    public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
+
+
     public const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
         self::CANCEL => 'Отменён',
         self::PAID => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
+        self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
     ];
 
     private const ROLE_CHANCE_STATUS = [
