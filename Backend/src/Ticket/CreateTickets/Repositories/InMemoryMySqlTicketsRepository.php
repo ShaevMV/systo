@@ -145,6 +145,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['last_comment'],
             Carbon::parse($result['created_at']),
             $result['view'],
+            new Uuid($result['festival_id']),
         );
     }
 
