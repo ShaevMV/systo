@@ -66,7 +66,6 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
                     ->orWhere('comment','like','%'.$q.'%')
                     ->orWhere('email','like','%'.$q.'%');
             })
-            ->andWhere('festival_id', '=', self::UUID_FESTIVAL)
             ->get()->toArray();
         $result = [];
         foreach ($resultRawList as $item) {
