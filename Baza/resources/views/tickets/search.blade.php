@@ -93,9 +93,7 @@
                                                 <thead class=" text-primary">
                                                 <th>
                                                 </th>
-                                                <th>
-                                                    Цвет
-                                                </th>
+
                                                 <th>
                                                     ID
                                                 </th>
@@ -144,8 +142,7 @@
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
-                                                        <td style="background: {{ $ticket['color'] }}">
-                                                        </td>
+
                                                         <td>
                                                             {{$ticket['kilter']}}
                                                         </td>
@@ -185,9 +182,6 @@
                                             <table class="table">
                                                 <thead class=" text-primary">
                                                 <th>
-                                                </th>
-                                                <th>
-                                                    Цвет
                                                 </th>
                                                 <th>
                                                     ID
@@ -237,9 +231,7 @@
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
-                                                        <td class="color-box"
-                                                            style="background: {{ $ticket['color'] }}">
-                                                        </td>
+
                                                         <td>
                                                             {{$ticket['kilter']}}
                                                         </td>
@@ -280,9 +272,7 @@
                                                 <thead class=" text-primary">
                                                 <th>
                                                 </th>
-                                                <th>
-                                                    Цвет
-                                                </th>
+
                                                 <th>
                                                     ID
                                                 </th>
@@ -331,9 +321,6 @@
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
                                                         </td>
-                                                        <td class="color-box"
-                                                            style="background: {{ $ticket['color'] }}">
-                                                        </td>
                                                         <td>
                                                             {{$ticket['kilter']}}
                                                         </td>
@@ -374,9 +361,7 @@
                                                 <thead class=" text-primary">
                                                 <th>
                                                 </th>
-                                                <th>
-                                                    Цвет
-                                                </th>
+
                                                 <th>
                                                     ID
                                                 </th>
@@ -409,9 +394,6 @@
                                                             @else
                                                                 Билет в статусе {{$ticket['status_human']}}
                                                             @endif
-                                                        </td>
-                                                        <td class="color-box"
-                                                            style="background: {{ $ticket['color'] }}">
                                                         </td>
                                                         <td>
                                                             {{$ticket['kilter']}}

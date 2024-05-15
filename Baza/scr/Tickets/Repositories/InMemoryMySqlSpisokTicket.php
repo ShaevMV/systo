@@ -13,6 +13,8 @@ use Throwable;
 class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 {
 
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+
     public function __construct(
         private SpisokTicketModel $spisokTicketModel
     )
@@ -22,7 +24,9 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 
     public function search(int $kilter): ?SpisokTicketResponse
     {
-        $data = $this->spisokTicketModel::whereKilter($kilter)->first()?->toArray();
+        $data = $this->spisokTicketModel::whereKilter($kilter)
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
+            ->first()?->toArray();
 
         if(is_null($data)) {
             return null;
@@ -55,11 +59,14 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
     public function find(string $q): array
     {
         $resultRawList = $this->spisokTicketModel::whereKilter((int)$q)
-            ->orWhere('curator','like','%'.$q.'%')
-            ->orWhere('project','like','%'.$q.'%')
-            ->orWhere('name','like','%'.$q.'%')
-            ->orWhere('comment','like','%'.$q.'%')
-            ->orWhere('email','like','%'.$q.'%')
+            ->where(function ($query) use ($q) {
+                return $query->orWhere('curator','like','%'.$q.'%')
+                    ->orWhere('project','like','%'.$q.'%')
+                    ->orWhere('name','like','%'.$q.'%')
+                    ->orWhere('comment','like','%'.$q.'%')
+                    ->orWhere('email','like','%'.$q.'%');
+            })
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->get()->toArray();
         $result = [];
         foreach ($resultRawList as $item) {

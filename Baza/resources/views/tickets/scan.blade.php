@@ -12,7 +12,7 @@
                     <span id="massage-result" class="massage"></span>
                 </div>
                 <div class="card-body" id="scan-result" style="display: none;">
-                    <p><b>Цвет браслета:</b> <span id="color" class="block-color"></span></p>
+                    <p style="display: none"><b>Цвет браслета:</b> <span id="color" class="block-color"></span></p>
 
                     <b>ID: </b>
                     <p id="kilter"></p>

@@ -10,6 +10,8 @@ use Throwable;
 
 class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
 {
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+
     public function __construct(
         private AutoModel $model
     )
@@ -39,17 +41,19 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->model::where('auto','<>','')
-            ->where(function($query) use ($q) {
+        $resultRawList = $this->model::where('auto', '<>', '')
+            ->where(function ($query) use ($q) {
                 return $query->where('auto', 'like', '%' . (int)$q . '%')
                     ->orWhere('project', 'like', '%' . $q . '%')
                     ->orWhere('curator', 'like', '%' . $q . '%')
                     ->orWhere('comment', 'like', '%' . $q . '%');
-            })->get()->toArray();
+            })
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
+            ->get()->toArray();
 
         $result = [];
         foreach ($resultRawList as $item) {
-            $result[]= AutoTicketResponse::fromState($item, $q);
+            $result[] = AutoTicketResponse::fromState($item, $q);
         }
 
         return $result;
