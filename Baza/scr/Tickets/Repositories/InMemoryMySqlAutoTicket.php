@@ -44,9 +44,9 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
         $resultRawList = $this->model::where('auto', '<>', '')
             ->where(function ($query) use ($q) {
                 return $query->where('auto', 'like', '%' . (int)$q . '%')
-                    ->orWhere('project', 'like', '%' . $q . '%')
-                    ->orWhere('curator', 'like', '%' . $q . '%')
-                    ->orWhere('comment', 'like', '%' . $q . '%');
+                    ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
             })
             ->where('id' ,'>' , 448)
             ->get()->toArray();
