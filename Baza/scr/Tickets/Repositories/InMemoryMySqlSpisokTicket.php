@@ -60,11 +60,11 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
     {
         $resultRawList = $this->spisokTicketModel::whereFestivalId(self::UUID_FESTIVAL)
             ->where(function ($query) use ($q) {
-                return $query->orWhere('curator','like','%'.$q.'%')
-                    ->orWhere('project','like','%'.$q.'%')
-                    ->orWhere('name','like','%'.$q.'%')
-                    ->orWhere('comment','like','%'.$q.'%')
-                    ->orWhere('email','like','%'.$q.'%');
+                return $query->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
             })
             ->get()->toArray();
 
