@@ -58,7 +58,6 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
         $resultRawList = $this->elTicketsModel::whereFestivalId(self::UUID_FESTIVAL)
             ->where(function($query) use ($q) {
                 return $query->whereKilter((int)$q)
-                    ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
