@@ -13,12 +13,8 @@ services:
       - ./Docker/nginx/ssl:/etc/nginx/ssl
       - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./Docker/nginx/proxy_params:/etc/nginx/proxy_params
-      - ./Backend:${ENV_ORG_BACKEND_PATCH}
-      - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
-      - ./Baza:${ENV_VHOD_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
       - ./Docker/nginx/auth.basic:/etc/nginx/auth.basic
     user: user
     environment:
@@ -38,47 +34,8 @@ services:
     networks:
       - backend
     links:
-      - mysql
-      - node
+      - database
       - phpFriendly
-      - phpList
-      - php
-
-  php:
-    hostname: ${ENV_ORG_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=true
-    image: 'ogr_laravel'
-    env_file:
-      - ./Backend/.env
-    container_name: php-solarSysto
-    volumes:
-      - ./Shared:${ENV_SHARED_PATCH}
-      - ./Backend:/var/www/org
-    working_dir: /var/www/org
-    user: user
-    environment:
-      - WITH_XDEBUG=true
-      - WORKING_DIR=${ENV_ORG_BACKEND_PATCH}
-    networks:
-      - backend
-
-  node:
-    hostname: ${ENV_ORG_FRONTEND_HOST}
-    build:
-      context: ./Docker/node
-    working_dir: ${ENV_ORG_FRONT_PATCH}
-    ports:
-      - "8081:8080"
-    container_name: node-solarSysto
-    volumes:
-      - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
-    command: tail -f /dev/null
-    user: node
-    networks:
-      - backend
 
   phpFriendly:
     hostname: ${ENV_DRUG_BACKEND_HOST}
@@ -101,49 +58,6 @@ services:
     networks:
       - backend
 
-  phpList:
-    hostname: ${ENV_SPISOK_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=true
-    container_name: php-list
-    image: 'list_laravel'
-    volumes:
-      - ./List:${ENV_SPISOK_PATCH}
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_SPISOK_PATCH}
-    environment:
-      - WITH_XDEBUG=true
-      - WORKING_DIR=${ENV_SPISOK_PATCH}
-    user: user
-    networks:
-      - backend
-
-  redis:
-    build: ./Docker/redis
-    container_name: redis-solarSysto
-    command: redis-server --appendonly yes
-    ports:
-      - "8002:6379"
-    networks:
-      - backend
-
-  mysql:
-    image: mysql:8
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_DATABASE: 'systo'
-      MYSQL_ROOT_PASSWORD: 'secret'
-      MYSQL_USER: 'default'
-      MYSQL_PASSWORD: 'secret'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
-    volumes:
-      - ./Docker/mysql/db:/var/lib/mysql
-    networks:
-      - backend
-
   database:
     image: mysql:5.7
     environment:
@@ -157,35 +71,12 @@ services:
     networks:
       - backend
 
-  phpBaza:
-    hostname: ${ENV_VHOD_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=false
-    container_name: php-baza
-    image: 'baza_laravel'
-    env_file:
-      - ./Baza/.env
-    volumes:
-      - ./Baza:/var/www/vhod
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_VHOD_PATCH}
-    user: user
-    environment:
-      - WITH_XDEBUG=false
-      - WORKING_DIR=${ENV_VHOD_PATCH}
-    networks:
-      - backend
-
   worker:
     build:
       context: ./Docker/worker
     image: 'laravelworker'
     volumes:
-      - ./Backend:${ENV_ORG_BACKEND_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
