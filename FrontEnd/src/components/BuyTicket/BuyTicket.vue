@@ -564,7 +564,7 @@ export default {
         'phone': this.phone,
         'comment': this.comment,
         'types_of_payment_id': this.selectTypesOfPayment,
-        'festival_id': '9d679bcf-b438-4ddb-ac04-023fa9bff4b4',
+        'festival_id': '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
         'callback': function (result, massage) {
           if (result) {
             self.clearData();
@@ -597,7 +597,7 @@ export default {
     },
   },
   async created() {
-    await this.loadDataForOrderingTickets({festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'});
+    await this.loadDataForOrderingTickets({festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b5'});
     await this.clearError();
     if (this.isAuth) {
       let self = this;
