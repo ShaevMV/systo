@@ -45,8 +45,16 @@ class ApiTicketController extends Controller
     {
         return json_encode([
             'festival_list' => [
-                env('UUID_FESTIVAL') => 'Систо 2024',
-                env('UUID_SECOND_FESTIVAL') => 'Систо-Осень 2024',
+                env('UUID_FESTIVAL') => [
+                    'name' => 'Систо 2024',
+                    'date_start' => '2024-02-16 13:47:53',
+                    'date_end' => '2024-05-16 13:47:53',
+                ],
+                env('UUID_SECOND_FESTIVAL') => [
+                    'name' => 'Систо-Осень 2024',
+                    'date_start' => '2024-05-16 13:47:53',
+                    'date_end' => '2024-08-16 13:47:53',
+                ],
             ],
         ]);
     }
