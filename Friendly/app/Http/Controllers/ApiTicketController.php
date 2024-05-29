@@ -40,4 +40,14 @@ class ApiTicketController extends Controller
             'error' => null,
         ]);
     }
+
+    public function getFestival(): string
+    {
+        return json_encode([
+            'festival_list' => [
+                env('UUID_FESTIVAL') => 'Систо 2024',
+                env('UUID_SECOND_FESTIVAL') => 'Систо-Осень 2024',
+            ],
+        ]);
+    }
 }
