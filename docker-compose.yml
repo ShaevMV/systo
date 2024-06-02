@@ -71,7 +71,7 @@ services:
       context: ./Docker/node
     working_dir: ${ENV_ORG_FRONT_PATCH}
     ports:
-      - "8081:8080"
+      - "8082:8080"
     container_name: node-solarSysto
     volumes:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
@@ -132,7 +132,7 @@ services:
   mysql:
     image: mysql:8
     ports:
-      - "3306:3306"
+      - "33069:3306"
     environment:
       MYSQL_DATABASE: 'systo'
       MYSQL_ROOT_PASSWORD: 'secret'
