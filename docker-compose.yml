@@ -6,8 +6,7 @@ services:
     build:
       context: ./Docker/nginx
     ports:
-      - "5080:8083"
-      - "5443:8443"
+      - "50080:8083"
     volumes:
       - ./Docker/nginx/default.dev.conf:/etc/nginx/conf.d/default.conf.template
       - ./Docker/nginx/ssl:/etc/nginx/ssl
