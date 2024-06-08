@@ -47,12 +47,18 @@ class CORS
             'http://193.106.175.59:8081',
             //     'http://localhost',
             'http://api.solarsysto.ru',
+            'https://api.solarsysto.ru',
             'http://org.solarsysto.ru',
             'https://org.solarsysto.ru',
             'http://org.solarsysto.ru',
-            'https://api.solarsysto.ru',
+
             'http://org.tickets.loc/',
             'http://193.106.175.59',
+
+            'http://org.spaceofjoy.ru',
+            'https://org.spaceofjoy.ru',
+            'http://api.spaceofjoy.ru',
+            'https://api.spaceofjoy.ru',
         ];
         $this->allowOrigins = array_merge(['http://localhost:8080',
             'http://localhost:8081',
