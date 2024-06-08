@@ -17,7 +17,6 @@ services:
       - ./Shared:${ENV_SHARED_PATCH}
       - ./Baza:${ENV_VHOD_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
       - ./Docker/nginx/auth.basic:/etc/nginx/auth.basic
     user: user
     environment:
@@ -25,14 +24,12 @@ services:
       - ENV_ORG_FRONTEND_HOST=${ENV_ORG_FRONTEND_HOST}
       - ENV_VHOD_BACKEND_HOST=${ENV_VHOD_BACKEND_HOST}
       - ENV_DRUG_BACKEND_HOST=${ENV_DRUG_BACKEND_HOST}
-      - ENV_SPISOK_BACKEND_HOST=${ENV_SPISOK_BACKEND_HOST}
 
       - ENV_ORG_BACKEND_PATCH=${ENV_ORG_BACKEND_PATCH}
       - ENV_ORG_FRONT_PATCH=${ENV_ORG_FRONT_PATCH}
       - ENV_SHARED_PATCH=${ENV_SHARED_PATCH}
       - ENV_VHOD_PATCH=${ENV_VHOD_PATCH}
       - ENV_DRUG_PATCH=${ENV_DRUG_PATCH}
-      - ENV_SPISOK_PATCH=${ENV_SPISOK_PATCH}
 
     networks:
       - backend
@@ -40,7 +37,6 @@ services:
       - mysql
       - node
       - phpFriendly
-      - phpList
       - php
 
   php:
@@ -96,25 +92,6 @@ services:
     environment:
       - WITH_XDEBUG=true
       - WORKING_DIR=${ENV_DRUG_PATCH}
-    user: user
-    networks:
-      - backend
-
-  phpList:
-    hostname: ${ENV_SPISOK_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=true
-    container_name: php-list
-    image: 'list_laravel'
-    volumes:
-      - ./List:${ENV_SPISOK_PATCH}
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_SPISOK_PATCH}
-    environment:
-      - WITH_XDEBUG=true
-      - WORKING_DIR=${ENV_SPISOK_PATCH}
     user: user
     networks:
       - backend
@@ -184,7 +161,6 @@ services:
     volumes:
       - ./Backend:${ENV_ORG_BACKEND_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
