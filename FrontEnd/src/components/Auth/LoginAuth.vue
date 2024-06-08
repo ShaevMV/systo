@@ -101,7 +101,7 @@ export default {
           } else {
             if (isAdmin === true) {
               // TODO: сделать нормально
-              location.href = '/orders/9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+              location.href = '/orders/9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
             } else {
               location.href = '/myOrders';
             }
