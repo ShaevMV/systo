@@ -8,7 +8,7 @@ import VCalendar from 'v-calendar';
 
 window.store = store;
 
-axios.defaults.baseURL = 'https://api.solarsysto.ru/'
+axios.defaults.baseURL = 'https://api.spaceofjoy.ru/'
 axios.defaults.withCredentials = true
 /*
 if (localStorage['secret'] !== 'XyzWar') {
