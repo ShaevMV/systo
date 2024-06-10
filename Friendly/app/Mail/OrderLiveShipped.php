@@ -19,7 +19,7 @@ class OrderLiveShipped extends Mailable
     public function __construct(string $email)
     {
         $this->email = trim($email);
-        $this->subject('Живой билет на Solar Systo Togathering ' . date('Y') . ' зарегистрирован');
+        $this->subject('Живой билет на Solar Systo Togathering. Осень. ' . date('Y') . ' зарегистрирован');
     }
 
     /**

@@ -28,7 +28,7 @@ class OrderShippedList extends Mailable
         $this->ids = $ids;
         $this->email = trim($email);
         $this->project = $project;
-        $this->subject('Ваше участие в Solar Systo Togathering '.date('Y').' подтверждено ');
+        $this->subject('Ваше участие в Solar Systo Togathering. Осень. '.date('Y').' подтверждено ');
     }
 
     /**
