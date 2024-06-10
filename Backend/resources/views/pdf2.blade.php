@@ -113,12 +113,12 @@
     </style>
 </head>
 <body>
-<img src="https://api.solarsysto.ru/images/main-bg.jpg" alt="fon" id="fon">
+<img src="https://api.spaceofjoy.ru/images/main-bg.jpg" alt="fon" id="fon">
 <div id="top"></div>
-<img src="https://api.solarsysto.ru/images/top-img.png" alt="top" id="top-img">
+<img src="https://api.spaceofjoy.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Систо-Осень {{date('Y')}}!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering. Осень. {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}
