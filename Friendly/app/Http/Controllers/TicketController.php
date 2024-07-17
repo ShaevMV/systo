@@ -320,10 +320,16 @@ class TicketController extends Controller
             'user_id' => Auth::id()
         ])->get();
 
+        $auto = Auto::where([
+            'festival_id' => $this->festivalId,
+            'user_id' => Auth::id()
+        ])->get();
+
         return view('tickets.profile', [
             'ticketsEl' => $el,
             'ticketsLive' => $live,
-            'ticketsList' => $list
+            'ticketsList' => $list,
+            'auto' => $auto,
         ]);
     }
 
@@ -342,6 +348,10 @@ class TicketController extends Controller
             case 'list_tickets':
                 ListTicket::destroy($id);
                 $this->ticketService->deleteTicketList($id);
+                break;
+            case 'auto':
+                Auto::destroy($id);
+                $this->ticketService->deleteAuto($id);
                 break;
         }
 

@@ -151,6 +151,50 @@
 
                         </table>
                     </div>
+                    <div>
+                    <h1> Автомобили </h1>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{{ __('Куратор') }}</th>
+                            <th>{{ __('Проект') }}</th>
+                            <th>{{ __('Номер автомобиля') }}</th>
+                            <th>{{ __('Комментарий') }}</th>
+                            <th>{{ __('Дата') }}</th>
+                            <th>{{ __('Действие') }}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach ($auto as $ticket)
+                            <tr>
+                                <td>{{$ticket->id}}</a></td>
+                                <td>{{$ticket->curator}}</td>
+                                <td>{{$ticket->project}}</td>
+                                <td>{{$ticket->auto}}</td>
+                                <td>{{$ticket->comment}}</td>
+                                <td>{{$ticket->created_at}}</td>
+
+                                <td>
+                                    <form method="POST" action="{{ route('delTicket') }}">
+                                        @csrf
+                                        <input type="hidden" name="id" value="{{$ticket->id}}">
+                                        <input type="hidden" name="type" value="auto">
+                                        <input type="hidden" name="url" value="/profile">
+                                        <x-jet-responsive-nav-link href="{{ route('delTicket') }}"
+                                                                   onclick="event.preventDefault();
+                                    this.closest('form').submit();">
+                                            {{ __('Х') }}
+                                        </x-jet-responsive-nav-link>
+                                    </form>
+                                </td>
+                            </tr>
+
+                        @endforeach
+                        </tbody>
+
+                    </table>
+                </div>
             </div>
         </div>
     </div>

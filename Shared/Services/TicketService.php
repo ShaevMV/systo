@@ -59,6 +59,16 @@ class TicketService
         ]);
     }
 
+    public function deleteAuto(int $id): void
+    {
+        $rawModel = DB::connection('mysqlBaza')->table('auto')
+            ->where('id', '=', $id);
+        if (!$rawModel->exists()) {
+            throw new DomainException('Автомобиль с id не найден ' . $id);
+        }
+
+        $rawModel->delete();
+    }
 
     public function pushTicketList(ListTicket $ticket): bool
     {
@@ -93,6 +103,7 @@ class TicketService
             ->insert([
                 'project' => $ticket->project,
                 'curator' => $ticket->curator,
+                'festival_id' => $ticket->festival_id,
                 'auto' => $ticket->auto,
                 'comment' => $ticket->comment,
             ]);
