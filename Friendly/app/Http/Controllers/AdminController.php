@@ -132,10 +132,14 @@ class AdminController extends Controller
         return redirect()->route('adminUser',['9d679bcf-b438-4ddb-ac04-023fa9bff4b5']);
     }
 
-    public function getAuto(): View|Factory|Application
+    public function getAuto(Request $request): View|Factory|Application
     {
+        $auto = Auto::where(
+            'festival_id', '=', $request->get('festival_id')
+        )->get();
+
         return view('admin.auto',[
-            'tickets' => Auto::all()
+            'tickets' => $auto
         ]);
     }
 
