@@ -246,9 +246,10 @@ class TicketController extends Controller
                     $success = -1;
                 }
 
-                if (LiveTicket::where('kilter', (int)$value)
-                    ->where('festival_id', $this->festivalId)
-                    ->exists()) {
+                if (LiveTicket::where([
+                    'kilter' => (int)$value,
+                    'festival_id' => $this->festivalId
+                ])->exists()) {
                     $success = -2;
                     $errorValue = $value;
                 }
