@@ -26,7 +26,7 @@
     </div>
     <div class="text-center title-block">
       <h1>Форма подтверждения добровольного оргвзноса</h1>
-      <small class="form-text text-muted">на создание туристического слёта на Solar Systo Togathering 2024</small>
+      <small class="form-text text-muted">на создание туристического слёта Solar Systo Togathering 2024</small>
     </div>
     <div class="row" id="main-form">
       <div class="col-md-10 mx-auto">
