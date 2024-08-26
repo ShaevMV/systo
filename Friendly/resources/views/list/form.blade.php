@@ -67,7 +67,7 @@
                     </div>
                     <div class="flex items-center justify-end mt-4">
                         <x-jet-button class="ml-4">
-                            {{ __('Продать') }}
+                            {{ __('Отправить') }}
                         </x-jet-button>
                     </div>
 
@@ -78,7 +78,7 @@
                         <input type="file" name="listFile" accept=".csv" />
                         <div class="flex items-center justify-end mt-4">
                             <x-jet-button class="ml-4">
-                                {{ __('Отправить') }}
+                                {{ __('Загрузить файл') }}
                             </x-jet-button>
                         </div>
                     </form>
