@@ -13,7 +13,7 @@ use Throwable;
 class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 {
 
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b4';
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
 
     public function __construct(
         private SpisokTicketModel $spisokTicketModel
