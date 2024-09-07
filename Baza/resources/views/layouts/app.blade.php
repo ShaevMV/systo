@@ -35,7 +35,7 @@
                     @include('layouts.footer')
                 </div>
             </div>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="">
+            <form id="logout-form" action="/logout" method="POST" style="">
                 @csrf
             </form>
         @else

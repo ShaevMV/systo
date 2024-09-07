@@ -7,7 +7,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Редактировать аккаунт') }}</h5>
                 </div>
-                <form method="post" action="{{ route('profile.update') }}" autocomplete="off">
+                <form method="post" action="/profile" autocomplete="off">
                     <div class="card-body">
                             @csrf
 
@@ -35,7 +35,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Пароль') }}</h5>
                 </div>
-                <form method="post" action="{{ route('profile.password') }}" autocomplete="off">
+                <form method="post" action="/password-request" autocomplete="off">
                     <div class="card-body">
                         @csrf
 

@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Поиск') }}</h5>
                 </div>
-                <form method="get" action="{{ route('tickets.search') }}" autocomplete="off">
+                <form method="get" action="/search" autocomplete="off">
                     <div class="card-body">
                         <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
                             <label>{{ __('Поля поиска') }}</label>
@@ -125,7 +125,7 @@
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
                                                                 <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                      action="/enterForTable">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
                                                                            value="{{$ticket['kilter']}}">
@@ -214,7 +214,7 @@
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
                                                                 <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                      action="/enterForTable">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
                                                                            value="{{$ticket['kilter']}}">
@@ -304,7 +304,7 @@
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
                                                                 <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                      action="/enterForTable">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
                                                                            value="{{$ticket['kilter']}}">
@@ -378,7 +378,7 @@
                                                         <td>
                                                             @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
                                                                 <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                      action="/enterForTable">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
                                                                            value="{{$ticket['kilter']}}">
@@ -442,7 +442,7 @@
                                                         <td>
                                                             @if($ticket['date_change'] === null)
                                                                 <form method="post"
-                                                                      action="{{ route('tickets.scan.enterForTable') }}">
+                                                                      action="/enterForTable">
                                                                     @csrf
                                                                     <input type="hidden" name="id"
                                                                            value="{{$ticket['id']}}">

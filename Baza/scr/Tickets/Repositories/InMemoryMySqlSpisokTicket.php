@@ -58,7 +58,8 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->spisokTicketModel::whereFestivalId(self::UUID_FESTIVAL)
+        $resultRawList = $this->spisokTicketModel
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($q) {
                 return $query->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
@@ -66,7 +67,8 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
                     ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
             })
-            ->get()->toArray();
+            ->get()
+            ->toArray();
 
         $result = [];
         foreach ($resultRawList as $item) {
