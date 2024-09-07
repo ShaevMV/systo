@@ -13,10 +13,12 @@ use Shared\Domain\ValueObject\Status;
 
 class TicketService
 {
-    public function pushTicketFriendly(FriendlyTicket $ticket): bool
+    public function pushTicketFriendly(FriendlyTicket $ticket, string $festivalId): bool
     {
         $rawModel = DB::connection('mysqlBaza')->table('friendly_tickets')
-            ->where('kilter', '=', $ticket->id);
+            ->where('kilter', '=', $ticket->id)
+            ->where('festival_id', '=', $festivalId);
+
         if (!$rawModel->exists()) {
             return DB::connection('mysqlBaza')
                 ->table('friendly_tickets')
@@ -70,11 +72,13 @@ class TicketService
         $rawModel->delete();
     }
 
-    public function pushTicketList(ListTicket $ticket): bool
+    public function pushTicketList(ListTicket $ticket, string $festivalId): bool
     {
         $rawModel =
             DB::connection('mysqlBaza')->table('spisok_tickets')
-                ->where('kilter', '=', $ticket->id);
+                ->where('kilter', '=', $ticket->id)
+                ->where('festival_id', '=', $festivalId);
+
         $data = [
             'kilter' => $ticket->id,
             'project' => $ticket->project,

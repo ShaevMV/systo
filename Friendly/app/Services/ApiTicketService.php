@@ -61,7 +61,7 @@ class ApiTicketService
                 $model->saveOrFail();
 
                 $ids['S' . $model->id] = $item;
-                $this->ticketService->pushTicketList($model);
+                $this->ticketService->pushTicketList($model, $apiTicketDTO->getFestivalId());
             }
 
             if (count($ids) > 0) {

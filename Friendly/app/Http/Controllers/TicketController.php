@@ -153,7 +153,7 @@ class TicketController extends Controller
                 $model->saveOrFail();
 
                 $ids['S' . $model->id] = $value;
-                $this->ticketService->pushTicketList($model);
+                $this->ticketService->pushTicketList($model, $this->festivalId);
             }
             if (count($ids) > 0) {
                 Bus::chain([
@@ -211,7 +211,7 @@ class TicketController extends Controller
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
                 $model->saveOrFail();
-                $this->ticketService->pushTicketFriendly($model);
+                $this->ticketService->pushTicketFriendly($model, $this->festivalId);
                 $ids['f' . $model->id] = $value;
             }
 
