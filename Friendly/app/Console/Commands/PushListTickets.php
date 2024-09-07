@@ -2,18 +2,18 @@
 
 namespace App\Console\Commands;
 
-use App\Models\FriendlyTicket;
+use App\Models\ListTicket;
 use Shared\Services\TicketService;
 use Illuminate\Console\Command;
 
-class PushTickets extends Command
+class PushListTickets extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'tickets:friendly:push';
+    protected $signature = 'tickets:list:push';
 
     /**
      * The console command description.
@@ -41,10 +41,10 @@ class PushTickets extends Command
         TicketService $ticketService
     )
     {
-        $tickets = FriendlyTicket::where('festival_id','=','9d679bcf-b438-4ddb-ac04-023fa9bff4b5')->get();
+        $tickets = ListTicket::where('festival_id','=','9d679bcf-b438-4ddb-ac04-023fa9bff4b5')->get();
 
         foreach ($tickets as $ticket) {
-            $ticketService->pushTicketFriendly($ticket);
+            $ticketService->pushTicketList($ticket);
             $this->info('push '. $ticket->id);
         }
 
