@@ -62,7 +62,7 @@ class DefineService
         } elseif (strripos($link, 'f') !== false) {
             $type = self::DRUG_TICKET;
             $id = $this->getOnlyNumber($link);
-        } elseif ($this->getOnlyNumber($link) == $link) {
+        } elseif ($this->getOnlyNumber($link) == $link || strripos($link, self::LIVE_TICKET_URL) !== false) {
             $type = self::LIVE_TICKET;
             $id = (int)str_replace(self::LIVE_TICKET_URL, '', $link);
         } else {
