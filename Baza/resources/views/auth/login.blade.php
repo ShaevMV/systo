@@ -5,12 +5,12 @@
         <h3 class="mb-5">Добро пожаловать на смену в Systo solar надеемся что ты справишься со всем!!! </h3>
     </div>
     <div class="col-lg-4 col-md-6 ml-auto mr-auto">
-        <form class="form" method="post" action="{{ route('login') }}">
+        <form class="form" method="post" action="/login">
             @csrf
 
             <div class="card card-login card-white">
                 <div class="card-header">
-                    <img src="{{ asset('black') }}/img/logo.png" alt="logo-img">
+                    <img src="/black/img/logo.png" alt="logo-img">
                 </div>
                 <div class="card-body">
                     <div class="input-group{{ $errors->has('email') ? ' has-danger' : '' }}">
