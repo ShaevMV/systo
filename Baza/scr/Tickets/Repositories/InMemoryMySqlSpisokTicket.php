@@ -40,7 +40,9 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->spisokTicketModel::whereKilter($id)->first();
+        $rawData = $this->spisokTicketModel::whereKilter($id)
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
+            ->first();
 
         DB::beginTransaction();
         try {

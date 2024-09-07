@@ -42,13 +42,13 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
     public function find(string $q): array
     {
         $resultRawList = $this->model::where('auto', '<>', '')
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($q) {
                 return $query->where('auto', 'like', '%' . (int)$q . '%')
                     ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                     ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
             })
-            ->where('id' ,'>' , 448)
             ->get()->toArray();
 
         $result = [];

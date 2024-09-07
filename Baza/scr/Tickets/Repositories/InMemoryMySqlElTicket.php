@@ -37,7 +37,9 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->elTicketsModel::whereKilter($id)->first();
+        $rawData = $this->elTicketsModel::whereKilter($id)
+            ->where('festival_id', '=', self::UUID_FESTIVAL)
+            ->first();
 
         DB::beginTransaction();
         try {

@@ -68,7 +68,8 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
                         ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                         ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
                 })
-            ->get()->toArray();
+            ->get()
+            ->toArray();
 
         $result = [];
         foreach ($resultRawList as $item) {
