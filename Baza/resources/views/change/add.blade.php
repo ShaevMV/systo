@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body" id="scan-result">
                     <form class="form" method="post"
-                          action="{{ route('changes.save') }}">
+                          action="/change/save">
                         @csrf
                         <input name="id" value="@if(isset($findChange['id'])){{$findChange['id']}}@endif" type="hidden">
                         <div id="Compound">
@@ -31,7 +31,7 @@
                     </form>
                     @if(isset($findChange['id']))
                         <form class="form" method="post"
-                              action="{{ route('changes.remove') }}">
+                              action="/change/remove">
                             @csrf
                             <input name="id" value="{{$findChange['id']}}" type="hidden">
                             <button type="submit"

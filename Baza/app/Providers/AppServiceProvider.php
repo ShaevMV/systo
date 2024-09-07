@@ -16,9 +16,9 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->isLocal()) {
             $this->app->register(IdeHelperServiceProvider::class);
-        } else {
-            \URL::forceScheme('https');
         }
+
+        \URL::forceScheme('https');
     }
 
     /**

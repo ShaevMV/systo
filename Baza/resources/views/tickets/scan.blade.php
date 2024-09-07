@@ -132,7 +132,7 @@
             scanner.stop();
             $.ajax({
                 type: 'POST',
-                url: '{{ route('tickets.scan.search') }}',
+                url: '/api/scan',
                 data: {
                     "_token": "{{ csrf_token() }}",
                     "search": result.data
@@ -220,7 +220,7 @@
         enterResult.addEventListener('click', () => {
             $.ajax({
                 type: 'POST',
-                url: '{{ route('tickets.scan.enter') }}',
+                url: '/api/enter',
                 data: {
                     "_token": "{{ csrf_token() }}",
                     "id": idTicket,
