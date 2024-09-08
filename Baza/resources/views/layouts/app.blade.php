@@ -7,7 +7,7 @@
 
         <meta name="csrf-token" content="{{ csrf_token() }}" />
 
-        <title>База входа 2023</title>
+        <title>База входа {{ date('Y') }}</title>
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="76x76" href="/black/img/apple-icon.png">
         <link rel="icon" type="image/png" href="/black/img/favicon.png">
