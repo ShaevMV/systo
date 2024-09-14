@@ -5,6 +5,32 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
+                    <h5 class="title">{{ __('Поиск') }}</h5>
+                </div>
+                <form method="get" action="/search" autocomplete="off">
+                    <div class="card-body">
+                        <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
+                            <label>{{ __('Поля поиска') }}</label>
+                            <input type="text"
+                                   name="q"
+                                   class="form-control"
+                                   placeholder="{{ __('Поиск') }}"
+                                   value=""
+                            >
+                            <b>Номер билета вводить только цифры без префикса в начале <br/>
+                                Друг автомобиль вбивай только цифры и внимательно проверяй в найденыйх списках</b>
+                            <h1 class="error" style="
+    color: red;
+">{{$error}}</h1>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="submit" class="btn btn-fill btn-primary">{{ __('Поиск') }}</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card">
+                <div class="card-header">
                     <h5 class="title">{{ __('Результат поиска') }}</h5>
                     <span id="error-result" class="error" style="
     color: red;
