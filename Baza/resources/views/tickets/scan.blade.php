@@ -9,7 +9,7 @@
                 </div>
                 <form method="get" action="/search" autocomplete="off">
                     <div class="card-body">
-                        <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
+                        <div class="form-group">
                             <label>{{ __('Поля поиска') }}</label>
                             <input type="text"
                                    name="q"
@@ -21,7 +21,7 @@
                                 Друг автомобиль вбивай только цифры и внимательно проверяй в найденыйх списках</b>
                             <h1 class="error" style="
     color: red;
-">{{$error}}</h1>
+"></h1>
                         </div>
                     </div>
                     <div class="card-footer">
