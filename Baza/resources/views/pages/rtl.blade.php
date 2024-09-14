@@ -10,18 +10,18 @@
 
     <title>{{ config('app.name', 'Black Dashboard') }}</title>
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="76x76" href="/black/img/apple-icon.png">
-    <link rel="icon" type="image/png" href="/black/img/favicon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="https://vhod.spaceofjoy.ru/black/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="https://vhod.spaceofjoy.ru/black/img/favicon.png">
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,600,700,800" rel="stylesheet" />
     <link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
     <!-- Icons -->
-    <link href="/black/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="https://vhod.spaceofjoy.ru/black/css/nucleo-icons.css" rel="stylesheet" />
     <!-- CSS -->
-    <link href="/black/css/black-dashboard.css?v=1.0.0" rel="stylesheet" />
+    <link href="https://vhod.spaceofjoy.ru/black/css/black-dashboard.css?v=1.0.0" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-rtl/3.4.0/css/bootstrap-rtl.css" rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="/black/demo/demo.css" rel="stylesheet" />
+    <link href="https://vhod.spaceofjoy.ru/black/demo/demo.css" rel="stylesheet" />
 </head>
 
 <body class=" rtl menu-on-right ">

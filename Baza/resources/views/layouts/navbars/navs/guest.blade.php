@@ -18,7 +18,7 @@
         <div class="collapse navbar-collapse" id="navigation">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item ">
-                    <a href="/login" class="nav-link">
+                    <a href="https://vhod.spaceofjoy.ru/login" class="nav-link">
                         <i class="tim-icons icon-single-02"></i> {{ __('Авторизоваться') }}
                     </a>
                 </li>

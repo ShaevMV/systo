@@ -7,7 +7,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Поиск') }}</h5>
                 </div>
-                <form method="get" action="/search" autocomplete="off">
+                <form method="get" action="https://vhod.spaceofjoy.ru/search" autocomplete="off">
                     <div class="card-body">
                         <div class="form-group">
                             <label>{{ __('Поля поиска') }}</label>

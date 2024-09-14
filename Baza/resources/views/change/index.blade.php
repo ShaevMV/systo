@@ -42,7 +42,7 @@
                                 @foreach($report as $item)
                                     <tr>
                                         <td>
-                                            <a href="/change/edit/{{$item['id']}}">{{$item['id']}}
+                                            <a href="https://vhod.spaceofjoy.ru/change/edit/{{$item['id']}}">{{$item['id']}}
                                         </td>
                                         <td>
                                             {{$item['userName']}}
@@ -114,7 +114,7 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <a href="/change/edit"> Добавить смену </a>
+                    <a href="https://vhod.spaceofjoy.ru/change/edit"> Добавить смену </a>
                 </div>
             </div>
         </div>

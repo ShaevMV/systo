@@ -8,7 +8,7 @@
                 <div class="card-header">
                     <h5 class="title">{{ __('Поиск') }}</h5>
                 </div>
-                <form method="get" action="/search" autocomplete="off">
+                <form method="get" action="https://vhod.spaceofjoy.ru/search" autocomplete="off">
                     <div class="card-body">
                         <div class="form-group{{ $errors->has('name') ? ' has-danger' : '' }}">
                             <label>{{ __('Поля поиска') }}</label>
@@ -27,7 +27,7 @@
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Поиск') }}</button>
-                        <a class="btn btn-fill btn-primary" href="/scan">{{ __('<- Верни меня на сканер') }}</a>
+                        <a class="btn btn-fill btn-primary" href="https://vhod.spaceofjoy.ru/scan">{{ __('<- Верни меня на сканер') }}</a>
                     </div>
                 </form>
             </div>
