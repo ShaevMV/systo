@@ -27,6 +27,7 @@
                     </div>
                     <div class="card-footer">
                         <button type="submit" class="btn btn-fill btn-primary">{{ __('Поиск') }}</button>
+                        <a class="btn btn-fill btn-primary" href="/scan">{{ __('<- Верни меня на сканер') }}</a>
                     </div>
                 </form>
             </div>
