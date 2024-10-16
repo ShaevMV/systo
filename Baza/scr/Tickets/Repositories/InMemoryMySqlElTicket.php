@@ -11,18 +11,29 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
+    private const UUID_FESTIVAL = null;
 
     public function __construct(
-        private ElTicketsModel $elTicketsModel
+        private ElTicketsModel $elTicketsModel,
+        private ?string $festivalId = self::UUID_FESTIVAL,
     )
     {
     }
+    private function addFestivalUuid(): ElTicketsModel
+    {
+        if($this->festivalId) {
+            return $this->elTicketsModel->where('festival_id', '=', self::UUID_FESTIVAL);
+        }
+
+        return $this->elTicketsModel;
+    }
+
 
     public function search(Uuid $id): ?ElTicketResponse
     {
-        $data = $this->elTicketsModel::whereFestivalId(self::UUID_FESTIVAL)
-            ->whereUuid($id->value())->first()?->toArray();
+        $data = $this->addFestivalUuid()
+            ->whereUuid($id->value())
+            ->first()?->toArray();
 
         if (is_null($data)) {
             return null;
@@ -37,8 +48,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->elTicketsModel::whereKilter($id)
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+        $rawData = $this->addFestivalUuid()->whereKilter($id)
             ->first();
 
         DB::beginTransaction();
@@ -57,7 +67,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->elTicketsModel::whereFestivalId(self::UUID_FESTIVAL)
+        $resultRawList = $this->addFestivalUuid()
             ->where(function($query) use ($q) {
                 return $query->whereKilter((int)$q)
                     ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
