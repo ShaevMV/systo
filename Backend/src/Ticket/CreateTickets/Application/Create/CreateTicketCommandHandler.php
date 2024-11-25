@@ -2,7 +2,7 @@
 
 namespace Tickets\Ticket\CreateTickets\Application\Create;
 
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class CreateTicketCommandHandler implements CommandHandler
@@ -13,7 +13,7 @@ class CreateTicketCommandHandler implements CommandHandler
     }
 
 
-    public function __invoke(CreateTicketCommand $ticket)
+    public function __invoke(CreateTicketCommand $ticket): void
     {
         $this->ticketsRepository->createTickets($ticket->getTicketDto());
     }

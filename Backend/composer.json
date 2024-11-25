@@ -8,29 +8,31 @@
         "php": "^8.0.2",
         "barryvdh/laravel-dompdf": "^2.0",
         "endroid/qr-code": "^4.7",
-        "guzzlehttp/guzzle": "^7.2",
+        "guzzlehttp/guzzle": "^7.5",
         "lambdish/phunctional": "^2.1",
-        "laravel/framework": "^9.19",
-        "laravel/sanctum": "^3.0",
-        "laravel/tinker": "^2.7",
+        "laravel/framework": "^9.42.2",
+        "laravel/sanctum": "^3.0.1",
+        "laravel/tinker": "^2.7.3",
         "php-open-source-saver/jwt-auth": "^2.0",
-        "symfony/messenger": "^6.0"
+        "sentry/sentry-laravel": "^3.2",
+        "symfony/messenger": "^6.0.16"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.12",
-        "fakerphp/faker": "^1.9.1",
-        "laravel/pint": "^1.0",
-        "laravel/sail": "^1.0.1",
-        "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0",
+        "barryvdh/laravel-ide-helper": "^2.12.3",
+        "fakerphp/faker": "^1.20.0",
+        "laravel/pint": "^1.2.1",
+        "laravel/sail": "^1.16.3",
+        "mockery/mockery": "^1.5.1",
+        "nunomaduro/collision": "^6.3.1",
+        "phpunit/phpunit": "^9.5.26",
+        "spatie/laravel-ignition": "^1.6.1",
         "worksome/request-factories": "^2.5"
     },
     "autoload": {
         "psr-4": {
             "App\\": "app/",
             "Tickets\\": "src/",
+            "Shared\\": "../Shared",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         }

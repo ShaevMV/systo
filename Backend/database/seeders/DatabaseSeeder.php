@@ -15,6 +15,9 @@ class DatabaseSeeder extends Seeder
         private OrderSeeder $orderSeeder,
         private CommentSeeder $commentSeeder,
         private FestivalSeeder $festivalSeeder,
+        private TypeTicketsPriceSeeder $typeTicketsPriceSeeder,
+        private TypeTicketsSecondFestivalSeeder $secondFestivalSeeder,
+        private TypeTicketsGroupSeeder $groupSeeder,
     ) {
     }
 
@@ -26,12 +29,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->promoCodSeeder->run();
+        $this->typesOfPaymentSeeder->run();
+
         $this->festivalSeeder->run();
         $this->typeTicketsSeeder->run();
-        $this->typesOfPaymentSeeder->run();
-        $this->promoCodSeeder->run();
+        $this->typeTicketsPriceSeeder->run();
+
         $this->userSeeder->run();
         $this->orderSeeder->run();
         $this->commentSeeder->run();
+        $this->secondFestivalSeeder->run();
+        $this->groupSeeder->run();
     }
 }

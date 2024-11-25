@@ -2,8 +2,8 @@
 
 namespace Tickets\Order\OrderTicket\Application\AddComment;
 
-use Tickets\Shared\Domain\Bus\Command\Command;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Command\Command;
+use Shared\Domain\ValueObject\Uuid;
 
 class AddCommentCommand implements Command
 {

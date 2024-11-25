@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit\AccountApplication;
 
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -48,5 +49,25 @@ class AccountApplicationTest extends TestCase
             );
 
         self::assertTrue($accountDto->getId()->equals($idAfterCreate));
+    }
+
+    public function test_it_correct_login(): void
+    {
+        $token = auth()->attempt(
+            [
+                'email' => UserSeeder::EMAIL_ADMIN,
+                'password' => UserSeeder::PASSWORD_ADMIN
+            ], true);
+
+        self::assertNotFalse($token);
+
+
+        $token = auth()->attempt(
+            [
+                'email' => UserSeeder::EMAIL_ADMIN,
+                'password' => UserSeeder::PASSWORD_ADMIN.'1564',
+            ], true);
+
+        self::assertFalse($token);
     }
 }

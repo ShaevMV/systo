@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Tickets\User\Account\Application\Create;
 
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\User\Account\Repositories\AccountInterface;
 
 final class CreatingNewAccountCommandHandler implements CommandHandler

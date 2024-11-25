@@ -5,29 +5,31 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Domain;
 
 use DomainException;
+use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
-use Tickets\Shared\Domain\Aggregate\AggregateRoot;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
 final class OrderTicket extends AggregateRoot
 {
     /**
-     * @param  GuestsDto[]  $ticket
+     * @param GuestsDto[] $ticket
      */
     public function __construct(
-        protected Uuid $festival_id,
-        protected Uuid $user_id,
-        protected Uuid $types_of_payment_id,
+        protected Uuid     $festival_id,
+        protected Uuid     $user_id,
+        protected Uuid     $types_of_payment_id,
         protected PriceDto $price,
-        protected Status $status,
-        protected array $ticket,
-        protected Uuid $id,
-        protected ?string $promo_code = null,
-    ) {
+        protected Status   $status,
+        protected array    $ticket,
+        protected Uuid     $id,
+        protected ?string  $promo_code = null,
+    )
+    {
     }
 
     private static function fromOrderTicketDto(OrderTicketDto $orderTicketDto): self
@@ -47,18 +49,35 @@ final class OrderTicket extends AggregateRoot
 
     public static function create(
         OrderTicketDto $orderTicketDto,
-        int $kilter,
-    ): self {
+        int            $kilter,
+    ): self
+    {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $result->record(new ProcessUserNotificationNewOrderTicket(
                 $orderTicketDto->getEmail(),
-                $kilter
+                $kilter,
+                $orderTicketDto->getTicketTypeId(),
+                $result->festival_id,
             )
         );
 
         return $result;
     }
+
+    public static function toPaidInLiveTicket(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessUserNotificationOrderPaidLiveTicket(
+                $orderTicketDto->getEmail(),
+                $orderTicketDto->getTicketTypeId(),
+            )
+        );
+
+        return $result;
+    }
+
 
     public static function toPaid(OrderTicketDto $orderTicketDto): self
     {
@@ -66,12 +85,13 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket()
+            $result->getTicket(),
         ));
 
         $result->record(new ProcessUserNotificationOrderPaid(
                 $orderTicketDto->getEmail(),
                 $result->getTicket(),
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 
@@ -88,6 +108,24 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessUserNotificationOrderCancel(
                 $orderTicketDto->getEmail(),
+                $orderTicketDto->getTicketTypeId(),
+            )
+        );
+
+        return $result;
+    }
+
+    public static function toLiveIssued(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+        $result->record(new ProcessCancelTicket(
+            $result->id,
+        ));
+
+        $result->record(new ProcessUserNotificationOrderLiveTicketIssued(
+                $orderTicketDto->getEmail(),
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 
@@ -103,7 +141,7 @@ final class OrderTicket extends AggregateRoot
 
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
-        if(is_null($comment)) {
+        if (is_null($comment)) {
             throw new DomainException('Комментарий обязательный для смены статус "Возникли трудности"');
         }
 
@@ -116,7 +154,8 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessUserNotificationOrderDifficultiesArose(
                 $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
-                $comment
+                $comment,
+                $orderTicketDto->getTicketTypeId(),
             )
         );
 

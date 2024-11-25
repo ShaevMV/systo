@@ -6,14 +6,15 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 
 use Bus;
 use DomainException;
+use Illuminate\Support\Facades\DB;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 final class CreateOrder
 {
@@ -42,12 +43,19 @@ final class CreateOrder
         OrderTicketDto $orderTicketDto,
     ): bool
     {
-        $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
+        DB::beginTransaction();
+        try {
+            $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
 
-        /** @var OrderTicketItemResponse $orderTicketItem */
-        $orderTicketItem = $this->queryBus->ask(new OrderIdQuery($orderTicketDto->getId()));
-        if (is_null($orderTicketItem)) {
-            throw new DomainException('Не получины данные о заказе ' . $orderTicketDto->getId()->value());
+            /** @var OrderTicketItemResponse $orderTicketItem */
+            $orderTicketItem = $this->queryBus->ask(new OrderIdQuery($orderTicketDto->getId()));
+            if (is_null($orderTicketItem)) {
+                throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
+            }
+            DB::commit();
+        } catch (Throwable $throwable) {
+            DB::rollBack();
+            throw $throwable;
         }
 
         $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());

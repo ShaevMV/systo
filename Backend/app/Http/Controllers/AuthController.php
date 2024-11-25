@@ -65,7 +65,6 @@ class AuthController extends Controller
     public function register(Request $request): JsonResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'city' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -248,7 +247,7 @@ class AuthController extends Controller
         /** @var User $user */
         $user = auth()->user();
 
-        $user->name = $request->get('name');
+        $user->name = $request->get('name','');
         $user->phone = $request->get('phone');
         $user->city = $request->get('city');
         $user->save();

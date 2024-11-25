@@ -12,9 +12,10 @@
           <table class="table table-hover">
             <thead>
             <tr>
-              <th scope="col">№ заказа</th>
-              <th scope="col" v-if="isAdmin"></th>
+              <th scope="col" class="mobile">№ заказа</th>
+              <th scope="col" v-if="isAdmin" class="mobile"></th>
               <th scope="col" v-if="isAdmin">Email</th>
+              <th scope="col" v-if="isAdmin">Гости</th>
               <th scope="col">Тип оргвзноса</th>
               <th scope="col">Стоимость</th>
               <th scope="col">Кол-во</th>
@@ -22,22 +23,24 @@
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col">Статус</th>
+              <th scope="col" class="mobile">Статус</th>
+              <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
-              <th scope="col" v-if="isAdmin"></th>
+              <th scope="col" v-if="isAdmin" class="mobile"></th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(itemOrder,index) in getOrderList"
                 v-bind:key="index"
                 @click="goItemOrderForUser(itemOrder.id, itemOrder.status)">
-              <th scope="row">
+              <th scope="row" class="mobile">
                 {{ itemOrder.kilter }}
               </th>
-              <td v-if="isAdmin">
+              <td v-if="isAdmin" class="mobile">
                 <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
+                          :style="{'background-color': activeColor(itemOrder.status)}"
                           aria-expanded="false">
                     ...
                   </button>
@@ -50,6 +53,9 @@
                 </div>
               </td>
               <td v-if="isAdmin">{{ itemOrder.email }}</td>
+              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) ">
+                {{ getListQuests(itemOrder.guests, false) }}
+              </td>
               <td>{{ itemOrder.name }}</td>
               <td>{{ itemOrder.price }} рублей</td>
               <td>{{ itemOrder.count }}</td>
@@ -58,9 +64,16 @@
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)">{{ itemOrder.humanStatus }}</td>
-              <td v-if="isAdmin">{{ itemOrder.lastComment }}</td>
+              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
+                {{ itemOrder.humanStatus }}
+              </td>
               <td v-if="isAdmin">
+                {{ itemOrder.city }}
+              </td>
+              <td v-if="isAdmin" :title="itemOrder.lastComment">
+                {{ cuttedText(itemOrder.lastComment) }}
+              </td>
+              <td v-if="isAdmin" class="mobile" style="text-align: left;">
                 <router-link
                     :to="{
                     name: 'orderItems',
@@ -68,7 +81,7 @@
                 }">
                   Перейти к билету
                 </router-link>
-                </td>
+              </td>
             </tr>
             </tbody>
           </table>
@@ -86,7 +99,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Сообщения для пользователя</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Номер живого билета или комментарий для пользователя</h5>
             <button type="button" class="close"
                     data-dismiss="modal"
                     id="closeModal"
@@ -102,7 +115,8 @@
           <div class="modal-footer">
             <button type="button"
                     @click="sendDifficultiesArose"
-                    class="btn btn-secondary">Сменить статус на возникли трудности</button>
+                    class="btn btn-secondary">Сменить статус
+            </button>
           </div>
         </div>
       </div>
@@ -115,10 +129,11 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "OrderList",
-  data(){
+  data() {
     return {
       comment: null,
       selectId: null,
+      selectStatus: null,
     }
   },
   props: {
@@ -133,12 +148,26 @@ export default {
       'getError'
     ]),
   },
+  // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
       'sendToChanceStatus'
     ]),
     styleObject: function (status) {
-      let color = 'black';
+      return {
+        color: this.activeColor(status),
+      }
+    },
+    goItemOrderForUser(idOrderItem, status) {
+      if (!this.isAdmin) {
+        if (status !== 'cancel') {
+          this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+        }
+      }
+    },
+    activeColor: function (status) {
+      let color = '#86201c';
+
       switch (status) {
         case 'new':
           color = '#333333';
@@ -149,23 +178,32 @@ export default {
         case 'cancel':
           color = '#86201c';
           break;
+        case 'live_ticket_issued':
         case 'difficulties_arose':
           color = '#d0ba27';
           break;
         default:
-          color = 'black';
+          color = 'red';
       }
 
-      return {
-        color: color,
-      }
+      return color
     },
-    goItemOrderForUser(idOrderItem, status) {
-      if (!this.isAdmin) {
-        if(status !== 'cancel') {
-          this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+    getListQuests: function (quests, isAll = true) {
+      let result = '';
+      let max = isAll ? quests.length : 3;
+      quests.forEach(function (item, i) {
+        if (i < max) {
+          result = result + item.value + " ";
         }
+      });
+
+      return result;
+    },
+    cuttedText: function (text) {
+      if (text !== null && text.length > 25) {
+        return text.slice(0, 25) + "...";
       }
+      return text
     },
     /**
      * Сменить статус
@@ -173,8 +211,10 @@ export default {
      * @param id
      */
     chanceStatus(status, id) {
-      if(status === 'difficulties_arose') {
-        this.selectId = id;
+      this.selectId = id;
+      this.selectStatus = status;
+
+      if (['difficulties_arose', 'live_ticket_issued'].includes(status)) {
         document.getElementById('modalOpenBtn').click();
       } else {
         this.sendToChanceStatus({
@@ -191,16 +231,15 @@ export default {
       let self = this;
       this.sendToChanceStatus({
         'id': this.selectId,
-        'status': 'difficulties_arose',
+        'status': this.selectStatus,
         'comment': this.comment,
         'callback': function () {
           document.getElementById('closeModal').click();
           self.selectId = null;
+          self.selectStatus = null;
           self.comment = null;
         }
       });
-
-
     }
   }
 }

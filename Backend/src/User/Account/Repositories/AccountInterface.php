@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Tickets\User\Account\Repositories;
 
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
 

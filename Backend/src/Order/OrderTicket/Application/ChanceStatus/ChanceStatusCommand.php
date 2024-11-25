@@ -2,17 +2,18 @@
 
 namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
-use Tickets\Shared\Domain\Bus\Command\Command;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Command\Command;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 
 class ChanceStatusCommand implements Command
 {
     public function __construct(
-        private Uuid $orderId,
-        private Status $nextStatus,
-        private Uuid $userId,
-        private ?string $comment,
+        public Uuid $orderId,
+        public Status $nextStatus,
+        public Uuid $userId,
+        public ?string $comment = null,
+        public bool $now = false,
     ){
     }
 
@@ -34,5 +35,10 @@ class ChanceStatusCommand implements Command
     public function getUserId(): Uuid
     {
         return $this->userId;
+    }
+
+    public function isNow(): bool
+    {
+        return $this->now;
     }
 }

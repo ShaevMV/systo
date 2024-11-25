@@ -11,6 +11,9 @@ import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
+import store from '../store'
+import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
+import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 
 const routes = [
     {
@@ -67,7 +70,7 @@ const routes = [
         }
     },
     {
-        path: '/orders',
+        path: '/orders/:id',
         name: 'AllOrders',
         component: OrderListForAdmin,
         meta: {
@@ -79,6 +82,7 @@ const routes = [
         path: '/order/:id',
         name: 'orderItems',
         component: OrderItemView,
+        props: true,
         meta: {
             'requiresAuth': true,
         }
@@ -98,6 +102,25 @@ const routes = [
         component: AboutView,
     },
     {
+        path: '/promo-codes',
+        name: 'PromoCodes',
+        component: PromoCodeView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/promoCode/:id?',
+        name: 'promoCodeItem',
+        component: PromoCodeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
         path: '/:pathMatch(.*)*',
         component: Error404,
     },
@@ -112,6 +135,7 @@ const router = createRouter({
  * Проверяем наличие маршрута и права доступа
  */
 router.beforeEach((to, from, next) => {
+        store.commit('HIDE_MENU');
         let token = (localStorage['user.token'] !== undefined && localStorage['user.token'] !== '' && localStorage['user.token'] !== null);
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {

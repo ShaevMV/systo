@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Dto;
 
 use Illuminate\Support\Facades\Hash;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 final class AccountDto extends AbstractionEntity
 {

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
 
 class ProcessAccountNotification implements ShouldQueue, DomainEvent
 {

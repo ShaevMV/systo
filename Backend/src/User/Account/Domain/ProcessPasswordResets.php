@@ -14,8 +14,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Hash;
 use Mail;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\ValueObject\Uuid;
 
 class ProcessPasswordResets implements ShouldQueue, DomainEvent
 {
@@ -40,7 +40,7 @@ class ProcessPasswordResets implements ShouldQueue, DomainEvent
     {
         $token = urlencode(md5($this->user->email));
 
-        $activationLink = env('APP_FRONT_URL')."/resetPassword/".$token;
+        $activationLink = "https://org.spaceofjoy.ru/resetPassword/".$token;
 
         PasswordResets::updateOrCreate([
             'email' => $this->user->email,

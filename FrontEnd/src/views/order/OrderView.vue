@@ -17,10 +17,8 @@ export default {
   created() {
     document.title = "Мои заказы"
   },
-
 }
 </script>
 
 <style scoped>
-
 </style>

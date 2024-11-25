@@ -31,11 +31,6 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td>
-                                    <a href="http://org.solarsysto.ru/">
-                                        <img src="http://193.106.175.59/images/top-img.png" alt="">
-                                    </a>
-                                </td>
                                 <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Смена пароля в системе регистрации оргвзносов на Систо</td>
                             </tr>
                         </table>
@@ -55,7 +50,7 @@
                         <table style="border: none; width: 100%; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td style="max-width: 250px;" class="footer-td">
-                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—2023, Solar Systo Togathering 2023.</p>
+                                    <p style="font-size: 14px; font-family: Tahoma, sans-serif;">© 2003—{{date('Y')}}, Solar Systo Togathering {{date('Y')}}.</p>
                                     <p style="font-size: 14px; font-family: Tahoma, sans-serif;">Все права защищены. Использование материалов сайта только с согласия правообладателей.
                                     <p>
                                 </td>

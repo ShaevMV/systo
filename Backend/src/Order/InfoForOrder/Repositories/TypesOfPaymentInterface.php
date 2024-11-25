@@ -11,5 +11,5 @@ interface TypesOfPaymentInterface
     /**
      * @return TypesOfPaymentDto[]
      */
-    public function getList():array;
+    public function getList(bool $isAdmin = false):array;
 }

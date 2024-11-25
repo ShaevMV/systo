@@ -28,6 +28,15 @@ export const isAdmin = state => {
     return state.userInfo.admin;
 };
 
+/**
+ * Проверить авторизацию
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const isManager = state => {
+    return state.userInfo.manager;
+};
 
 /**
  * Вывести email

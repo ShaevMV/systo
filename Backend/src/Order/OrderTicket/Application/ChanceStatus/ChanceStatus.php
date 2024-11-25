@@ -6,9 +6,9 @@ namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use DomainException;
 use Throwable;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 
 class ChanceStatus
 {
@@ -24,13 +24,20 @@ class ChanceStatus
     /**
      * @throws Throwable
      */
-    public function chance(Uuid $orderId, Status $status, ?string $comment = null): void
+    public function chance(
+        Uuid $orderId,
+        Status $status,
+        Uuid $userId,
+        ?string $comment = null,
+        bool $now = false,
+    ): void
     {
         $this->commandBus->dispatch(new ChanceStatusCommand(
             $orderId,
             $status,
-            new Uuid(auth()->id()),
+            $userId,
             $comment,
+            $now
         ));
     }
 }

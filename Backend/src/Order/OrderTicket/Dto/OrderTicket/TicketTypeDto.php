@@ -4,8 +4,8 @@ declare(strict_types =1);
 
 namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 final class TicketTypeDto extends AbstractionEntity
 {
@@ -13,7 +13,8 @@ final class TicketTypeDto extends AbstractionEntity
         protected Uuid $id,
         protected string $name,
         protected float $price,
-        protected ?int $gropeLimit = null
+        protected ?int $gropeLimit = null,
+        protected array $festivalList = [],
     ) {
     }
 
@@ -24,7 +25,8 @@ final class TicketTypeDto extends AbstractionEntity
             new Uuid($data['id']),
             $data['name'],
             (float)$data['price'],
-            $data['groupLimit']
+            $data['groupLimit'],
+            $data[]
         );
     }
 

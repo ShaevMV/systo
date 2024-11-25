@@ -13,8 +13,8 @@
                       id="validationDefault01">
                 <option value=null>Выберите тип оргвзноса</option>
                 <option v-for="(typeTickets) in getTicketType"
-                        v-bind:key="typeTickets.id"
-                        v-bind:value="typeTickets.id">{{ typeTickets.name }} /
+                        v-bind:key="typeTickets.price"
+                        v-bind:value="typeTickets">{{ typeTickets.name }} /
                   {{ typeTickets.price }} руб.
                 </option>
               </select>
@@ -48,7 +48,7 @@
               <select class="form-select"
                       v-model="status"
                       id="validationDefault01">
-                <option value=null>Выберите статус заказа</option>
+                <option value="">Выберите статус заказа</option>
                 <option value="new">Новый</option>
                 <option value="paid">Оплаченный</option>
                 <option value="cancel">Отменёный</option>
@@ -64,18 +64,25 @@
                      class="form-control"
                      id="validationDefault03">
             </div>
+            <div class="col-md-4">
+              <label for="validationDefault04" class="form-label">Город</label>
+              <input type="text"
+                     v-model="city"
+                     class="form-control"
+                     id="validationDefault04">
+            </div>
           </div>
 
-            <div class="row b-row mt-2">
-              <button class="btn btn-primary"
-                      @click="sendFilter"
-                      type="submit">Применить фильтр
-              </button>
-              <button class="btn btn-primary"
-                      @click="clearFilter"
-                      type="submit">Сбросить фильтр
-              </button>
-              </div>
+          <div class="row b-row mt-2">
+            <button class="btn btn-primary"
+                    @click="sendFilter"
+                    type="submit">Применить фильтр
+            </button>
+            <button class="btn btn-primary"
+                    @click="clearFilter"
+                    type="submit">Сбросить фильтр
+            </button>
+          </div>
 
         </div>
       </div>
@@ -88,13 +95,17 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "FilterOrder",
+  props: {
+    'festivalId': String
+  },
   data() {
     return {
-      typeOrder: null,
       email: null,
-      status: null,
+      typeOrder: null,
+      status: '',
       promoCode: null,
       typesOfPayment: null,
+      city: null,
     }
   },
   computed: {
@@ -102,10 +113,22 @@ export default {
       'getTypesOfPayment',
       'getTicketType',
     ]),
+    /*typeOrder: {
+        get: function () {
+          return this.price;
+        },
+        set: function (newValue) {
+            this.price = newValue.price;
+            this.typePrice = newValue.id;
+
+            console.log(newValue);
+        },
+    }*/
   },
   methods: {
     ...mapActions('appFestivalTickets', [
-      'loadDataForOrderingTickets',
+      'getListTypesOfPayment',
+      'getListPriceFor',
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
@@ -114,25 +137,38 @@ export default {
      * Отправить данные для фильтра
      */
     sendFilter: function () {
+      let price = this.typeOrder !== null ? this.typeOrder.price : null;
+      let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
+      let self = this;
+      let festivalId = this.$route.params.id
       this.getOrderListForAdmin({
-        'typeOrder': this.typeOrder,
-        'email': this.email,
-        'status': this.status,
-        'promoCode': this.promoCode,
-        'typesOfPayment': this.typesOfPayment,
+        'price': price,
+        'typePrice': typePrice,
+        'email': self.email,
+        'status': self.status,
+        'promoCode': self.promoCode,
+        'typesOfPayment': self.typesOfPayment,
+        'festivalId': festivalId,
+        'city': self.city,
       });
     },
     clearFilter: function () {
-      this.typeOrder = null;
+      this.typePrice = null;
+      this.price = null;
       this.email = null;
-      this.status = null;
+      this.status = '';
       this.promoCode = null;
       this.typesOfPayment = null;
-      this.getOrderListForAdmin();
+      this.typeOrder = null;
+      this.city = null;
+      let festivalId = this.$route.params.id
+      this.getOrderListForAdmin({
+        'festivalId': festivalId,
+      });
     }
   },
   async created() {
-    await this.loadDataForOrderingTickets();
+    await this.getListTypesOfPayment({festival_id: this.$route.params.id});
   },
 }
 </script>

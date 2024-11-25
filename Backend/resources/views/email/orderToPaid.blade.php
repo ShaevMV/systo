@@ -31,12 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td>
-                                    <a href="http://org.solarsysto.ru/">
-                                        <img src="http://193.106.175.59/images/top-img.png" alt="">
-                                    </a>
-                                </td>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Оргвзнос на Solar Systo Togathering {{date('Y')}} подтверждён</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Билеты на {{$festivalName}}</td>
                             </tr>
                         </table>
                     </td>
@@ -44,11 +39,11 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на Solar Systo Togathering {{date('Y')}} потдверждён</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на {{$festivalName}} потдверждён</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создании общего праздника!</p>
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с qr-кодом на каждого гостя прикреплены к этому письму.</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы {{ env('APP_FRONT_URL') }}/myOrders</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы https://org.solarsysto.ru/myOrders</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>

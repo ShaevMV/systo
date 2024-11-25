@@ -8,23 +8,25 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use App\Models\User;
-use Database\Seeders\FestivalSeeder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Service\TicketService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -32,15 +34,18 @@ use Tickets\User\Account\Dto\AccountDto;
 class OrderTickets extends Controller
 {
     public function __construct(
-        private CreateOrder $createOrder,
+        private CreateOrder        $createOrder,
+        private GetTicketType      $getTicketType,
+        private TicketService      $ticketService,
         private AccountApplication $accountApplication,
-        private PriceService $priceService,
-        private GetOrder $getOrder,
-        private TotalNumber $totalNumber,
-        private ChanceStatus $chanceStatus,
-        private TicketApplication $ticketApplication,
-        private AddComment $addComment,
-    ) {
+        private PriceService       $priceService,
+        private GetOrder           $getOrder,
+        private TotalNumber        $totalNumber,
+        private ChanceStatus       $chanceStatus,
+        private TicketApplication  $ticketApplication,
+        private AddComment         $addComment,
+    )
+    {
     }
 
     /**
@@ -55,26 +60,33 @@ class OrderTickets extends Controller
             $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
                 AccountDto::fromState($createOrderTicketsRequest->toArray())
             )->value());
-
+            $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
-                new Uuid($createOrderTicketsRequest->ticket_type_id),
+                $ticketTypeId,
                 count($createOrderTicketsRequest->guests),
                 $createOrderTicketsRequest->promo_code
             );
 
+            $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
+
             $data = $createOrderTicketsRequest->toArray();
-            $data['festival_id'] = FestivalSeeder::ID_FOR_2023_FESTIVAL;
+
+            $data['guests'] = $this->ticketService->initFestivalId(
+                $createOrderTicketsRequest->guests,
+                $ticketType->getFestivalListId()
+            );
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
                 $userId,
                 $priceDto,
+                $ticketType->isLiveTicket(),
             );
 
             $this->createOrder->createAndSave($orderTicketDto);
             // Добавления комментария
-            if($createOrderTicketsRequest->comment) {
+            if ($createOrderTicketsRequest->comment) {
                 $this->addComment->send(
                     $orderTicketDto->getId(),
                     $userId,
@@ -117,7 +129,10 @@ class OrderTickets extends Controller
     public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
         $listResponse = $this->getOrder->listByFilter(
-            OrderFilterQuery::fromState($filterForTicketOrder->toArray())
+            OrderFilterQuery::fromState(
+                $filterForTicketOrder->toArray(),
+                Auth::user()->isManager() ?? false
+            )
         ) ?? new ListResponse();
 
         return response()->json(
@@ -156,7 +171,10 @@ class OrderTickets extends Controller
      */
     public function toChanceStatus(string $id, Request $request): JsonResponse
     {
-        if($request->get('status') === Status::DIFFICULTIES_AROSE) {
+        if (in_array($request->get('status'), [
+            Status::DIFFICULTIES_AROSE,
+            Status::LIVE_TICKET_ISSUED
+        ])) {
             $request->validate([
                 'comment' => 'required|string'
             ], [
@@ -168,6 +186,7 @@ class OrderTickets extends Controller
         $this->chanceStatus->chance(
             new Uuid($id),
             $status,
+            new Uuid(Auth::id()),
             $request->get('comment', null)
         );
 
@@ -184,7 +203,7 @@ class OrderTickets extends Controller
     /**
      * Получить список билетов в PDF
      *
-     * @param  string  $id
+     * @param string $id
      * @return JsonResponse
      */
     public function getUrlListForPdf(string $id): JsonResponse

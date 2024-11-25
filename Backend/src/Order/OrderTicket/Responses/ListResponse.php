@@ -3,7 +3,7 @@
 namespace Tickets\Order\OrderTicket\Responses;
 
 use Nette\Utils\JsonException;
-use Tickets\Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Bus\Query\Response;
 
 class ListResponse implements Response
 {

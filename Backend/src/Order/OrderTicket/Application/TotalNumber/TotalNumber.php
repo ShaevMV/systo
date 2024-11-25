@@ -6,7 +6,7 @@ namespace Tickets\Order\OrderTicket\Application\TotalNumber;
 
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\TotalNumberResponse;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 
 class TotalNumber
 {

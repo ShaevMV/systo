@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Dto;
 
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\Entity\EntityInterface;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\Entity\EntityInterface;
+use Shared\Domain\ValueObject\Uuid;
 
 final class CommentDto extends AbstractionEntity
 {

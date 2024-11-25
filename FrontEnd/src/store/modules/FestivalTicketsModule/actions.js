@@ -4,15 +4,38 @@ import axios from 'axios';
  * Загрузить список способов оплаты и типов билета
  *
  * @param context
+ * @param payload
  */
-export const loadDataForOrderingTickets = (context) => {
-    let promise = axios.get('/api/v1/festival/orderingTickets');
+export const loadDataForOrderingTickets = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/orderingTickets',
+        {params: {festival_id: payload.festival_id}});
     promise.then(function (response) {
         context.commit('setTypesOfPayment', response.data.typesOfPayment);
         context.commit('setTicketType', response.data.ticketType);
         context.commit('setSelectTicketType', response.data.ticketType[0]);
     })
 };
+
+
+export const getListPriceFor = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/getListPrice',
+        {params: {festival_id: payload.festival_id}});
+    promise.then(function (response) {
+        context.commit('setTicketType', response.data.ticketType);
+    })
+};
+
+export const getListTypesOfPayment = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/orderingTickets',
+        {params: {
+            festival_id: payload.festival_id,
+            is_admin: true,
+        }});
+    promise.then(function (response) {
+        context.commit('setTypesOfPayment', response.data.typesOfPayment);
+    })
+};
+
 
 /**
  * Записать выбранный тип билета

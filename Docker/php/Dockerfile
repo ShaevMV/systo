@@ -1,6 +1,8 @@
 FROM php:8.0-fpm
 
-WORKDIR /var/www/html
+
+ENV HOME ${WORKING_DIR}
+
 
 RUN apt-get update && apt-get install -y \
         libpng-dev \
@@ -26,41 +28,33 @@ RUN apt-get update && apt-get install -y \
         && docker-php-ext-install sockets \
         && docker-php-source delete
 
-
-
-
-#ENV HOME /var/www/html
-#ENV DOCKER_PHP ${HOME}/docker/php
-
-#COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf
-#COPY custom.ini /usr/local/etc/php/conf.d/custom.ini
+COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
 
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
 #xdebug
-RUN pecl install xdebug \
-    && docker-php-ext-enable xdebug
+ARG WITH_XDEBUG="false"
+COPY xdebug.ini /tmp/xdebug.ini
 
-
-#Redis
-RUN pecl install redis && docker-php-ext-enable redis
-
-#rebbitMQ
-RUN apt-get install -y librabbitmq-dev
-RUN pecl install amqp && docker-php-ext-enable amqp
-
-#node
-RUN apt-get install -y curl
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install -y nodejs
-RUN node -v
+RUN if [ ${WITH_XDEBUG} = "true" ]; then \
+    pecl install xdebug \
+     && docker-php-ext-enable xdebug \
+;fi
 
 #
 RUN adduser --disabled-password --gecos "" user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
+RUN if [ ${WITH_XDEBUG} = "true" ]; then \
+    chown -R user:user /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+;fi
 
+RUN if [ ${WITH_XDEBUG} = "true" ]; then \
+    chmod 777 /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+;fi
+
+COPY docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 

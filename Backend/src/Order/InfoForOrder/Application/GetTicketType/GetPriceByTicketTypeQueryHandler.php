@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Application\GetTicketType;
 
-use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterface;
+use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
 use Tickets\Order\InfoForOrder\Response\PriceByTicketTypeResponse;
 
 class GetPriceByTicketTypeQueryHandler
 {
     public function __construct(
-        private TicketTypeInterface $ticketType
+        private TicketTypeInterfaceRepository $ticketType
     ) {
     }
 
     public function __invoke(GetPriceByTicketTypeQuery $query): PriceByTicketTypeResponse
     {
-        $ticketType = $this->ticketType->getById($query->getUuid());
+        $ticketType = $this->ticketType->getById($query->getUuid(), $query->getCarbon());
 
         return new PriceByTicketTypeResponse(
             $ticketType->getPrice(),

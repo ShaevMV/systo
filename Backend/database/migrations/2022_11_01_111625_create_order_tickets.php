@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use Tickets\Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Status;
 
 return new class extends Migration {
     /**
@@ -37,7 +37,7 @@ return new class extends Migration {
             $table->float('discount')->default(0);
 
             $table->string('status')->nullable(false)->default(Status::NEW);
-            $table->dateTime('date')->nullable(false);
+            $table->string('date')->nullable(false);
 
             $table->timestamps();
         });

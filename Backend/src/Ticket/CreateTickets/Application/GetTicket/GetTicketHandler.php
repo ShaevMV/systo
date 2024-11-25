@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Application\GetTicket;
 
-use Tickets\Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Bus\Query\QueryHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class GetTicketHandler implements QueryHandler

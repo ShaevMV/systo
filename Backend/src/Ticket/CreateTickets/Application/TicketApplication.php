@@ -7,23 +7,21 @@ namespace Tickets\Ticket\CreateTickets\Application;
 use Illuminate\Support\Facades\Bus;
 use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
-use Tickets\Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
-use Tickets\Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\Ticket\CreateTickets\Application\Cancel\CancelTicketCommand;
 use Tickets\Ticket\CreateTickets\Application\Cancel\CancelTicketCommandHandler;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommand;
 use Tickets\Ticket\CreateTickets\Application\Create\CreateTicketCommandHandler;
-use Tickets\Ticket\CreateTickets\Application\GetTicket\GetTicketHandler;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQuery;
 use Tickets\Ticket\CreateTickets\Application\GetPdf\GetPdfQueryHandler;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\GetTicketHandler;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\GetTicketQuery;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Domain\Ticket;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 use Tickets\Ticket\CreateTickets\Responses\UrlsTicketPdfResponse;
-use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
-
 class TicketApplication
 {
     private InMemorySymfonyCommandBus $commandBus;
@@ -49,7 +47,7 @@ class TicketApplication
 
     /**
      * @param  GuestsDto[]  $guests
-     *
+     * TODO: рефакторинг
      * @return Ticket[]
      * @throws Throwable
      */
@@ -60,6 +58,7 @@ class TicketApplication
             $ticketDto =  new TicketDto(
                 $orderId,
                 $guest->getValue(),
+                $guest->getFestivalId(),
                 $guest->getId() ?? null,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(

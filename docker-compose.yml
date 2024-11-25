@@ -6,31 +6,92 @@ services:
     build:
       context: ./Docker/nginx
     ports:
-      - "80:8083"
+      - "50080:8083"
     volumes:
-      - ./Docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./Docker/nginx/default.dev.conf:/etc/nginx/conf.d/default.conf.template
+      - ./Docker/nginx/ssl:/etc/nginx/ssl
       - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./Docker/nginx/proxy_params:/etc/nginx/proxy_params
-      - ./Backend:/var/www/html
-      - ./FrontEnd:/var/app/
+      - ./Backend:${ENV_ORG_BACKEND_PATCH}
+      - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
+      - ./Shared:${ENV_SHARED_PATCH}
+      - ./Baza:${ENV_VHOD_PATCH}
+      - ./Friendly:${ENV_DRUG_PATCH}
+      - ./Docker/nginx/auth.basic:/etc/nginx/auth.basic
     user: user
+    environment:
+      - ENV_ORG_BACKEND_HOST=${ENV_ORG_BACKEND_HOST}
+      - ENV_ORG_FRONTEND_HOST=${ENV_ORG_FRONTEND_HOST}
+      - ENV_VHOD_BACKEND_HOST=${ENV_VHOD_BACKEND_HOST}
+      - ENV_DRUG_BACKEND_HOST=${ENV_DRUG_BACKEND_HOST}
+
+      - ENV_ORG_BACKEND_PATCH=${ENV_ORG_BACKEND_PATCH}
+      - ENV_ORG_FRONT_PATCH=${ENV_ORG_FRONT_PATCH}
+      - ENV_SHARED_PATCH=${ENV_SHARED_PATCH}
+      - ENV_VHOD_PATCH=${ENV_VHOD_PATCH}
+      - ENV_DRUG_PATCH=${ENV_DRUG_PATCH}
+
     networks:
       - backend
     links:
-      - php
       - mysql
       - node
+      - phpFriendly
+      - php
 
   php:
+    hostname: ${ENV_ORG_BACKEND_HOST}
     build:
       context: ./Docker/php
-    image: 'laravelapp'
+      args:
+        - WITH_XDEBUG=true
+    image: 'ogr_laravel'
+    env_file:
+      - ./Backend/.env
     container_name: php-solarSysto
     volumes:
-      - ./Backend:/var/www/html
-      - ./Docker/php/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-      - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
-      - ~/.ssh/id_rsa.pub:/home/user/.ssh/id_rsa.pub
+      - ./Shared:${ENV_SHARED_PATCH}
+      - ./Backend:/var/www/org
+    working_dir: /var/www/org
+    user: user
+    environment:
+      - WITH_XDEBUG=true
+      - WORKING_DIR=${ENV_ORG_BACKEND_PATCH}
+    networks:
+      - backend
+
+  node:
+    hostname: ${ENV_ORG_FRONTEND_HOST}
+    build:
+      context: ./Docker/node
+    working_dir: ${ENV_ORG_FRONT_PATCH}
+    ports:
+      - "8082:8080"
+    container_name: node-solarSysto
+    volumes:
+      - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
+    command: tail -f /dev/null
+    user: node
+    networks:
+      - backend
+
+  phpFriendly:
+    hostname: ${ENV_DRUG_BACKEND_HOST}
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=true
+    container_name: php-friendly
+    image: 'friendly_laravel'
+    env_file:
+      - ./Friendly/.env
+    volumes:
+      - ./Friendly:${ENV_DRUG_PATCH}
+      - ./Shared:${ENV_SHARED_PATCH}
+    working_dir: ${ENV_DRUG_PATCH}
+    environment:
+      - WITH_XDEBUG=true
+      - WORKING_DIR=${ENV_DRUG_PATCH}
     user: user
     networks:
       - backend
@@ -44,24 +105,10 @@ services:
     networks:
       - backend
 
-  node:
-    build:
-      context: ./Docker/node
-    working_dir: /var/app
-    ports:
-        - "8081:8080"
-    container_name: node-solarSysto
-    volumes:
-      - ./FrontEnd:/var/app
-    command: tail -f /dev/null
-    user: node
-    networks:
-      - backend
-
   mysql:
     image: mysql:8
     ports:
-      - "3306:3306"
+      - "33069:3306"
     environment:
       MYSQL_DATABASE: 'systo'
       MYSQL_ROOT_PASSWORD: 'secret'
@@ -70,6 +117,55 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
       - ./Docker/mysql/db:/var/lib/mysql
+    networks:
+      - backend
+
+  database:
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD=common404"
+      - "MYSQL_DATABASE=friendly"
+    volumes:
+      - ./Docker/mysqlFriendly/db:/var/lib/mysql
+      - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "33065:3306"
+    networks:
+      - backend
+
+  phpBaza:
+    hostname: ${ENV_VHOD_BACKEND_HOST}
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=false
+    container_name: php-baza
+    image: 'baza_laravel'
+    env_file:
+      - ./Baza/.env
+    volumes:
+      - ./Baza:/var/www/vhod
+      - ./Shared:${ENV_SHARED_PATCH}
+    working_dir: ${ENV_VHOD_PATCH}
+    user: user
+    environment:
+      - WITH_XDEBUG=false
+      - WORKING_DIR=${ENV_VHOD_PATCH}
+    networks:
+      - backend
+
+  worker:
+    build:
+      context: ./Docker/worker
+    image: 'laravelworker'
+    volumes:
+      - ./Backend:${ENV_ORG_BACKEND_PATCH}
+      - ./Friendly:${ENV_DRUG_PATCH}
+      - ./Shared:${ENV_SHARED_PATCH}
+      - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+      - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    user: user
+    command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
     networks:
       - backend
 

@@ -40,6 +40,7 @@ export const getOrderListForUser = (context) => {
  * @param payload
  */
 export const getOrderListForAdmin = (context, payload) => {
+    console.log(payload);
     let promise = axios.post('/api/v1/festival/ticketsOrder/getList', payload);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
@@ -119,15 +120,19 @@ export const sendToChanceStatus = (context, payload) => {
 }
 
 export const getUrlForPdf = (context, payload) => {
+    return new Promise((resolve, reject) => {
     let promise = axios.get('/api/v1/festival/ticketsOrder/getTicketPdf/' + payload);
-    promise.then(function (response) {
+    return promise.then(function (response) {
+        //console.log('in promise ', response);
         response.data.listUrl.forEach(function (item) {
-            window.open(item)
+             resolve(item);
         })
-        console.log(response)
+        //console.log(response)
     }).catch(function (error) {
-        console.error(error);
+        //console.error(error);
         context.commit('setError', error.response.data.errors);
+        reject(error);
+    });
     });
 };
 

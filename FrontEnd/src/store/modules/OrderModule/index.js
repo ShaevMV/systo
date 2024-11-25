@@ -11,6 +11,7 @@ export default {
             totalAmount: 0,
             totalCount: 0,
             totalCountToPaid: 0,
+            countTickets: 0,
         },
         orderItem: {
             name: null,

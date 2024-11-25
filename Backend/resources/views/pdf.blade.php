@@ -30,7 +30,7 @@
             background-color: #fff;
             z-index: 3;
             position: absolute;
-            border-bottom: 2px solid #86201c;
+            border-bottom: 2px solid #152035;
             z-index: 5;
         }
 
@@ -104,7 +104,7 @@
             width: 720px;
             bottom: 0;
             height: 40px;
-            background-color: #86201c;
+            background-color: #152035;
             z-index: 5;
         }
 
@@ -113,19 +113,19 @@
     </style>
 </head>
 <body>
-<img src="http://193.106.175.59/images/main-bg.jpg" alt="fon" id="fon">
+<img src="https://api.solarsysto.ru/images/main-bg.jpg" alt="fon" id="fon">
 <div id="top"></div>
-<img src="http://193.106.175.59/images/top-img.png" alt="top" id="top-img">
+<img src="https://api.solarsysto.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering 2023!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}
 </div>
 
 <div class="email">
-   Email: {{$email}}
+    Email: {{$email}}
 </div>
 
 <div class="id">

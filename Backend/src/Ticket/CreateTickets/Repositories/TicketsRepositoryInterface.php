@@ -2,8 +2,9 @@
 
 namespace Tickets\Ticket\CreateTickets\Repositories;
 
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+use Tickets\Ticket\CreateTickets\Dto\PushTicketsDto;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 interface TicketsRepositoryInterface
@@ -13,10 +14,17 @@ interface TicketsRepositoryInterface
     public function deleteTicketsByOrderId(Uuid $orderId): bool;
 
     /**
-     * @param  Uuid  $orderId
+     * @param Uuid $orderId
      * @return Uuid[]
      */
-    public function getListIdByOrderId(Uuid $orderId): array;
+    public function getListIdByOrderId(Uuid $orderId, bool $isShowDelete = false): array;
 
-    public function getTicket(Uuid $ticketId): TicketResponse;
+    public function getTicket(Uuid $ticketId, bool $isShowDelete = false): TicketResponse;
+
+    public function setInBaza(TicketResponse $ticketsDto): bool;
+
+    /**
+     * @return Uuid[]
+     */
+    public function getAllTicketsId(Uuid $festivalId): array;
 }

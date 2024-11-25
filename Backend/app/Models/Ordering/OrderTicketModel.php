@@ -14,10 +14,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 /**
  * App\Models\Tickets\Ordering\OrderTicket
@@ -65,6 +65,8 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel wherePhone($value)
  * @property int $kilter
  * @method static Builder|OrderTicketModel whereKilter($value)
+ * @property-read Collection|TicketModel[] $tickets
+ * @property-read int|null $tickets_count
  */
 final class OrderTicketModel extends Model
 {
@@ -101,5 +103,17 @@ final class OrderTicketModel extends Model
     public function typeOfPayment(): BelongsTo
     {
         return $this->belongsTo(TypesOfPaymentModel::class, 'types_of_payment_id');
+    }
+
+    public function festivalsUuid(): array
+    {
+        $ticketType = $this->ticketType()
+            ->with([
+                'festival'
+            ])
+            ->first()
+            ->toArray();
+
+        return array_map(fn(array $data) => new Uuid($data['id']), $ticketType['festival']);
     }
 }

@@ -16,9 +16,9 @@
     scroll-behavior: smooth;
     --transition: all 0.5s 0.03s ease;
     --radius: 10px;
-    --c-red: rgb(134, 32, 28);
+    --c-red: #1e1e38;
     --c-red-bg: rgba(134, 32, 28, 0.1);
-    --c-red-hover: #ff0a00;
+    --c-red-hover: #4747ff;
     --c-grey: rgb(235, 237, 244);
     --c-lightgrey: rgba(235, 237, 244, 0.5);
     --c-green: rgb(30, 135, 28);
@@ -1212,6 +1212,18 @@ a:hover {
     color: #012970;
 }
 
+#check-check{
+     display: flex;
+     flex-wrap: nowrap;
+     align-items: center;
+ }
+
+
+button[disabled]{
+    background-color: grey !important;
+}
+
+
 .ximg, #left-logo img{
     width: 100%;
     height: auto;
@@ -1584,6 +1596,7 @@ select.form-select::after{
 }
 
 #contact-form .row{
+    margin-top: 10px;
     justify-content: space-between;
     align-items: center;
 }
@@ -1612,7 +1625,7 @@ select.form-select::after{
 
 .payment-choice label{
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
 }
 
@@ -1630,12 +1643,12 @@ select.form-select::after{
 }
 
 .in-choice > div:nth-of-type(2) span{
-    background-image: url('../img/icon-qiwi.png');
+    background-image: url('../img/icon-umoney.png');
     background-size: 25px;
 }
 
 .in-choice > div:last-of-type span{
-    background-image: url('../img/icon-umoney.png');
+    background-image: url('../img/sticker.webp');
     background-size: 25px;
 }
 
@@ -1847,7 +1860,7 @@ input[readonly]{
     color: #86201c;
     font-weight: bold;
     display: inline-block;
-    width: 500px;
+    width: 100%;
     position: relative;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -1864,7 +1877,7 @@ input[readonly]{
 }
 
 .x-button{
-    width: 450px;
+    width: 100%;
 }
 
 .download-title{
@@ -1889,7 +1902,7 @@ input[readonly]{
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px auto;
-    /*display: none;*/
+    display: none;
 }
 
 
@@ -1919,6 +1932,10 @@ input[readonly]{
 @media (max-width: 1200px) {
     .sidebar {
         left: -300px;
+    }
+
+    .sidebar.active {
+        left: 0 !important;
     }
 
     #header button{
@@ -1963,7 +1980,7 @@ input[readonly]{
     }
 
     #defaultCheck1{
-        width: 25px;
+        width: 35px;
         height: 25px;
         border-width: 1px;
     }
@@ -1994,6 +2011,18 @@ input[readonly]{
         font-size: 24px;
     }
 
+    #check-check.form-check .form-check-input{
+        margin-left: 0;
+    }
+
+    .form-check-label{
+        width: 100%;
+    }
+
+    #defaultCheck1 + label{
+        font-size: 15px;
+    }
+
     #app .row.pp1 {
         justify-content: center;
         flex-direction: column;
@@ -2009,24 +2038,21 @@ input[readonly]{
         margin-right: 0;
     }
 
-    .card-body > table thead {
+    .card-body > table th:not(.mobile){
         display: none;
     }
-
+    .card-body > table td:not(.mobile){
+        display: none;
+    }
+    
     .card-body > table tbody td,  .card-body > table tbody th{
-        display: flex;
         justify-content: space-between;
         font-size: 14px;
-    }
-
-    .card-body > table tbody tr{
-        display: block;
     }
 
     .card-body > table td::before {
         content: attr(data-label);
         font-weight: bold;
-        margin-right: 20px;
     }
 
     .payment-choice label span{
@@ -2071,6 +2097,10 @@ input[readonly]{
 @media(max-width: 600px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    #defaultCheck1 + label {
+        font-size: 14px;
     }
 
     #main .title-block small {
@@ -2224,6 +2254,30 @@ input[readonly]{
         font-size: 15px
     }
 
+    #contact-form .col-12 button, #reg-form .btn{
+        margin-top: 5vw;
+    }
+
+    .mt-4 {
+        margin-top: 1rem !important;
+    }
+
+    .in-choice > div:first-of-type span{
+        background-size: 20px;
+    }
+
+    .in-choice > div:nth-of-type(2) span {
+        background-size: 22px;
+    }
+
+    .in-choice > div:last-of-type span {
+        background-size: 21px;
+    }
+
+    .sidebar{
+        top: 48px;
+    }
+
 }
 
 
@@ -2232,8 +2286,24 @@ input[readonly]{
         font-size: 20px;
     }
 
+
+
+    label {
+        margin-bottom: 6px;
+        font-size: 15px;
+    }
+
+    #contact-form .id-info {
+        font-size: 13px;
+    }
+
+    #defaultCheck1 + label {
+        font-size: 13px;
+    }
+
     .payment-choice label span{
-        padding: 6px 35px;
+        padding: 6px 18px 6px 30px;
+        font-size: 14px;
     }
 
     .card-body {
@@ -2241,7 +2311,9 @@ input[readonly]{
     }
 
     .copy-payment{
-        right: 20px;
+        width: 20px;
+        height: 20px;
+        right: 9px;
         top: 7px;
     }
 
@@ -2253,7 +2325,6 @@ input[readonly]{
         font-size: 11px;
         padding-top: 16px;
         padding-bottom: 13px;
-        accent-color: ;
     }
 
     .form-control:not(textarea) {

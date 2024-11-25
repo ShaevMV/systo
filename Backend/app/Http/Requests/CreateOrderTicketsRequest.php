@@ -10,6 +10,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string|null $email
  * @property string $date
  * @property string $id_buy
+ * @property string $festival_id
  * @property string $phone
  * @property string $city
  * @property string|null $comment
@@ -29,8 +30,8 @@ class CreateOrderTicketsRequest extends FormRequest
     {
         return [
             'email' => 'required|email',
-            'date' => 'required|before:now',
-            'id_buy' => 'required|numeric',
+            'date' => 'required',
+            'id_buy' => 'required',
             'phone' => 'required',
             'city' => 'required',
             'guests' => 'required|array',

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Dto;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Uuid;
 
 final class UserInfoDto extends AbstractionEntity implements Response
 {
@@ -16,6 +16,7 @@ final class UserInfoDto extends AbstractionEntity implements Response
         protected string $city,
         protected string $phone,
         protected bool $admin,
+        protected bool $manager,
         protected ?string $name = null,
     ) {
     }
@@ -28,6 +29,7 @@ final class UserInfoDto extends AbstractionEntity implements Response
             $data['city'],
             $data['phone'],
             (bool) $data['is_admin'],
+            (bool) $data['is_manager'],
             $data['name'] ?? null
         );
     }

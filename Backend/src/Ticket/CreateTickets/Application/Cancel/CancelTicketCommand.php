@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace Tickets\Ticket\CreateTickets\Application\Cancel;
 
-use Tickets\Shared\Domain\Bus\Command\Command;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Command\Command;
+use Shared\Domain\ValueObject\Uuid;
 
 class CancelTicketCommand implements Command
 {

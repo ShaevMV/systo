@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Ticket\CreateTickets\Responses;
 
-use Tickets\Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Bus\Query\Response;
 
 class UrlsTicketPdfResponse implements Response
 {

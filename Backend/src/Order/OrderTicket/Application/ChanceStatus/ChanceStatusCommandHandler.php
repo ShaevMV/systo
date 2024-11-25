@@ -12,8 +12,9 @@ use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
-use Tickets\Shared\Domain\ValueObject\Status;
+use Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\ValueObject\Status;
+use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class ChanceStatusCommandHandler implements CommandHandler
 {
@@ -21,6 +22,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         private OrderTicketRepositoryInterface $orderTicketRepository,
         private Bus                            $bus,
         private AddComment                     $addComment,
+        private PushTicket                     $pushTicket,
     )
     {
     }
@@ -43,9 +45,11 @@ class ChanceStatusCommandHandler implements CommandHandler
 
         $orderTicket = match ((string)$command->getNextStatus()) {
             Status::PAID => OrderTicket::toPaid($orderTicketDto),
+            Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
+            Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),
-            default => throw new DomainException('Не коректнный статус' . $command->getNextStatus()),
+            default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),
         };
 
         if ($command->getNextStatus()->isdDifficultiesArose()) {
@@ -64,6 +68,13 @@ class ChanceStatusCommandHandler implements CommandHandler
             $orderTicket->getTicket()
         );
 
-        $this->bus::chain($list)->dispatch();
+        if($command->isNow()) {
+            $this->bus::chain($list)->onConnection('sync')->dispatch();
+        } else {
+            $this->bus::chain($list)->dispatch();
+
+        }
+
+        $this->pushTicket->pushByOrderId($command->getOrderId());
     }
 }

@@ -6,10 +6,11 @@ use Database\Seeders\OrderSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ApplicationTicketTest extends TestCase
@@ -40,7 +41,8 @@ class ApplicationTicketTest extends TestCase
             [
                 new GuestsDto(
                     'test',
-                    new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)
+                    new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET),
+                    new Uuid(FestivalHelper::UUID_FESTIVAL),
                 ),
             ]
         );
@@ -58,5 +60,34 @@ class ApplicationTicketTest extends TestCase
             'http://localhost/storage/tickets/56f04400-02ab-4cbe-bfd4-4f7dda23d675.pdf',
             $tickets->getUrls()[0]
         );
+    }
+
+    public function test_in_create_QR_code(): void
+    {
+        $this->expectNotToPerformAssertions();
+        /*$service = new CreatingQrCodeService();
+        for($i = 5001;$i<=5500;$i++) {
+            $number = $this->addZero($i);
+            $qrCode = $service->createQrCode($number,'');
+            $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");
+        }*/
+    }
+
+
+    private function addZero(int $number): string
+    {
+        $zero = '';
+
+        if ($number < 1000) {
+            $zero.='0';
+        }
+        if ($number < 100) {
+            $zero.='0';
+        }
+        if ($number < 10) {
+            $zero.='0';
+        }
+
+        return $zero.$number;
     }
 }

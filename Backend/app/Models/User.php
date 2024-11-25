@@ -17,7 +17,7 @@ use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
-use Tickets\Shared\Infrastructure\Models\HasUuid;
+use Shared\Infrastructure\Models\HasUuid;
 
 
 /**
@@ -50,11 +50,14 @@ use Tickets\Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User create(array $toArray)
  * @mixin Eloquent
  * @property bool $is_admin
+ * @property bool $is_manager
  * @method static Builder|User whereIsAdmin($value)
  * @property string|null $phone
  * @property string|null $city
  * @method static Builder|User whereCity($value)
  * @method static Builder|User wherePhone($value)
+ * @property string|null $project
+ * @method static Builder|User whereProject($value)
  */
 class User extends Authenticatable implements JWTSubject
 {
@@ -102,5 +105,13 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims(): array
     {
         return [];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isManager(): bool
+    {
+        return (bool) $this->is_manager;
     }
 }

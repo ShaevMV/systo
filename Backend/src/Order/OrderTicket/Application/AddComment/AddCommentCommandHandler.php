@@ -4,7 +4,7 @@ namespace Tickets\Order\OrderTicket\Application\AddComment;
 
 use Tickets\Order\OrderTicket\Dto\CommentDto;
 use Tickets\Order\OrderTicket\Repositories\CommentRepositoryInterface;
-use Tickets\Shared\Domain\Bus\Command\CommandHandler;
+use Shared\Domain\Bus\Command\CommandHandler;
 
 class AddCommentCommandHandler implements CommandHandler
 {

@@ -11,7 +11,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Mail;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
+use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
+use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Shared\Domain\ValueObject\Uuid;
+use App\Mail\SecondFestival\OrderToCreate as SecondOrderToCreate;
+use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
 {
@@ -20,13 +25,22 @@ class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
     public function __construct(
         private string $email,
         private int    $kilter,
+        private Uuid   $ticketTypeId,
+        private Uuid   $festival,
     )
     {
     }
 
     public function handle(): void
     {
+        $festivalService = app()->get(FestivalService::class);
+
+        $mail = new OrderToCreate(
+            $this->kilter,
+            $festivalService->getFestivalNameByTicketType($this->ticketTypeId),
+        );
+
         Mail::to($this->email)
-            ->send(new OrderToCreate($this->kilter));
+            ->send($mail);
     }
 }

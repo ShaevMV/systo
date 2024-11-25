@@ -1,7 +1,7 @@
 FROM node:latest
 
 
-RUN npm install -g npm@9.5.0
+RUN npm install -g npm@9.8.0
 
 # Generate the build of the application
 # RUN nset NODE_OPTIONS

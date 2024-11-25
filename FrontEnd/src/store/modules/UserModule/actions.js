@@ -1,8 +1,5 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://api.solarsysto.ru/';
-axios.defaults.withCredentials = true
-
 /**
  * Авторизоваться
  *
@@ -93,7 +90,7 @@ export const loadUserData = (context, payload) => {
     let promise = axios.get('/api/user');
     promise.then(async function (response) {
         context.commit('setUserData', response.data);
-        if(payload.callback !== undefined) {
+        if (payload.callback !== undefined) {
             payload.callback(response.data);
         }
     }).catch(function (error) {

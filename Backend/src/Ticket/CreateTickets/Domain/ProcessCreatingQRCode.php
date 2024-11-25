@@ -9,11 +9,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Log;
 use Throwable;
-use Tickets\Shared\Domain\Bus\EventJobs\DomainEvent;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
-use Tickets\Ticket\CreateTickets\Services\Dto\DataInfoForPdf;
+
 
 class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
 {
@@ -21,7 +20,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
 
     public function __construct(
         private TicketResponse $dataInfoForPdf
-    ) {
+    ){
     }
 
     /**
@@ -31,6 +30,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
         CreatingQrCodeService $codeInPdfService,
     ): void
     {
+        ini_set('memory_limit', '-1');
         try {
             $pdf = $codeInPdfService->createPdf(
                 $this->dataInfoForPdf

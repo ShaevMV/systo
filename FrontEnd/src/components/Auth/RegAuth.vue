@@ -11,12 +11,6 @@
             <div class="card-body">
 
               <div class="col-12 mb-3">
-                <label for="yourName" class="form-label hidder">Your Name</label>
-                <input type="text" name="name" class="form-control" id="yourName" required="" v-model="name" placeholder="Введи свое имя:">
-                <div class="invalid-feedback" style="display: block">{{ getError('name') }}</div>
-              </div>
-
-              <div class="col-12 mb-3">
                 <label for="yourUsername" class="form-label hidder">Your Email</label>
                 <div class="input-group has-validation">
                   <span class="input-group-text hidder" id="inputGroupPrepend">@</span>

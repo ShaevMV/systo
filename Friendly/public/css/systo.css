@@ -1,0 +1,334 @@
+@font-face {
+    font-family: istok;
+    src: url('istok-r.ttf');
+    font-weight: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: istok;
+    src: url('istok-b.ttf');
+    font-weight: bold;
+    font-display: swap;
+}
+
+:root{
+    --c-blue: #1e1e38;
+    --c-green: rgb(30, 135, 28);
+    --c-light-grey: rgba(235, 237, 244, 0.5);
+    --transition: all 0.4s 0.03s ease;
+    --radius: 10px;
+}
+
+body{
+    font-family: "istok", sans-serif;
+}
+
+.font-sans{
+    font-family: "istok", sans-serif;
+}
+
+#fon{
+    background: url('../images/main-bg.jpg') center no-repeat;
+    background-size: cover;
+    position: relative;
+    padding-bottom: 3vw;
+}
+
+.buttonz{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2vw;
+    margin-bottom: 1vw;
+}
+
+.btnx{
+    box-sizing: border-box;
+    text-decoration: none !important;
+    display: block;
+    width: 48%;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: var(--c-blue);
+    color: #fff !important;
+    transition: all 0.3s;
+    border-radius: var(--radius);
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.btnx.active{
+    cursor: default;
+    background-color: grey !important;
+}
+
+.btnx:hover{
+    background-color: var(--c-green);
+}
+
+.prose h1{
+    font-family: 'istok';
+    font-weight: bold;
+    font-size: 30px;
+    margin-top: 22px;
+}
+
+.exit-sys{
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.exit-sys a{
+    background-color: var(--c-blue);
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    border: 2px solid #fff;
+}
+
+.exit-sys a:hover{
+    background-color: var(--c-green);
+}
+
+#main-former label{
+    font-size: 15px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#fon input[type="text"], #fon select, #fon input[type=email], #fon input[type="tel"], #fon input[type=number], #fon textarea, #fon input[type="password"]{
+    margin-bottom: 20px;
+    font-size: 16px;
+    height: 40px;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    background-color: var(--c-light-grey);
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    outline: none !important;
+    transition: var(--transition);
+    border: 1px solid rgb(209, 213, 219);
+}
+
+#fon textarea{
+    height: auto;
+    resize: vertical;
+}
+
+
+#fon input[type="text"]:focus, #fon select:focus, #fon input[type=email]:focus, #fon input[type="tel"]:focus, #fon input[type=number]:focus, #fon input[type="password"]:focus{
+    border-color: var(--c-green);
+    box-shadow: 0 0 6px #000290;
+}
+
+#main-btn button{
+    margin-left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--c-green);
+    color: #fff;
+    text-align: center;
+    font-family: 'istok';
+    font-size: 16px;
+    margin-top: 2vw;
+    padding-top: 17px;
+    padding-bottom: 15px;
+    display: block;
+    border-radius: var(--radius);
+    transition: var(--transition);
+}
+
+.main-logo{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main-btn button:hover{
+    background-color: var(--c-blue);
+}
+
+.log-h1{
+    font-size: 25px;
+    margin-top: 20px;
+    margin-bottom: 0;
+    font-family: 'istok';
+    font-weight: bold;
+}
+
+.full-btnx{
+    width: 100%;
+    text-transform: uppercase;
+    font-weight: bold !important;
+    background-color: #f7a000;
+}
+
+#red-form label{
+    display: inline-block;
+}
+
+.red-span{
+    color: red;
+}
+
+
+.w-full{
+    max-width: 70rem !important;
+}
+
+.x-warn{
+    font-weight: 500 !important;
+    font-size: 16px;
+}
+
+@media(max-width: 805px){
+    .prose thead th{
+        font-size: 13px;
+    }
+
+    .prose h1{
+        font-size: 27px;
+        margin-top: 18px;
+        margin-bottom: 10px;
+    }
+
+    .prose table{
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+
+
+    .prose tbody td, .prose tbody td a.text-sm{
+        line-height: 1.2;
+        font-size: 12px;
+    }
+
+    .prose thead th, .prose tbody td{
+        padding-left: 2px;
+        padding-right: 2px;
+    }
+}
+
+@media(max-width: 705px){
+    .prose thead th{
+        font-size: 12px;
+    }
+
+    .prose table {
+        margin-top: 17px;
+        margin-bottom: 23px;
+    }
+
+    .prose h1 {
+        font-size: 23px;
+        margin-top: 14px;
+        margin-bottom: 7px;
+    }
+
+    .prose tbody td{
+        font-size: 11px;
+        word-break: break-all;
+    }
+}
+
+
+@media(max-width: 605px){
+    .prose thead th{
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .prose h1 {
+        font-size: 22px;
+        margin-top: 3px;
+        margin-bottom: 6px;
+    }
+
+    .prose tbody td, .prose tbody td a.text-sm{
+        font-size: 10px;
+    }
+
+
+    .prose tbody td a.block{
+        padding-left: 5px;
+        padding-right: 5px;
+        border-left: none;
+    }
+
+    .prose thead th:last-of-type{
+        font-size: 0;
+    }
+
+    .prose tbody td a.block {
+        padding-left: 3px;
+        padding-right: 5px;
+        border-left: none;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        font-size: 14px;
+    }
+}
+
+@media(max-width: 455px){
+    .prose tbody td, .prose tbody td a.text-sm {
+        font-size: 9px;
+    }
+
+    .prose tbody td a.text-sm{
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .prose tbody td{
+        padding-left: 1px;
+        padding-right: 0;
+    }
+
+    .p-6{
+        padding: 0.5rem;
+    }
+
+    .prose table {
+        margin-top: 9px;
+    }
+
+    .prose h1 {
+        font-size: 20px;
+        margin-top: 1px;
+        margin-bottom: 3px;
+    }
+
+    .prose .x-warn{
+        font-size: 14px;
+        line-height: 1.2;
+        margin-bottom: 20px;
+    }
+
+    .prose thead th {
+        font-size: 10px;
+    }
+
+    .prose tbody td a.block {
+        padding-left: 2px;
+        padding-right: 4px;
+        border-left: none;
+        padding-top: 2px;
+        padding-bottom: 3px;
+        font-size: 13px;
+    }
+}
+
+
+@media(max-width: 405px){
+    .prose h1 {
+        font-size: 18px;
+        margin-top: 0px;
+        margin-bottom: 2px;
+    }
+}

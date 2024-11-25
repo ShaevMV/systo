@@ -100,7 +100,8 @@ export default {
             location.href = url;
           } else {
             if (isAdmin === true) {
-              location.href = '/orders';
+              // TODO: сделать нормально
+              location.href = '/orders/9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
             } else {
               location.href = '/myOrders';
             }

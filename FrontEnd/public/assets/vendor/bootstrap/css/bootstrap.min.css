@@ -2122,9 +2122,9 @@ progress {
 }
 
 .form-text {
-    margin-top: .25rem;
-    font-size: .875em;
-    color: #6c757d
+    margin-top: 0.25rem;
+    font-size: 1.2em;
+    color: #86201c;
 }
 
 @media (prefers-reduced-motion: reduce) {

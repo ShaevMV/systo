@@ -6,11 +6,10 @@ namespace Tickets\Order\OrderTicket\Responses;
 
 use Carbon\Carbon;
 use Nette\Utils\Json;
-use Tickets\Order\OrderTicket\Domain\OrderTicketDto;
-use Tickets\Shared\Domain\Bus\Query\Response;
-use Tickets\Shared\Domain\Entity\AbstractionEntity;
-use Tickets\Shared\Domain\ValueObject\Status;
-use Tickets\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\Bus\Query\Response;
+use Shared\Domain\Entity\AbstractionEntity;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
 class OrderTicketItemResponse extends AbstractionEntity implements Response
@@ -28,7 +27,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
      * @param  float  $discount
      * @param  array  $guests
      * @param  Status  $status
-     * @param  Carbon  $dateBuy
+     * @param  string  $dateBuy
      * @param  Carbon  $dateCreate
      * @param  string  $typeOfPayment
      * @param  string  $email
@@ -44,7 +43,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         protected float $discount,
         protected array $guests,
         protected Status $status,
-        protected Carbon $dateBuy,
+        protected string $dateBuy,
         protected Carbon $dateCreate,
         protected string $typeOfPayment,
         protected string $email,
@@ -61,7 +60,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
         foreach ($data['tickets'] as $ticket) {
-            $tickets[] = TicketDto::fromState($ticket);
+            $tickets[] = TicketDto::fromState($ticket, new Uuid($data['festival_id']));
         }
 
         return new self(
@@ -73,7 +72,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
             $data['discount'],
             $guests,
             new Status($data['status']),
-            new Carbon($data['date']),
+            $data['date'],
             new Carbon($data['created_at']),
             $data['type_of_payment']['name'],
             $data['users']['email'],
