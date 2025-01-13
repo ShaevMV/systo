@@ -44,7 +44,7 @@ services:
     build:
       context: ./Docker/php
       args:
-        - WITH_XDEBUG=true
+        - WITH_XDEBUG=false
     image: 'ogr_laravel'
     env_file:
       - ./Backend/.env
@@ -55,7 +55,7 @@ services:
     working_dir: /var/www/org
     user: user
     environment:
-      - WITH_XDEBUG=true
+      - WITH_XDEBUG=false
       - WORKING_DIR=${ENV_ORG_BACKEND_PATCH}
     networks:
       - backend
