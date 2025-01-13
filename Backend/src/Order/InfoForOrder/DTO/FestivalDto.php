@@ -11,7 +11,7 @@ class FestivalDto extends AbstractionEntity
 {
     public function __construct(
         protected Uuid $id,
-        protected int $year,
+        protected string $year,
         protected string $name,
         protected bool $active = false,
     )
