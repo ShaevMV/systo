@@ -14,7 +14,10 @@
         оргвзнос не возвращается, а ваши средства будут зачтены при следующих мероприятиях, организованных
         командой Space of Joy Community.<br><br>  <b>Правила перерегистрации оргвзноса</b> <br>Если Вы решили
         передать ваш оргвзнос другому человеку, то Вам необходимо перерегистрировать его на другое имя.<br>
-        Для этого напишите письмо на <a href="ticket@spaceofjoy.ru" target="_blank">ticket@spaceofjoy.ru</a></p>
+        Для этого напишите письмо на <a href="ticket@spaceofjoy.ru" target="_blank">ticket@spaceofjoy.ru</a>
+        или в телеграм <a href="https://t.me/systo_vznos" target="_blank">@systo_vznos</a> <br>
+
+      </p>
     </div>
     </div>
   </div>

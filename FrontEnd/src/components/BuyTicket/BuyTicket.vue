@@ -26,7 +26,7 @@
     </div>
     <div class="text-center title-block">
       <h1>Форма подтверждения добровольного оргвзноса</h1>
-      <small class="form-text text-muted">на создание туристического слёта Solar Systo Togathering 2024</small>
+      <small class="form-text text-muted">на создание туристического слёта Solar Systo Togathering 2025</small>
     </div>
     <div class="row" id="main-form">
       <div class="col-md-10 mx-auto">
@@ -233,7 +233,7 @@
                               <span>
                               {{ typesOfPayment.name }}
                               <i class="copy-payment" title="Нажми, чтобы скопировать реквизиты"
-                                 @click="CopyTypesOfPayment(typesOfPayment.name)"></i>
+                                 @click="CopyTypesOfPayment(typesOfPayment.card)"></i>
                                 </span>
                             </label>
 
@@ -328,7 +328,7 @@
                   <div class="after-order">
                     <p>
                       После оплаты в течение 3-4 дней на твой e-mail придет подтверждение
-                      оргвзноса и <br><strong>электронный билет с QR-кодом</strong> для входа на Solar Systo Togathering 2024!
+                      оргвзноса и <br><strong>электронный билет с QR-кодом</strong> для входа на Solar Systo Togathering 2025!
                     </p>
                     <p>
                       <b>«Живые билеты» можно приобрести в Санкт-Петербурге</b>
@@ -341,12 +341,12 @@
                       +7 (921) 392-47-48<br/>
 
 
-                      <a href="https://t.me/cacaotemple">Телеграм </a><br/>
+                      <a href="https://t.me/cacaotemple" target="_blank">Телеграм </a><br/>
 
-                      <a href="https://cacaotemple.ru">Сайт </a><br/>
+                      <a href="https://cacaotemple.ru" target="_blank">Сайт </a><br/>
 
-                      <a href="https://yandex.ru/navi/org/kakao_templ/156023560596?si=hgcx2kzvw06q9hvz04e4a1dp4g">Как проехать</a><br/>
-
+                      <a href="https://yandex.ru/navi/org/kakao_templ/156023560596?si=hgcx2kzvw06q9hvz04e4a1dp4g" target="_blank">Как проехать</a><br/>
+                      <br/>
                       "Живой билет" является таким же видом оргвзноса, как и электронный, просто в этом случае вы получите конверт внутри которого будет карта участника с номером и сувенирная продукция. При регистрации оргвзноса электронно - отдельно покупать "живой билет" не нужно!
                     </p>
                   </div>
@@ -522,11 +522,9 @@ export default {
       'loadUserData',
     ]),
     CopyTypesOfPayment: function (name) {
-      let card = name.replace(/[^0-9, ]/g, "");
       let area = document.createElement('textarea');
-
       document.body.appendChild(area);
-      area.value = card;
+      area.value = name;
       area.select();
       document.execCommand("copy");
       document.body.removeChild(area);

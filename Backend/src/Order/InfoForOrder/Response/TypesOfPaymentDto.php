@@ -13,6 +13,7 @@ final class TypesOfPaymentDto extends AbstractionEntity implements Response
     public function __construct(
         public Uuid $id,
         public string $name,
+        public string $card,
     ) {
     }
 
@@ -20,7 +21,8 @@ final class TypesOfPaymentDto extends AbstractionEntity implements Response
     {
         return new self(
             new Uuid($data['id']),
-            $data['name']
+            $data['name'],
+            $data['card'],
         );
     }
 }
