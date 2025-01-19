@@ -42,7 +42,7 @@ class TicketController extends Controller
         $this->middleware('auth');
         $this->ticketService = $ticketService;
         $this->creatingQrCodeService = $creatingQrCodeService;
-        $this->festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
+        $this->festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b6';
     }
 
     public function view(Request $request)
