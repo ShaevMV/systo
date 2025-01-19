@@ -77,7 +77,7 @@
                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
                             ]) }}"
                         :active="request()->path().'?festival_id='.request()->get('festival_id') == 'admin/auto?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5'">
-                        {{ __('Автомобили Осень') }}
+                        {{ __('Автомобили Осень!!!!!') }}
                     </x-jet-nav-link>
                 </div>
 
@@ -179,7 +179,7 @@
                             'type' => 'friendly_tickets'
                             ]) }}"
                 :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=friendly_tickets'">
-                {{ __('Электронные билеты Осень') }}
+                {{ __('Электронные билеты Осень!!!!!!') }}
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
                 href="{{ route('adminTickets',[
