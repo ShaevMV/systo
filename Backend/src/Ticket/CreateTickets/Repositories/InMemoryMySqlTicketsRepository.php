@@ -7,6 +7,7 @@ namespace Tickets\Ticket\CreateTickets\Repositories;
 use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\OrderTicketModel;
+use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use Carbon\Carbon;
@@ -116,11 +117,16 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
+            ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
+                $join->on($this->model::TABLE . '.festival_id', '=', TicketTypeFestivalModel::TABLE . '.festival_id');
+                $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
+            })
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
-                FestivalModel::TABLE . '.view',
+                TicketTypeFestivalModel::TABLE . '.pdf',
+                TicketTypeFestivalModel::TABLE . '.email as emailView',
                 OrderTicketModel::TABLE . '.phone',
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
@@ -144,7 +150,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['city'],
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            $result['view'],
+            $result['pdf'],
+            $result['emailView'],
             new Uuid($result['festival_id']),
         );
     }

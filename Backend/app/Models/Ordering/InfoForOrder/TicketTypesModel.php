@@ -66,6 +66,6 @@ class TicketTypesModel extends Model
             TicketTypeFestivalModel::TABLE,
             'ticket_type_id',
             'festival_id'
-        );
+        )->withPivot(['email', 'pdf']);
     }
 }

@@ -39,7 +39,7 @@ class OrderToPaid extends Mailable
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
 
         $this->subject('Ваш оргвзнос на Систо '.date('Y').' подтверждён');
-        $mail = $this->view('email.orderToPaid',[
+        $mail = $this->view('email.'. ($this->tickets[0]->getEmailView() ?? 'orderToPaid'),[
             'festivalName' => $festivalName,
         ]);
 

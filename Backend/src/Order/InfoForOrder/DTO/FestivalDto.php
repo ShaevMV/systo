@@ -22,7 +22,7 @@ class FestivalDto extends AbstractionEntity
     {
         return new self(
             new Uuid($data['id']),
-            $data['year'],
+            (string)$data['year'],
             $data['name'],
             (bool) $data['active'],
         );
