@@ -154,6 +154,7 @@
                               {{ typeTickets.name }} /
                               {{ typeTickets.price }} руб.
                             </p>
+                            <p v-html="typeTickets.description"></p>
                           </label>
                           <small class="form-text text-muted">
                             {{ getError('ticket_type_id') }}

@@ -11,6 +11,7 @@ export default {
         selectTicketType: {
             id: null,
             groupLimit: null,
+            description: null,
         },
         promoCode: {
             discount: null,
