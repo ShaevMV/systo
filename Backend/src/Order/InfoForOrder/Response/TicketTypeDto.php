@@ -31,6 +31,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         protected array  $priceList,
         protected int    $sort = 0,
         protected bool   $isLiveTicket = false,
+        protected ?string $description = null,
     )
     {
     }
@@ -67,6 +68,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             $priceList,
             $data['sort'],
             (bool)$data['is_live_ticket'],
+            $data['description'] ?? null,
         );
     }
 
