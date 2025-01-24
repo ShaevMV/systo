@@ -11,12 +11,12 @@ class CreateOrUpdatePromoCodeCommand implements Command
 {
     public function __construct(
         private string $name,
-        private float $discount,
-        private bool $is_percent,
-        private bool $active,
-        private ?Uuid $id = null,
-        private ?int $limit = null,
-        private ?Uuid $type_ticket_id = null,
+        private float  $discount,
+        private bool   $is_percent,
+        private bool   $active,
+        private ?Uuid  $id = null,
+        private ?int   $limit = null,
+        private ?Uuid  $ticket_type_id = null,
 
     )
     {
@@ -33,7 +33,7 @@ class CreateOrUpdatePromoCodeCommand implements Command
             $data['active'],
             $id,
             $data['limit'] ?? null,
-            $data['type_ticket_id'] ?? null,
+            $data['ticket_type_id'] ?? null,
         );
     }
 
@@ -74,8 +74,8 @@ class CreateOrUpdatePromoCodeCommand implements Command
         return $this;
     }
 
-    public function getTypeTicketId(): ?Uuid
+    public function getTicketTypeId(): ?Uuid
     {
-        return $this->type_ticket_id;
+        return $this->ticket_type_id;
     }
 }
