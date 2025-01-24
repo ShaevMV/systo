@@ -2383,3 +2383,80 @@ input[readonly]{
         font-size: 13px;
     }
 }
+
+
+.col-3 label[for="form_need"] {
+    display: none !important;
+}
+
+.ticket-choice{
+    margin-bottom: 20px;
+}
+
+.ticket-choice:last-of-type{
+    margin-bottom: 2vw;
+}
+
+.ticket-choice .intckt a:hover{
+    color: #1e871c;
+}
+
+.ticket-choice label .form-check-input{
+    position: relative;
+    left: -5px;
+    top: 10px;
+    cursor: pointer;
+
+}
+
+
+.ticket-choice label span.intckt > p:last-of-type{
+    font-size: 14px;
+    color: #333333;
+    padding-bottom: 10px;
+}
+
+.ticket-choice label span.intckt > p:first-of-type{
+    font-weight: bold;
+    border-bottom: 2px solid #d5d5d5;
+    padding-bottom: 7px;
+    margin-bottom: 7px;
+}
+
+.ticket-choice label span.intckt{
+    display: block;
+    cursor: pointer;
+    border: 3px solid rgb(217, 217, 226);
+    border-radius: 10px;
+    background: rgb(235, 237, 244);
+    box-sizing: border-box;
+    padding-top: 6px;
+}
+
+.ticket-choice label{
+    display: block;
+}
+
+.ticket-choice label input:checked + span.intckt {
+    border-color: rgb(30, 135, 28) !important;
+}
+
+.ticket-choice label span.intckt > p{
+    margin: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+
+@media(max-width: 760px){
+    .ticket-choice label .form-check-input{
+        left: 0;
+    }
+}
+
+
+@media(max-width: 405px){
+    .ticket-choice label .form-check-input{
+        display: none;
+    }
+}

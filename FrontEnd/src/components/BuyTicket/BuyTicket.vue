@@ -150,11 +150,13 @@
                               v-bind:value="typeTickets.id"
                               v-bind:id="typeTickets.id"
                             />
+                            <span class="intckt">
                             <p>
                               {{ typeTickets.name }} /
                               {{ typeTickets.price }} руб.
                             </p>
                             <p v-html="typeTickets.description"></p>
+                              </span>
                           </label>
                           <small class="form-text text-muted">
                             {{ getError('ticket_type_id') }}
