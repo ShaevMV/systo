@@ -104,7 +104,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             'is_percent' => $this->isPercent,
             'active' => $this->isSuccess,
             'limit' => $this->limit->getLimit(),
-            'type_ticket_id' => $this->ticket_type_id?->value()
+            'ticket_type_id' => $this->ticket_type_id?->value()
         ];
     }
 
