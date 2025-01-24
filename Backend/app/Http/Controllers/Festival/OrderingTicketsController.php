@@ -64,7 +64,7 @@ class OrderingTicketsController extends Controller
             ->findPromoCode(
                 $promoCode,
                 $price->getPrice(),
-                new Uuid($request->input('typeOrder'))
+                $request->input('typeOrder')
             )->toArray();
     }
 

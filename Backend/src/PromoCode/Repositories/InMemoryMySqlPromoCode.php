@@ -28,9 +28,8 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
             '=',
             OrderTicketModel::TABLE . '.promo_code')
             ->where(function ($query) use ($ticketTypeId){
-                $query->whereHas('client', function ($q) use ($ticketTypeId) {
-                    $q->where('id', $ticketTypeId->value());
-                })->orWhereNull($this->model::TABLE . '.ticketTypeId', null);
+                $query->where($this->model::TABLE . '.ticket_type_id', '=', $ticketTypeId->value())
+                    ->orWhereNull($this->model::TABLE . '.ticket_type_id', null);
             })
             ->where($this->model::TABLE . '.name', '=', $name)
             ->where($this->model::TABLE . '.active', '=', true)
