@@ -41,6 +41,7 @@
                       <option value=null>Выберите тип оргвзноса или оставте пустым для всех оргвзносов</option>
                       <option v-for="(ticketType) in getTicketType"
                               v-bind:key="ticketType.id"
+                              :selected="ticketType.id === ticket_type_id"
                               v-bind:value="ticketType.id">{{ ticketType.name }}
                       </option>
                     </select>
@@ -119,7 +120,7 @@ export default {
       newName: null,
       newIsPercent: null,
       newDiscount: null,
-      newIsActive: false,
+      newIsActive: null,
       newLimit: null,
       newTicketTypeId: null,
       massage: null,
