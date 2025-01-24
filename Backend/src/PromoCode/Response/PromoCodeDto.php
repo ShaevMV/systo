@@ -32,6 +32,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     public static function fromState(array $data): self
     {
         $massage = str_replace('{getDiscountByPromoCode}', (string)$data['discount'], self::MASSAGE_IN_SUCCESS);
+
         $ticket_type_id = !empty($data['ticket_type_id']) ? new Uuid($data['ticket_type_id']) : null;
 
         return new self(
@@ -43,7 +44,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             (bool)$data['active'],
             (bool)$data['is_percent'],
             $ticket_type_id,
-            $data['ticket_type_name']
+            $data['ticket_type_name'] ?? null
         );
     }
 
@@ -103,7 +104,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             'is_percent' => $this->isPercent,
             'active' => $this->isSuccess,
             'limit' => $this->limit->getLimit(),
-            'type_ticket_id' => $this->ticket_type_id->value()
+            'type_ticket_id' => $this->ticket_type_id?->value()
         ];
     }
 
