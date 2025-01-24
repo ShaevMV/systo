@@ -24,13 +24,15 @@ final class PromoCodeDto extends AbstractionEntity implements Response
         protected float $discount = 0.00,
         protected bool $isSuccess = false,
         protected bool $isPercent = false,
-
+        protected ?Uuid $ticket_type_id = null,
+        protected ?string $ticket_type_name = null,
     ) {
     }
 
     public static function fromState(array $data): self
     {
         $massage = str_replace('{getDiscountByPromoCode}', (string)$data['discount'], self::MASSAGE_IN_SUCCESS);
+        $ticket_type_id = !empty($data['ticket_type_id']) ? new Uuid($data['ticket_type_id']) : null;
 
         return new self(
             LimitPromoCodeDto::fromState($data),
@@ -40,6 +42,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             $data['discount'],
             (bool)$data['active'],
             (bool)$data['is_percent'],
+            $ticket_type_id,
+            $data['ticket_type_name']
         );
     }
 
@@ -99,6 +103,7 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             'is_percent' => $this->isPercent,
             'active' => $this->isSuccess,
             'limit' => $this->limit->getLimit(),
+            'type_ticket_id' => $this->ticket_type_id->value()
         ];
     }
 
@@ -106,7 +111,6 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     {
         return $this->id;
     }
-
 
     /**
      * @param Uuid|null $id

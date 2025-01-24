@@ -52,6 +52,14 @@ class OrderingTicketsController extends Controller
     /**
      * @throws JsonException
      */
+    public function getTicketTypeList(): array
+    {
+        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b6'))->toArray();
+    }
+
+    /**
+     * @throws JsonException
+     */
     public function findPromoCode(Request $request, ?string $promoCode = null): array
     {
         $price = $this->getTicketType->getPrice(new Uuid($request->input('typeOrder')), new Carbon());

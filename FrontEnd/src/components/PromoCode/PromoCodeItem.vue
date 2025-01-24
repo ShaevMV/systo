@@ -33,6 +33,21 @@
                   <small class="form-text text-muted"> {{ getError('is_percent') }}</small>
                 </div>
                 <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Тип оргвзноса:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="ticket_type_id"
+                            id="validationDefault01">
+                      <option value=null>Выберите тип оргвзноса или оставте пустым для всех оргвзносов</option>
+                      <option v-for="(ticketType) in getTicketType"
+                              v-bind:key="ticketType.id"
+                              v-bind:value="ticketType.id">{{ ticketType.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('ticket_type_id') }}</small>
+                </div>
+                <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Скидка:</label>
                   <div class="col-8">
                     <input name="company"
@@ -106,6 +121,7 @@ export default {
       newDiscount: null,
       newIsActive: false,
       newLimit: null,
+      newTicketTypeId: null,
       massage: null,
     }
   },
@@ -113,6 +129,9 @@ export default {
     ...mapGetters('appPromoCode', [
       'getError',
       'getPromoCodeItem',
+    ]),
+    ...mapGetters('appFestivalTickets', [
+      'getTicketType',
     ]),
     name: {
       get: function () {
@@ -169,11 +188,25 @@ export default {
         this.newLimit = newValue;
       },
     },
+    ticket_type_id: {
+      get: function () {
+        if (this.newTicketTypeId === null) {
+          return this.getPromoCodeItem.ticket_type_id;
+        }
+        return this.newTicketTypeId;
+      },
+      set: function (newValue) {
+        this.newTicketTypeId = newValue;
+      },
+    }
   },
   methods: {
     ...mapActions('appPromoCode', [
       'sendSavePromoCode',
       'clearError'
+    ]),
+    ...mapActions('appFestivalTickets',[
+        'getListTicketTypes'
     ]),
     back: function () {
       this.$router.push({name: 'PromoCodes'});
@@ -188,6 +221,7 @@ export default {
         'is_percent': this.isPercent === "true",
         'active': this.isActive,
         'limit': this.limit,
+        'ticket_type_id': this.ticket_type_id,
         'callback': function () {
           app.$router.push({name: 'PromoCodes'});
         }
@@ -200,6 +234,7 @@ export default {
     } else {
       document.title = "Промокод " + this.name;
     }
+    this.getListTicketTypes();
     this.clearError();
   }
 }

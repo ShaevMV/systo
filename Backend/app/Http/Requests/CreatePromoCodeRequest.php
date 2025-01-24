@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property ?string $id
+ * @property ?string $type_ticket_id
  * @property string $name
  * @property float $discount
  * @property boolean $is_percent

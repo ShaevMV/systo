@@ -32,7 +32,8 @@ export const sendSavePromoCode = (context, payload) => {
         'discount': payload.discount,
         'is_percent': payload.is_percent,
         'active': payload.active,
-        'limit': payload.limit
+        'limit': payload.limit,
+        'type_ticket_id': payload.type_ticket_id,
     })
     promise.then(function () {
         if(payload.callback !== undefined) {

@@ -14,6 +14,7 @@ use Illuminate\Database\Query\JoinClause;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Shared\Domain\ValueObject\Uuid;
 use Illuminate\Database\Eloquent\Builder;
+use function Sentry\trace;
 
 class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {
@@ -25,14 +26,14 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 
     public function getList(
         Uuid    $festivalId,
-        bool $isAllPrice = false,
+        bool    $isAllPrice = false,
         ?Carbon $afterDate = null
     ): array
     {
         $result = [];
-
+       //dd($festivalId);
         $data = $this->joinFestival($festivalId, $afterDate)
-            ->addSelect([TicketTypeFestivalModel::TABLE.'.description'])
+            ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
             ->where('active', '=', 1);
 
         $data = $data->get()
@@ -102,5 +103,15 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $this->model::create($typeDto->toArray());
 
         return true;
+    }
+
+    public function getNameById(): array
+    {
+        $result = [];
+        foreach ($this->model::whereActive(true)->select(['id', 'name'])->get()->toArray() as $item) {
+            $result[$item['id']] = $item['name'];
+        }
+
+        return $result;
     }
 }

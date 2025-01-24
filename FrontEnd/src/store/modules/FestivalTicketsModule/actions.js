@@ -37,6 +37,13 @@ export const getListTypesOfPayment = (context, payload) => {
 };
 
 
+export const getListTicketTypes = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/getTicketTypeList');
+    promise.then(function (response) {
+        context.commit('setTicketType', response.data.typesOfPayment);
+    })
+};
+
 /**
  * Записать выбранный тип билета
  *

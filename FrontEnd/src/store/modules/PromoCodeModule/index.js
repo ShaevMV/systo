@@ -14,6 +14,7 @@ export default {
             is_percent: null,
             action: false,
             limit: null,
+            ticket_type_id: null,
         },
     },
     getters,

@@ -16,6 +16,7 @@ class CreateOrUpdatePromoCodeCommand implements Command
         private bool $active,
         private ?Uuid $id = null,
         private ?int $limit = null,
+        private ?Uuid $type_ticket_id = null,
 
     )
     {
@@ -32,6 +33,7 @@ class CreateOrUpdatePromoCodeCommand implements Command
             $data['active'],
             $id,
             $data['limit'] ?? null,
+            $data['type_ticket_id'] ?? null,
         );
     }
 
@@ -65,10 +67,15 @@ class CreateOrUpdatePromoCodeCommand implements Command
         return $this->id;
     }
 
-    public function setId(?Uuid $id): CreateOrUpdatePromoCodeCommand
+    public function setId(?Uuid $id): self
     {
         $this->id = $id;
 
         return $this;
+    }
+
+    public function getTypeTicketId(): ?Uuid
+    {
+        return $this->type_ticket_id;
     }
 }

@@ -27,6 +27,7 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
         $promoCode = $this->model->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.name',
             '=',
             OrderTicketModel::TABLE . '.promo_code')
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE. '.id')
             ->where(function ($query) use ($ticketTypeId){
                 $query->where($this->model::TABLE . '.ticket_type_id', '=', $ticketTypeId->value())
                     ->orWhereNull($this->model::TABLE . '.ticket_type_id', null);
@@ -35,6 +36,7 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
             ->where($this->model::TABLE . '.active', '=', true)
             ->select([
                 $this->model::TABLE . '.*',
+                TicketTypesModel::TABLE. '.name as ticket_type_name',
                 \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses')
             ])
             ->groupBy([
@@ -45,9 +47,10 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
                 $this->model::TABLE . '.is_percent',
                 $this->model::TABLE . '.active',
                 $this->model::TABLE . '.limit',
+                TicketTypesModel::TABLE . '.name',
             ])
             ->first()?->toArray();
-
+        dd($promoCode);
         if (!is_null($promoCode)) {
             return PromoCodeDto::fromState($promoCode);
         }
@@ -61,9 +64,11 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.name',
                 '=',
                 OrderTicketModel::TABLE . '.promo_code')
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE. '.id')
             ->select([
                 $this->model::TABLE . '.*',
-                \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses')
+                \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses'),
+                TicketTypesModel::TABLE. '.name as ticket_type_name',
             ])
             ->groupBy([
                 OrderTicketModel::TABLE . '.promo_code',
@@ -73,6 +78,7 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
                 $this->model::TABLE . '.is_percent',
                 $this->model::TABLE . '.active',
                 $this->model::TABLE . '.limit',
+                TicketTypesModel::TABLE. '.name',
             ])
             ->orderBy($this->model::TABLE . '.updated_at','desc')
             ->get()?->toArray();

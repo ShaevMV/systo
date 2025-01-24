@@ -39,6 +39,14 @@ final class GetInfoForOrder
         );
     }
 
+    public function getListTicketTypeDto(Uuid $festivalId): ListTicketTypeDto
+    {
+        /** @var ListTicketTypeDto $listTicketTypeDto */
+        $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
+
+        return $listTicketTypeDto;
+    }
+
     public function getAllPrice(Uuid $festivalId): ListTicketTypeDto
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */

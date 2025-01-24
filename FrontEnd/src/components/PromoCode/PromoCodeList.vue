@@ -10,6 +10,7 @@
             <thead>
             <tr>
               <th scope="col">Название</th>
+              <th scope="col">Тип билета</th>
               <th scope="col">Тип скидки</th>
               <th scope="col">Скидка</th>
               <th scope="col">Кол-во использованей (Всего/Макс кол-во)</th>
@@ -23,6 +24,7 @@
                 style="cursor: pointer"
             >
               <td>{{ item.name }}</td>
+              <td>{{ item.ticket_type_name }}</td>
               <td>{{ getTypeDiscount(item.isPercent) }}</td>
               <td>{{ item.discount }}</td>
               <td>{{ item.limit.count }} / {{ getLimit(item.limit.limit) }}</td>
