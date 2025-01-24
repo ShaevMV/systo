@@ -18,7 +18,7 @@ final class PromoCodeQueryHandler implements QueryHandler
 
     public function __invoke(PromoCodeQuery $query): PromoCodeDto
     {
-        $result =$this->promoCode->find($query->getName()) ?? new PromoCodeDto(new LimitPromoCodeDto());
+        $result = $this->promoCode->find($query->getName(), $query->getTicketsTypeId()) ?? new PromoCodeDto(new LimitPromoCodeDto());
         if(!$result->isCorrectForLimit() || !$result->isSuccess()) {
             return new PromoCodeDto(new LimitPromoCodeDto());
         }

@@ -22,11 +22,16 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
     }
 
 
-    public function find(string $name): ?PromoCodeDto
+    public function find(string $name, Uuid $ticketTypeId): ?PromoCodeDto
     {
         $promoCode = $this->model->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.name',
             '=',
             OrderTicketModel::TABLE . '.promo_code')
+            ->where(function ($query) use ($ticketTypeId){
+                $query->whereHas('client', function ($q) use ($ticketTypeId) {
+                    $q->where('id', $ticketTypeId->value());
+                })->orWhereNull($this->model::TABLE . '.ticketTypeId', null);
+            })
             ->where($this->model::TABLE . '.name', '=', $name)
             ->where($this->model::TABLE . '.active', '=', true)
             ->select([
