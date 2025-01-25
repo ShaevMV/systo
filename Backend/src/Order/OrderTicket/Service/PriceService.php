@@ -34,7 +34,7 @@ class PriceService
         $discount = $this->isCorrectPromoCode->findPromoCode(
             $promoCode,
             $priceByType->getPrice(),
-            $ticketTypeId->value()
+            $ticketTypeId
         )?->getDiscount() ?? 0.00;
 
         return new PriceDto(
