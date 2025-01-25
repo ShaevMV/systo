@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Application\SearchPromoCode;
 
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\PromoCode\Dto\LimitPromoCodeDto;
 use Tickets\PromoCode\Response\PromoCodeDto;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
@@ -20,7 +21,7 @@ final class IsCorrectPromoCode
         ]);
     }
 
-    public function findPromoCode(?string $name, float $price, string $ticketTypeId): PromoCodeDto
+    public function findPromoCode(?string $name, float $price, Uuid $ticketTypeId): PromoCodeDto
     {
         if (null === $name) {
             return new PromoCodeDto(new LimitPromoCodeDto());
@@ -28,7 +29,7 @@ final class IsCorrectPromoCode
 
         /** @var PromoCodeDto $result */
         $result = $this->queryBus->ask(
-            new PromoCodeQuery($name, $ticketTypeId)
+            new PromoCodeQuery($name, $ticketTypeId->value())
         );
 
         if($result->isPercent()) {
