@@ -50,7 +50,7 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
                 TicketTypesModel::TABLE . '.name',
             ])
             ->first()?->toArray();
-        dd($promoCode);
+
         if (!is_null($promoCode)) {
             return PromoCodeDto::fromState($promoCode);
         }
