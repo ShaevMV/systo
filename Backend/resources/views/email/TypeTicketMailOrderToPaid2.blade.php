@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Билеты соорганизатора на {{$festivalName}}</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Билеты на {{$festivalName}}</td>
                             </tr>
                         </table>
                     </td>
@@ -39,12 +39,13 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твоя лесная карта на {{$festivalName}} потдверждена</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой большой вклад в создание Систо</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос соорганизатора на {{$festivalName}} потдверждён</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создание общего праздника и посадку деревьев!</p>
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с qr-кодом на каждого гостя прикреплены к этому письму.</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В ближайшее время с тобой свяжется ответственный куратор, чтобы передать тебе физическую именную карту, а также расскажет как получить все остальные бонусы и скидки годового оргвзноса</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напишите в телеграмм <a href="https://t.me/systo_vznos" target="_blank">@systo_vznos</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы https://org.solarsysto.ru/myOrders</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой саженец кедра будет ждать тебя в питомнике растений возле инфоцентра. Для его получения предъяви этот QR-код.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
