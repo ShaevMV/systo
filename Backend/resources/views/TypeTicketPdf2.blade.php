@@ -118,7 +118,7 @@
 <img src="https://api.spaceofjoy.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">2!</p>
+<p id="top-class-title">Привет дорогой друг, это твой билет соорганизатора на Solar Systo Togathering {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}
@@ -143,4 +143,3 @@
 <footer></footer>
 </body>
 </html>
-
