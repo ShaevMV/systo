@@ -54,6 +54,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected ?string $promoCode = null,
         protected int     $discount = 0,
         protected ?string $city = null,
+        protected ?string $phone = null,
     )
     {
         $this->count = count($guests);
@@ -87,7 +88,8 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
             (int)$data['discount'],
-            $data['city']
+            $data['city'],
+            $data['phone'],
         );
     }
 

@@ -28,6 +28,7 @@ export default {
             email: null,
             lastComment: null,
             listCorrectNextStatus: [],
+            phone: null,
         },
     },
     getters,

@@ -82,6 +82,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE . '.*',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
+                User::TABLE . '.phone',
                 TicketTypesModel::TABLE . '.name',
                 TypesOfPaymentModel::TABLE . '.name as payment_name',
             ])
@@ -162,6 +163,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE . '.*',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
+                User::TABLE . '.phone',
                 TicketTypesModel::TABLE . '.name',
                 TypesOfPaymentModel::TABLE . '.name as payment_name'
             ])

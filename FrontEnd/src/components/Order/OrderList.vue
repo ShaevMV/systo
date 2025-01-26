@@ -23,7 +23,7 @@
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col" class="mobile">Статус</th>
+              <th scope="col" class="mobile">Телефон</th>
               <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
@@ -65,7 +65,7 @@
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
-                {{ itemOrder.humanStatus }}
+                {{ itemOrder.phone }}
               </td>
               <td v-if="isAdmin">
                 {{ itemOrder.city }}
