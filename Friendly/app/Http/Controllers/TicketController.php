@@ -210,7 +210,7 @@ class TicketController extends Controller
                 $model->festival_id = $this->festivalId;
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
-                $model->is_need_seedling = $request->post('is_need_seedling') ?? false;
+                $model->is_need_seedling = (bool)($request->post('is_need_seedling') ?? false);
                 $model->saveOrFail();
                 $this->ticketService->pushTicketFriendly($model, $this->festivalId);
                 $ids['f' . $model->id] = $value;
