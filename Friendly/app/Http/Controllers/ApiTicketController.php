@@ -40,4 +40,25 @@ class ApiTicketController extends Controller
             'error' => null,
         ]);
     }
+
+    /**
+     * @throws Throwable
+     */
+    public function getList(): string
+    {
+        return json_encode([
+            'festival_list' => [
+                "9d679bcf-b438-4ddb-ac04-023fa9bff4b5" => [
+                    "name" => "Тест",
+                    "date_start" => "2025-01-16 13:47:53",
+                    "date_end" => "2025-12-16 13:47:53"
+                ],
+                "9d679bcf-b438-4ddb-ac04-023fa9bff4b6" => [
+                    "name" => "Систо-весна 2025",
+                    "date_start" => "2025-01-28 00:00:00",
+                    "date_end" => "2025-05-19 00:00:00"
+                ]
+            ]
+        ]);
+    }
 }
