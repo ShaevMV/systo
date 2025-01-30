@@ -28,6 +28,7 @@
                             <th>{{ __('Email') }}</th>
                             <th>{{ __('ФИО покупателя') }}</th>
                             <th>{{ __('Стоимость') }}</th>
+                            <th>{{ __('Сажанец') }}</th>
                             <th>{{ __('Дата') }}</th>
                             <th>{{ __('Действие') }}</th>
                         </tr>
@@ -39,6 +40,13 @@
                                 <td>{{$ticket->email}}</td>
                                     <td>{{$ticket->fio_friendly}}</td>
                                     <td>{{$ticket->price}}</td>
+                                <td>
+                                    @if($tiket->is_need_seedling)
+                                        {{ __('Нужен') }}
+                                    @else
+                                        {{ __('Не нужен') }}
+                                    @endif
+                                </td>
                                 <td>{{$ticket->created_at}}</td>
 
                                 <td>
