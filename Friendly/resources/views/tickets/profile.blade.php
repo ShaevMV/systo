@@ -41,7 +41,7 @@
                                     <td>{{$ticket->fio_friendly}}</td>
                                     <td>{{$ticket->price}}</td>
                                 <td>
-                                    @if($tiket->is_need_seedling)
+                                    @if($ticket->is_need_seedling)
                                         {{ __('Нужен') }}
                                     @else
                                         {{ __('Не нужен') }}
