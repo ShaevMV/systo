@@ -53,7 +53,7 @@
                         @endif
                         @if($type === 'friendly_tickets')
                            <td>
-                               @if($tiket->is_need_seedling)
+                               @if($ticket->is_need_seedling)
                                    {{ __('Нужен') }}
                                @else
                                    {{ __('Не нужен') }}
