@@ -229,7 +229,6 @@ class TicketController extends Controller
 
             DB::rollback();
             $success = false;
-            dd($e->getMessage());
         }
 
         return Redirect::route('viewAddTickets', ['success' => $success]);
