@@ -73,6 +73,11 @@
                                      autocomplete="price"/>
                     </div>
                     <div class="mt-4">
+                        <x-jet-label for="is_need_seedling" value="{{ __('Нужен саженец:') }}"/>
+                        <x-jet-checkbox id="is_need_seedling" class="block mt-1 w-full" name="is_need_seedling"
+                                     autocomplete="is_need_seedling"/>
+                    </div>
+                    <div class="mt-4">
                         <x-jet-label for="comment" value="{{ __('Комментарий:') }}"/>
                         <textarea class="block mt-1 w-full" name="comment" id="comment" rows="3"> </textarea>
                     </div>
