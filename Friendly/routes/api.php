@@ -21,4 +21,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 Route::middleware('bot')->post('/insert/list', [ApiTicketController::class, 'insert']);
-Route::middleware('bot')->get('/getFestival', [ApiTicketController::class, 'insert']);
+Route::middleware('bot')->get('/getFestival', [ApiTicketController::class, 'getList']);
