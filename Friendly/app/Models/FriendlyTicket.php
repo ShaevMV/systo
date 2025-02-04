@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $count
  * @property float $price
  * @property int $user_id
- * @property int $is_need_seedling
+ * @property float $is_need_seedling
  * @property string $comment
  * @property string $festival_id
  * @property Carbon $created_at

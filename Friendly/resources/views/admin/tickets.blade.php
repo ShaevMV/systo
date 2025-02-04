@@ -21,7 +21,7 @@
                         <th>{{ __('ФИО покупателя') }}</th>
                         <th>{{ __('Стоимость') }}</th>
                     @endif
-                    @if($type === 'friendly_tickets')
+                    @if(in_array($type, ['friendly_tickets', 'live_tickets']))
                         <th>{{ __('Нужен сажанец') }}</th>
                     @endif
                     <th>{{ __('Комментарий') }}</th>
@@ -51,7 +51,7 @@
                             <td>{{$ticket->fio_friendly}}</td>
                             <td>{{$ticket->price}}</td>
                         @endif
-                        @if($type === 'friendly_tickets')
+                        @if(in_array($type, ['friendly_tickets', 'live_tickets']))
                            <td>
                                @if($ticket->is_need_seedling)
                                    {{ __('Нужен') }}

@@ -80,6 +80,7 @@
                                 <th>{{ __('Телефон') }}</th>
                                 <th>{{ __('Комментарий') }}</th>
                                 <th>{{ __('Стоимость') }}</th>
+                                <th>{{ __('Сажанец') }}</th>
                                 <th>{{ __('Дата') }}</th>
                                 <th>{{ __('Действие') }}</th>
                             </tr>
@@ -93,6 +94,13 @@
                                     <td>{{$ticket->phone}}</td>
                                     <td>{{$ticket->fio_friendly}}</td>
                                     <td>{{$ticket->price}}</td>
+                                    <td>
+                                        @if($ticket->is_need_seedling)
+                                            {{ __('Нужен') }}
+                                        @else
+                                            {{ __('Не нужен') }}
+                                        @endif
+                                    </td>
                                     <td>{{$ticket->created_at}}</td>
 
                                     <td>
