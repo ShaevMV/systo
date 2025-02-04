@@ -180,6 +180,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ]);
             }
         } catch (\Exception $e) {
+            throw $e;
             return false;
         } finally {
             return true;
