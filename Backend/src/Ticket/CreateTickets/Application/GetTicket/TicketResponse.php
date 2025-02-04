@@ -74,6 +74,7 @@ class TicketResponse extends AbstractionEntity implements Response
     {
         $result = parent::toArray();
         unset($result['festivalView']);
+        unset($result['emailView']);
 
         return $result;
     }
