@@ -7,6 +7,8 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommand;
+use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushFestivalIdInBazaCommand extends Command
@@ -32,13 +34,14 @@ class PushFestivalIdInBazaCommand extends Command
      */
     public function handle(
         PushTicket                 $pushTicket,
-        TicketsRepositoryInterface $ticketsRepository
+        TicketsRepositoryInterface $ticketsRepository,
+        PushTicketsCommandHandler  $handler,
     ): int
     {
         try {
             $ids = $ticketsRepository->getAllTicketsId(new Uuid($this->argument('id')));
             foreach ($ids as $id) {
-                $pushTicket->pushTicket($id);
+                $handler(new PushTicketsCommand($id));
                 $this->info('Удачно отправленные ' . $id->value());
             }
 
