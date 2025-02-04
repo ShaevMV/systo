@@ -167,6 +167,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             if (!DB::connection('mysqlBaza')->table('el_tickets')
                 ->where('uuid', '=', $ticketsDto->getId()->value())->exists()
             ) {
+                var_dump($data);
                 return DB::connection('mysqlBaza')
                     ->table('el_tickets')
                     ->insert(
@@ -174,13 +175,17 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     );
             } else {
                 DB::connection('mysqlBaza')->table('el_tickets')
-                    ->where('uuid', '=', $ticketsDto->getId()->value())->update([
-                        'status' => $data['status'],
-                        'festival_id' => $data['festival_id'],
-                    ]);
+                    ->where('uuid', '=', $ticketsDto->getId()->value())
+                    ->update([
+                            'status' => $data['status'],
+                            'festival_id' => $data['festival_id'],
+                        ]);
+
+                    echo 'update';
             }
         } catch (\Exception $e) {
-            throw $e;
+
+            echo $e->getMessage();
             return false;
         } finally {
             return true;
