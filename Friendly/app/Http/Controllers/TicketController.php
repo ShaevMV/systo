@@ -49,9 +49,9 @@ class TicketController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->is_list && !$user->is_admin) {
-            return Redirect::route('viewListTickets');
-        }
+        /*if ($user->is_list && !$user->is_admin) {
+            //return Redirect::route('viewListTickets');
+        }*/
 
         return view('tickets/form', [
             'user' => $user,
@@ -74,9 +74,9 @@ class TicketController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->is_list && !$user->is_admin) {
-            return Redirect::route('viewListTickets');
-        }
+        /*if ($user->is_list && !$user->is_admin) {
+            //return Redirect::route('viewListTickets');
+        }*/
 
         return view('live/form', [
             'user' => $user,
