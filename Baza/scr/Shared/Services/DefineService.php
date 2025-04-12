@@ -76,7 +76,7 @@ class DefineService
     private function getOnlyNumber(string $str, ?string $symbol = null): int
     {
         if($symbol !== null) {
-            $start = strripos($str, $symbol);
+            $start = mb_strripos($str, $symbol);
             $str = mb_substr($str, $start);
         }
         return (int)preg_replace("/[^,.0-9]/", '', $str);
