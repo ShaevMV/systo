@@ -58,10 +58,10 @@ class DefineService
             $id = new Uuid($uuid);
         } elseif (strripos($link, 's') !== false) {
             $type = self::SPISOK_TICKET;
-            $id = $this->getOnlyNumber($link);
+            $id = $this->getOnlyNumber($link, 's');
         } elseif (strripos($link, 'f') !== false) {
             $type = self::DRUG_TICKET;
-            $id = $this->getOnlyNumber($link);
+            $id = $this->getOnlyNumber($link, 'f');
         } elseif ($this->getOnlyNumber($link) == $link || strripos($link, self::LIVE_TICKET_URL) !== false) {
             $type = self::LIVE_TICKET;
             $id = (int)str_replace(self::LIVE_TICKET_URL, '', $link);
@@ -73,8 +73,12 @@ class DefineService
 
     }
 
-    private function getOnlyNumber(string $str): int
+    private function getOnlyNumber(string $str, ?string $symbol = null): int
     {
+        if($symbol !== null) {
+            $start = strripos($str, $symbol);
+            $str = mb_substr($str, $start);
+        }
         return (int)preg_replace("/[^,.0-9]/", '', $str);
     }
 }

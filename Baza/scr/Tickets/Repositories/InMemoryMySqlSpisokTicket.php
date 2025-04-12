@@ -28,7 +28,7 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->first()?->toArray();
 
-        if(is_null($data)) {
+        if (is_null($data)) {
             return null;
         }
 
@@ -63,18 +63,19 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
         $resultRawList = $this->spisokTicketModel
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($q) {
-                return $query->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
+                return $query->orWhereRaw('LOWER(`curator`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`kilter`) LIKE ? ', ['%' . (int)strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`project`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`name`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ', ['%' . strtolower(trim($q)) . '%']);
             })
             ->get()
             ->toArray();
 
         $result = [];
         foreach ($resultRawList as $item) {
-            $result[]= SpisokTicketResponse::fromState($item, $q);
+            $result[] = SpisokTicketResponse::fromState($item, $q);
         }
 
         return $result;
