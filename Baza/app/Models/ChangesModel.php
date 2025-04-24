@@ -47,6 +47,9 @@ class ChangesModel extends Model
         'count_el_tickets',
         'count_drug_tickets',
         'count_spisok_tickets',
+        'count_parking_tickets',
+        'count_parking_free_tickets',
+        'count_parking_cross-country_tickets',
         'start',
         'end',
     ];

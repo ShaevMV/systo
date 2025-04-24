@@ -13,6 +13,7 @@ use Baza\Tickets\Applications\Scan\FriendlyTicket\FriendlyTicketQuery;
 use Baza\Tickets\Applications\Scan\FriendlyTicket\FriendlyTicketQueryHandler;
 use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQuery;
 use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQueryHandler;
+use Baza\Tickets\Applications\Scan\ParkingTicket\ParkingTicketQuery;
 use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQuery;
 use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQueryHandler;
 use DomainException;
@@ -47,6 +48,9 @@ class SearchEngine
             DefineService::SPISOK_TICKET => new SpisokTicketQuery($searchDto->getId()),
             DefineService::DRUG_TICKET => new FriendlyTicketQuery($searchDto->getId()),
             DefineService::LIVE_TICKET => new LiveTicketQuery($searchDto->getId()),
+            DefineService::PARKING_TICKET,
+            DefineService::PARKING_FREE_TICKET,
+            DefineService::PARKING_CROSS_COUNTRY_TICKET => new ParkingTicketQuery($searchDto->getId(), $searchDto->getType()),
             default => throw new DomainException('Не верный тип ' . $searchDto->getType()),
         };
         /** @var TicketResponseInterface|null $result */
