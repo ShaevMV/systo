@@ -6,7 +6,15 @@ use App\Models\LiveTicketModel;
 use Baza\Tickets\Repositories\LiveTicketRepositoryInterface;
 use Baza\Tickets\Repositories\ParkingTicketRepositoryInterface;
 use Illuminate\Console\Command;
-use Shared\Services\CreatingQrCodeService;
+use Endroid\QrCode\Builder\Builder;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
+use Endroid\QrCode\Label\Font\OpenSans;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\Result\ResultInterface;
 
 class CreateParkingCommand extends Command
 {
@@ -42,11 +50,11 @@ class CreateParkingCommand extends Command
             (int)$this->argument('end'),
             $this->argument('type')
         );
-        $service = new CreatingQrCodeService();
-        for($i = (int)$this->argument('start');$i<=(int)$this->argument('end');$i++) {
+
+        for ($i = (int)$this->argument('start'); $i <= (int)$this->argument('end'); $i++) {
             $number = $this->addZero($i);
-            $qrCode = $service->createQrCode($number,$this->argument('type'));
-            $qrCode->saveToFile(__DIR__.'/QR/'.$this->argument('type').'_'.$number.".png");
+            $qrCode = $this->createQrCode($number, $this->argument('type'));
+            $qrCode->saveToFile(__DIR__ . '/QR/' . $this->argument('type') . '_' . $number . ".png");
         }
 
         $this->error('Созданы парковочные билеты от ' . $this->argument('start') . ' до ' . $this->argument('end') . ' типа ' . $this->argument('type'));
@@ -60,15 +68,46 @@ class CreateParkingCommand extends Command
         $zero = '';
 
         if ($number < 1000) {
-            $zero.='0';
+            $zero .= '0';
         }
         if ($number < 100) {
-            $zero.='0';
+            $zero .= '0';
         }
         if ($number < 10) {
-            $zero.='0';
+            $zero .= '0';
         }
 
-        return $zero.$number;
+        return $zero . $number;
+    }
+
+    private function createQrCode(string $ticketId, string $prefix): ResultInterface
+    {
+        return Builder::create()
+            ->writer(new PngWriter())
+            ->writerOptions([])
+            ->data($prefix . $ticketId)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(300)
+            ->margin(10)
+            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->labelText('') //TODO: Автомотизировать
+            ->labelFont(new OpenSans(16))
+            ->labelAlignment(new LabelAlignmentCenter())
+            ->validateResult(false)
+            ->build();
+    }
+
+    public function createPdf(string $id, string $name, string $email, string $prefix, ?string $project = null): \Barryvdh\DomPDF\PDF
+    {
+        $qrCode = $this->createQrCode($id, $prefix);
+
+        return Pdf::loadView('pdf2', [
+            'url' => $qrCode->getDataUri(),
+            'name' => $name,
+            'email' => $email,
+            'kilter' => $id,
+            'project' => $project
+        ]);
     }
 }
