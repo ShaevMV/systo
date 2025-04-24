@@ -194,7 +194,7 @@
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
         const phoneResult = document.getElementById('phone');
-        const typeResult = document.getElementById('humanType');
+        const typeResult = document.getElementById('type');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
         const colorResult = document.getElementById('color');
@@ -221,7 +221,7 @@
             phoneResult.textContent = data.phone || '';
             statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
-            typeResult.textContent = data.type;
+            typeResult.textContent = data.humanType;
             commentResult.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
             colorResult.style.background = data.color || '';
