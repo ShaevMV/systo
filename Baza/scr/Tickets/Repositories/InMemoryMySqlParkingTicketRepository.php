@@ -62,7 +62,7 @@ class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInt
     {
         DB::beginTransaction();
         try {
-            for ($kilter = $start; $kilter < $end; $kilter++) {
+            for ($kilter = $start; $kilter <= $end; $kilter++) {
                 $this->model::create([
                     'kilter' => $kilter,
                     'type' => $type
