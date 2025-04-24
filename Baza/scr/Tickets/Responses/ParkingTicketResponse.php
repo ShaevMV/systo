@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Responses;
 
 use Baza\Shared\Domain\ValueObject\Status;
+use Baza\Shared\Services\DefineService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
 use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
@@ -25,7 +26,7 @@ class ParkingTicketResponse implements TicketResponseInterface
     public function toArray(): array
     {
         return [
-            'type' => $this->type,
+            'type' => DefineService::HUMAN_LIST[$this->type],
             'kilter' => $this->kilter,
             'comment' => $this->comment,
             'status_human' => $this->status->getHumanStatus(),
