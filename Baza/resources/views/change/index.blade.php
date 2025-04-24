@@ -27,7 +27,13 @@
                                     Списки
                                 </th>
                                 <th>
-                                    Авто
+                                    Парковка плат.
+                                </th>
+                                <th>
+                                    Парковка б/п.
+                                </th>
+                                <th>
+                                    Парковка вездиход.
                                 </th>
                                 <th>
                                     Время начала смены
@@ -60,7 +66,13 @@
                                             {{$item['count_spisok_tickets']}}
                                         </td>
                                         <td>
-                                            {{$item['count_auto_tickets']}}
+                                            {{$item['count_parking_tickets']}}
+                                        </td>
+                                        <td>
+                                            {{$item['count_parking_free_tickets']}}
+                                        </td>
+                                        <td>
+                                            {{$item['count_parking_cross_country_tickets']}}
                                         </td>
                                         <td>
                                             {{$item['start']}}

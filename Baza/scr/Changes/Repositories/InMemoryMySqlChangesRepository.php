@@ -29,6 +29,9 @@ class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
        `changes`.`count_drug_tickets`,
        `changes`.`count_spisok_tickets`,
        `changes`.`count_auto_tickets`,
+       `changes`.`count_parking_tickets`,
+       `changes`.`count_parking_free_tickets`,
+       `changes`.`count_parking_cross-country_tickets`,
        `changes`.`start`,
        `changes`.`end`
 from `changes`

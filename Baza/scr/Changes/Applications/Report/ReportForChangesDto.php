@@ -15,6 +15,9 @@ class ReportForChangesDto extends AbstractionEntity
         protected int     $count_drug_tickets,
         protected int     $count_spisok_tickets,
         protected int     $count_auto_tickets,
+        protected int     $count_parking_tickets,
+        protected int     $count_parking_free_tickets,
+        protected int     $count_parking_cross_country_tickets,
         protected Carbon  $start,
         protected ?Carbon $end = null,
     )
@@ -33,6 +36,9 @@ class ReportForChangesDto extends AbstractionEntity
             $data['count_drug_tickets'],
             $data['count_spisok_tickets'],
             $data['count_auto_tickets'],
+            $data['count_parking_tickets'],
+            $data['count_parking_free_tickets'],
+            $data['count_parking_cross-country_tickets'],
             Carbon::parse($data['start']),
             $end
         );
@@ -61,5 +67,20 @@ class ReportForChangesDto extends AbstractionEntity
     public function getCountAutoTickets(): int
     {
         return $this->count_auto_tickets;
+    }
+
+    public function getCountParkingTickets(): int
+    {
+        return $this->count_parking_tickets;
+    }
+
+    public function getCountParkingFreeTickets(): int
+    {
+        return $this->count_parking_free_tickets;
+    }
+
+    public function getCountParkingCrossCountryTickets(): int
+    {
+        return $this->count_parking_cross_country_tickets;
     }
 }
