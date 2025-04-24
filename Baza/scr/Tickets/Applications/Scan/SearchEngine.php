@@ -14,6 +14,7 @@ use Baza\Tickets\Applications\Scan\FriendlyTicket\FriendlyTicketQueryHandler;
 use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQuery;
 use Baza\Tickets\Applications\Scan\LiveTicket\LiveTicketQueryHandler;
 use Baza\Tickets\Applications\Scan\ParkingTicket\ParkingTicketQuery;
+use Baza\Tickets\Applications\Scan\ParkingTicket\ParkingTicketQueryHandler;
 use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQuery;
 use Baza\Tickets\Applications\Scan\SpisokTicket\SpisokTicketQueryHandler;
 use DomainException;
@@ -28,6 +29,7 @@ class SearchEngine
         SpisokTicketQueryHandler   $spisokTicketQueryHandler,
         FriendlyTicketQueryHandler $friendlyTicketQueryHandler,
         LiveTicketQueryHandler     $liveTicketQueryHandler,
+        ParkingTicketQueryHandler  $parkingTicketQueryHandler,
     )
     {
         $this->bus = new InMemorySymfonyQueryBus([
@@ -35,6 +37,7 @@ class SearchEngine
             SpisokTicketQuery::class => $spisokTicketQueryHandler,
             FriendlyTicketQuery::class => $friendlyTicketQueryHandler,
             LiveTicketQuery::class => $liveTicketQueryHandler,
+            ParkingTicketQuery::class => $parkingTicketQueryHandler,
         ]);
     }
 
