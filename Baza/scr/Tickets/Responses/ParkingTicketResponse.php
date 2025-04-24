@@ -26,7 +26,8 @@ class ParkingTicketResponse implements TicketResponseInterface
     public function toArray(): array
     {
         return [
-            'type' => DefineService::HUMAN_LIST[$this->type],
+            'humanType' => DefineService::HUMAN_LIST[$this->type],
+            'type' => $this->type,
             'kilter' => $this->kilter,
             'comment' => $this->comment,
             'status_human' => $this->status->getHumanStatus(),

@@ -194,7 +194,7 @@
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
         const phoneResult = document.getElementById('phone');
-        const typeResult = document.getElementById('type');
+        const typeResult = document.getElementById('humanType');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
         const colorResult = document.getElementById('color');
