@@ -13,7 +13,7 @@ class ParkingTicketResponse implements TicketResponseInterface
 {
     public function __construct(
         protected int     $kilter,
-        protected string     $type,
+        protected string  $type,
         protected ?Status $status,
         protected ?string $comment = null,
         protected ?int    $change_id = null,

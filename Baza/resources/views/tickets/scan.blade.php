@@ -46,6 +46,8 @@
                     <p id="name"></p>
                     <b>Email: </b>
                     <p id="email"></p>
+                    <b>Тип парковки: </b>
+                    <p id="type"></p>
                     <b>Дата получение билета: </b>
                     <p id="date-order"></p>
                     <b>Телефон: </b>
@@ -192,6 +194,7 @@
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
         const phoneResult = document.getElementById('phone');
+        const typeResult = document.getElementById('type');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
         const colorResult = document.getElementById('color');
@@ -218,6 +221,7 @@
             phoneResult.textContent = data.phone || '';
             statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
+            typeResult.textContent = data.type;
             commentResult.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
             colorResult.style.background = data.color || '';
