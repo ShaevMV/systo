@@ -29,7 +29,8 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/",
-            "Baza\\": "scr/"
+            "Baza\\": "scr/",
+            "Shared\\": "../Shared"
         }
     },
     "autoload-dev": {
