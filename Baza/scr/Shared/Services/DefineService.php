@@ -63,8 +63,16 @@ class DefineService
     public function getTypeByReference(string $origLink): SearchDto
     {
         $link = str_replace(self::URL, '', $origLink);
-
-        if (strripos($link, self::ELECTRON_TICKET_URL) !== false) {
+        if(strripos($link, self::PARKING_FREE_TICKET) !== false) {
+            $type = self::PARKING_FREE_TICKET;
+            $id = $this->getOnlyNumber($link, self::PARKING_FREE_TICKET);
+        } elseif (strripos($link, self::PARKING_CROSS_COUNTRY_TICKET) !== false) {
+            $type = self::PARKING_CROSS_COUNTRY_TICKET;
+            $id = $this->getOnlyNumber($link, self::PARKING_CROSS_COUNTRY_TICKET);
+        } elseif (strripos($link, self::PARKING_TICKET) !== false) {
+            $type = self::PARKING_TICKET;
+            $id = $this->getOnlyNumber($link, self::PARKING_TICKET);
+        } elseif (strripos($link, self::ELECTRON_TICKET_URL) !== false) {
             $type = self::ELECTRON_TICKET;
             $uuid = str_replace(self::ELECTRON_TICKET_URL, '', $link);
             $id = new Uuid($uuid);
@@ -74,15 +82,7 @@ class DefineService
         } elseif (strripos($link, 'f') !== false) {
             $type = self::DRUG_TICKET;
             $id = $this->getOnlyNumber($link, 'f');
-        } elseif (strripos($link, self::PARKING_FREE_TICKET) !== false) {
-            $type = self::PARKING_FREE_TICKET;
-            $id = $this->getOnlyNumber($link, self::PARKING_FREE_TICKET);
-        } elseif (strripos($link, self::PARKING_CROSS_COUNTRY_TICKET) !== false) {
-            $type = self::PARKING_CROSS_COUNTRY_TICKET;
-            $id = $this->getOnlyNumber($link, self::PARKING_CROSS_COUNTRY_TICKET);
-        } elseif (strripos($link, self::PARKING_TICKET) !== false) {
-            $type = self::PARKING_TICKET;
-            $id = $this->getOnlyNumber($link, self::PARKING_TICKET);
+
         } elseif ($this->getOnlyNumber($link) == $link || strripos($link, self::LIVE_TICKET_URL) !== false) {
             $type = self::LIVE_TICKET;
             $id = (int)str_replace(self::LIVE_TICKET_URL, '', $link);
