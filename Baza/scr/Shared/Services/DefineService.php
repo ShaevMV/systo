@@ -17,7 +17,7 @@ class DefineService
     public const DRUG_TICKET = 'drug';
     public const PARKING_TICKET = 'parking';
     public const PARKING_FREE_TICKET = 'parking_free';
-    public const PARKING_CROSS_COUNTRY_TICKET = 'parking_cross-country';
+    public const PARKING_CROSS_COUNTRY_TICKET = 'parking_cross-countrycross-country';
 
     public const HUMAN_LIST = [
         self::ELECTRON_TICKET => 'Электронный',
