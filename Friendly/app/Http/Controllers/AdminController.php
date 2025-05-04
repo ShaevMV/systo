@@ -97,13 +97,13 @@ class AdminController extends Controller
 
         foreach ($usersList as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
-            $total['list']['sum'] = $total['list']['sum'] + $value['sum_price_live'];
-            $total['list']['count'] = $total['list']['count'] + $value['count_tickets_live'];
+            $total['list']['count'] = $total['list']['count'] + $value['count_tickets_list'];
         }
 
         foreach ($usersLive as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
-            $total['live']['count'] = $total['live']['count'] + $value['count_tickets_list'];
+            $total['live']['count'] = $total['live']['count'] + $value['count_tickets_live'];
+            $total['live']['sum'] = $total['live']['sum'] + $value['sum_price_live'];
         }
 
         return view('admin.users', [
