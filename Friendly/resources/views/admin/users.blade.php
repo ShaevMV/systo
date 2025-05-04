@@ -15,6 +15,7 @@
                     <th>{{ __('Сумма за живые') }}</th>
                     <th>{{ __('Кол-во за живые') }}</th>
                     <th>{{ __('Кол-во за списки') }}</th>
+                    <th>{{ __('ВСЕГО:') }}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -24,6 +25,7 @@
                     <td><b>{{number_format($total['live']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
                     <td><b>{{$total['live']['count'] ?? 0}}</b></td>
                     <td><b>{{$total['list']['count'] ?? 0}}</b></td>
+                    <td><b>{{number_format(($total['live']['sum'] + $total['friendly']['sum']), 2, '.', ' ')}}</b></td>
                 </tr>
                 </tbody>
 
