@@ -49,6 +49,7 @@ class AdminController extends Controller
         })->select(['users.*',
                 DB::raw('SUM(friendly_tickets.price) AS sum_price_friendly'),
                 DB::raw('COUNT(friendly_tickets.id) AS count_tickets_friendly'),
+                DB::raw('COUNT(friendly_tickets.is_need_seedling) AS count_is_need_seedling'),
             ])
             ->groupBy('users.id')
             ->get()
@@ -80,9 +81,9 @@ class AdminController extends Controller
             'friendly' => [
                 'sum' => 0,
                 'count' => 0,
+                'count_is_need_seedling' => 0,
             ],
             'list' => [
-
                 'count' => 0,
             ],
             'live' => [
@@ -94,6 +95,7 @@ class AdminController extends Controller
             $users[$value['id']] = $value;
             $total['friendly']['sum'] = $total['friendly']['sum'] + $value['sum_price_friendly'];
             $total['friendly']['count'] = $total['friendly']['count'] + $value['count_tickets_friendly'];
+            $total['friendly']['is_need_seedling'] = $total['friendly']['is_need_seedling'] + $value['count_is_need_seedling'];
         }
 
         foreach ($usersList as $value) {

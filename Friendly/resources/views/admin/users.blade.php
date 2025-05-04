@@ -12,6 +12,7 @@
                 <tr>
                     <th>{{ __('Сумма за френдли') }}</th>
                     <th>{{ __('Кол-во за френдли') }}</th>
+                    <th>{{ __('Кол-во сажанцев') }}</th>
                     <th>{{ __('Сумма за живые') }}</th>
                     <th>{{ __('Кол-во за живые') }}</th>
                     <th>{{ __('Кол-во за списки') }}</th>
@@ -22,6 +23,7 @@
                 <tr>
                     <td><b>{{number_format($total['friendly']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
                     <td><b>{{$total['friendly']['count'] ?? 0}}</b></td>
+                    <td><b>{{$total['friendly']['count_is_need_seedling'] ?? 0}}</b></td>
                     <td><b>{{number_format($total['live']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
                     <td><b>{{$total['live']['count'] ?? 0}}</b></td>
                     <td><b>{{$total['list']['count'] ?? 0}}</b></td>
