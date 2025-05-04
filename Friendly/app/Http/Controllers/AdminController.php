@@ -82,11 +82,12 @@ class AdminController extends Controller
                 'count' => 0,
             ],
             'list' => [
-                'sum' => 0,
+
                 'count' => 0,
             ],
             'live' => [
                 'count' => 0,
+                'sum' => 0,
             ],
         ];
         foreach ($usersFriendly as $value) {
