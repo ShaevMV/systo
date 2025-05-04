@@ -95,7 +95,7 @@ class AdminController extends Controller
             $users[$value['id']] = $value;
             $total['friendly']['sum'] = $total['friendly']['sum'] + $value['sum_price_friendly'];
             $total['friendly']['count'] = $total['friendly']['count'] + $value['count_tickets_friendly'];
-            $total['friendly']['is_need_seedling'] = $total['friendly']['is_need_seedling'] + $value['count_is_need_seedling'];
+            $total['friendly']['count_is_need_seedling'] = $total['friendly']['is_need_seedling'] + $value['count_is_need_seedling'];
         }
 
         foreach ($usersList as $value) {
