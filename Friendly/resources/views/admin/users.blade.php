@@ -7,7 +7,7 @@
                 </x-jet-responsive-nav-link>
             </div>
             <h3> ИТОГО: </h3>
-            <table class="table" style="width: 600px;">
+            <table class="table" style="width: 800px;">
                 <thead>
                 <tr>
                     <th>{{ __('Сумма за френдли') }}</th>
@@ -25,7 +25,7 @@
                     <td><b>{{number_format($total['live']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
                     <td><b>{{$total['live']['count'] ?? 0}}</b></td>
                     <td><b>{{$total['list']['count'] ?? 0}}</b></td>
-                    <td><b>{{number_format(($total['live']['sum'] + $total['friendly']['sum']), 2, '.', ' ')}}</b></td>
+                    <td style="width: 200px;"><b>{{number_format(($total['live']['sum'] + $total['friendly']['sum']), 2, '.', ' ')}}</b></td>
                 </tr>
                 </tbody>
 
