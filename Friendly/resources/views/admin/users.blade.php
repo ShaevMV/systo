@@ -54,7 +54,28 @@
                 </tbody>
 
             </table>
+            <h3> ИТОГО: </h3>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{{ __('Сумма за френдли') }}</th>
+                    <th>{{ __('Кол-во за френдли') }}</th>
+                    <th>{{ __('Сумма за живые') }}</th>
+                    <th>{{ __('Кол-во за живые') }}</th>
+                    <th>{{ __('Кол-во за списки') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>{{$total['friendly']['sum'] ?? 0}}</b></td>
+                        <td><b>{{$total['friendly']['count'] ?? 0}}</b></td>
+                        <td><b>{{$total['list']['sum'] ?? 0}}</b></td>
+                        <td><b>{{$total['list']['count'] ?? 0}}</b></td>
+                        <td><b>{{$total['live']['count'] ?? 0}}</b></td>
+                    </tr>
+                </tbody>
 
+            </table>
         </div>
     </div>
 </x-app-layout>

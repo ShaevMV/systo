@@ -76,20 +76,39 @@ class AdminController extends Controller
             ->toArray();
 
         $users = [];
+        $total = [
+            'friendly' => [
+                'sum' => 0,
+                'count' => 0,
+            ],
+            'list' => [
+                'sum' => 0,
+                'count' => 0,
+            ],
+            'live' => [
+                'count' => 0,
+            ],
+        ];
         foreach ($usersFriendly as $value) {
             $users[$value['id']] = $value;
+            $total['friendly']['sum'] = $total['friendly']['sum'] + $value['sum_price_friendly'];
+            $total['friendly']['count'] = $total['friendly']['count'] + $value['count_tickets_friendly'];
         }
 
         foreach ($usersList as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
+            $total['list']['sum'] = $total['list']['sum'] + $value['sum_price_live'];
+            $total['list']['count'] = $total['list']['count'] + $value['count_tickets_live'];
         }
 
         foreach ($usersLive as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
+            $total['live']['count'] = $total['live']['count'] + $value['count_tickets_list'];
         }
 
         return view('admin.users', [
             'users' => $users,
+            'total' => $total,
         ]);
     }
 
