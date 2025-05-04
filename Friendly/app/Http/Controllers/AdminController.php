@@ -49,7 +49,7 @@ class AdminController extends Controller
         })->select(['users.*',
                 DB::raw('SUM(friendly_tickets.price) AS sum_price_friendly'),
                 DB::raw('COUNT(friendly_tickets.id) AS count_tickets_friendly'),
-                DB::raw('COUNT(friendly_tickets.is_need_seedling) AS count_is_need_seedling'),
+                DB::raw('SUM(friendly_tickets.is_need_seedling) AS count_is_need_seedling'),
             ])
             ->groupBy('users.id')
             ->get()
