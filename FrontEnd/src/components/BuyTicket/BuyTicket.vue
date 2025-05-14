@@ -152,7 +152,7 @@
                             />
                             <span class="intckt">
                             <p>
-                              {{ typeTickets.name }} /
+                              <span v-html="typeTickets.name"></span> /
                               {{ typeTickets.price }} руб.
                             </p>
                             <p v-html="typeTickets.description"></p>
