@@ -151,8 +151,8 @@
                               v-bind:id="typeTickets.id"
                             />
                             <span class="intckt">
-                            <p>
-                              {{ typeTickets.name }} /
+                            <p v-html="typeTickets.name">
+                              /
                               {{ typeTickets.price }} руб.
                             </p>
                             <p v-html="typeTickets.description"></p>
