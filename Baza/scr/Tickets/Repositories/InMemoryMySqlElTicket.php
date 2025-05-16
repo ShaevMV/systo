@@ -19,7 +19,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     )
     {
     }
-    private function addFestivalUuid(): ElTicketsModel
+    private function addFestivalUuid()
     {
         if($this->festivalId) {
             return $this->elTicketsModel->where('festival_id', '=', self::UUID_FESTIVAL);
