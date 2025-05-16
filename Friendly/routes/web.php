@@ -66,7 +66,7 @@ Route::get('/clear', function() {
 
 Route::get('/pas', function (Request $request) {
     for ($i=1; $i<50 ; $i++){
-        echo Hash::make('znaytvse'.$i)."
-";
+        echo Hash::make('znaytvse'.$i)."";
+        echo "<br/>";
     };
 });
