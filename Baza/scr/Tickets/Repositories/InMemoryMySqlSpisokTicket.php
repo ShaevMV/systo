@@ -64,7 +64,6 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($q) {
                 return $query->orWhereRaw('LOWER(`curator`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`kilter`) LIKE ? ', ['%' . (int)strtolower(trim($q)) . '%'])
                     ->orWhereRaw('LOWER(`project`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
                     ->orWhereRaw('LOWER(`name`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
                     ->orWhereRaw('LOWER(`comment`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])

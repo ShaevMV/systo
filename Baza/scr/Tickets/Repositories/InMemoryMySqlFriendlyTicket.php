@@ -63,7 +63,6 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
         $resultRawList = $this->friendlyTicketModel::whereFestivalId(self::UUID_FESTIVAL)
                 ->where(function($query) use ($q) {
                     return $query->whereKilter((int)$q)
-                        ->orWhereRaw('LOWER(`kilter`) LIKE ? ', ['%' . (int)strtolower(trim($q)) . '%'])
                         ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                         ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
                         ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
