@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
+use Shared\Services\CreatingQrCodeService;
 use Tests\TestCase;
 use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
@@ -65,12 +66,12 @@ class ApplicationTicketTest extends TestCase
     public function test_in_create_QR_code(): void
     {
         $this->expectNotToPerformAssertions();
-        /*$service = new CreatingQrCodeService();
-        for($i = 5001;$i<=5500;$i++) {
+        $service = new CreatingQrCodeService();
+        for($i = 1;$i<=500;$i++) {
             $number = $this->addZero($i);
             $qrCode = $service->createQrCode($number,'');
             $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");
-        }*/
+        }
     }
 
 
