@@ -130,6 +130,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.phone',
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
+                OrderTicketModel::TABLE . '.ticket_type_id',
                 $this->model::TABLE . '.festival_id',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
@@ -153,6 +154,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['pdf'],
             $result['emailView'],
             new Uuid($result['festival_id']),
+            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada04', '222abc0c-fc8e-4a1d-a4b0-d345cafada02'])
         );
     }
 
@@ -178,6 +180,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->update([
                             'status' => $data['status'],
                             'festival_id' => $data['festival_id'],
+                            'is_need_seedling' => $data['is_need_seedling']
                         ]);
             }
         } catch (\Exception $e) {
