@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string $date_order
  * @property string $status
  * @property string $comment
+ * @property boolean $is_need_seedling
  * @property int|null $change_id
  * @property string|null $date_change
  * @property Carbon|null $created_at
@@ -62,5 +63,6 @@ class ElTicketsModel extends Model
         'status',
         'change_id',
         'date_change',
+        'is_need_seedling',
     ];
 }

@@ -17,8 +17,10 @@ class ElTicket extends Ticket
         protected string $email,
         protected string $phone,
         protected Carbon $date_order,
+        protected bool $is_need_seedling = false,
         ?int             $change_id = null,
-        ?Carbon          $date_change = null)
+        ?Carbon          $date_change = null
+    )
     {
         parent::__construct($kilter, $change_id, $date_change);
     }
@@ -39,6 +41,7 @@ class ElTicket extends Ticket
             $data['email'],
             $data['phone'],
             Carbon::parse($data['date_order']),
+            $data['is_need_seedling'] ?? false,
             $data['change_id'] ?? null,
             $date_change
         );

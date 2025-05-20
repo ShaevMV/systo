@@ -25,7 +25,8 @@ class ElTicketResponse implements TicketResponseInterface
         protected Carbon  $date_order,
         protected ?string $comment = null,
         protected ?int    $change_id = null,
-        protected ?Carbon $date_change = null
+        protected ?Carbon $date_change = null,
+        protected bool  $is_need_seedling = false,
     )
     {
     }
@@ -47,6 +48,7 @@ class ElTicketResponse implements TicketResponseInterface
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
             'color' => Color::COLOR_ELECTRON,
+            'is_need_seedling' => $this->is_need_seedling,
         ];
     }
 
@@ -66,6 +68,7 @@ class ElTicketResponse implements TicketResponseInterface
             ShowSearchWordService::insertTag($data['comment'], $q),
             $data['change_id'] ?? null,
             $date_change,
+            $data['is_need_seedling'] ?? false,
         );
     }
 }
