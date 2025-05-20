@@ -31,6 +31,7 @@ class TicketService
                     'email' => $ticket->email,
                     'comment' => $ticket->comment,
                     'festival_id' => $ticket->festival_id,
+                    'is_need_seedling' => $ticket->is_need_seedling,
                 ]);
         }
 
@@ -43,6 +44,7 @@ class TicketService
             'email' => $ticket->email,
             'comment' => $ticket->comment,
             'festival_id' => $ticket->festival_id,
+            'is_need_seedling' => $ticket->is_need_seedling,
         ]);
 
         return true;
