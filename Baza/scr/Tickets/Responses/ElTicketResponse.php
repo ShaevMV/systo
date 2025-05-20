@@ -68,7 +68,7 @@ class ElTicketResponse implements TicketResponseInterface
             ShowSearchWordService::insertTag($data['comment'], $q),
             $data['change_id'] ?? null,
             $date_change,
-            $data['is_need_seedling'] ?? false,
+            (bool) ($data['is_need_seedling'] ?? false),
         );
     }
 }
