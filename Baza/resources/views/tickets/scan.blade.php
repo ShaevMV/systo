@@ -225,7 +225,7 @@
             statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
             typeResult.textContent = data.humanType;
-            commentResult.textContent = data.comment;
+            commentResult.textContent = data.is_need_seedling || false ? 'Нужен' : 'Не нужен';
             is_need_seedling.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
             colorResult.style.background = data.color || '';
