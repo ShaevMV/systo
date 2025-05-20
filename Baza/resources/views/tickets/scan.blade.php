@@ -60,7 +60,8 @@
                     <p id="curator"></p>
                     <b>Комментарий: </b>
                     <p id="comment"></p>
-
+                    <b>Нужен сажанец: </b>
+                    <p id="is_need_seedling"></p>
                 </div>
                 <div class="card-footer">
                     <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ
@@ -153,6 +154,7 @@
         const alreadyPassedResult = document.getElementById('already-passed');
         const massageResult = document.getElementById('massage-result');
 
+
         var idTicket = null;
         var typeTicket = null;
 
@@ -197,6 +199,7 @@
         const typeResult = document.getElementById('type');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
+        const is_need_seedling = document.getElementById('is_need_seedling');
         const colorResult = document.getElementById('color');
 
         function showResult(data) {
@@ -223,6 +226,7 @@
             emailResult.textContent = data.email;
             typeResult.textContent = data.humanType;
             commentResult.textContent = data.comment;
+            is_need_seedling.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
             colorResult.style.background = data.color || '';
         }
@@ -239,6 +243,7 @@
             emailResult.textContent = '';
             dateOrderResult.textContent = '';
             commentResult.textContent = '';
+            is_need_seedling.textContent = '';
             phoneResult.textContent = '';
             statusResult.textContent = '';
             idTicket = null;
