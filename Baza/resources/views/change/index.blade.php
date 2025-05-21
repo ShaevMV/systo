@@ -109,10 +109,10 @@
                                         <b>{{$total['spisok']}} </b>
                                     </td>
                                     <td>
-                                        <b>{{$total['auto']}} </b>
+                                        <b>{{$total['parking']}} </b>
                                     </td>
-                                    <td>{{$total['parking']}}</td>
-                                    <td>{{$total['parkingFree']}}</td>
+                                    <td><b>{{$total['parkingFree']}}</b></td>
+
                                 </tr>
                                 </tbody>
                             </table>
