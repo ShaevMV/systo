@@ -33,9 +33,6 @@
                                     Парковка б/п.
                                 </th>
                                 <th>
-                                    Парковка вездиход.
-                                </th>
-                                <th>
                                     Время начала смены
                                 </th>
                                 <th>
@@ -70,9 +67,6 @@
                                         </td>
                                         <td>
                                             {{$item['count_parking_free_tickets']}}
-                                        </td>
-                                        <td>
-                                            {{$item['count_parking_cross_country_tickets']}}
                                         </td>
                                         <td>
                                             {{$item['start']}}
@@ -117,9 +111,8 @@
                                     <td>
                                         <b>{{$total['auto']}} </b>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{$total['parking']}}</td>
+                                    <td>{{$total['parkingFree']}}</td>
                                 </tr>
                                 </tbody>
                             </table>
