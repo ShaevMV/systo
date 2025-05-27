@@ -6,7 +6,7 @@ use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 
 class FestivalHelper
 {
-    public const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b6';
+    public const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b7';
     public const UUID_SECOND_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
 
     /**

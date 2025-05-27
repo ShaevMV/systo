@@ -54,7 +54,7 @@ class OrderingTicketsController extends Controller
      */
     public function getTicketTypeList(): array
     {
-        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b6'))->toArray();
+        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'))->toArray();
     }
 
     /**
