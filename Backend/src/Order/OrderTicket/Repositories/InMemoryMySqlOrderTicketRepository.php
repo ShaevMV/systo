@@ -180,7 +180,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 );
             }
         }
-        //$sql = $builder->toSql();
+        $sql = $builder->toSql();
+        dd($sql);
         $rawData = $builder
             ->get()
             ->toArray();
