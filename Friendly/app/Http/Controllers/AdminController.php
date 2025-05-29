@@ -152,7 +152,7 @@ class AdminController extends Controller
 
         User::destroy($id);
 
-        return redirect()->route('adminUser',['9d679bcf-b438-4ddb-ac04-023fa9bff4b7']);
+        return redirect()->route('adminUser',['9d679bcf-b438-4ddb-ac04-023fa9bff4b6']);
     }
 
     public function getAuto(Request $request): View|Factory|Application

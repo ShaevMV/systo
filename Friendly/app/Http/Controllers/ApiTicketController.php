@@ -53,7 +53,7 @@ class ApiTicketController extends Controller
                     "date_start" => "2025-01-16 13:47:53",
                     "date_end" => "2025-12-16 13:47:53"
                 ],
-                "9d679bcf-b438-4ddb-ac04-023fa9bff4b7" => [
+                "9d679bcf-b438-4ddb-ac04-023fa9bff4b6" => [
                     "name" => "Систо-весна 2025",
                     "date_start" => "2025-01-28 00:00:00",
                     "date_end" => "2025-05-26 00:00:00"
