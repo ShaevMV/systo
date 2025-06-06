@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Оргвзнос на Solar Systo Togathering {{date('Y')}} подтверждён</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Оргвзнос на Solar Systo Togathering {{date('Y')}} Осень подтверждён</td>
                             </tr>
                         </table>
                     </td>
