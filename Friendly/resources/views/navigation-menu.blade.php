@@ -11,9 +11,9 @@
                         {{ __('Пользователи Весна (2025)') }}
                     </x-jet-nav-link>
                     <x-jet-nav-link
-                        href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5']) }}"
-                        :active="request()->path() == 'admin/user/9d679bcf-b438-4ddb-ac04-023fa9bff4b5'">
-                        {{ __('Пользователи Осень (2024)') }}
+                        href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7']) }}"
+                        :active="request()->path() == 'admin/user/9d679bcf-b438-4ddb-ac04-023fa9bff4b7'">
+                        {{ __('Пользователи Осень (2025)') }}
                     </x-jet-nav-link>
                 </div>
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
@@ -27,11 +27,11 @@
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',[
-                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                             'type' => 'friendly_tickets'
                             ]) }}"
-                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=friendly_tickets'">
-                        {{ __('Электронные билеты Осень (2024)') }}
+                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=friendly_tickets'">
+                        {{ __('Электронные билеты Осень (2025)') }}
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',[
@@ -43,11 +43,11 @@
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',[
-                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                                 'type' => 'live_tickets'
                                 ]) }}"
-                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=live_tickets'">
-                        {{ __('Живые билеты Осень (2024)') }}
+                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=live_tickets'">
+                        {{ __('Живые билеты Осень (2025)') }}
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',[
@@ -59,11 +59,11 @@
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('adminTickets',[
-                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                             'type' => 'list_tickets'
                             ]) }}"
-                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b6&type=list_tickets'">
-                        {{ __('Списки Осень (2024)') }}
+                        :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=list_tickets'">
+                        {{ __('Списки Осень (2025)') }}
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('getAuto',[
@@ -74,10 +74,10 @@
                     </x-jet-nav-link>
                     <x-jet-nav-link
                         href="{{ route('getAuto',[
-                               'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                               'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                             ]) }}"
-                        :active="request()->path().'?festival_id='.request()->get('festival_id') == 'admin/auto?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5'">
-                        {{ __('Автомобили Осень (2024)') }}
+                        :active="request()->path().'?festival_id='.request()->get('festival_id') == 'admin/auto?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7'">
+                        {{ __('Автомобили Осень (2025)') }}
                     </x-jet-nav-link>
                 </div>
 
@@ -159,9 +159,9 @@
                 {{ __('Пользователи Весна (2025)') }}
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
-                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5']) }}"
-                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5'])">
-                {{ __('Пользователи Осень (2024)') }}
+                href="{{ route('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7']) }}"
+                :active="request()->routeIs('adminUser',['festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'])">
+                {{ __('Пользователи Осень (2025)') }}
             </x-jet-responsive-nav-link>
         </div>
         <div class="pt-2 pb-3 space-y-1">
@@ -175,11 +175,11 @@
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
                 href="{{ route('adminTickets',[
-                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                            'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                             'type' => 'friendly_tickets'
                             ]) }}"
-                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=friendly_tickets'">
-                {{ __('Электронные билеты Осень (2024)!') }}
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=friendly_tickets'">
+                {{ __('Электронные билеты Осень (2025)') }}
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
                 href="{{ route('adminTickets',[
@@ -191,19 +191,19 @@
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
                 href="{{ route('adminTickets',[
-                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                                 'type' => 'live_tickets'
                                 ]) }}"
-                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=live_tickets'">
-                {{ __('Живые билеты Осень (2024)') }}
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=live_tickets'">
+                {{ __('Живые билеты Осень (2025)') }}
             </x-jet-responsive-nav-link>
             <x-jet-responsive-nav-link
                 href="{{ route('adminTickets',[
-                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
                                 'type' => 'list_tickets'
                                 ]) }}"
-                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5&type=list_tickets'">
-                {{ __('Списки Осень (2024)') }}
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/tickets?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7&type=list_tickets'">
+                {{ __('Списки Осень (2025)') }}
             </x-jet-responsive-nav-link>
 
             <x-jet-responsive-nav-link
@@ -217,11 +217,11 @@
 
             <x-jet-responsive-nav-link
                 href="{{ route('getAuto',[
-                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+                                'festival_id' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
 
                                 ]) }}"
-                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/auto?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b5'">
-                {{ __('Автомобили Осень (2024)') }}
+                :active="request()->path().'?festival_id='.request()->get('festival_id').'&type='.request()->get('type') == 'admin/auto?festival_id=9d679bcf-b438-4ddb-ac04-023fa9bff4b7'">
+                {{ __('Автомобили Осень (2025)') }}
             </x-jet-responsive-nav-link>
 
             <x-jet-responsive-nav-link
