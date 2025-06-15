@@ -29,7 +29,6 @@
                 <form method="POST" action="{{ route('addLiveTicket') }}" id="main-former">
                     @csrf
                     <h2>Форма продажи живого билета</h2>
-                    <small>Гость должен получить от вас конверт с карточкой лично в руки, либо забрать его в Лесистой.</small>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца:') }}"/>
                         <x-jet-input id="password" readonly class="block mt-1 w-full" type="text" name="seller" required
