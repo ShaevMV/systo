@@ -72,7 +72,9 @@
                     </div>
 
                     <div class="mt-4">
-                        <x-jet-label for="price" value="{{ __('Сумма, полученная за билеты:') }}"/>
+                        <b>
+                        <x-jet-label for="price" value="{{ __('Сумма, полученная за билеты: (за вычетом вашей комиссии, т.е. комиссию сюда не пишем):') }}"/>
+                        </b>
                         <x-jet-input id="price" class="block mt-1 w-full" type="number" name="price" required
                                      autocomplete="price"/>
                     </div>
