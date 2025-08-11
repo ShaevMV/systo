@@ -61,6 +61,10 @@ Route::prefix('v1/festival')->group(static function (): void {
     ])->middleware('auth:api');
 });
 
+Route::any('v1/order/succes',function (Request $request){
+    Log::debug('Billing', $request->toArray());
+});
+
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
