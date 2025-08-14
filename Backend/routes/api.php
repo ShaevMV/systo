@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Billing\BillingController;
 use App\Http\Controllers\Festival\OrderingTicketsController;
 use App\Http\Controllers\TicketsOrder\Comment;
 use App\Http\Controllers\TicketsOrder\OrderTickets;
@@ -61,9 +62,7 @@ Route::prefix('v1/festival')->group(static function (): void {
     ])->middleware('auth:api');
 });
 
-Route::any('v1/order/succes',function (Request $request){
-    Log::debug('Billing', $request->toArray());
-});
+Route::any('v1/order/succes',[BillingController::class, 'webHook']);
 
 
 Route::controller(AuthController::class)->group(function () {
