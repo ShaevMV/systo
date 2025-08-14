@@ -30,8 +30,8 @@ class WebHookCommandHandler implements CommandHandler
         };
 
         $status = match (true) {
-            $command->getStatus()->isPaymentRefund() => new Status(Status::PAID),
-            $command->getStatus()->isPaymentCompleted() => new Status(Status::CANCEL),
+            $command->getStatus()->isPaymentRefund() => new Status(Status::CANCEL),
+            $command->getStatus()->isPaymentCompleted() => new Status(Status::PAID),
             default => new Status(Status::DIFFICULTIES_AROSE),
         };
 
