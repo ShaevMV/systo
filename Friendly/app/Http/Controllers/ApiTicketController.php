@@ -49,14 +49,14 @@ class ApiTicketController extends Controller
         return json_encode([
             'festival_list' => [
                 "9d679bcf-b438-4ddb-ac04-023fa9bff4b0" => [
-                    "name" => "Тест",
-                    "date_start" => "2025-01-16 13:47:53",
-                    "date_end" => "2025-12-16 13:47:53"
+                    "name" => "Тест 3025",
+                    "date_start" => "2025-08-01 00:00:00",
+                    "date_end" => "2025-09-15 00:00:00"
                 ],
                 "9d679bcf-b438-4ddb-ac04-023fa9bff4b7" => [
                     "name" => "Систо-Осень 2025",
-                    "date_start" => "2025-01-28 00:00:00",
-                    "date_end" => "2025-05-26 00:00:00"
+                    "date_start" => "2025-08-01 00:00:00",
+                    "date_end" => "2025-09-15 00:00:00"
                 ]
             ]
         ]);
