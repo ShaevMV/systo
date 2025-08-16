@@ -26,7 +26,7 @@ class ApiTicketController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
-        $user = User::where('email', $data['user_email'])->first();
+        $user = User::where('email', 'bot@telegram.com')->first();
         if (null === $user) {
             return json_encode([
                 'success' => false,
@@ -48,7 +48,7 @@ class ApiTicketController extends Controller
     {
         return json_encode([
             'festival_list' => [
-                "9d679bcf-b438-4ddb-ac04-023fa9bff4b5" => [
+                "9d679bcf-b438-4ddb-ac04-023fa9bff4b0" => [
                     "name" => "Тест",
                     "date_start" => "2025-01-16 13:47:53",
                     "date_end" => "2025-12-16 13:47:53"
