@@ -39,7 +39,7 @@ class OrderingTicketsController extends Controller
         if (is_null($request->get('festival_id'))) {
             throw new DomainException('Не задан идентификатор фестиваля');
         }
-        $isAdmin = $request->get('is_admin', false);
+        $isAdmin = (bool) $request->get('is_admin', false);
 
         return $this->allInfoForOrderingTicketsSearcher
             ->getInfoForOrderingDto(
