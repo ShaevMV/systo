@@ -39,8 +39,8 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} создан и ожидает проверки ответственным организатором.  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В течение 3-5 дней после получения средств на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на {{$festivalName}}! </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} создан и ожидает проверки нашей системой.  </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Как только ты оплатишь через СБП на твой e-mail придет подтверждение оргвзноса и электронный билет с QR-кодом для входа на {{$festivalName}}! </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
