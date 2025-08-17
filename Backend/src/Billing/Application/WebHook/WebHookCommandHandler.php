@@ -34,13 +34,15 @@ class WebHookCommandHandler implements CommandHandler
             default => new Status(Status::DIFFICULTIES_AROSE),
         };
 
+        if($command->getStatus()->isPaymentCompleted()) {
+            $this->chanceStatus->chance(
+                $command->getOrderId(),
+                $status,
+                new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
+                $comment
+            );
+        }
 
-        $this->chanceStatus->chance(
-            $command->getOrderId(),
-            $status,
-            new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
-            $comment
-        );
     }
 
     private function insertLink(?string $link): string
