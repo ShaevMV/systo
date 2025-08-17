@@ -20,12 +20,11 @@ class WebHookCommandHandler implements CommandHandler
     /**
      * @throws \Throwable
      */
-    public function __invoke(WebHookCommand $command)
+    public function __invoke(WebHookCommand $command): void
     {
-
         $comment = match (true) {
             $command->getStatus()->isPaymentRefund() => 'Возврат платежа',
-            $command->getStatus()->isPaymentCompleted() => 'Оплата через Биллинг',
+            $command->getStatus()->isPaymentCompleted() => $this->insertLink($command->getLinkToReceipt()),
             default => 'Статус платежа не обработан ' . $command->getStatus()->getStatus()
         };
 
@@ -42,5 +41,14 @@ class WebHookCommandHandler implements CommandHandler
             new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
             $comment
         );
+    }
+
+    private function insertLink(?string $link): string
+    {
+        if(null === $link) {
+            return '';
+        }
+
+        return '<br/> <a href="$link"> Ссылка на чек </a>';
     }
 }

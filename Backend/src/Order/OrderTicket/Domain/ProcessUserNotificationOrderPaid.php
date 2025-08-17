@@ -27,6 +27,7 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
         private string $email,
         private array  $tickets,
         private Uuid $ticketTypeId,
+        private ?string $comment = null,
     )
     {
     }

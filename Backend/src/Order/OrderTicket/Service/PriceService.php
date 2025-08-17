@@ -30,7 +30,7 @@ class PriceService
             $ticketTypeId,
             $dateTime ?? new Carbon()
         );
-        $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
+
         $discount = $this->isCorrectPromoCode->findPromoCode(
             $promoCode,
             $priceByType->getPrice(),
@@ -38,7 +38,8 @@ class PriceService
         )?->getDiscount() ?? 0.00;
 
         return new PriceDto(
-            $totalPrice,
+            (int)$priceByType->getPrice(),
+            ($priceByType->isGroupType() ? 1 : $count),
             $discount * $count
         );
     }

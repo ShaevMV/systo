@@ -182,4 +182,9 @@ class OrderTicketDto
     {
         return $this->is_live_ticket;
     }
+
+    public function isBilling(): bool
+    {
+        return $this->types_of_payment_id->equals(new Uuid('3fcded69-4aef-4c4a-a041-52c91e5afd91'));
+    }
 }

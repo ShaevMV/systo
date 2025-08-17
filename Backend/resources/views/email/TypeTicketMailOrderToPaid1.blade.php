@@ -46,6 +46,10 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы https://org.solarsysto.ru/myOrders</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
+                        @if($comment)
+                            <p style="font-family: Tahoma, sans-serif; font-size: 18px;">{{$comment}}</p>
+                        @endif
+
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>

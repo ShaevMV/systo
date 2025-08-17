@@ -79,7 +79,7 @@ final class OrderTicket extends AggregateRoot
     }
 
 
-    public static function toPaid(OrderTicketDto $orderTicketDto): self
+    public static function toPaid(OrderTicketDto $orderTicketDto, ?string $comment = null): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
@@ -92,6 +92,7 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getEmail(),
                 $result->getTicket(),
                 $orderTicketDto->getTicketTypeId(),
+                $comment
             )
         );
 

@@ -15,6 +15,9 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\Billing\Application\Billing;
+use Tickets\Billing\DTO\PaymentRequestDTO;
+use Tickets\Billing\ValueObject\DeviceValueObject;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
@@ -44,6 +47,7 @@ class OrderTickets extends Controller
         private ChanceStatus       $chanceStatus,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
+        private Billing $billing,
     )
     {
     }
@@ -92,6 +96,27 @@ class OrderTickets extends Controller
                     $userId,
                     $createOrderTicketsRequest->comment
                 );
+            }
+            if($orderTicketDto->isBilling()) {
+                $billingResponse = $this->billing->creatingLink(
+                    new PaymentRequestDTO(
+                        $orderTicketDto->getId(),
+                        $priceDto->getPriceItem(),
+                        $priceDto->getCount(),
+                        $createOrderTicketsRequest->email,
+                        $createOrderTicketsRequest->phone,
+                    ),
+                    new DeviceValueObject(
+                        request()->userAgent(),
+                    ),
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'massage' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
+              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
+                    'link' => $billingResponse->getLinkToReceipt(),
+                ]);
             }
 
             return response()->json([
