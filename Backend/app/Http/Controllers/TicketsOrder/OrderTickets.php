@@ -114,7 +114,8 @@ class OrderTickets extends Controller
                 return response()->json([
                     'success' => true,
                     'massage' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
-              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
+              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации<br/>
+              <a href="{$billingResponse->getLinkToReceipt()}" target="_blank"> Открыть ссылку для оплаты </a>',
                     'link' => $billingResponse->getLinkToReceipt(),
                 ]);
             }
