@@ -26,7 +26,8 @@ class Billing
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            WebHookCommand::class => $commandHandler
+            WebHookCommand::class => $commandHandler,
+            CreatingLinkForPayCommand::class => $creatingLinkForPayCommandHandler,
         ]);
     }
 
