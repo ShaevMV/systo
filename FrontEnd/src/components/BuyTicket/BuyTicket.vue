@@ -317,7 +317,7 @@
                                 v-bind:id="typesOfPayment.id"
                               />
                               <span>
-                                {{ typesOfPayment.name }}с
+                                {{ typesOfPayment.name }}
                               </span>
                             </label>
 
