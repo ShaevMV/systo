@@ -758,6 +758,7 @@ export default {
   async created() {
     await this.loadDataForOrderingTickets({
       festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
+      is_admin: this.isAuth,
     });
     await this.clearError();
     if (this.isAuth) {

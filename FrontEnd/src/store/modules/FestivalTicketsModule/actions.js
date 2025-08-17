@@ -8,7 +8,10 @@ import axios from 'axios';
  */
 export const loadDataForOrderingTickets = (context, payload) => {
     let promise = axios.get('/api/v1/festival/orderingTickets',
-        {params: {festival_id: payload.festival_id}});
+        {params: {
+            festival_id: payload.festival_id,
+            is_admin:    payload.is_admin,
+        }});
     promise.then(function (response) {
         context.commit('setTypesOfPayment', response.data.typesOfPayment);
         context.commit('setTicketType', response.data.ticketType);
