@@ -30,4 +30,9 @@ class DeviceValueObject
     {
         return $this->device === self::IOS;
     }
+
+    public function getDevice(): string
+    {
+        return $this->device;
+    }
 }

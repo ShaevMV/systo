@@ -24,6 +24,7 @@ class CreatingLinkForPayCommand implements Command
 
     public function getDeviceValueObject(): DeviceValueObject
     {
+        throw new \DomainException($this->deviceValueObject->getDevice());
         return $this->deviceValueObject;
     }
 }
