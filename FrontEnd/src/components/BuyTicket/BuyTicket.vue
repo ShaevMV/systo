@@ -341,59 +341,6 @@
                     </div>
                   </div>
                 </div>
-                <div
-                  class="row flex-flex justify-content-center mt-2"
-                  style="
-                    color: var(--c-red);
-                    text-align: center;
-                    font-weight: bold;
-                  "
-                >
-                  ТЕПЕРЬ СОВЕРШИ ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ
-                  БАНКА
-                </div>
-                <div
-                  class="row mb-4 flex-flex justify-content-center"
-                  style="text-align: center; font-weight: bold"
-                >
-                  и только после этого заполни поля ниже
-                </div>
-                <div class="row mb-4 flex-flex">
-                  <div class="col-3">
-                    <label for="idBuy">Идентификатор платежа:</label>
-                  </div>
-                  <div class="col-3">
-                    <input class="form-control" v-model="idBuy" id="idBuy" />
-                  </div>
-                  <div class="col-6">
-                    <small class="form-text text-muted id-info">
-                      При переводах на Сбербанк напиши сюда
-                      <b>последние 4 цифры номера карты</b>, с которой был
-                      сделан перевод
-                    </small>
-                  </div>
-                  <small class="form-text text-muted">
-                    {{ getError('idBuy') }}</small
-                  >
-                </div>
-                <!--                  Дата платежа -->
-                <div class="row mt-4">
-                  <div class="col-3">
-                    <label for="form_message">Когда был сделан платеж?</label>
-                  </div>
-                  <div class="col-9 flex-flex">
-                    <input
-                      type="text"
-                      class="form-control"
-                      placeholder="Например: 18 февраля в 13.20"
-                      aria-label="Дата и время перевода"
-                      v-model="date"
-                    />
-                  </div>
-                  <small class="form-text text-muted">
-                    {{ getError('date') }}</small
-                  >
-                </div>
 
                 <div class="row">
                   <div class="col-3">
@@ -593,10 +540,8 @@ export default {
       return (
         this.selectTypeTicket !== null &&
         this.selectTypesOfPayment !== null &&
-        this.guests.length > 0 &&
         this.date !== null &&
         this.confirm === true &&
-        this.idBuy !== null &&
         this.phone !== null &&
         group &&
         (this.isAuth || this.email)
