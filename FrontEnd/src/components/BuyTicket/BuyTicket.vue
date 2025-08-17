@@ -290,8 +290,7 @@
                 </div>
 
                 <div class="pp1 row">
-                  <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства,
-                  осуществи перевод и заполни данные о платеже!
+                  <span>ШАГ 3.</span> После появления всплывающего окна нажмите на кнопку ОТКРЫТЬ ССЫЛКУ НА ОПЛАТУ
                 </div>
                 <div class="row">
                   <div class="col-12">
@@ -318,14 +317,7 @@
                                 v-bind:id="typesOfPayment.id"
                               />
                               <span>
-                                {{ typesOfPayment.name }}
-                                <i
-                                  class="copy-payment"
-                                  title="Нажми, чтобы скопировать реквизиты"
-                                  @click="
-                                    CopyTypesOfPayment(typesOfPayment.card)
-                                  "
-                                ></i>
+                                {{ typesOfPayment.name }}с
                               </span>
                             </label>
 
@@ -335,9 +327,6 @@
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div class="copy-btn">
-                      Нажми на <span></span> чтобы скопировать реквизиты
                     </div>
                   </div>
                 </div>
@@ -540,7 +529,6 @@ export default {
       return (
         this.selectTypeTicket !== null &&
         this.selectTypesOfPayment !== null &&
-        this.date !== null &&
         this.confirm === true &&
         this.phone !== null &&
         group &&
