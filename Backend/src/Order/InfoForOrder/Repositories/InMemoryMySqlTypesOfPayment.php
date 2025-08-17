@@ -19,7 +19,7 @@ class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface
     public function getList(bool $isAdmin = false): array
     {
         $result = [];
-        if (!$isAdmin) {
+        if ($isAdmin) {
             $typesOfPayments = $this->model::where('active', '=', true);
         } else {
             $typesOfPayments = $this->model;
