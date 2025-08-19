@@ -151,12 +151,12 @@
                               v-bind:id="typeTickets.id"
                             />
                             <span class="intckt">
-                            <p>
-                              {{ typeTickets.name }} /
-                              {{ typeTickets.price }} руб.
-                            </p>
-                            <p v-html="typeTickets.description"></p>
-                              </span>
+                              <p>
+                                {{ typeTickets.name }} /
+                                {{ typeTickets.price }} руб.
+                              </p>
+                              <p v-html="typeTickets.description"></p>
+                            </span>
                           </label>
                           <small class="form-text text-muted">
                             {{ getError('ticket_type_id') }}
@@ -290,7 +290,10 @@
                 </div>
 
                 <div class="pp1 row">
-                  <span>ШАГ 3.</span> Выберите тип оплаты через СБП и нажмите ниже на кнопку ЗАРЕГИСТРИРОВАТЬ ОРГВЗНОС. <br><br> После появится всплывающее окно с QR-кодом для оплаты, который надо сохранить и оплатить в приложении банка.
+                  <span>ШАГ 3.</span> Выберите тип оплаты через СБП и нажмите
+                  ниже на кнопку ЗАРЕГИСТРИРОВАТЬ ОРГВЗНОС. <br /><br />
+                  После появится всплывающее окно с QR-кодом для оплаты, который
+                  надо сохранить и оплатить в приложении банка.
                 </div>
                 <div class="row">
                   <div class="col-12">
@@ -312,7 +315,7 @@
                               <input
                                 type="radio"
                                 class="form-check-input"
-                                v-model="selectTypesOfPayment"
+                                v-model="selectTypeOfPayment"
                                 v-bind:value="typesOfPayment.id"
                                 v-bind:id="typesOfPayment.id"
                               />
@@ -390,10 +393,8 @@
                 <div class="row mt-4">
                   <div class="after-order">
                     <p>
-                      После оплаты на твой e-mail придет
-                      подтверждение оргвзноса и <br /><strong
-                        >электронный билет с QR-кодом</strong
-                      >
+                      После оплаты на твой e-mail придет подтверждение оргвзноса
+                      и <br /><strong>электронный билет с QR-кодом</strong>
                       для входа на Solar Systo Togathering 2025!
                     </p>
                     <p>
@@ -469,7 +470,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'BuyTicket',
@@ -486,7 +487,6 @@ export default {
       },
       hour: null,
       minute: null,
-      selectTypesOfPayment: null,
       guests: [],
       newGuest: null,
       email: null,
@@ -529,7 +529,7 @@ export default {
       }
       return (
         this.selectTypeTicket !== null &&
-        this.selectTypesOfPayment !== null &&
+        this.selectTypeOfPayment !== null &&
         this.confirm === true &&
         this.phone !== null &&
         group &&
@@ -568,7 +568,7 @@ export default {
       set: function (newValue) {
         this.setSelectTypesOfPayment(newValue);
       },
-  },
+    },
     /**
      * Стоимость билета
      */
@@ -658,6 +658,7 @@ export default {
     orderTicket: function () {
       let self = this;
       this.preload = true;
+      console.log(this.getSelectTypeOfPaymentId);
       this.goToCreateOrderTicket({
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
@@ -668,13 +669,13 @@ export default {
         city: this.city,
         phone: this.phone,
         comment: this.comment,
-        types_of_payment_id: this.selectTypesOfPayment,
+        types_of_payment_id: this.getSelectTypeOfPaymentId,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
         callback: function (result, massage, link) {
           if (result) {
             self.clearData();
           }
-          if(link !== null) {
+          if (link !== null) {
             window.location.href = link;
           } else {
             self.massage = massage;
@@ -690,7 +691,7 @@ export default {
      * Очистить данные
      */
     clearData: async function () {
-      this.selectTypesOfPayment = null;
+      this.selectTypeOfPayment = null;
       this.guests = [];
       this.preload = false;
       this.newGuest = '';
