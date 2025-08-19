@@ -578,7 +578,7 @@ export default {
               this.setSelectTypesOfPayment(oldId);
             }
           }
-        },
+        }
     },
     /**
      * Стоимость билета
