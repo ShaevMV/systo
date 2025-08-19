@@ -14,6 +14,7 @@ export const loadDataForOrderingTickets = (context, payload) => {
         }});
     promise.then(function (response) {
         context.commit('setTypesOfPayment', response.data.typesOfPayment);
+        context.commit('setSelectTypesOfPayment', response.data.typesOfPayment[0]);
         context.commit('setTicketType', response.data.ticketType);
         context.commit('setSelectTicketType', response.data.ticketType[0]);
     })
@@ -58,6 +59,17 @@ export const setSelectTicketType = (context, payload) => {
     context.commit('setSelectTicketType', select);
 };
 
+
+/**
+ * Записать выбранный тип оплаты
+ *
+ * @param context
+ * @param payload
+ */
+export const setSelectTypesOfPayment = (context, payload) => {
+    let select = context.state.typesOfPayment.find(type => type.id === payload);
+    context.commit('setSelectTypesOfPayment', select);
+};
 /**
  * Проверить промо код
  *
