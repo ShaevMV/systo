@@ -621,6 +621,7 @@ export default {
     ...mapActions('appFestivalTickets', [
       'loadDataForOrderingTickets',
       'setSelectTicketType',
+      'setSelectTypesOfPayment',
       'checkPromoCode',
       'clearPromoCode',
     ]),
