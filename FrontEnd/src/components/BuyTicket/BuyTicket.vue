@@ -559,28 +559,28 @@ export default {
         }
       },
     },
-      /**
-       * Выбранный тип билета
-       */
-      selectTypeOfPayment: {
-        get: function () {
-          return this.getSelectTypeOfPaymentId;
-        },
-        set: function (newValue) {
-          let oldId = this.getSelectTypeOfPaymentId;
+    /**
+     * Выбранный тип билета
+     */
+    selectTypeOfPayment: {
+      get: function () {
+        return this.getSelectTypeOfPaymentId;
+      },
+      set: function (newValue) {
+        let oldId = this.getSelectTypeOfPaymentId;
 
-          this.setSelectTypesOfPayment(newValue);
-          if (this.getSelectTicketType !== null) {
-            if (!this.isAllowedGuest(this.guests.length)) {
-              alert(
-                  'Привышен лимин по данному типу доступна только ' +
-                  this.getSelectTicketTypeLimit
-              );
-              this.setSelectTypesOfPayment(oldId);
-            }
+        this.setSelectTypesOfPayment(newValue);
+        if (this.getSelectTicketType !== null) {
+          if (!this.isAllowedGuest(this.guests.length)) {
+            alert(
+                'Привышен лимин по данному типу доступна только ' +
+                this.getSelectTicketTypeLimit
+            );
+            this.setSelectTypesOfPayment(oldId);
           }
         }
-    },
+      },
+  },
     /**
      * Стоимость билета
      */
