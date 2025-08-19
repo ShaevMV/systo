@@ -10,7 +10,7 @@ export const goToCreateOrderTicket = (context, payload) => {
     let promise = axios.post('/api/v1/festival/ticketsOrder/create', payload);
     promise.then(function (response) {
         console.log(response.data.success);
-        payload.callback(response.data.success, response.data.massage);
+        payload.callback(response.data.success, response.data.massage, response.data.link ?? null);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);

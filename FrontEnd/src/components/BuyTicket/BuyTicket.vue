@@ -657,13 +657,19 @@ export default {
         comment: this.comment,
         types_of_payment_id: this.selectTypesOfPayment,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
-        callback: function (result, massage) {
+        callback: function (result, massage, link) {
           if (result) {
             self.clearData();
           }
-          self.massage = massage;
-          document.getElementById('modalOpenBtn').click();
-          self.preload = false;
+          if(link !== null) {
+            window.location.href = link;
+          } else {
+            self.massage = massage;
+
+            document.getElementById('modalOpenBtn').click();
+
+            self.preload = false;
+          }
         },
       });
     },
