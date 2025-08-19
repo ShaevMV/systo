@@ -487,7 +487,6 @@ export default {
       },
       hour: null,
       minute: null,
-      selectTypesOfPayment: null,
       guests: [],
       newGuest: null,
       email: null,
