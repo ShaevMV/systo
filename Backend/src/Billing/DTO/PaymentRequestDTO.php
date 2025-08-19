@@ -58,7 +58,7 @@ class PaymentRequestDTO
             ],
             "method" => "sbp",
             "client_receipt" => [
-                "customer_email" => "shaevmv@gmail.com",
+                "customer_email" => $this->email,
                 "taxation_system" => 1,
                 "items" => [
                     [
