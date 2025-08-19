@@ -470,7 +470,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import {setSelectTypesOfPayment} from "@/store/modules/FestivalTicketsModule/actions";
 
 export default {
   name: 'BuyTicket',
@@ -487,6 +486,7 @@ export default {
       },
       hour: null,
       minute: null,
+      selectTypesOfPayment: null,
       guests: [],
       newGuest: null,
       email: null,
@@ -566,18 +566,7 @@ export default {
         return this.getSelectTypeOfPaymentId;
       },
       set: function (newValue) {
-        let oldId = this.getSelectTypeOfPaymentId;
-
         this.setSelectTypesOfPayment(newValue);
-        if (this.getSelectTicketType !== null) {
-          if (!this.isAllowedGuest(this.guests.length)) {
-            alert(
-                'Привышен лимин по данному типу доступна только ' +
-                this.getSelectTicketTypeLimit
-            );
-            this.setSelectTypesOfPayment(oldId);
-          }
-        }
       },
   },
     /**
