@@ -34,6 +34,16 @@ export const setSelectTicketType = (state, payload) => {
 };
 
 /**
+ * Запись данные о выбранном видае оплаты
+ *
+ * @param state
+ * @param payload
+ */
+export const setSelectTypesOfPayment = (state, payload) => {
+    state.selectTypeOfPayment = payload;
+};
+
+/**
  * Записать данные о промо коде
  *
  * @param state

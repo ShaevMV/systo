@@ -40,7 +40,7 @@ export const getSelectTicketType = state => {
 };
 
 /**
- * Id Выбранноготипа билета
+ * Id Выбранного типа билета
  *
  * @param state
  * @returns {null|*}
@@ -48,6 +48,19 @@ export const getSelectTicketType = state => {
 export const getSelectTicketTypeId = state => {
     if (state.selectTicketType.id !== null) {
         return state.selectTicketType.id;
+    }
+    return null;
+};
+
+/**
+ * Id Выбранного типа оплаты
+ *
+ * @param state
+ * @returns {null|*}
+ */
+export const getSelectTypeOfPaymentId = state => {
+    if (state.selectTypeOfPayment.id !== null) {
+        return state.selectTypeOfPayment.id;
     }
     return null;
 };
