@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 
 class Bot
 {
-    private const TOKEN = 'CiRP3hdM6r5MBqzQCvquvSlJ9CJ1';
+    public const TOKEN_BOT = 'CiRP3hdM6r5MBqzQCvquvSlJ9CJ1';
+    public const TOKEN_AI = 'PCf4yeeM8prVGee3zbArQGQP2eGpPHsV';
 
     /**
      * Handle an incoming request.
@@ -21,10 +22,21 @@ class Bot
     {
         $token = $request->headers->get('auth-token');
 
-        if ($token === self::TOKEN) {
+        if (in_array($token, [
+                self::TOKEN_BOT,
+                self::TOKEN_AI,
+            ])) {
             return $next($request);
         }
 
-        return redirect('/profile');
+        return redirect('/');
+    }
+
+    public static function getUserEmailByToken(string $token ): string
+    {
+        return match($token) {
+            self::TOKEN_BOT => 'bot@telegram.com',
+            self::TOKEN_AI => 'bot@ai.com',
+        };
     }
 }

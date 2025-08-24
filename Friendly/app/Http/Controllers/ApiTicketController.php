@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Middleware\Bot;
 use App\Models\User;
 use App\Services\ApiTicketService;
 use App\Services\DTO\CreateApiTicketDTO;
@@ -26,7 +27,9 @@ class ApiTicketController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
-        $user = User::where('email', 'bot@telegram.com')->first();
+        $user = User::where('email', Bot::getUserEmailByToken(
+            $request->headers->get('auth-token')
+        ))->first();
         if (null === $user) {
             return json_encode([
                 'success' => false,
