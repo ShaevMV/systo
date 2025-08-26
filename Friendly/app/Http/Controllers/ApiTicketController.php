@@ -53,7 +53,7 @@ class ApiTicketController extends Controller
             'festival_list' => [
                 "9d679bcf-b438-4ddb-ac04-023fa9bff4b0" => [
                     "name" => "Тест 3025",
-                    "date_start" => "2025-08-01 00:00:00",
+                    "date_start" => "2025-09-10 00:00:00",
                     "date_end" => "2025-09-15 00:00:00"
                 ],
                 "9d679bcf-b438-4ddb-ac04-023fa9bff4b7" => [
