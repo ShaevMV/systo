@@ -6,6 +6,7 @@ namespace Tickets\Ticket\CreateTickets\Repositories;
 
 use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\CommentOrderTicketModel;
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\Tickets\TicketModel;
@@ -117,6 +118,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
+            ->leftJoin(TicketTypesModel::TABLE, OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE . '.id')
             ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
                 $join->on($this->model::TABLE . '.festival_id', '=', TicketTypeFestivalModel::TABLE . '.festival_id');
                 $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
@@ -134,6 +136,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.festival_id',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
+                TicketTypesModel::TABLE . '.name',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->first()?->toArray();
 
@@ -154,7 +157,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['pdf'],
             $result['emailView'],
             new Uuid($result['festival_id']),
-            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada04', '222abc0c-fc8e-4a1d-a4b0-d345cafada02'])
+            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada04', '222abc0c-fc8e-4a1d-a4b0-d345cafada02']),
+            new Uuid($result['ticket_type_id']),
+            $result['name']
         );
     }
 
