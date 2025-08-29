@@ -8,6 +8,7 @@ use Bus;
 use DomainException;
 use Illuminate\Validation\ValidationException;
 use JsonException;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
@@ -49,7 +50,9 @@ class ChanceStatusCommandHandler implements CommandHandler
             Status::PAID => OrderTicket::toPaid(
                 $orderTicketDto,
                 $command->getComment(),
-                $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()),
+                $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada07')) ?
+                    $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()) :
+                    null,
             ),
             Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
