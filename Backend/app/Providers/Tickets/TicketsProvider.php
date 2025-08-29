@@ -14,6 +14,8 @@ use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlCommentRepository;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlFestivalRepository;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
+use Tickets\PromoCode\Repositories\ExternalPromoCodeInterface;
+use Tickets\PromoCode\Repositories\InMemoryMySqlExternalPromoCode;
 use Tickets\PromoCode\Repositories\InMemoryMySqlPromoCode;
 use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlPushTicketsRepository;
@@ -40,5 +42,6 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(CommentRepositoryInterface::class, InMemoryMySqlCommentRepository::class);
         $this->app->bind(TicketsRepositoryInterface::class, InMemoryMySqlTicketsRepository::class);
         $this->app->bind(FestivalRepositoryInterface::class, InMemoryMySqlFestivalRepository::class);
+        $this->app->bind(ExternalPromoCodeInterface::class, InMemoryMySqlExternalPromoCode::class);
     }
 }
