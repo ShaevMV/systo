@@ -11,6 +11,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\PromoCode\Response\ExternalPromoCodeDto;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
@@ -79,7 +80,7 @@ final class OrderTicket extends AggregateRoot
     }
 
 
-    public static function toPaid(OrderTicketDto $orderTicketDto, ?string $comment = null): self
+    public static function toPaid(OrderTicketDto $orderTicketDto, ?string $comment = null, ?ExternalPromoCodeDto $externalPromoCodeDto = null): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
@@ -92,7 +93,8 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getEmail(),
                 $result->getTicket(),
                 $orderTicketDto->getTicketTypeId(),
-                $comment
+                $comment,
+                $externalPromoCodeDto?->getPromocode(),
             )
         );
 

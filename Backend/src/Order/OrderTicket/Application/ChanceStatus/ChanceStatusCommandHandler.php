@@ -14,6 +14,7 @@ use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Shared\Domain\Bus\Command\CommandHandler;
 use Shared\Domain\ValueObject\Status;
+use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class ChanceStatusCommandHandler implements CommandHandler
@@ -23,6 +24,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         private Bus                            $bus,
         private AddComment                     $addComment,
         private PushTicket                     $pushTicket,
+        private ExternalPromocode              $externalPromocode,
     )
     {
     }
@@ -44,7 +46,11 @@ class ChanceStatusCommandHandler implements CommandHandler
         }
 
         $orderTicket = match ((string)$command->getNextStatus()) {
-            Status::PAID => OrderTicket::toPaid($orderTicketDto, $command->getComment()),
+            Status::PAID => OrderTicket::toPaid(
+                $orderTicketDto,
+                $command->getComment(),
+                $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()),
+            ),
             Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto),

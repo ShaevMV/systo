@@ -45,6 +45,10 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с qr-кодом на каждого гостя прикреплены к этому письму.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы https://org.solarsysto.ru/myOrders</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
+                        @if($promocode)
+                            <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Чтобы зарегистрироваться на трансфер, перейдите по ссылке spacetransfer.ru, выберете нужные даты и рейсы, при оплате введите промокод {{$promocode}}, стоимость изменится на 0, дополнительно оплачивать ничего не нужно!</p>
+                            <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у вас возникли проблемы с регистрацией трансфера напишите в Поддержку - t.me/SpaceTransferTeam</p>
+                        @endif
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>

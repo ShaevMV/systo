@@ -22,6 +22,7 @@ class OrderToPaid extends Mailable
         private array $tickets,
         private Uuid $ticketTypeId,
         private ?string $comment = null,
+        private ?string $promocode = null,
     )
     {
     }
@@ -43,6 +44,7 @@ class OrderToPaid extends Mailable
         $mail = $this->view('email.'. ($this->tickets[0]->getEmailView() ?? 'orderToPaid'),[
             'festivalName' => $festivalName,
             'comment' => $this->comment,
+            'promocode' => $this->promocode,
         ]);
 
         foreach ($this->tickets as $ticket) {
