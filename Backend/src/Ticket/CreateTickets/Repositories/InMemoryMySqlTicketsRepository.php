@@ -185,7 +185,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->update([
                             'status' => $data['status'],
                             'festival_id' => $data['festival_id'],
-                            'is_need_seedling' => $data['is_need_seedling']
+                            'is_need_seedling' => $data['is_need_seedling'],
+                            'name' => $data['name']
                         ]);
             }
         } catch (\Exception $e) {
