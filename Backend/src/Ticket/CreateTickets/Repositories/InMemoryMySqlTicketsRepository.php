@@ -136,7 +136,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.festival_id',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
-                TicketTypesModel::TABLE . '.name',
+                TicketTypesModel::TABLE . '.name_type',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->first()?->toArray();
 
@@ -159,7 +159,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada04', '222abc0c-fc8e-4a1d-a4b0-d345cafada02']),
             new Uuid($result['ticket_type_id']),
-            $result['name']
+            $result['name_type']
         );
     }
 
