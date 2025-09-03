@@ -136,7 +136,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.festival_id',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
-                TicketTypesModel::TABLE . '.name_type',
+                TicketTypesModel::TABLE . '.name as name_type',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->first()?->toArray();
 
