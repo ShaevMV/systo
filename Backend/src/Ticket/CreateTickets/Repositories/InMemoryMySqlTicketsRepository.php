@@ -186,7 +186,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                             'status' => $data['status'],
                             'festival_id' => $data['festival_id'],
                             'is_need_seedling' => $data['is_need_seedling'],
-                            'name' => $data['name']
+                            'type_ticket_id' => $data['type_ticket_id'],
+                            'type_ticket' => $data['type_ticket_id'],
+                            'name' => $data['type_ticket']
                         ]);
             }
         } catch (\Exception $e) {
