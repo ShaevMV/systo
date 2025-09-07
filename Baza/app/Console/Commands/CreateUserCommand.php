@@ -80,7 +80,7 @@ class CreateUserCommand extends Command
         ];
 
         $repository->createList($users);
-        $this->error(implode($users));
+
 
         return Command::SUCCESS;
     }
