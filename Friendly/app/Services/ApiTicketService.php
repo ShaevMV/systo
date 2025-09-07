@@ -60,7 +60,7 @@ class ApiTicketService
                 $model->phone = $apiTicketDTO->getPhone();
                 $model->saveOrFail();
 
-                $ids['S' . $model->id] = $item;
+                $ids[$model->id] = $item;
                 $this->ticketService->pushTicketList($model, $apiTicketDTO->getFestivalId());
             }
 
