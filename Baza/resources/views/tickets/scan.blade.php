@@ -46,6 +46,8 @@
                     <p id="name"></p>
                     <b>Email: </b>
                     <p id="email"></p>
+                    <b>Тип билета: </b>
+                    <p id="type_ticket"></p>
                     <b>Тип парковки: </b>
                     <p id="type"></p>
                     <b>Дата получение билета: </b>
@@ -155,6 +157,7 @@
         const massageResult = document.getElementById('massage-result');
 
 
+
         var idTicket = null;
         var typeTicket = null;
 
@@ -201,6 +204,7 @@
         const commentResult = document.getElementById('comment');
         const is_need_seedling = document.getElementById('is_need_seedling');
         const colorResult = document.getElementById('color');
+        const typeTicketResult = document.getElementById('type_ticket');
 
         function showResult(data) {
             if (data.date_change === null && data.status === 'paid') {
@@ -224,6 +228,7 @@
             phoneResult.textContent = data.phone || '';
             statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
+            typeTicketResult.textContent = data.type_ticket;
             typeResult.textContent = data.humanType;
             is_need_seedling.textContent = data.is_need_seedling || false ? 'Нужен' : 'Не нужен';
             commentResult.textContent = data.comment;
@@ -241,6 +246,7 @@
             projectResult.textContent = '';
             curatorResult.textContent = '';
             emailResult.textContent = '';
+            typeTicketResult.textContent = '';
             dateOrderResult.textContent = '';
             commentResult.textContent = '';
             is_need_seedling.textContent = '';

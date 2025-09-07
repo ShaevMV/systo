@@ -27,6 +27,8 @@ class ElTicketResponse implements TicketResponseInterface
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null,
         protected bool  $is_need_seedling = false,
+        protected ?Uuid  $type_ticket_id = null,
+        protected ?string  $type_ticket = null,
     )
     {
     }
@@ -49,6 +51,8 @@ class ElTicketResponse implements TicketResponseInterface
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
             'color' => Color::COLOR_ELECTRON,
             'is_need_seedling' => $this->is_need_seedling,
+            'type_ticket_id' => $this->type_ticket_id,
+            'type_ticket' => $this->type_ticket,
         ];
     }
 
@@ -69,6 +73,8 @@ class ElTicketResponse implements TicketResponseInterface
             $data['change_id'] ?? null,
             $date_change,
             (bool) ($data['is_need_seedling'] ?? false),
+            empty($data['type_ticket_id']) ? null : new Uuid($data['type_ticket_id']),
+            $data['type_ticket'] ?? null
         );
     }
 }
