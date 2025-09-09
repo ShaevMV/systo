@@ -36,7 +36,7 @@ class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
        `changes`.`end`
 from `changes`
          left join `users` as `u` on JSON_CONTAINS(changes.user_id, CAST(u.id as JSON), '$'
-             WHERE `changes`.`festival_id` = '?')
+             WHERE `changes`.`festival_id` = '?'
 group by `changes`.`id`", [$festivalId]);
 
         $result = [];
