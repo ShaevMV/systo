@@ -17,6 +17,6 @@ class ReportForChangesQueryHandler implements QueryHandler
 
     public function __invoke(ReportForChangesQuery $query): ReportForChangesResponse
     {
-        return new ReportForChangesResponse($this->repository->getAllReport());
+        return new ReportForChangesResponse($this->repository->getAllReport($query->getFestivalId()));
     }
 }

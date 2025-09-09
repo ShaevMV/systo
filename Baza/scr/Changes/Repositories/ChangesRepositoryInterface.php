@@ -13,7 +13,7 @@ interface ChangesRepositoryInterface
      *
      * @return array
      */
-    public function getAllReport(): array;
+    public function getAllReport(string $festivalId): array;
 
     /**
      * Закрыть смену
@@ -40,7 +40,7 @@ interface ChangesRepositoryInterface
      */
     public function getChangeId(int $userId): ?int;
 
-    public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool;
+    public function updateOrCreate(array $userList, Carbon $start, string $festivalId, ?int $id = null): bool;
 
     public function get(int $id): array;
 

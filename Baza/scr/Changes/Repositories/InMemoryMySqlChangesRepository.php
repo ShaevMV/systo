@@ -20,7 +20,7 @@ class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
     }
 
 
-    public function getAllReport(): array
+    public function getAllReport(string $festivalId): array
     {
         $resultRaw = DB::select("select `changes`.`id`,
        GROUP_CONCAT(u.name SEPARATOR ',') AS user_name,
@@ -35,8 +35,9 @@ class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
        `changes`.`start`,
        `changes`.`end`
 from `changes`
-         left join `users` as `u` on JSON_CONTAINS(changes.user_id, CAST(u.id as JSON), '$')
-group by `changes`.`id`");
+         left join `users` as `u` on JSON_CONTAINS(changes.user_id, CAST(u.id as JSON), '$'
+             WHERE `changes`.`festival_id` = ?)
+group by `changes`.`id`", [$festivalId]);
 
         $result = [];
         foreach ($resultRaw as $item) {
@@ -75,7 +76,7 @@ group by `changes`.`id`");
         return $result?->id;
     }
 
-    public function updateOrCreate(array $userList, Carbon $start, ?int $id = null): bool
+    public function updateOrCreate(array $userList, Carbon $start, string $festivalId, ?int $id = null): bool
     {
         if (!is_null($id)) {
             $model = $this->model::find($id);
@@ -83,6 +84,7 @@ group by `changes`.`id`");
             $model = $this->model;
         }
         $model->user_id = Json::encode($userList);
+        $model->festival_id = $festivalId;
         $model->start = $start;
 
         return $model->save();

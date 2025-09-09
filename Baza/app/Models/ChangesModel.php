@@ -17,6 +17,7 @@ use Nette\Utils\Json;
  * @property int $count_drug_tickets
  * @property int $count_spisok_tickets
  * @property string|null $start
+ * @property string $festival_id
  * @property string|null $end
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -52,5 +53,6 @@ class ChangesModel extends Model
         'count_parking_cross-country_tickets',
         'start',
         'end',
+        'festival_id',
     ];
 }
