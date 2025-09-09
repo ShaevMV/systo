@@ -38,7 +38,7 @@ class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInt
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->model::whereKilter($id)
+        $rawData = $this->model::whereId($id)
             ->first();
 
         DB::beginTransaction();

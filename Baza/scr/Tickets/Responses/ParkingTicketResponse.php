@@ -41,9 +41,9 @@ class ParkingTicketResponse implements TicketResponseInterface
     public static function fromState(array $data): self
     {
         $date_change = !is_null($data['date_change'] ?? null) ? Carbon::parse($data['date_change']) : null;
-        dd($data);
+
         return new self(
-            $data['kilter'],
+            $data['id'],
             $data['type'],
             new Status($data['status']),
             $data['comment'] ?? null,
