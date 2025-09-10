@@ -139,6 +139,7 @@ class OrderingTicketsController extends Controller
         return response()->json([
             'massage' => $massage,
             'id' => $id->value(),
+            'name' => $createPromoCodeRequest->name,
         ]);
     }
 

@@ -26,7 +26,7 @@ class CreatePromoCodeForBotRequest extends FormRequest
      */
     public function rules(): array
     {
-        $this->name = $this->name . Str::random(3);
+        $this->name = mb_strtoupper($this->name . Str::random(3));
         $this->active = true;
 
         return [
