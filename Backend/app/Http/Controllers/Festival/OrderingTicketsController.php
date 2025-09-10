@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
@@ -127,19 +128,23 @@ class OrderingTicketsController extends Controller
      * @throws Throwable
      */
     public function savePromoCodeForBot(
-        CreatePromoCodeForBotRequest $createPromoCodeRequest
+        Request $createPromoCodeRequest
     ): JsonResponse
     {
+
+        $data = $createPromoCodeRequest->toArray();
+        $data['name'] = mb_strtoupper($data['name'] . Str::random(3));
+        $data['active'] = true;
         $id = $this->getPromoCodes->createOrUpdatePromoCode(
-            $createPromoCodeRequest->toArray(),
+            $data,
             '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
         );
-        $massage = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
+        $massage = $data['id'] ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([
             'massage' => $massage,
             'id' => $id->value(),
-            'name' => $createPromoCodeRequest->name,
+            'name' => $data['name'],
         ]);
     }
 
