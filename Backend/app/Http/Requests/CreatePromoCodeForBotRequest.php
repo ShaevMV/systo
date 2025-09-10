@@ -39,7 +39,7 @@ class CreatePromoCodeForBotRequest extends FormRequest
                     $fail('Скидка при проценте не может быть больше 100');
                 }
             },],
-            'limit' => ['numeric', 'nullable'],
+            'limit' => ['numeric'],
         ];
     }
 
