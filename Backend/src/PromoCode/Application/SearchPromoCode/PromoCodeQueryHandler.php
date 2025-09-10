@@ -22,8 +22,10 @@ final class PromoCodeQueryHandler implements QueryHandler
     {
         $result = $this->promoCode->find(
             $query->getName(),
-            new Uuid($query->getTicketsTypeId())
-        ) ?? new PromoCodeDto(new LimitPromoCodeDto());
+            new Uuid($query->getTicketsTypeId()),
+            new Uuid($query->getFestivalId()),
+            )
+        ?? new PromoCodeDto(new LimitPromoCodeDto());
         if(!$result->isCorrectForLimit() || !$result->isSuccess()) {
             return new PromoCodeDto(new LimitPromoCodeDto());
         }

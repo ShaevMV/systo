@@ -21,7 +21,7 @@ final class IsCorrectPromoCode
         ]);
     }
 
-    public function findPromoCode(?string $name, float $price, Uuid $ticketTypeId): PromoCodeDto
+    public function findPromoCode(?string $name, float $price, Uuid $ticketTypeId, Uuid $festivalId): PromoCodeDto
     {
         if (null === $name) {
             return new PromoCodeDto(new LimitPromoCodeDto());
@@ -29,7 +29,11 @@ final class IsCorrectPromoCode
 
         /** @var PromoCodeDto $result */
         $result = $this->queryBus->ask(
-            new PromoCodeQuery($name, $ticketTypeId->value())
+            new PromoCodeQuery(
+                $name,
+                $ticketTypeId->value(),
+                $festivalId->value(),
+            )
         );
 
         if($result->isPercent()) {

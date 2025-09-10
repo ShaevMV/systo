@@ -26,6 +26,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
         protected bool $isPercent = false,
         protected ?Uuid $ticket_type_id = null,
         protected ?string $ticket_type_name = null,
+        protected ?string $festival = null,
+        protected ?Uuid $festival_id = null,
     ) {
     }
 
@@ -34,6 +36,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
         $massage = str_replace('{getDiscountByPromoCode}', (string)$data['discount'], self::MASSAGE_IN_SUCCESS);
 
         $ticket_type_id = !empty($data['ticket_type_id']) ? new Uuid($data['ticket_type_id']) : null;
+        $festival = empty($data['festival_name']) ? 'Мультифестивальный' : $data['festival_name'] . " " . $data['festival_year'];
+
 
         return new self(
             LimitPromoCodeDto::fromState($data),
@@ -44,7 +48,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             (bool)$data['active'],
             (bool)$data['is_percent'],
             $ticket_type_id,
-            $data['ticket_type_name'] ?? null
+            $data['ticket_type_name'] ?? null,
+            $festival,
         );
     }
 
@@ -104,7 +109,8 @@ final class PromoCodeDto extends AbstractionEntity implements Response
             'is_percent' => $this->isPercent,
             'active' => $this->isSuccess,
             'limit' => $this->limit->getLimit(),
-            'ticket_type_id' => $this->ticket_type_id?->value()
+            'ticket_type_id' => $this->ticket_type_id?->value(),
+            'festival_id' => $this->festival_id?->value(),
         ];
     }
 
@@ -119,5 +125,10 @@ final class PromoCodeDto extends AbstractionEntity implements Response
     public function setId(?Uuid $id): void
     {
         $this->id = $id;
+    }
+
+    public function getFestival(): ?string
+    {
+        return $this->festival;
     }
 }

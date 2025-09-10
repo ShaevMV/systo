@@ -60,6 +60,9 @@ Route::prefix('v1/festival')->group(static function (): void {
     Route::get('/ticketsOrder/getTicketPdf/{id}',[
         OrderTickets::class, 'getUrlListForPdf'
     ])->middleware('auth:api');
+
+    Route::post('/savePromoCodeForBot/{idPromoCode?}',
+        [OrderingTicketsController::class, 'savePromoCodeForBot'])->middleware('bot');
 });
 
 Route::any('v1/order/succes',[BillingController::class, 'webHook']);

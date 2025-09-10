@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Repositories;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\InfoForOrder\PromoCodeModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
@@ -22,22 +23,29 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
     }
 
 
-    public function find(string $name, Uuid $ticketTypeId): ?PromoCodeDto
+    public function find(string $name, Uuid $ticketTypeId, Uuid $festivalId): ?PromoCodeDto
     {
         $promoCode = $this->model->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.name',
             '=',
             OrderTicketModel::TABLE . '.promo_code')
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE. '.id')
+            ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id','=', FestivalModel::TABLE. '.id')
             ->where(function ($query) use ($ticketTypeId){
                 $query->where($this->model::TABLE . '.ticket_type_id', '=', $ticketTypeId->value())
                     ->orWhereNull($this->model::TABLE . '.ticket_type_id', null);
+            })
+            ->where(function ($query) use ($ticketTypeId){
+                $query->where($this->model::TABLE . '.festival_id', '=', $ticketTypeId->value())
+                    ->orWhereNull($this->model::TABLE . '.festival_id', null);
             })
             ->where($this->model::TABLE . '.name', '=', $name)
             ->where($this->model::TABLE . '.active', '=', true)
             ->select([
                 $this->model::TABLE . '.*',
                 TicketTypesModel::TABLE. '.name as ticket_type_name',
-                \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses')
+                \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses'),
+                FestivalModel::TABLE. '.name as festival_name',
+                FestivalModel::TABLE. '.year as festival_year',
             ])
             ->groupBy([
                 OrderTicketModel::TABLE . '.promo_code',
@@ -65,10 +73,13 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
                 '=',
                 OrderTicketModel::TABLE . '.promo_code')
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE. '.id')
+            ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id','=', FestivalModel::TABLE. '.id')
             ->select([
                 $this->model::TABLE . '.*',
                 \DB::raw('count(' . OrderTicketModel::TABLE . '.id) AS countUses'),
                 TicketTypesModel::TABLE. '.name as ticket_type_name',
+                FestivalModel::TABLE. '.name as festival_name',
+                FestivalModel::TABLE. '.year as festival_year',
             ])
             ->groupBy([
                 OrderTicketModel::TABLE . '.promo_code',

@@ -17,7 +17,7 @@ class CreateOrUpdatePromoCodeCommand implements Command
         private ?Uuid  $id = null,
         private ?int   $limit = null,
         private ?Uuid  $ticket_type_id = null,
-
+        private ?Uuid  $festivalId = null,
     )
     {
     }
@@ -26,14 +26,16 @@ class CreateOrUpdatePromoCodeCommand implements Command
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : Uuid::random();
         $ticketTypeId = !empty($data['ticket_type_id'] ?? null) ? new Uuid($data['ticket_type_id']) : null;
+        $festivalId = !empty($data['festival_id'] ?? null) ? new Uuid($data['festival_id']) : null;
         return new self(
             $data['name'],
             $data['discount'],
-            $data['is_percent'],
+            $data['is_percent'] ?? false,
             $data['active'],
             $id,
             $data['limit'] ?? null,
             $ticketTypeId,
+            $festivalId
         );
     }
 
@@ -77,5 +79,10 @@ class CreateOrUpdatePromoCodeCommand implements Command
     public function getTicketTypeId(): ?Uuid
     {
         return $this->ticket_type_id;
+    }
+
+    public function getFestivalId(): ?Uuid
+    {
+        return $this->festivalId;
     }
 }

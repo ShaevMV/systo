@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreatePromoCodeForBotRequest;
 use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
 use DomainException;
@@ -13,7 +14,6 @@ use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
-use Tickets\Order\InfoForOrder\Application\GetPriceList\GetPriceList;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
@@ -72,7 +72,8 @@ class OrderingTicketsController extends Controller
             ->findPromoCode(
                 $promoCode,
                 $price->getPrice(),
-                new Uuid($request->input('typeOrder'))
+                new Uuid($request->input('typeOrder')),
+                new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'),
             )->toArray();
     }
 
@@ -110,7 +111,29 @@ class OrderingTicketsController extends Controller
         CreatePromoCodeRequest $createPromoCodeRequest
     ): JsonResponse
     {
-        $id = $this->getPromoCodes->createOrUpdatePromoCode($createPromoCodeRequest->toArray());
+        $id = $this->getPromoCodes->createOrUpdatePromoCode(
+            $createPromoCodeRequest->toArray(),
+            '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
+        );
+        $massage = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
+
+        return response()->json([
+            'massage' => $massage,
+            'id' => $id->value(),
+        ]);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function savePromoCodeForBot(
+        CreatePromoCodeForBotRequest $createPromoCodeRequest
+    ): JsonResponse
+    {
+        $id = $this->getPromoCodes->createOrUpdatePromoCode(
+            $createPromoCodeRequest->toArray(),
+            '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
+        );
         $massage = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([

@@ -9,6 +9,7 @@ final class PromoCodeQuery implements Query
     public function __construct(
         private string $name,
         private string $ticketsTypeId,
+        private string $festivalId,
     ){
     }
 
@@ -20,5 +21,11 @@ final class PromoCodeQuery implements Query
     public function getTicketsTypeId(): string
     {
         return $this->ticketsTypeId;
+    }
+
+
+    public function getFestivalId(): string
+    {
+        return $this->festivalId;
     }
 }
