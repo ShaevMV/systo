@@ -139,7 +139,7 @@ class OrderingTicketsController extends Controller
             $data,
             '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
         );
-        $massage = $data['id'] ? 'промокод обновлён' : 'промокод добавлен';
+        $massage = !empty($data['id']) ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([
             'massage' => $massage,
