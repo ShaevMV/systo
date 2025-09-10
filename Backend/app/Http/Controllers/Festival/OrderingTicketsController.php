@@ -134,7 +134,7 @@ class OrderingTicketsController extends Controller
 
         $data = $createPromoCodeRequest->toArray();
         $data['name'] = mb_strtoupper($data['name'] . Str::random(3));
-        $data['active'] = true;
+
         $id = $this->getPromoCodes->createOrUpdatePromoCode(
             $data,
             '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
