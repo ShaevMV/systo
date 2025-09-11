@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Billing;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 use Tickets\Billing\Application\Billing;
 
@@ -24,6 +25,8 @@ class BillingController extends Controller
      */
     public function webHook(Request $request): JsonResponse
     {
+
+        Log::debug('Billing', $request->toArray());
         $data = $request->toArray();
 
         $this->billing->webHook(
