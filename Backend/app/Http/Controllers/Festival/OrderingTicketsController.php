@@ -71,7 +71,7 @@ class OrderingTicketsController extends Controller
 
         return $this->isCorrectPromoCode
             ->findPromoCode(
-                $promoCode,
+                trim($promoCode),
                 $price->getPrice(),
                 new Uuid($request->input('typeOrder')),
                 new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'),
