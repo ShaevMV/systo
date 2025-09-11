@@ -28,12 +28,13 @@ class BillingController extends Controller
 
         Log::debug('Billing', $request->toArray());
         $data = $request->toArray();
-
-        $this->billing->webHook(
-            $data['data']['metadata']['order_id'],
-            $data['type'],
-            $data['data']['receipts'][0]['link_to_receipt']
-        );
+        if(!empty($data['data']['metadata']['order_id'])) {
+            $this->billing->webHook(
+                $data['data']['metadata']['order_id'],
+                $data['type'],
+                $data['data']['receipts'][0]['link_to_receipt']
+            );
+        }
 
         return response()->json(['message' => 'Ok']);
     }
