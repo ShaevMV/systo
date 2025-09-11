@@ -65,7 +65,7 @@ Route::prefix('v1/festival')->group(static function (): void {
         [OrderingTicketsController::class, 'savePromoCodeForBot'])->middleware('bot');
 });
 
-Route::any('v1/order/succes',[BillingController::class, 'webHook']);
+Route::any('/v1/order/succes',[BillingController::class, 'webHook']);
 
 
 Route::controller(AuthController::class)->group(function () {
