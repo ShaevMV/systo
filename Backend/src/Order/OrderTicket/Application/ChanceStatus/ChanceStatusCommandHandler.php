@@ -77,10 +77,14 @@ class ChanceStatusCommandHandler implements CommandHandler
             $orderTicket->getTicket()
         );
 
-        if($command->isNow()) {
+        if ($command->isNow()) {
             $this->bus::chain($list)->onConnection('sync')->dispatch();
         } else {
-            $this->bus::chain($list)->dispatch();
+            if ($command->getDelayMinute() > 0) {
+                $this->bus::chain($list)->dispatch($command->getDelayMinute());
+            } else {
+                $this->bus::chain($list)->dispatch();
+            }
 
         }
 
