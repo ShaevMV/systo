@@ -36,6 +36,6 @@ class BillingController extends Controller
             );
         }
 
-        return response()->json(['message' => 'Ok']);
+        return response()->json(["status" => 0]);
     }
 }
