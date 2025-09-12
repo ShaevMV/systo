@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use Bus;
+use Carbon\Carbon;
 use DomainException;
 use Illuminate\Validation\ValidationException;
 use JsonException;
@@ -81,7 +82,11 @@ class ChanceStatusCommandHandler implements CommandHandler
             $this->bus::chain($list)->onConnection('sync')->dispatch();
         } else {
             if ($command->getDelayMinute() > 0) {
-                $this->bus::chain($list)->dispatch($command->getDelayMinute());
+                $this->bus::chain($list)->dispatch()
+                    ->delay(
+                        Carbon::now()
+                            ->addMinutes($command->getDelayMinute())
+                    );
             } else {
                 $this->bus::chain($list)->dispatch();
             }
