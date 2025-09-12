@@ -29,7 +29,7 @@ final class CreatingOrderCommandHandler
         $this->chanceStatus->chance(
             $command->getOrderTicketDto()->getId(),
             new Status(Status::PAID),
-            new Uuid(Auth::id()),
+            new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
             null,
             false,
             10
