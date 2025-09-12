@@ -82,10 +82,9 @@ class ChanceStatusCommandHandler implements CommandHandler
             $this->bus::chain($list)->onConnection('sync')->dispatch();
         } else {
             if ($command->getDelayMinute() > 0) {
-                $this->bus::chain($list)->dispatch()
+                $this->bus::chain($list)
                     ->delay(
-                        Carbon::now()
-                            ->addMinutes($command->getDelayMinute())
+                        now()->addMinutes($command->getDelayMinute())
                     );
             } else {
                 $this->bus::chain($list)->dispatch();
