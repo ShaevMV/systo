@@ -85,7 +85,7 @@ class ChanceStatusCommandHandler implements CommandHandler
                 $this->bus::chain($list)
                     ->delay(
                         now()->addMinutes($command->getDelayMinute())
-                    );
+                    )->dispatch();
             } else {
                 $this->bus::chain($list)->dispatch();
             }
