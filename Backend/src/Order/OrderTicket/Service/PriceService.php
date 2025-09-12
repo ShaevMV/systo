@@ -32,7 +32,7 @@ class PriceService
         );
 
         $discount = $this->isCorrectPromoCode->findPromoCode(
-            trim($promoCode),
+            !empty($promoCode) ? trim($promoCode) : null,
             $priceByType->getPrice(),
             $ticketTypeId,
             new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'),
