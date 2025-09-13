@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\Create;
 
@@ -15,8 +15,9 @@ final class CreatingOrderCommandHandler
 {
     public function __construct(
         private OrderTicketRepositoryInterface $orderTicket,
-        private ChanceStatus $chanceStatus,
-    ){
+        private ChanceStatus                   $chanceStatus,
+    )
+    {
     }
 
     /**
@@ -25,14 +26,15 @@ final class CreatingOrderCommandHandler
     public function __invoke(CreatingOrderCommand $command): void
     {
         $this->orderTicket->create($command->getOrderTicketDto());
-
-        $this->chanceStatus->chance(
-            $command->getOrderTicketDto()->getId(),
-            new Status(Status::PAID),
-            new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
-            null,
-            false,
-            10
-        );
+        if ($command->getOrderTicketDto()->isBilling()) {
+            $this->chanceStatus->chance(
+                $command->getOrderTicketDto()->getId(),
+                new Status(Status::PAID),
+                new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
+                null,
+                false,
+                10
+            );
+        }
     }
 }
