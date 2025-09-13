@@ -594,9 +594,9 @@ export default {
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.guests.length > 0 &&
-          this.date !== null &&
+          //this.date !== null &&
           this.confirm === true &&
-          this.idBuy !== null &&
+          // this.idBuy !== null &&
           this.phone !== null &&
           group &&
           (this.isAuth || this.email)
