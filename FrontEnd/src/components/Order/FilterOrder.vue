@@ -76,10 +76,9 @@
               <select class="form-select"
                       v-model="selectFestivalId"
                       id="validationDefault01">
-                <option value=null>Фестиваль</option>
                 <option v-for="(festivalItem) in getFestivalList"
                         v-bind:key="festivalItem.id"
-                        :selected="festivalItem.id === festivalId"
+                        :selected="festivalItem.id == festivalId"
                         v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
                 </option>
               </select>
