@@ -118,7 +118,7 @@ export default {
       promoCode: null,
       typesOfPayment: null,
       city: null,
-      festivalSelectId: null,
+      selectFestivalId: null,
     }
   },
   computed: {
@@ -162,7 +162,7 @@ export default {
         'status': self.status,
         'promoCode': self.promoCode,
         'typesOfPayment': self.typesOfPayment,
-        'festivalId': self.festivalSelectId,
+        'festivalId': self.selectFestivalId,
         'city': self.city,
       });
     },
