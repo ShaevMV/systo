@@ -130,7 +130,7 @@ export default {
     festival_id: {
       get: function () {
         if (this.selectFestivalId === null) {
-          return this.$route.params.id;
+          return this.getFestivalList[0].id
         }
         return this.selectFestivalId;
       },
@@ -193,7 +193,7 @@ export default {
     }
   },
   async created() {
-    await this.getListTypesOfPayment({festival_id: this.$route.params.id});
+    await this.getListTypesOfPayment({festival_id: this.festival_id});
     await this.getListFestival();
   },
 }

@@ -30,20 +30,7 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{
-                  name: 'AllOrders',
-                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b6'}
-          }">Все оргвзносы (Весна)
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{
-                  name: 'AllOrders',
-                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'}
-          }">Все оргвзносы (Осень)
+          :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
     <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
