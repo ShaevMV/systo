@@ -130,7 +130,7 @@ export default {
     festival_id: {
       get: function () {
         if (this.selectFestivalId === null) {
-          return this.festivalId;
+          return this.$route.params.id;
         }
         return this.selectFestivalId;
       },
@@ -173,7 +173,7 @@ export default {
         'status': self.status,
         'promoCode': self.promoCode,
         'typesOfPayment': self.typesOfPayment,
-        'festivalId': self.selectFestivalId,
+        'festivalId': self.festival_id,
         'city': self.city,
       });
     },
