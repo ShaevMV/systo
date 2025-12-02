@@ -50,7 +50,7 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
         $list = $this->model->get()?->toArray() ?? [];
         $result = [];
         foreach ($list as $item) {
-            $result[] = FestivalDto::fromState($item->toArray());
+            $result[] = FestivalDto::fromState($item);
         }
 
         return $result;
