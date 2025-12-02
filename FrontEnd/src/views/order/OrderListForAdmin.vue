@@ -1,5 +1,5 @@
 <template>
-      <filter-order :festival-id="id"/>
+      <filter-order/>
       <total-number/>
       <order-list :is-admin="true"/>
 </template>

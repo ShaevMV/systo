@@ -107,9 +107,6 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "FilterOrder",
-  props: {
-    'festivalId': String
-  },
   data() {
     return {
       email: null,
@@ -176,6 +173,11 @@ export default {
         'festivalId': self.festival_id,
         'city': self.city,
       });
+      this.getListTypesOfPayment({
+        festival_id: self.festival_id,
+        is_admin: true,
+      });
+      this.getListPriceFor({festival_id: self.festival_id})
     },
     clearFilter: function () {
       this.typePrice = null;
@@ -194,7 +196,11 @@ export default {
   },
   async created() {
     await this.getListFestival();
-    await this.getListTypesOfPayment({festival_id: this.festival_id});
+    await this.getListPriceFor({festival_id: this.festival_id})
+    await this.getListTypesOfPayment({
+      festival_id: this.festival_id,
+      is_admin: true,
+    });
   },
 }
 </script>
