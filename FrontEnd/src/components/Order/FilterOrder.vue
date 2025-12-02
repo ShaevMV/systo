@@ -72,13 +72,14 @@
                      id="validationDefault04">
             </div>
             <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Способ покупки билета</label>
+              <label for="validationDefault01" class="form-label">Выберите фестиваль</label>
               <select class="form-select"
                       v-model="selectFestivalId"
                       id="validationDefault01">
-                <option value=null>Выберите способ покупки билета</option>
+                <option value=null>Фестиваль</option>
                 <option v-for="(festivalItem) in getFestivalList"
                         v-bind:key="festivalItem.id"
+                        :selected="festivalItem.id === festivalId"
                         v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
                 </option>
               </select>
@@ -155,7 +156,6 @@ export default {
       let price = this.typeOrder !== null ? this.typeOrder.price : null;
       let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
       let self = this;
-      let festivalId = this.$route.params.id
       this.getOrderListForAdmin({
         'price': price,
         'typePrice': typePrice,
@@ -163,7 +163,7 @@ export default {
         'status': self.status,
         'promoCode': self.promoCode,
         'typesOfPayment': self.typesOfPayment,
-        'festivalId': festivalId,
+        'festivalId': self.festivalSelectId,
         'city': self.city,
       });
     },
