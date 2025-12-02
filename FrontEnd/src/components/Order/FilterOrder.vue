@@ -127,6 +127,17 @@ export default {
       'getFestivalList',
       'getTicketType',
     ]),
+    festival_id: {
+      get: function () {
+        if (this.selectFestivalId === null) {
+          return this.festivalId;
+        }
+        return this.selectFestivalId;
+      },
+      set: function (newValue) {
+        this.newTicketTypeId = newValue;
+      },
+    }
     /*typeOrder: {
         get: function () {
           return this.price;
