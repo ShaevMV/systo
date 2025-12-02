@@ -193,8 +193,8 @@ export default {
     }
   },
   async created() {
-    await this.getListTypesOfPayment({festival_id: this.festival_id});
     await this.getListFestival();
+    await this.getListTypesOfPayment({festival_id: this.festival_id});
   },
 }
 </script>
