@@ -71,6 +71,18 @@
                      class="form-control"
                      id="validationDefault04">
             </div>
+            <div class="col-md-4">
+              <label for="validationDefault01" class="form-label">Способ покупки билета</label>
+              <select class="form-select"
+                      v-model="selectFestivalId"
+                      id="validationDefault01">
+                <option value=null>Выберите способ покупки билета</option>
+                <option v-for="(festivalItem) in getFestivalList"
+                        v-bind:key="festivalItem.id"
+                        v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="row b-row mt-2">
@@ -106,11 +118,13 @@ export default {
       promoCode: null,
       typesOfPayment: null,
       city: null,
+      festivalSelectId: null,
     }
   },
   computed: {
     ...mapGetters('appFestivalTickets', [
       'getTypesOfPayment',
+      'getFestivalList',
       'getTicketType',
     ]),
     /*typeOrder: {
@@ -129,6 +143,7 @@ export default {
     ...mapActions('appFestivalTickets', [
       'getListTypesOfPayment',
       'getListPriceFor',
+      'getListFestival',
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
@@ -169,6 +184,7 @@ export default {
   },
   async created() {
     await this.getListTypesOfPayment({festival_id: this.$route.params.id});
+    await this.getListFestival();
   },
 }
 </script>

@@ -40,6 +40,13 @@ export const getListTypesOfPayment = (context, payload) => {
     })
 };
 
+export const getListFestival = (context, payload) => {
+    let promise = axios.get('/api/v1/festival/getFestivalList');
+    promise.then(function (response) {
+        context.commit('appFestivalTickets/setFestivalList', response.data);
+    })
+};
+
 
 export const getListTicketTypes = (context) => {
     let promise = axios.get('/api/v1/festival/getTicketTypeList');

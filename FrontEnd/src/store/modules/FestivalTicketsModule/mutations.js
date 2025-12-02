@@ -13,6 +13,16 @@ export const setTypesOfPayment = (state, payload) => {
 };
 
 /**
+ * Запись данные о cиске фестивалей
+ *
+ * @param state
+ * @param payload
+ */
+export const setFestivalList = (state, payload) => {
+    state.festivalList = payload;
+};
+
+/**
  * Запись данные о типах билета
  *
  * @param state

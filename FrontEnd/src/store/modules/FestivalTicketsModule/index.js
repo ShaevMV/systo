@@ -6,6 +6,7 @@ export default {
     namespaced: true,
     state: {
         typesOfPayment: [],
+        festivalList: [],
         selectTypeOfPayment: null,
         ticketType: [],
         selectTicketType: {

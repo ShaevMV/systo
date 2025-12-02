@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Billing\BillingController;
+use App\Http\Controllers\Festival\FestivalController;
 use App\Http\Controllers\Festival\OrderingTicketsController;
 use App\Http\Controllers\TicketsOrder\Comment;
 use App\Http\Controllers\TicketsOrder\OrderTickets;
@@ -39,6 +40,8 @@ Route::prefix('v1/festival')->group(static function (): void {
 
     Route::post('/savePromoCode/{idPromoCode?}',
         [OrderingTicketsController::class, 'savePromoCode'])->middleware('auth:api')->middleware('admin');
+    Route::get('/getFestivalList',
+        [FestivalController::class, 'getFestivalList'])->middleware('auth:api')->middleware('admin');
 
     Route::get('/getTicketTypeList',
         [OrderingTicketsController::class, 'getTicketTypeList'])->middleware('auth:api')->middleware('admin');

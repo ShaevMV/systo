@@ -41,4 +41,18 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
 
         return $result;
     }
+
+    /**
+     * @return array|FestivalDto[]
+     */
+    public function getFestivalList(): array
+    {
+        $list = $this->model->get()?->toArray() ?? [];
+        $result = [];
+        foreach ($list as $item) {
+            $result[] = FestivalDto::fromState($item->toArray());
+        }
+
+        return $result;
+    }
 }

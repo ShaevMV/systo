@@ -18,6 +18,16 @@ export const getTypesOfPayment = state => {
     return state.typesOfPayment;
 };
 
+/**
+ * Вывести список фестивалей
+ *
+ * @param state
+ * @returns {Array}
+ */
+export const getFestivalList = state => {
+    return state.festivalList;
+};
+
 
 /**
  * Вывести список типов билетов

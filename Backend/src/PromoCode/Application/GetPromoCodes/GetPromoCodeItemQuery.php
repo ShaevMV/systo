@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tickets\PromoCode\Application\GetPromoCodes;
 
 use Shared\Domain\Bus\Query\Query;
