@@ -74,11 +74,11 @@
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Выберите фестиваль</label>
               <select class="form-select"
-                      v-model="selectFestivalId"
+                      v-model="festival_id"
                       id="validationDefault01">
                 <option v-for="(festivalItem) in getFestivalList"
                         v-bind:key="festivalItem.id"
-                        :selected="festivalItem.id == festivalId"
+                        :selected="festivalItem.id == festival_id"
                         v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
                 </option>
               </select>
@@ -135,7 +135,7 @@ export default {
         return this.selectFestivalId;
       },
       set: function (newValue) {
-        this.newTicketTypeId = newValue;
+        this.selectFestivalId = newValue;
       },
     }
     /*typeOrder: {
