@@ -130,7 +130,7 @@ export default {
     festival_id: {
       get: function () {
         if (this.selectFestivalId === null) {
-          return this.getFestivalList[0].id
+          return null
         }
         return this.selectFestivalId;
       },
