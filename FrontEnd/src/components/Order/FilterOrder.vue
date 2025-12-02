@@ -186,7 +186,7 @@ export default {
       this.typesOfPayment = null;
       this.typeOrder = null;
       this.city = null;
-      let festivalId = this.$route.params.id
+      let festivalId = this.festival_id;
       this.getOrderListForAdmin({
         'festivalId': festivalId,
       });
