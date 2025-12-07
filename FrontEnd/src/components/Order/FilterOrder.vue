@@ -127,7 +127,7 @@ export default {
     festival_id: {
       get: function () {
         if (this.selectFestivalId === null) {
-          return '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
+          return '9d679bcf-b438-4ddb-ac04-023fa9bff4b8'
         }
         return this.selectFestivalId;
       },
