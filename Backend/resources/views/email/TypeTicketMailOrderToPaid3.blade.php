@@ -42,9 +42,8 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твоя лесная карта на {{$festivalName}} потдверждена</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой большой вклад в создание Систо</p>
                         <br/>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В ближайшее время с тобой свяжется ответственный куратор, чтобы передать тебе физическую именную карту, а также расскажет как получить все остальные бонусы и скидки годового оргвзноса</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В ближайшее время с тобой свяжется куратор лесных, чтобы обсудить печать новой лесной карты на 2026 год, а также расскажет как получить все остальные бонусы и скидки годового оргвзноса</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напишите в телеграмм <a href="https://t.me/systo_vznos" target="_blank">@systo_vznos</a></p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с QR-кодом на каждого гостя прикреплены к этому письму. Они также будут работать при входе на событие.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
