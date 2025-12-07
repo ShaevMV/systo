@@ -712,7 +712,8 @@ export default {
           value: this.newGuest,
           email: this.newGuest,
         });
-        this.newGuest = null;
+        this.newGuest = '';
+        this.newGuestEmail = '';
       }
     },
     /**
@@ -764,6 +765,7 @@ export default {
       this.guests = [];
       this.preload = false;
       this.newGuest = '';
+      this.newGuestEmail = '';
       this.email = this.getEmail;
       this.promoCode = null;
       this.day = null;
