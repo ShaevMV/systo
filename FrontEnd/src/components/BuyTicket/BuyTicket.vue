@@ -710,7 +710,7 @@ export default {
       if (this.newGuest.length > 0 && this.newGuestEmail.length > 0) {
         this.guests.push({
           value: this.newGuest,
-          email: this.newGuest,
+          email: this.newGuestEmail,
         });
         this.newGuest = '';
         this.newGuestEmail = '';
