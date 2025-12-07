@@ -219,6 +219,17 @@
                         aria-describedby="basic-addon1"
                         @blur="addGuest"
                     />
+                    <input
+                        type="email"
+                        id="newEmailGuest"
+                        class="form-control"
+                        placeholder="Email гостя для отправки белета"
+                        aria-label="Email гостя для отправки белета"
+                        v-model="newEmailGuest"
+                        :disabled="!isAllowedNewGuest"
+                        aria-describedby="basic-addon1"
+                        @blur="addGuest"
+                    />
                     <div class="input-group-prepend">
                       <span
                           class="input-group-text btn"
@@ -243,6 +254,13 @@
                             class="form-control"
                             readonly
                             v-bind:value="itemGuest.value"
+                            aria-describedby="basic-addon2"
+                        />
+                        <input
+                            type="email"
+                            class="form-control"
+                            readonly
+                            v-bind:value="itemGuest.email"
                             aria-describedby="basic-addon2"
                         />
                         <div class="input-group-prepend">
@@ -547,6 +565,7 @@ export default {
       selectTypesOfPayment: null,
       guests: [],
       newGuest: null,
+      newGuestEmail: null,
       email: null,
       date: null,
       phone: null,
@@ -688,8 +707,11 @@ export default {
      * Добавить нового гостя
      */
     addGuest: function () {
-      if (this.newGuest.length > 0) {
-        this.guests.push({ value: this.newGuest });
+      if (this.newGuest.length > 0 && this.newGuestEmail.length > 0) {
+        this.guests.push({
+          value: this.newGuest,
+          email: this.newGuest,
+        });
         this.newGuest = null;
       }
     },
