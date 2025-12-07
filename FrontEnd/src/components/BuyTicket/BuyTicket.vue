@@ -225,7 +225,7 @@
                         class="form-control"
                         placeholder="Email гостя для отправки белета"
                         aria-label="Email гостя для отправки белета"
-                        v-model="newEmailGuest"
+                        v-model="newGuestEmail"
                         :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
                         @blur="addGuest"
@@ -564,8 +564,8 @@ export default {
       minute: null,
       selectTypesOfPayment: null,
       guests: [],
-      newGuest: null,
-      newGuestEmail: null,
+      newGuest: '',
+      newGuestEmail: '',
       email: null,
       date: null,
       phone: null,
