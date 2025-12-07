@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Repositories;
 
-use App\Models\Festival\FestivalModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesPriceModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use Carbon\Carbon;
 use DomainException;
@@ -14,7 +12,6 @@ use Illuminate\Database\Query\JoinClause;
 use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 use Shared\Domain\ValueObject\Uuid;
 use Illuminate\Database\Eloquent\Builder;
-use function Sentry\trace;
 
 class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {
@@ -31,7 +28,6 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
     ): array
     {
         $result = [];
-       //dd($festivalId);
         $data = $this->joinFestival($festivalId, $afterDate)
             ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
             ->where('active', '=', 1);

@@ -21,6 +21,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
      * @param PriceDto[] $priceList
      * @param int $sort
      * @param bool $isLiveTicket
+     * @param string|null $description
      */
     public function __construct(
         protected Uuid   $id,
