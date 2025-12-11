@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
 import AdminDashboard from "../views/admin/AdminDashboard";
@@ -18,6 +19,11 @@ import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 const routes = [
     {
         path: '/',
+        name: 'stub',
+        component: StubView
+    },
+    {
+        path: '/hfjlsd65t4732',
         name: 'home',
         component: HomeView
     },

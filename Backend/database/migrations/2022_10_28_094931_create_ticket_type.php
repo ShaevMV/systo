@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->float('price');
-            $table->integer('groupLimit')->nullable();
+            $table->integer('groupLimit')->nullable()->default(null);
             $table->timestamps();
         });
     }

@@ -61,7 +61,8 @@ export const loadOrderItem = (context, payload) => {
     if (payload !== null && payload.length > 0) {
         let promise = axios.get('/api/v1/festival/ticketsOrder/getItem/' + payload);
         promise.then(function (response) {
-            context.commit('setOrderItem', response.data);
+            context.commit('setOrderItem', response.data.order);
+            context.commit('setQuestionnaireItem', response.data.questionnaire);
         }).catch(function (error) {
             console.error(error);
             context.commit('setError', error.response.data.errors);

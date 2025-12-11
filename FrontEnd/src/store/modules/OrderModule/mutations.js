@@ -15,6 +15,10 @@ export const setOrderItem = (state, payload) => {
     state.orderItem = payload;
 };
 
+export const setQuestionnaireItem = (state, payload) => {
+    state.questionnaireItem = payload;
+};
+
 export const addCommentByOrderItem = (state, payload) => {
     state.orderItem.comment.push(payload);
 };

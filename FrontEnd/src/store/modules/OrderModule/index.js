@@ -30,6 +30,14 @@ export default {
             listCorrectNextStatus: [],
             phone: null,
         },
+        questionnaireItem: {
+            agy: null,
+            telegram: null,
+            vk: null,
+            howManyTimes: null,
+            musicStyles: null,
+            questionForSysto: null,
+        }
     },
     getters,
     actions,

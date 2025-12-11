@@ -42,6 +42,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static \Illuminate\Database\Query\Builder|TicketModel withoutTrashed()
  * @property int $kilter
  * @method static Builder|TicketModel whereKilter($value)
+ * @property-read OrderTicketModel|null $orderTicket
+ * @method static Builder|TicketModel whereFestivalId($value)
  */
 class TicketModel extends Model
 {

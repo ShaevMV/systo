@@ -24,8 +24,10 @@ use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
@@ -48,6 +50,7 @@ class OrderTickets extends Controller
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
         private Billing $billing,
+        private QuestionnaireApplication $questionnaireApplication,
     )
     {
     }
@@ -89,6 +92,15 @@ class OrderTickets extends Controller
             );
 
             $this->createOrder->createAndSave($orderTicketDto);
+            // Добавляем анкету
+            if(isset($data['questionnaire'])) {
+                $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
+                    $data['questionnaire'],
+                    $orderTicketDto->getId(),
+                );
+                $this->questionnaireApplication->create($questionnaireTicketDto);
+            }
+
             // Добавления комментария
             if ($createOrderTicketsRequest->comment) {
                 $this->addComment->send(
@@ -180,7 +192,8 @@ class OrderTickets extends Controller
      */
     public function getOrderItem(string $id): JsonResponse
     {
-        $orderItem = $this->getOrder->getItemById(new Uuid($id));
+        $orderUuid = new Uuid($id);
+        $orderItem = $this->getOrder->getItemById($orderUuid);
         /** @var User $user */
         $user = Auth::user();
         if (is_null($orderItem) ||
@@ -192,7 +205,10 @@ class OrderTickets extends Controller
             ], 404);
         }
 
-        return response()->json($orderItem->toArray());
+        return response()->json([
+            'order' => $orderItem->toArray(),
+            'questionnaire' => $this->questionnaireApplication->getItemByOrderId($orderUuid)->toArray(),
+        ]);
     }
 
     /**

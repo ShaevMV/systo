@@ -1,6 +1,7 @@
 <template>
   <div v-if="!getError('error')">
     <order-item/>
+    <questionnaire-item/>
   </div>
   <div v-else>
     {{ getError('error') }}
@@ -9,11 +10,12 @@
 
 <script>
 import OrderItem from "@/components/Order/OrderItem";
+import QuestionnaireItem from "@/components/Order/QuestionnaireItem";
 import {mapGetters} from "vuex";
 
 export default {
   name: "OrderItemView",
-  components: {OrderItem},
+  components: {OrderItem, QuestionnaireItem},
   computed: {
     ...mapGetters('appOrder', [
       'getError',

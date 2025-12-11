@@ -12,6 +12,8 @@ use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
+ * App\Models\Ordering\InfoForOrder\ExternalPromoCodeModel
+ *
  * @property string $id
  * @property string $promocode
  * @property string|null $order_tickets_id
@@ -25,6 +27,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|PromoCodeModel wherePromocode($value)
  * @method static Builder|PromoCodeModel whereUpdatedAt($value)
  * @mixin Eloquent
+ * @method static Builder|ExternalPromoCodeModel whereCreatedAt($value)
  */
 class ExternalPromoCodeModel extends Model
 {

@@ -58,6 +58,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User wherePhone($value)
  * @property string|null $project
  * @method static Builder|User whereProject($value)
+ * @method static Builder|User whereIsManager($value)
  */
 class User extends Authenticatable implements JWTSubject
 {

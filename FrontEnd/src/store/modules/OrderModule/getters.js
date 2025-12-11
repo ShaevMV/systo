@@ -29,6 +29,16 @@ export const getOrderItem = state => {
 };
 
 /**
+ * Вывести анкету по заказу
+ *
+ * @param state
+ * @returns {null| Object}
+ */
+export const getQuestionnaireItem = state => {
+    return state.questionnaireItem;
+};
+
+/**
  * Вывести комментарии
  *
  * @param state

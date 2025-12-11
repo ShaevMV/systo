@@ -6,6 +6,7 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 
 use Shared\Domain\Bus\Command\Command;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 
 final class CreatingOrderCommand implements Command
 {
@@ -17,5 +18,10 @@ final class CreatingOrderCommand implements Command
     public function getOrderTicketDto(): OrderTicketDto
     {
         return $this->orderTicketDto;
+    }
+
+    public function getQuestionnaireTicketDto(): QuestionnaireTicketDto
+    {
+        return $this->questionnaireTicketDto;
     }
 }

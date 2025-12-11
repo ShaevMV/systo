@@ -24,6 +24,12 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TypesOfPaymentModel whereName($value)
  * @method static Builder|TypesOfPaymentModel whereUpdatedAt($value)
  * @mixin Eloquent
+ * @property int $active
+ * @property int $sort
+ * @property string $card
+ * @method static Builder|TypesOfPaymentModel whereActive($value)
+ * @method static Builder|TypesOfPaymentModel whereCard($value)
+ * @method static Builder|TypesOfPaymentModel whereSort($value)
  */
 class TypesOfPaymentModel extends Model
 {

@@ -38,6 +38,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|PromoCodeModel whereLimit($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|OrderTicketModel[] $orderTickets
  * @property-read int|null $order_tickets_count
+ * @property string|null $ticket_type_id
+ * @property string|null $festival_id
+ * @method static Builder|PromoCodeModel whereFestivalId($value)
+ * @method static Builder|PromoCodeModel whereTicketTypeId($value)
  */
 class PromoCodeModel extends Model
 {

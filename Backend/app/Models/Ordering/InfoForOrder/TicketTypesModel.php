@@ -44,6 +44,9 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketTypesModel whereActive($value)
  * @method static Builder|TicketTypesModel whereFestivalId($value)
  * @method static Builder|TicketTypesModel whereSort($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|FestivalModel[] $festivals
+ * @property-read int|null $festivals_count
+ * @method static Builder|TicketTypesModel whereIsLiveTicket($value)
  */
 class TicketTypesModel extends Model
 {

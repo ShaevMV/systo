@@ -42,6 +42,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|FestivalModel whereUpdatedAt($value)
  * @method static Builder|FestivalModel whereYear($value)
  * @mixin Eloquent
+ * @property string|null $view
+ * @method static Builder|FestivalModel whereView($value)
  */
 final class FestivalModel extends Model
 {

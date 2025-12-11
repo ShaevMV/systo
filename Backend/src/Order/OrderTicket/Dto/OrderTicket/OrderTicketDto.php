@@ -94,6 +94,7 @@ class OrderTicketDto
         foreach ($this->ticket as $item) {
             $tickets[] = [
                 'value' => $item->getValue(),
+                'email' => $item->getEmail(),
                 'id' => $item->getId()->value(),
                 'festival_id' => $item->getFestivalId()->value(),
             ];

@@ -223,8 +223,8 @@
                         type="email"
                         id="newEmailGuest"
                         class="form-control"
-                        placeholder="Email гостя для отправки белета"
-                        aria-label="Email гостя для отправки белета"
+                        placeholder="Введите e-mail этого гостя"
+                        aria-label="Введите e-mail этого гостя"
                         v-model="newGuestEmail"
                         :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
@@ -240,7 +240,7 @@
                     </div>
                   </div>
                 </div>
-
+                <div>  “После оформления заказа на почту твоих гостей придет ссылка на анкету, которую необходимо заполнить всем гостям!” </div>
                 <div class="row x-row" v-show="guests.length > 0">
                   <div class="col-12">
                     <div class="form-group">
@@ -415,7 +415,7 @@
 
                 <div class="row">
                   <div class="col-3">
-                    <label for="idBuy">Комментарий к заказу:</label>
+                    <label for="idBuy">Комментарий к платежу:</label>
                   </div>
 
                   <div class="col-9">
@@ -423,6 +423,106 @@
                         class="form-control order-text"
                         v-model="comment"
                         id="idBuy"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="pp1 row">
+                  <span>ШАГ 4.</span> Заполни анкетные данные для подтверждения участия в туристическом слёте:
+                </div>
+                <div class="mb-12">
+                  <div class="col-3">
+                    <label for="questionnaire_agy">Возраст: *</label>
+                  </div>
+
+                  <div class="col-4">
+                    <div class="input-group" id="promo-input">
+                      <input
+                          type="number"
+                          id="questionnaire_agy"
+                          class="form-control"
+                          placeholder="Возраст"
+                          aria-label="Возраст"
+                          v-model="questionnaire.agy"
+                          aria-describedby="basic-addon1"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-3">
+                    <label for="questionnaire_tellegram">Telegram-аккаунт:</label>
+                  </div>
+
+                  <div class="col-4">
+                    <div class="input-group" id="promo-input">
+                      <input
+                          type="text"
+                          id="questionnaire_tellegram"
+                          class="form-control"
+                          placeholder="Telegram-аккаунт"
+                          aria-label="Telegram-аккаунт"
+                          v-model="questionnaire.telegram"
+                          aria-describedby="basic-addon1"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-3">
+                    <label for="questionnaire_vk">Профайл Вконтакте:</label>
+                  </div>
+
+                  <div class="col-4">
+                    <div class="input-group" id="promo-input">
+                      <input
+                          type="text"
+                          id="questionnaire_tellegram"
+                          class="form-control"
+                          placeholder="Профайл Вконтакте"
+                          aria-label="Профайл Вконтакте"
+                          v-model="questionnaire.vk"
+                          aria-describedby="basic-addon1"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-3">
+                    <label for="questionnaire_howManyTimes">Сколько раз ты уже бывал на Систо? *</label>
+                  </div>
+
+                  <div class="col-4">
+                    <div class="input-group" id="promo-input">
+                      <input
+                          type="number"
+                          id="questionnaire_howManyTimes"
+                          class="form-control"
+                          placeholder="Сколько раз ты уже бывал на Систо? *"
+                          aria-label="Сколько раз ты уже бывал на Систо? *"
+                          v-model="questionnaire.howManyTimes"
+                          aria-describedby="basic-addon1"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="col-3">
+                    <label for="questionnaire_musicStyles">Стили музыки, которые предпочитаешь в лесу:</label>
+                  </div>
+
+                  <div class="col-9">
+                    <textarea
+                        class="form-control order-text"
+                        v-model="questionnaire.musicStyles"
+                        id="questionnaire_musicStyles"
+                    ></textarea>
+                  </div>
+
+                  <div class="col-3">
+                    <label for="questionnaire_questionForSysto">Ответь кратко и честно на простой вопрос "Зачем ты едешь на Систо?": *</label>
+                  </div>
+
+                  <div class="col-9">
+                    <textarea
+                        class="form-control order-text"
+                        v-model="questionnaire.questionForSysto"
+                        id="questionnaire_musicStyles"
                     ></textarea>
                   </div>
                 </div>
@@ -576,6 +676,14 @@ export default {
       promoCode: null,
       massageForPromoCode: null,
       comment: null,
+      questionnaire: {
+        agy: null,
+        telegram: null,
+        vk: null,
+        howManyTimes: null,
+        musicStyles: null,
+        questionForSysto: null,
+      }
     };
   },
   computed: {
@@ -607,10 +715,13 @@ export default {
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.guests.length > 0 &&
-          //this.date !== null &&
+          this.date !== null &&
           this.confirm === true &&
-          // this.idBuy !== null &&
+          this.idBuy !== null &&
           this.phone !== null &&
+          this.questionnaire.agy !== null &&
+          this.questionnaire.howManyTimes !== null &&
+          this.questionnaire.questionForSysto  !== null &&
           group &&
           (this.isAuth || this.email)
       );
@@ -740,6 +851,7 @@ export default {
         phone: this.phone,
         comment: this.comment,
         types_of_payment_id: this.selectTypesOfPayment,
+        questionnaire: this.questionnaire,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
         callback: function (result, massage, link) {
           if (result) {
@@ -776,6 +888,14 @@ export default {
       this.idBuy = null;
       this.comment = null;
       this.confirm = true;
+      this.questionnaire = {
+        agy: null,
+        telegram: null,
+        vk: null,
+        howManyTimes: null,
+        musicStyles: null,
+        questionForSysto: null,
+      };
       this.clearPromoCode();
     },
   },

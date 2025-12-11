@@ -83,7 +83,7 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTypeOrder()?->value(),
             ],
             [
-                'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
+                'field' => OrderTicketModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],
