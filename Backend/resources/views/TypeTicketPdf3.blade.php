@@ -113,7 +113,7 @@
     </style>
 </head>
 <body>
-<img src="https://api.spaceofjoy.ru/images/main-bg.jpg" alt="fon" id="fon">
+<img src="https://api.spaceofjoy.ru/images/main-bg.png" alt="fon" id="fon">
 <div id="top"></div>
 <img src="https://api.spaceofjoy.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
