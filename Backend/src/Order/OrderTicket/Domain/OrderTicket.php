@@ -62,6 +62,17 @@ final class OrderTicket extends AggregateRoot
                 $result->festival_id,
             )
         );
+        $orderId = $orderTicketDto->getId();
+
+        foreach (collect($orderTicketDto->getTicket())->skip(1) as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $item->getEmail(),
+                    $orderId->value(),
+                    $item->getId()->value(),
+                )
+            );
+        }
+
 
         return $result;
     }

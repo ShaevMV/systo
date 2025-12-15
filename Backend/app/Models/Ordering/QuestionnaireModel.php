@@ -41,6 +41,7 @@ class QuestionnaireModel extends Model
 
     protected $fillable = [
         'id',
+        'ticket_id',
         'order_id',
         'agy',
         'howManyTimes',

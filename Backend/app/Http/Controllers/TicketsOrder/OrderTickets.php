@@ -94,8 +94,10 @@ class OrderTickets extends Controller
             $this->createOrder->createAndSave($orderTicketDto);
             // Добавляем анкету
             if(isset($data['questionnaire'])) {
+                $ticket = $orderTicketDto->getTicket()[0];
                 $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
                     $data['questionnaire'],
+                    $ticket->getId(),
                     $orderTicketDto->getId(),
                 );
                 $this->questionnaireApplication->create($questionnaireTicketDto);
