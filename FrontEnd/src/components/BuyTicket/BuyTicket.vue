@@ -427,6 +427,9 @@
                     ></textarea>
                   </div>
                 </div>
+                <div class="pp1 row">
+                  <span>ШАГ 4.</span> Заполни анкетные данные для подтверждения участия в туристическом слёте:
+                </div>
                 <questionnaire-ticket :questionnaire="questionnaire"/>
                 <div class="row mt-4">
                   <div class="form-check" id="check-check">

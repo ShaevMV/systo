@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div class="pp1 row">
-      <span>ШАГ 4.</span> Заполни анкетные данные для подтверждения участия в туристическом слёте:
-    </div>
+
     <div class="mb-12">
       <div class="col-3">
         <label for="questionnaire_agy">Возраст: *</label>
