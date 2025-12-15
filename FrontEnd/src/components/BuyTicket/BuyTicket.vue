@@ -228,6 +228,7 @@
                         v-model="newGuestEmail"
                         :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
+                        :show="guests.length > 0"
                         @blur="addGuest"
                     />
                     <div class="input-group-prepend">
@@ -721,7 +722,7 @@ export default {
      * Добавить нового гостя
      */
     addGuest: function () {
-      if (this.newGuest.length > 0 && this.newGuestEmail.length > 0) {
+      if (this.newGuest.length > 0 && (this.newGuestEmail.length > 0 && this.guests.length > 0)) {
         this.guests.push({
           value: this.newGuest,
           email: this.newGuestEmail,
