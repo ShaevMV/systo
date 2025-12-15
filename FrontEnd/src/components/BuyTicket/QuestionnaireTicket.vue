@@ -16,7 +16,7 @@
               class="form-control"
               placeholder="Возраст"
               aria-label="Возраст"
-              v-model="questionnaire.agy"
+              :value="questionnaire.agy"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -34,7 +34,7 @@
               class="form-control"
               placeholder="Telegram-аккаунт"
               aria-label="Telegram-аккаунт"
-              v-model="questionnaire.telegram"
+              :value="questionnaire.telegram"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -52,7 +52,7 @@
               class="form-control"
               placeholder="Профайл Вконтакте"
               aria-label="Профайл Вконтакте"
-              v-model="questionnaire.vk"
+              :value="questionnaire.vk"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -70,7 +70,7 @@
               class="form-control"
               placeholder="Сколько раз ты уже бывал на Систо? *"
               aria-label="Сколько раз ты уже бывал на Систо? *"
-              v-model="questionnaire.howManyTimes"
+              :value="questionnaire.howManyTimes"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -83,7 +83,7 @@
       <div class="col-9">
                     <textarea
                         class="form-control order-text"
-                        v-model="questionnaire.musicStyles"
+                        :value="questionnaire.musicStyles"
                         id="questionnaire_musicStyles"
                     ></textarea>
       </div>
@@ -95,7 +95,7 @@
       <div class="col-9">
                     <textarea
                         class="form-control order-text"
-                        v-model="questionnaire.questionForSysto"
+                        :value="questionnaire.questionForSysto"
                         id="questionnaire_musicStyles"
                     ></textarea>
       </div>
@@ -107,9 +107,7 @@
 <script>
 export default {
   name: "QuestionnaireTicket",
-  props: {
-    questionnaire: Object,
-  }
+  props: ['questionnaire'],
 }
 </script>
 
