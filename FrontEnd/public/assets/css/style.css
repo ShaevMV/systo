@@ -52,6 +52,7 @@ a:hover {
     background-attachment: fixed;
     box-sizing: border-box;
     min-height: 100%;
+    position: relative;
 }
 
 @media (max-width: 1199px) {
@@ -1303,7 +1304,7 @@ button[disabled]{
 
 .sidebar-nav .nav-item .exit-link{
     background-color: transparent !important;
-    background-image: url('../img/logout.png');
+    background-image: url('../img/logout.png') !important;
     background-repeat: no-repeat;
     background-position: left center;
     background-size: 16px;
@@ -1411,7 +1412,7 @@ button[disabled]{
     bottom: 0;
     width: 100%;
     background-color: #fff;
-    padding-bottom: 7px;
+    padding-bottom: 0;
     padding-top: 10px;
     box-sizing: border-box;
     width: 295px;
@@ -1814,10 +1815,6 @@ input[readonly]{
     background-color: #e3ffe8 !important;
 }
 
-#contact-form .x-row{
-    margin-top: -10px;
-}
-
 #contact-form .x-row input[type="text"]{
     background-color: rgba(30, 135, 28, 0.1);
     font-size: 16px;
@@ -1911,6 +1908,55 @@ input[readonly]{
     margin-top: 2vw;
 }
 
+#intro{
+    text-align: center;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+}
+
+#quest{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.quest-item{
+    width: 48%;
+    margin-bottom: 2vw;
+}
+
+#contact-form #quest .phone-item{
+    display: none !important;
+}
+
+#sub-order {
+    display: block;
+    text-align: center;
+}
+
+.number-item{
+    width: 25%;
+}
+
+#main-quest .last-item{
+    width: 100% !important;
+}
+
+#main-quest #questionnaire_musicStyles{
+    height: 50px !important;
+}
+
+.mt-7{
+    margin-top: 2vw !important;
+}
+
 .invalid-feedback{
     font-style: italic;
 }
@@ -1958,6 +2004,10 @@ input[readonly]{
 @media(max-width: 1030px){
     #main h1 {
         font-size: 26px;
+    }
+
+    #total-numberz{
+        width: 100%;
     }
 
     th span{
@@ -2009,6 +2059,10 @@ input[readonly]{
 @media(max-width: 800px) {
     #main h1 {
         font-size: 24px;
+    }
+
+    #total-numberz юв-адflex{
+        flex-wrap: wrap;
     }
 
     #check-check.form-check .form-check-input{
@@ -2190,6 +2244,19 @@ input[readonly]{
 
     .itog-row h4{
         font-size: 15px;
+    }
+
+    .quest-item{
+        width: 100%;
+        margin-bottom: 4vw;
+    }
+
+    .number-item{
+        width: 50%;
+    }
+
+    #main-quest #questionnaire_musicStyles{
+        height: auto !important;
     }
 }
 
@@ -2446,7 +2513,6 @@ input[readonly]{
     padding-left: 10px;
     padding-right: 10px;
 }
-
 
 @media(max-width: 760px){
     .ticket-choice label .form-check-input{

@@ -212,7 +212,7 @@
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        placeholder="Введи Имена и Фамилии себя и своих гостей"
+                        :placeholder="isFirstGuestAdded ? 'Введи Имя и Фамилию своего гостя' : 'Введи свои Имя и Фамилию'"
                         aria-label="Введи Имена и Фамилии себя и своих гостей"
                         v-model="newGuest"
                         :disabled="!isAllowedNewGuest"
@@ -223,10 +223,10 @@
                         type="email"
                         id="newEmailGuest"
                         class="form-control"
-                        placeholder="Введите e-mail этого гостя"
+                        :placeholder="isFirstGuestAdded ? 'Введи Email своего гостя' : ''"
                         aria-label="Введите e-mail этого гостя"
                         v-model="newGuestEmail"
-                        :disabled="!isAllowedNewGuest"
+                        :disabled="!isAllowedNewGuest || !isFirstGuestAdded"
                         aria-describedby="basic-addon1"
                         :show="guests.length > 0"
                         @blur="addGuest"
@@ -361,7 +361,7 @@
                   </div>
                 </div>
                 <div
-                    class="row flex-flex justify-content-center mt-2"
+                    class="row flex-flex justify-content-center mt-7"
                     style="
                     color: var(--c-red);
                     text-align: center;
@@ -474,7 +474,7 @@
                 >
                   Если кнопка не активна проверь все ли поля заполнены!
                 </div>
-                <div class="row mt-4">
+                <div class="row mt-4" id="sub-order">
                   <div class="after-order">
                     <p>
                       После оплаты в течение 3-4 дней на твой e-mail придет
@@ -573,6 +573,7 @@ export default {
       guests: [],
       newGuest: '',
       newGuestEmail: '',
+      isFirstGuestAdded: false,
       email: null,
       date: null,
       phone: null,
@@ -587,6 +588,7 @@ export default {
         agy: null,
         telegram: null,
         vk: null,
+        phone: null,
         howManyTimes: null,
         musicStyles: null,
         questionForSysto: null,
@@ -725,13 +727,18 @@ export default {
      * Добавить нового гостя
      */
     addGuest: function () {
-      if (this.newGuest.length > 0 && (this.newGuestEmail.length > 0 && this.guests.length > 0)) {
+      if (this.newGuest.length > 0 && (this.newGuestEmail.length > 0 || !this.isFirstGuestAdded)) {
         this.guests.push({
           value: this.newGuest,
           email: this.newGuestEmail,
         });
         this.newGuest = '';
         this.newGuestEmail = '';
+
+        // После добавления первого гостя меняем состояние
+        if (!this.isFirstGuestAdded) {
+          this.isFirstGuestAdded = true;
+        }
       }
     },
     /**
@@ -795,6 +802,7 @@ export default {
       this.idBuy = null;
       this.comment = null;
       this.confirm = true;
+      this.isFirstGuestAdded = false; // сбросить состояние до первого участника
       this.questionnaire = {
         agy: null,
         telegram: null,

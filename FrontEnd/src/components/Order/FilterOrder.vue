@@ -87,8 +87,9 @@
 
           <div class="row b-row mt-2">
             <button class="btn btn-primary"
-                    @click="sendFilter"
-                    type="submit">Применить фильтр
+                    @click="sendFilter" :disabled="isLoading"
+                    type="submit"><span v-if="isLoading">Загрузка...</span>
+              <span v-else>Отправить</span>
             </button>
             <button class="btn btn-primary"
                     @click="clearFilter"
@@ -116,6 +117,7 @@ export default {
       typesOfPayment: null,
       city: null,
       selectFestivalId: null,
+      isLoading: false,
     }
   },
   computed: {
@@ -160,25 +162,26 @@ export default {
      * Отправить данные для фильтра
      */
     sendFilter: function () {
-      let price = this.typeOrder !== null ? this.typeOrder.price : null;
-      let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
-      let self = this;
-      this.getOrderListForAdmin({
-        'price': price,
-        'typePrice': typePrice,
-        'email': self.email,
-        'status': self.status,
-        'promoCode': self.promoCode,
-        'typesOfPayment': self.typesOfPayment,
-        'festivalId': self.festival_id,
-        'city': self.city,
-      });
-      this.getListTypesOfPayment({
-        festival_id: self.festival_id,
-        is_admin: true,
-      });
-      this.getListPriceFor({festival_id: self.festival_id})
-    },
+      this.isLoading = true;
+        let price = this.typeOrder !== null ? this.typeOrder.price : null;
+        let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
+        let self = this;
+        this.getOrderListForAdmin({
+          'price': price,
+          'typePrice': typePrice,
+          'email': self.email,
+          'status': self.status,
+          'promoCode': self.promoCode,
+          'typesOfPayment': self.typesOfPayment,
+          'festivalId': self.festival_id,
+          'city': self.city,
+        });
+        this.getListTypesOfPayment({
+          festival_id: self.festival_id,
+          is_admin: true,
+        });
+        this.getListPriceFor({festival_id: self.festival_id})
+      },
     clearFilter: function () {
       this.typePrice = null;
       this.price = null;

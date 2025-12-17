@@ -5,16 +5,16 @@
         <div class="card-body">
           <h5 class="card-title">Отчёт о билетах</h5>
           <div class="d-flex">
-          <p class="col-md-4 text-center">
+          <p class="number-item text-center">
             <b>Подтвержденные заказы:</b><span> {{ getTotalCountToPaid }} </span>
           </p>
-          <p class="col-md-4 text-center">
+          <p class="number-item text-center">
             <b>На сумму:</b><span> {{ getTotalAmount }} </span>
           </p>
-            <p class="col-md-4 text-center">
+            <p class="number-item text-center">
               <b>Всего билетов:</b><span> {{ getTotalCountTicket }} </span>
             </p>
-            <p class="col-md-4 text-center">
+            <p class="number-item text-center">
               <b>Сумма скидок:</b><span> {{ getTotalDiscount }} </span>
             </p>
         </div>

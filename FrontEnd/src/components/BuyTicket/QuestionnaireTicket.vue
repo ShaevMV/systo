@@ -1,12 +1,9 @@
 <template>
   <div>
-
-    <div class="mb-12">
-      <div class="col-3">
+    <div class="mb-12" id="quest">
+      <div class="quest-item">
         <label for="questionnaire_agy">Возраст: *</label>
-      </div>
 
-      <div class="col-4">
         <div class="input-group" id="promo-input">
           <input
               type="number"
@@ -20,11 +17,9 @@
         </div>
       </div>
 
-      <div class="col-3">
+      <div class="quest-item">
         <label for="questionnaire_tellegram">Telegram-аккаунт:</label>
-      </div>
 
-      <div class="col-4">
         <div class="input-group" id="promo-input">
           <input
               type="text"
@@ -35,14 +30,28 @@
               :value="questionnaire.telegram"
               aria-describedby="basic-addon1"
           />
+      </div>
+      </div>
+
+      <div class="quest-item phone-item">
+        <label for="questionnaire_phone">Номер телефона:</label>
+
+        <div class="input-group" id="promo-input">
+          <input
+              type="text"
+              id="questionnaire_phone"
+              class="form-control"
+              placeholder="Номер телефона"
+              aria-label="Номер телефона"
+              :value="questionnaire.phone"
+              aria-describedby="basic-addon1"
+          />
         </div>
       </div>
 
-      <div class="col-3">
+      <div class="quest-item">
         <label for="questionnaire_vk">Профайл Вконтакте:</label>
-      </div>
 
-      <div class="col-4">
         <div class="input-group" id="promo-input">
           <input
               type="text"
@@ -53,14 +62,12 @@
               :value="questionnaire.vk"
               aria-describedby="basic-addon1"
           />
-        </div>
+      </div>
       </div>
 
-      <div class="col-3">
+      <div class="quest-item">
         <label for="questionnaire_howManyTimes">Сколько раз ты уже бывал на Систо? *</label>
-      </div>
 
-      <div class="col-4">
         <div class="input-group" id="promo-input">
           <input
               type="number"
@@ -71,14 +78,12 @@
               :value="questionnaire.howManyTimes"
               aria-describedby="basic-addon1"
           />
-        </div>
+      </div>
       </div>
 
-      <div class="col-3">
+      <div class="quest-item">
         <label for="questionnaire_musicStyles">Стили музыки, которые предпочитаешь в лесу:</label>
-      </div>
 
-      <div class="col-9">
                     <textarea
                         class="form-control order-text"
                         :value="questionnaire.musicStyles"
@@ -86,17 +91,15 @@
                     ></textarea>
       </div>
 
-      <div class="col-3">
+      <div class="quest-item last-item">
         <label for="questionnaire_questionForSysto">Ответь кратко и честно на простой вопрос "Зачем ты едешь на Систо?": *</label>
-      </div>
 
-      <div class="col-9">
                     <textarea
                         class="form-control order-text"
                         :value="questionnaire.questionForSysto"
-                        id="questionnaire_musicStyles"
+                        id="questionnaire_questionForSysto"
                     ></textarea>
-      </div>
+        </div>
     </div>
   </div>
 
