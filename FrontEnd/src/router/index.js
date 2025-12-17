@@ -12,7 +12,8 @@ import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
-import store from '../store'
+import QuestionnaireView from "../views/QuestionnaireView.vue";
+import store from '../store';
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 
@@ -114,6 +115,14 @@ const routes = [
         meta: {
             'requiresAuth': true,
             'role': ['admin']
+        }
+    },
+    {
+        path: '/questionnaire',
+        name: 'Questionnaire',
+        component: QuestionnaireView,
+        meta: {
+            'requiresAuth': true,
         }
     },
     {

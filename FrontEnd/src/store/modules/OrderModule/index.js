@@ -33,6 +33,7 @@ export default {
         questionnaireItem: {
             agy: null,
             telegram: null,
+            phone: null,
             vk: null,
             howManyTimes: null,
             musicStyles: null,
