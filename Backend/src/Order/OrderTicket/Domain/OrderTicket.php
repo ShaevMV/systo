@@ -64,13 +64,15 @@ final class OrderTicket extends AggregateRoot
         );
         $orderId = $orderTicketDto->getId();
 
-        foreach (collect($orderTicketDto->getTicket())->skip(1) as $item) {
-            $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail(),
-                    $orderId->value(),
-                    $item->getId()->value(),
-                )
-            );
+        foreach ($orderTicketDto->getTicket() as $item) {
+            if(null !== $item->getEmail()) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail(),
+                        $orderId->value(),
+                        $item->getId()->value(),
+                    )
+                );
+            }
         }
 
 

@@ -18,6 +18,7 @@ class QuestionnaireTicketDto
         protected ?string $telegram = null,
         protected ?string $vk = null,
         protected ?string $musicStyles = null,
+        protected ?Uuid $id = null,
     )
     {
     }
@@ -28,6 +29,7 @@ class QuestionnaireTicketDto
         Uuid $ticketId
     ): self
     {
+        $id = $data['id'] === null ? null : new Uuid($data['id']);
         return new self(
             $orderId,
             $ticketId,
@@ -38,6 +40,7 @@ class QuestionnaireTicketDto
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
             $data['musicStyles'] ?? null,
+            $id
         );
     }
 

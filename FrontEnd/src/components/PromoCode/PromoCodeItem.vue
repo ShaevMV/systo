@@ -82,7 +82,7 @@
                   </div>
                   <small class="form-text text-muted"> {{ getError('active') }}</small>
                 </div>
-                <div class="row massager">{{ massage }}</div>
+                <div class="row messager">{{ message }}</div>
                 <div class="row b-row mt-2">
                   <button type="submit"
                           @click="save"
@@ -123,7 +123,7 @@ export default {
       newIsActive: null,
       newLimit: null,
       newTicketTypeId: null,
-      massage: null,
+      message: null,
     }
   },
   computed: {

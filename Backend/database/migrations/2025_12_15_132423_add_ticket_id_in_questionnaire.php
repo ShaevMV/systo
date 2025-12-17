@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::table('questionnaire', function (Blueprint $table) {
             $table->string('phone')->after('telegram')->comment('Телефон');
             $table->uuid('ticket_id')->nullable()->default(null)->after('order_id')->comment('Id билета');
-
         });
     }
 

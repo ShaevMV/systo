@@ -16,7 +16,7 @@ class QuestionnaireGetItemQueryHandler implements QueryHandler
     {
     }
 
-    public function __invoke(QuestionnaireGetItemQuery $query): ?QuestionnaireGetItemQueryResponse
+    public function __invoke(QuestionnaireGetItemQuery $query): QuestionnaireGetItemQueryResponse
     {
         return $this->repository->getByOrderId($query->getOrderId());
     }

@@ -15,7 +15,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
+                <tr v-for="getQuestionnaireItem in getQuestionnaireList" v-bind:key="getQuestionnaireItem.id">
                   <td>{{ getQuestionnaireItem.agy }}</td>
                   <td>{{ getQuestionnaireItem.telegram }}</td>
                   <td>{{ getQuestionnaireItem.vk }}</td>
@@ -39,7 +39,7 @@ export default {
   name: "QuestionnaireItem",
   computed: {
     ...mapGetters('appOrder', [
-      'getQuestionnaireItem',
+      'getQuestionnaireList',
     ]),
   },
 }

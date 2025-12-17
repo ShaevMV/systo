@@ -116,10 +116,10 @@ class OrderingTicketsController extends Controller
             $createPromoCodeRequest->toArray(),
             '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
         );
-        $massage = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
+        $message = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([
-            'massage' => $massage,
+            'message' => $message,
             'id' => $id->value(),
         ]);
     }
@@ -137,12 +137,12 @@ class OrderingTicketsController extends Controller
 
         $id = $this->getPromoCodes->createOrUpdatePromoCode(
             $data,
-            '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
+            '9d679bcf-b438-4ddb-ac04-023fa9bff4b8'
         );
-        $massage = !empty($data['id']) ? 'промокод обновлён' : 'промокод добавлен';
+        $message = !empty($data['id']) ? 'промокод обновлён' : 'промокод добавлен';
 
         return response()->json([
-            'massage' => $massage,
+            'message' => $message,
             'id' => $id->value(),
             'name' => $data['name'],
         ]);

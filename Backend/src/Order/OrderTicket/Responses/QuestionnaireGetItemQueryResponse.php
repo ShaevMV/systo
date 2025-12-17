@@ -4,21 +4,32 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Responses;
 
+use Illuminate\Support\Collection;
 use Shared\Domain\Bus\Query\Response;
-use Shared\Domain\Entity\AbstractionEntity;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 
-class QuestionnaireGetItemQueryResponse extends AbstractionEntity implements Response
+class QuestionnaireGetItemQueryResponse implements Response
 {
+    /**
+     * @var Collection
+     */
+    private Collection $collection;
+
     public function __construct(
-        protected int $id,
-        protected string $order_id,
-        protected int $agy,
-        protected int $howManyTimes,
-        protected string $questionForSysto,
-        protected ?string $telegram = null,
-        protected ?string $vk = null,
-        protected ?string $musicStyles = null,
+        array $questionnaire
     )
     {
+        $this->collection = new Collection($questionnaire);
+    }
+
+    public function toArray():array
+    {
+        $result=[];
+        /** @var QuestionnaireTicketDto $item */
+        foreach ($this->collection as $item)
+        {
+            $result[]=$item->toArray();
+        }
+        return $result;
     }
 }

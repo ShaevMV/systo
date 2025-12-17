@@ -30,7 +30,7 @@ export default {
             listCorrectNextStatus: [],
             phone: null,
         },
-        questionnaireItem: {
+        questionnaireItem: [{
             agy: null,
             telegram: null,
             phone: null,
@@ -38,7 +38,8 @@ export default {
             howManyTimes: null,
             musicStyles: null,
             questionForSysto: null,
-        }
+            message: null,
+        }]
     },
     getters,
     actions,

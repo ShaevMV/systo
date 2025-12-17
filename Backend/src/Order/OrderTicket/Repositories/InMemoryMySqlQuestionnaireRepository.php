@@ -40,23 +40,22 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
     }
 
-    public function getByOrderId(Uuid $orderId): ?QuestionnaireGetItemQueryResponse
+    public function getByOrderId(Uuid $orderId): QuestionnaireGetItemQueryResponse
     {
-        $result = $this->model::whereOrderId($orderId->value())->first();
-
-        if($result === null) {
-            return null;
+        $result = [];
+        foreach ($this->model::whereOrderId($orderId->value())->get() as $item) {
+            $result[] = new QuestionnaireTicketDto(
+                new Uuid($item->ticket_id),
+                new Uuid($item->order_id),
+                $item->agy,
+                $item->howManyTimes,
+                $item->questionForSysto,
+                $item->telegram,
+                $item->vk,
+                $item->musicStyles
+            );
         }
 
-        return new QuestionnaireGetItemQueryResponse(
-            $result->id,
-            $result->order_id,
-            $result->agy,
-            $result->howManyTimes,
-            $result->questionForSysto,
-            $result->telegram,
-            $result->vk,
-            $result->musicStyles
-        );
+        return new QuestionnaireGetItemQueryResponse($result);
     }
 }

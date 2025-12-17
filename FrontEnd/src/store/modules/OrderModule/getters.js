@@ -34,7 +34,7 @@ export const getOrderItem = state => {
  * @param state
  * @returns {null| Object}
  */
-export const getQuestionnaireItem = state => {
+export const getQuestionnaireList = state => {
     return state.questionnaireItem;
 };
 
@@ -56,4 +56,11 @@ export const getComment = state => {
  */
 export const getTotalNumber = state => {
     return state.totalNumber;
+};
+
+/**
+ * Вывести данные о сообщение после заполнения анкеты
+ */
+export const getMessageForQuestionnaire = state => {
+    return state.questionnaireItem.message;
 };

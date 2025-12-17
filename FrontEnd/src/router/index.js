@@ -118,12 +118,10 @@ const routes = [
         }
     },
     {
-        path: '/questionnaire',
+        path: '/questionnaire/:order_id/:ticket_id',
         name: 'Questionnaire',
+        props: true,
         component: QuestionnaireView,
-        meta: {
-            'requiresAuth': true,
-        }
     },
     {
         path: '/promoCode/:id?',

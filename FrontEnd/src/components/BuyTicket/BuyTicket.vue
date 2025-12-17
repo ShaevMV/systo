@@ -32,7 +32,7 @@
               <span aria-hidden="true">х</span>
             </button>
           </div>
-          <div class="modal-body" v-html="massage"></div>
+          <div class="modal-body" v-html="message"></div>
           <div class="modal-footer">
             <button
                 type="button"
@@ -194,9 +194,9 @@
                   <div class="col-5">
                     <small
                         class="form-text text-muted id-info"
-                        v-show="massageForPromoCode !== null"
+                        v-show="messageForPromoCode !== null"
                     >
-                      {{ massageForPromoCode }}
+                      {{ messageForPromoCode }}
                     </small>
                   </div>
                 </div>
@@ -430,7 +430,10 @@
                 <div class="pp1 row">
                   <span>ШАГ 4.</span> Заполни анкетные данные для подтверждения участия в туристическом слёте:
                 </div>
-                <questionnaire-ticket :questionnaire="questionnaire"/>
+                <questionnaire-ticket
+                    :questionnaire="questionnaire"
+                    @update-questionnaire="updateQuestionnaire"
+                />
                 <div class="row mt-4">
                   <div class="form-check" id="check-check">
                     <input
@@ -580,9 +583,9 @@ export default {
       city: null,
       idBuy: null,
       confirm: true,
-      massage: null,
+      message: null,
       promoCode: null,
-      massageForPromoCode: null,
+      messageForPromoCode: null,
       comment: null,
       questionnaire: {
         agy: null,
@@ -710,6 +713,9 @@ export default {
       document.execCommand('copy');
       document.body.removeChild(area);
     },
+    updateQuestionnaire(updatedQuestionnaire) {
+      this.questionnaire = updatedQuestionnaire;
+    },
     /**
      * Отправить промо код
      */
@@ -718,8 +724,8 @@ export default {
       this.checkPromoCode({
         promoCode: this.promoCode,
         typeOrder: this.getSelectTicketTypeId,
-        callback: function (massage) {
-          self.massageForPromoCode = massage;
+        callback: function (message) {
+          self.messageForPromoCode = message;
         },
       });
     },
@@ -767,14 +773,14 @@ export default {
         types_of_payment_id: this.selectTypesOfPayment,
         questionnaire: this.questionnaire,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
-        callback: function (result, massage, link) {
+        callback: function (result, message, link) {
           if (result) {
             self.clearData();
           }
           if (link !== null) {
             window.location.href = link;
           } else {
-            self.massage = massage;
+            self.message = message;
 
             document.getElementById('modalOpenBtn').click();
 
@@ -798,7 +804,7 @@ export default {
       this.mount = null;
       this.date = null;
       this.minute = null;
-      this.massageForPromoCode = null;
+      this.messageForPromoCode = null;
       this.idBuy = null;
       this.comment = null;
       this.confirm = true;

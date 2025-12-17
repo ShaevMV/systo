@@ -10,7 +10,7 @@ export const goToCreateOrderTicket = (context, payload) => {
     let promise = axios.post('/api/v1/festival/ticketsOrder/create', payload);
     promise.then(function (response) {
         console.log(response.data.success);
-        payload.callback(response.data.success, response.data.massage, response.data.link ?? null);
+        payload.callback(response.data.success, response.data.message, response.data.link ?? null);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);
@@ -113,7 +113,6 @@ export const sendToChanceStatus = (context, payload) => {
             'status': response.data.status.name,
             'listCorrectNextStatus': response.data.status.listCorrectNextStatus,
         })
-        console.log(response);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);
@@ -134,6 +133,22 @@ export const getUrlForPdf = (context, payload) => {
         context.commit('setError', error.response.data.errors);
         reject(error);
     });
+    });
+};
+
+// отправить данные для анкеты
+export const sendQuestionnaire = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post('/api/v1/festival/ticketsOrder/questionnaire/' + payload.orderId + '/' + payload.ticketId,{
+            'questionnaire': payload.questionnaire
+        });
+        return promise.then(function (response) {
+            context.commit('setMessage', response.data.message)
+        }).catch(function (error) {
+            //console.error(error);
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
     });
 };
 

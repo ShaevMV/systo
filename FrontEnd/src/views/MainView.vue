@@ -11,7 +11,6 @@
   </aside>
   <main id="main" class="main">
     <router-view/>
-    <a href="https://t.me/systo_vznos" id="telega" target="_blank" title="Помощь c оргвзносом!">Помощь c оргвзносом</a>
   </main>
 </template>
 <script>

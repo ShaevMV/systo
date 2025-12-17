@@ -90,7 +90,7 @@ export const checkPromoCode = (context, payload) => {
 
     promise.then(function (response) {
         if (payload.callback !== undefined) {
-            payload.callback(response.data.massage);
+            payload.callback(response.data.message);
         }
 
         context.commit('setValuePromoCode', response.data);

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int $id
  * @property string $order_id
+ * @property string $ticket_id
  * @property int $agy Возраст
  * @property int $howManyTimes Сколько раз ты уже бывал на Систо
  * @property string $questionForSysto Ответь кратко и честно на простой вопрос Зачем ты едешь на Систо?

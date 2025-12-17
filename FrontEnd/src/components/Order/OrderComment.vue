@@ -5,11 +5,11 @@
         <div class="chat-history">
           <ul class="m-b-0">
             <li class="clearfix" v-for="(comment,index) in getComment" v-bind:key="index">
-              <div :class="{ 'text-right': isMyMassage(comment.user_id) }"
+              <div :class="{ 'text-right': isMymessage(comment.user_id) }"
                    class="message-data">
                 <span class="message-data-time">{{ comment.created_at }}</span>
               </div>
-              <div :class="{ 'float-right': isMyMassage(comment.user_id) }"
+              <div :class="{ 'float-right': isMymessage(comment.user_id) }"
                    class="message other-message"> {{ comment.comment }}
               </div>
             </li>
@@ -60,7 +60,7 @@ export default {
      * @param idUser
      * @returns {boolean}
      */
-    isMyMassage: function (idUser) {
+    isMymessage: function (idUser) {
       return this.getIdUser === idUser;
     },
     sendMessage: function () {

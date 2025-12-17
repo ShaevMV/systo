@@ -12,6 +12,7 @@
               placeholder="Возраст"
               aria-label="Возраст"
               :value="questionnaire.agy"
+              @input="updateParent('agy', $event.target.value)"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -28,6 +29,7 @@
               placeholder="Telegram-аккаунт"
               aria-label="Telegram-аккаунт"
               :value="questionnaire.telegram"
+              @input="updateParent('telegram', $event.target.value)"
               aria-describedby="basic-addon1"
           />
       </div>
@@ -44,6 +46,7 @@
               placeholder="Номер телефона"
               aria-label="Номер телефона"
               :value="questionnaire.phone"
+              @input="updateParent('phone', $event.target.value)"
               aria-describedby="basic-addon1"
           />
         </div>
@@ -60,6 +63,7 @@
               placeholder="Профайл Вконтакте"
               aria-label="Профайл Вконтакте"
               :value="questionnaire.vk"
+              @input="updateParent('vk', $event.target.value)"
               aria-describedby="basic-addon1"
           />
       </div>
@@ -76,6 +80,7 @@
               placeholder="Сколько раз ты уже бывал на Систо? *"
               aria-label="Сколько раз ты уже бывал на Систо? *"
               :value="questionnaire.howManyTimes"
+              @input="updateParent('howManyTimes', $event.target.value)"
               aria-describedby="basic-addon1"
           />
       </div>
@@ -88,6 +93,7 @@
                         class="form-control order-text"
                         :value="questionnaire.musicStyles"
                         id="questionnaire_musicStyles"
+                        @input="updateParent('musicStyles', $event.target.value)"
                     ></textarea>
       </div>
 
@@ -98,17 +104,36 @@
                         class="form-control order-text"
                         :value="questionnaire.questionForSysto"
                         id="questionnaire_questionForSysto"
+                        @input="updateParent('questionForSysto', $event.target.value)"
                     ></textarea>
         </div>
+
+      <span> {{getMessageForQuestionnaire}} </span>
     </div>
   </div>
 
 </template>
 
 <script>
+import {mapGetters} from "vuex";
+
 export default {
   name: "QuestionnaireTicket",
   props: ['questionnaire'],
+  methods: {
+    updateParent(field, value) {
+      const updated = {
+        ...this.questionnaire,
+        [field]: value
+      };
+      this.$emit('update-questionnaire', updated);
+    }
+  },
+  computed: {
+    ...mapGetters('appOrder', [
+      'getMessageForQuestionnaire',
+    ])
+  }
 }
 </script>
 

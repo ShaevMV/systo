@@ -96,9 +96,9 @@ class OrderTickets extends Controller
             if(isset($data['questionnaire'])) {
                 $ticket = $orderTicketDto->getTicket()[0];
                 $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
-                    $data['questionnaire'],
-                    $ticket->getId(),
+                    array_merge($data['questionnaire'],['phone' => $createOrderTicketsRequest->phone]),
                     $orderTicketDto->getId(),
+                    $ticket->getId(),
                 );
                 $this->questionnaireApplication->create($questionnaireTicketDto);
             }
@@ -127,7 +127,7 @@ class OrderTickets extends Controller
 
                 return response()->json([
                     'success' => true,
-                    'massage' => 'Через несколько секунд откроется QR-код для оплаты. Откройте приложение вашего банка и совершите перевод. <br/>
+                    'message' => 'Через несколько секунд откроется QR-код для оплаты. Откройте приложение вашего банка и совершите перевод. <br/>
                 Если окно не открылось нажмите на кнопку ниже.<br/>
               Если Вы зарегистрировали нового пользователя, то Вы также получите на почту данные для авторизации<br/>
               <a href="' .$billingResponse->getLinkToReceipt() .'" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>
@@ -141,14 +141,14 @@ class OrderTickets extends Controller
 
             return response()->json([
                 'success' => true,
-                'massage' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
+                'message' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
               Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
             ]);
 
         } catch (Throwable $exception) {
             return response()->json([
                 'success' => false,
-                'massage' => $exception->getMessage(),
+                'message' => $exception->getMessage(),
             ]);
         }
     }
@@ -267,8 +267,39 @@ class OrderTickets extends Controller
         } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
-                'massage' => $throwable->getMessage()
+                'message' => $throwable->getMessage()
             ], 422);
         }
+    }
+
+    /**
+     * Записать анкету
+     *
+     * @throws Throwable
+     */
+    public function setQuestionnaire(Request $request, string $orderId, string $ticketId): JsonResponse
+    {
+        $data = $request->toArray();
+        try {
+            if(isset($data['questionnaire'])) {
+                $this->questionnaireApplication->create(
+                    QuestionnaireTicketDto::fromState(
+                        $data['questionnaire'],
+                        new Uuid($orderId),
+                        new Uuid($ticketId),
+                    )
+                );
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Ваша анкета заполнена'
+            ]);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'success' => true,
+                'message' => $throwable->getMessage()
+            ], 422);
+        }
+
     }
 }
