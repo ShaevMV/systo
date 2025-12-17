@@ -29,7 +29,7 @@ class QuestionnaireTicketDto
         Uuid $ticketId
     ): self
     {
-        $id = $data['id'] === null ? null : new Uuid($data['id']);
+        $id = (empty($data['id'])) ? null : new Uuid($data['id']);
         return new self(
             $orderId,
             $ticketId,
