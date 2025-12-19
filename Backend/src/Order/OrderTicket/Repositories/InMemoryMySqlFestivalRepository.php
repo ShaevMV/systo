@@ -35,7 +35,7 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
         }
         $result = [];
 
-        foreach ($ticketTypesModelItem->festivals()->where('active', '=',1) as $value) {
+        foreach ($ticketTypesModelItem->festivals()->where('festivals.active', '=',1) as $value) {
             $result[] = FestivalDto::fromState($value->toArray());
         }
 
