@@ -1681,6 +1681,10 @@ select.form-select::after{
 
 .reg-label{
     margin-bottom: 10px;
+    display: block;
+    font-style: italic;
+    color: red !important;
+    font-weight: bold;
 }
 
 #basic-addon1, #basic-addon2{
@@ -2151,6 +2155,20 @@ input[readonly]{
 @media(max-width: 600px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    #newEmailGuest[show="false"]{
+        display: none !important;
+    }
+
+    #enter-guests .not-first-guest{
+        flex-direction: column;
+    }
+
+    #enter-guests .not-first-guest input, #enter-guests .not-first-guest span{
+        width: 100%;
+        margin-bottom: 10px;
+        border-radius: var(--radius);
     }
 
     #defaultCheck1 + label {

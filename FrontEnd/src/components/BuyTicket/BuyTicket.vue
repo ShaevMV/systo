@@ -201,18 +201,17 @@
                   </div>
                 </div>
 
-                <div class="row mt-3 mb-3">
+                <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="col-5">
                     <label for="newGuest" class="reg-label"
-                    >Данные о гостях:</label
-                    >
+                    >Введи данные о гостях:</label>
                   </div>
-                  <div class="input-group mb-3">
+                  <div :class="!isFirstGuestAdded ? 'first-guest input-group mb-3' : 'not-first-guest input-group mb-3'">
                     <input
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        :placeholder="isFirstGuestAdded ? 'Введи Имя и Фамилию своего гостя' : 'Введи свои Имя и Фамилию'"
+                        :placeholder="isFirstGuestAdded ? 'Имя и фамилия вашего гостя' : 'Ваши имя и фамилия'"
                         aria-label="Введи Имена и Фамилии себя и своих гостей"
                         v-model="newGuest"
                         :disabled="!isAllowedNewGuest"
