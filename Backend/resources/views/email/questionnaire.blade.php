@@ -40,9 +40,12 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">{{ $link }} </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">С этого года мы хотим познакомиться поближе и просим тебя заполнить анкету участника.
+                            Твой друг уже внес оргвзнос, тебе остается только заполнить данные о себе. Как только данные будут внесены, твои QR-коды будут активированы.  </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: {{ $link }} </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи на Solar Systo!</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Вы можете связаться с организаторами через e-mail: ticket@spaceofjoy.ru либо оперативнее через Telegram - @systo_vznos </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">По всем вопросам пиши в ТГ @systo_vznos</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
