@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Responses;
 
-use Carbon\Carbon;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
@@ -12,7 +11,6 @@ use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
-use function Ramsey\Uuid\v1;
 
 class OrderTicketItemForListResponse extends AbstractionEntity implements Response
 {
@@ -55,6 +53,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected int     $discount = 0,
         protected ?string $city = null,
         protected ?string $phone = null,
+        protected int     $questionnaireCount = 0,
     )
     {
         $this->count = count($guests);
@@ -90,6 +89,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             (int)$data['discount'],
             $data['city'],
             $data['phone'],
+            (int)$data['questionnaire_count'] ?? 0,
         );
     }
 
@@ -153,5 +153,10 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         $this->guests = $guests;
         $this->count = count($guests);
         return $this;
+    }
+
+    public function getQuestionnaireCount(): int
+    {
+        return $this->questionnaireCount;
     }
 }

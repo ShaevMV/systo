@@ -13,6 +13,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property ?string $typePrice
  * @property ?string $festivalId
  * @property ?string $city
+ * @property ?string $questionnaire
  */
 class FilterForTicketOrder extends FormRequest
 {

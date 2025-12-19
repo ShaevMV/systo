@@ -9,6 +9,7 @@ use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
+use App\Models\Ordering\QuestionnaireModel;
 use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\User;
 use Carbon\Carbon;
@@ -24,6 +25,7 @@ use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
@@ -87,6 +89,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TypesOfPaymentModel::TABLE . '.name as payment_name',
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter')
             ->get()
             ->toArray();
@@ -110,6 +113,19 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->whereColumn('order_tickets_id', $this->model::TABLE . '.id')
             ->latest()
             ->limit(1)
+            ->getQuery();
+    }
+
+    /**
+     * Добавить под запрос на кол-во заполненных анкет
+     *
+     * @return Builder
+     */
+    private function getSubQueryCountQuestionnaire(): Builder
+    {
+        return QuestionnaireModel::select(DB::raw('count(*)'))
+            ->whereColumn('order_id', $this->model::TABLE . '.id')
+            ->groupBy(QuestionnaireModel::TABLE.'.order_id')
             ->getQuery();
     }
 
@@ -172,6 +188,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TypesOfPaymentModel::TABLE . '.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
         /** @var Filter $filter */

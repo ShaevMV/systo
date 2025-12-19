@@ -25,13 +25,19 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         DB::beginTransaction();
         $data = $questionnaireTicketDto->toArray();
         try {
-            $this->model->insert(
-                array_merge($data,
-                    [
-                        'created_at' => (string)(new Carbon()),
-                        'updated_at' => (string)(new Carbon()),
-                    ]
-                ));
+            $rawModel =$this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
+                ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
+            if($rawModel->exists()) {
+                $rawModel->update($data);
+            } else {
+                $this->model->insert(
+                    array_merge($data,
+                        [
+                            'created_at' => (string)(new Carbon()),
+                            'updated_at' => (string)(new Carbon()),
+                        ]
+                    ));
+            }
             DB::commit();
             return true;
         } catch (Exception $exception) {

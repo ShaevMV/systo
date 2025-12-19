@@ -72,10 +72,10 @@
                      id="validationDefault04">
             </div>
             <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Выберите фестиваль</label>
+              <label for="validationDefault05" class="form-label">Выберите фестиваль</label>
               <select class="form-select"
                       v-model="festival_id"
-                      id="validationDefault01">
+                      id="validationDefault05">
                 <option v-for="(festivalItem) in getFestivalList"
                         v-bind:key="festivalItem.id"
                         :selected="festivalItem.id == festival_id"
@@ -83,12 +83,22 @@
                 </option>
               </select>
             </div>
+            <div class="col-md-4">
+              <label for="validationDefault06" class="form-label">Анкета</label>
+              <select class="form-select"
+                      v-model="questionnaire"
+                      id="validationDefault06">
+                <option value="">Выберите заполнености анкеты</option>
+                <option value="empty">Не заполненая</option>
+                <option value="full">Заполнено</option>
+              </select>
+            </div>
           </div>
 
           <div class="row b-row mt-2">
             <button class="btn btn-primary"
-                    @click="sendFilter" :disabled="isLoading"
-                    type="submit"><span v-if="isLoading">Загрузка...</span>
+                    @click="sendFilter" :disabled="getIsLoading"
+                    type="submit"><span v-if="getIsLoading">Загрузка...</span>
               <span v-else>Отправить</span>
             </button>
             <button class="btn btn-primary"
@@ -117,7 +127,7 @@ export default {
       typesOfPayment: null,
       city: null,
       selectFestivalId: null,
-      isLoading: false,
+      questionnaire: '',
     }
   },
   computed: {
@@ -125,6 +135,9 @@ export default {
       'getTypesOfPayment',
       'getFestivalList',
       'getTicketType',
+    ]),
+    ...mapGetters('appOrder', [
+      'getIsLoading'
     ]),
     festival_id: {
       get: function () {
@@ -157,12 +170,13 @@ export default {
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
+      'loading'
     ]),
     /**
      * Отправить данные для фильтра
      */
     sendFilter: function () {
-      this.isLoading = true;
+        this.loading();
         let price = this.typeOrder !== null ? this.typeOrder.price : null;
         let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
         let self = this;
@@ -175,6 +189,7 @@ export default {
           'typesOfPayment': self.typesOfPayment,
           'festivalId': self.festival_id,
           'city': self.city,
+          'questionnaire': self.questionnaire,
         });
         this.getListTypesOfPayment({
           festival_id: self.festival_id,

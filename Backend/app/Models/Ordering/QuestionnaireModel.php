@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereMusicStyles($value)
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereOrderId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereTicketId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereQuestionForSysto($value)
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereTelegram($value)
  * @method static \Illuminate\Database\Eloquent\Builder|QuestionnaireModel whereUpdatedAt($value)

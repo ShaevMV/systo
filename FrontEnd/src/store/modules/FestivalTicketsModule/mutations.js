@@ -30,8 +30,8 @@ export const setFestivalList = (state, payload) => {
  */
 export const setTicketType = (state, payload) => {
     state.ticketType = payload;
-
 };
+
 
 /**
  * Записать данные о выбранном типе билета

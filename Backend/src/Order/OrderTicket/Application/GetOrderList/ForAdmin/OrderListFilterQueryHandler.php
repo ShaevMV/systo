@@ -16,6 +16,7 @@ use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
+use const Lambdish\Phunctional\any;
 
 class OrderListFilterQueryHandler implements QueryHandler
 {
@@ -41,6 +42,9 @@ class OrderListFilterQueryHandler implements QueryHandler
             $result[] = $value->setGuests($value->getGuestsByFestivalId($filterQuery->getFestivalId()));
         }
 
+        if (!empty($filterQuery->getQuestionnaire())) {
+            $result = $this->filterByQuestionnaire($filterQuery->getQuestionnaire(),$result);
+        }
 
         return count($result) > 0 ? new ListResponse($result) : null;
     }
@@ -121,4 +125,22 @@ class OrderListFilterQueryHandler implements QueryHandler
 
         return $result;
     }
+
+    /**
+     * @param string $questionnaire
+     * @param OrderTicketItemForListResponse[] $orderTicketItem
+     * @return OrderTicketItemForListResponse[]
+     */
+    private function filterByQuestionnaire(
+        string $questionnaire,
+        array $orderTicketItem,
+    ): array
+    {
+        if($questionnaire === 'empty') {
+            return array_filter($orderTicketItem, fn(OrderTicketItemForListResponse $listResponse) => $listResponse->getCount() > $listResponse->getQuestionnaireCount());
+        }
+
+        return array_filter($orderTicketItem, fn(OrderTicketItemForListResponse $listResponse) => $listResponse->getCount() === $listResponse->getQuestionnaireCount());
+    }
+
 }

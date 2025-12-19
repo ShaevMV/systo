@@ -20,6 +20,7 @@ class OrderFilterQuery implements Query
         private ?Uuid $typeOrder = null,
         private bool $isManager = false,
         private ?string $city = null,
+        private ?string $questionnaire = null,
     ) {
     }
 
@@ -61,6 +62,7 @@ class OrderFilterQuery implements Query
             (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
             $isManager,
             $data['city'] ?? null,
+            $data['questionnaire'] ?? null,
         );
     }
 
@@ -92,5 +94,10 @@ class OrderFilterQuery implements Query
     public function getCity(): ?string
     {
         return null !== $this->city ? '%'.$this->city.'%' : null;
+    }
+
+    public function getQuestionnaire(): ?string
+    {
+        return $this->questionnaire;
     }
 }

@@ -39,6 +39,16 @@ export const getQuestionnaireList = state => {
 };
 
 /**
+ * проверим прошла ли загрузка
+ *
+ * @param state
+ * @returns {Array}
+ */
+export const getIsLoading = state => {
+    return state.isLoading;
+};
+
+/**
  * Вывести комментарии
  *
  * @param state

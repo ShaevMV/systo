@@ -39,7 +39,8 @@ export default {
             musicStyles: null,
             questionForSysto: null,
             message: null,
-        }]
+        }],
+        isLoading: false,
     },
     getters,
     actions,

@@ -32,3 +32,13 @@ export const chanceStatus = (state, payload) => {
 export const setMessage = (state, payload) => {
     state.questionnaireItem.message = payload;
 };
+
+/**
+ * Установить Loaging
+ *
+ * @param state
+ * @param payload
+ */
+export const setLoaging = (state, payload) => {
+    state.isLoading = payload;
+};

@@ -58,4 +58,14 @@ class QuestionnaireTicketDto
             'musicStyles' => $this->musicStyles,
         ];
     }
+
+    public function getOrderId(): Uuid
+    {
+        return $this->orderId;
+    }
+
+    public function getTicketId(): Uuid
+    {
+        return $this->ticketId;
+    }
 }

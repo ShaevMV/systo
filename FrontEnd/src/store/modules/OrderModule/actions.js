@@ -45,6 +45,7 @@ export const getOrderListForAdmin = (context, payload) => {
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
         context.commit('setTotalNumber', response.data.totalNumber);
+        context.commit('setLoaging', false);
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response.data.errors);
@@ -154,4 +155,15 @@ export const sendQuestionnaire = (context, payload) => {
 
 export const clearError = (context) => {
     context.commit('setError', []);
+};
+
+
+
+/**
+ * Установить загрузку
+ *
+ * @param context
+ */
+export const loading = (context) => {
+    context.commit('setLoaging', true);
 };
