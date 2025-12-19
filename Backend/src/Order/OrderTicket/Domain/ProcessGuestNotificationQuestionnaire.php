@@ -27,7 +27,7 @@ class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
     public function handle(): void
     {
         $mail = new TicketQuestionnaire(
-            'https://org.solarsysto.ru/questionnaire/'. $this->orderId . '/' . $this->ticketId
+            'https://org.spaceofjoy.ru/questionnaire/'. $this->orderId . '/' . $this->ticketId
         );
 
         \Mail::to($this->email)
