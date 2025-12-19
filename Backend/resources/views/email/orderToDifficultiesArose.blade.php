@@ -43,7 +43,7 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Сообщение от организатора:</p>
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">"{{ $comment }}"</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Вы можете связаться с организаторами через e-mail: ticket@spaceofjoy.ru либо оперативнее через Telegram - @systo_vznos </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Вы можете связаться с организаторами через e-mail: ticket@spaceofjoy.ru либо оперативнее через Telegram - <a href="https://t.me/systo_vznos" target="_blank">@systo_vznos</a> </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>

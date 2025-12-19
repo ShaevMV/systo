@@ -36,7 +36,7 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
         }
         $result = [];
 
-        foreach (TicketTypeFestivalModel::whereFestivalId('9d679bcf-b438-4ddb-ac04-023fa9bff4b8')->whereTicketTypeId($ticketTypeId->value())->get() as $value) {
+        foreach ($ticketTypesModelItem->festivals as $value) {
             $result[] = FestivalDto::fromState($value->toArray());
         }
 

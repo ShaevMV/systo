@@ -17,9 +17,6 @@ class FestivalHelper
     {
         $nameFestival = [];
         foreach ($festivalList as $festivalDto) {
-            if(!$festivalDto->getId()->equals(new Uuid(self::UUID_FESTIVAL))) {
-                continue;
-            }
             $nameFestival[] = $festivalDto->getName() . ' ' . $festivalDto->getYear();
         }
 
