@@ -34,12 +34,12 @@ final class Status implements EntityDataInterface
     private function getRoleChanceStatus(string $status): array
     {
         return match ($status) {
-            self::NEW,self::QUESTIONNAIRE_NOT_FULL, self::QUESTIONNAIRE_FULL => [
+            self::NEW, self::NEW_FOR_LIVE, self::QUESTIONNAIRE_NOT_FULL, self::QUESTIONNAIRE_FULL => [
                 self::CANCEL,
                 self::PAID,
                 self::DIFFICULTIES_AROSE,
                 ],
-            self::PAID => [
+            self::PAID, self::PAID_FOR_LIVE => [
                 self::DIFFICULTIES_AROSE,
                 self::LIVE_TICKET_ISSUED,
                 self::PAID,
