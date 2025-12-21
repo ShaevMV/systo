@@ -39,6 +39,7 @@ export default {
             musicStyles: null,
             questionForSysto: null,
             message: null,
+            link: null,
         }],
         isLoading: false,
     },

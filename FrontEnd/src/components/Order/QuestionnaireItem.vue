@@ -14,6 +14,7 @@
                   <th scope="col">Сколько раз на Систо?</th>
                   <th scope="col">Стили музыки</th>
                   <th scope="col">"Зачем ты на Систо?"</th>
+                  <th scope="col">Ссылка на анкету</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -26,6 +27,7 @@
                   <td>{{ getQuestionnaireItem.howManyTimes }}</td>
                   <td>{{ getQuestionnaireItem.musicStyles }}</td>
                   <td>{{ getQuestionnaireItem.questionForSysto }}</td>
+                  <td><a :href="getQuestionnaireItem.link">{{ getQuestionnaireItem.link }} </a></td>
                 </tr>
                 </tbody>
               </table>
