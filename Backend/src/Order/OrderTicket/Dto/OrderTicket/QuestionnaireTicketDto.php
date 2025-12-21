@@ -8,6 +8,7 @@ use Shared\Domain\ValueObject\Uuid;
 
 class QuestionnaireTicketDto
 {
+    protected string $link;
     public function __construct(
         protected Uuid $orderId,
         protected Uuid $ticketId,
@@ -15,7 +16,6 @@ class QuestionnaireTicketDto
         protected int $howManyTimes,
         protected string $questionForSysto,
         protected string $phone,
-        protected string $link,
         protected ?string $telegram = null,
         protected ?string $vk = null,
         protected ?string $musicStyles = null,
@@ -23,6 +23,7 @@ class QuestionnaireTicketDto
         protected ?Uuid $id = null,
     )
     {
+        $this->link ='https://org.spaceofjoy.ru/'.$orderId->value().'/'.$ticketId->value();
     }
 
     public static function fromState(
@@ -39,7 +40,6 @@ class QuestionnaireTicketDto
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
-            'https://org.spaceofjoy.ru/'.$orderId->value().'/'.$ticketId->value(),
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
             $data['musicStyles'] ?? null,
