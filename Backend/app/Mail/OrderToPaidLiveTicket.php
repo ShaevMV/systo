@@ -31,7 +31,7 @@ class OrderToPaidLiveTicket extends Mailable
         ini_set('memory_limit', '-1');
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
 
-        $this->subject('Ваш оргвзнос на Систо '.date('Y').' подтверждён');
+        $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
         $mail = $this->view('email.orderToPaidLiveTicket',[
             'festivalName' => $festivalName
         ]);
