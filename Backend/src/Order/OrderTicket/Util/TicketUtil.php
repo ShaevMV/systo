@@ -20,7 +20,7 @@ class TicketUtil
             if($uuid->equals(new Uuid($guest['id']))) {
                 return new GuestsDto(
                     $guest['value'],
-                    $guest['email'],
+                    $guest['email'] ?? null,
                     new Uuid($guest['id']),
                     null
                 );
