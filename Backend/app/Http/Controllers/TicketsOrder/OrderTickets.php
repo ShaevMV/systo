@@ -28,10 +28,10 @@ use Tickets\Order\OrderTicket\Application\Questionnaire\QuestionnaireApplication
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
-use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Order\OrderTicket\Service\TicketService;
+use Tickets\Order\OrderTicket\Util\TicketUtil;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -96,7 +96,10 @@ class OrderTickets extends Controller
             if(isset($data['questionnaire'])) {
                 $ticket = $orderTicketDto->getTicket()[0];
                 $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
-                    array_merge($data['questionnaire'],['phone' => $createOrderTicketsRequest->phone]),
+                    array_merge($data['questionnaire'],[
+                        'phone' => $createOrderTicketsRequest->phone,
+                        'name' => $ticket->getValue(),
+                    ]),
                     $orderTicketDto->getId(),
                     $ticket->getId(),
                 );
@@ -282,6 +285,11 @@ class OrderTickets extends Controller
         $data = $request->toArray();
         try {
             if(isset($data['questionnaire'])) {
+                $order = $this->getOrder->getItemById(new Uuid($orderId));
+                $name = TicketUtil::findGuestByUuid(
+                    new Uuid($ticketId),
+                    $order->getGuests(),
+                )?->getValue();
                 $this->questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire'],

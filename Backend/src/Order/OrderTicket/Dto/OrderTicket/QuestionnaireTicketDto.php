@@ -62,6 +62,21 @@ class QuestionnaireTicketDto
         ];
     }
 
+    public function toArrayForMySql(): array
+    {
+        return [
+            'order_id' => $this->orderId->value(),
+            'ticket_id' => $this->ticketId->value(),
+            'agy' => $this->agy,
+            'howManyTimes' => $this->howManyTimes,
+            'questionForSysto' => $this->questionForSysto,
+            'phone' => $this->phone,
+            'telegram' => $this->telegram,
+            'vk' => $this->vk,
+            'musicStyles' => $this->musicStyles,
+        ];
+    }
+
     public function getOrderId(): Uuid
     {
         return $this->orderId;

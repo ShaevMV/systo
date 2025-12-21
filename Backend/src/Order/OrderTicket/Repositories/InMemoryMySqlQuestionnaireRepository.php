@@ -26,7 +26,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     public function create(QuestionnaireTicketDto $questionnaireTicketDto): bool
     {
         DB::beginTransaction();
-        $data = $questionnaireTicketDto->toArray();
+        $data = $questionnaireTicketDto->toArrayForMySql();
         try {
             $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
                 ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
@@ -59,7 +59,6 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
             OrderTicketModel::TABLE . '.id')
             ->select([
                 $this->model->getTable().'.*',
-                OrderTicketModel::TABLE . '.festival_id',
                 OrderTicketModel::TABLE . '.guests'
             ])->get()
             ->toArray();
@@ -78,7 +77,6 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
                 TicketUtil::findGuestByUuid(
                     new Uuid($item['ticket_id']),
                     json_decode($item['guests'], true),
-                    new Uuid($item['festival_id'])
                 )?->getValue() ?? null,
 
             );

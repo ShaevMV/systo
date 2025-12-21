@@ -15,20 +15,20 @@ final class GuestsDto implements EntityDataInterface
         protected string $value,
         protected ?string $email,
         protected Uuid   $id,
-        protected Uuid   $festivalId,
+        protected ?Uuid   $festivalId,
     )
     {
     }
 
-    public static function fromState(array $data, string $festivalId): self
+    public static function fromState(array $data, ?string $festivalId = null): self
     {
         $id = isset($data['id']) && !empty($data['id']) ? new Uuid($data['id']) : Uuid::random();
-
+        $festivalUuid = !empty($data['festival_id'] ?? $festivalId) ? new Uuid($data['festival_id'] ?? $festivalId) : null;
         return new self(
             $data['value'],
             $data['email'] ?? null,
             $id,
-            new Uuid($data['festival_id'] ?? $festivalId)
+            $festivalUuid
         );
     }
 
@@ -65,7 +65,7 @@ final class GuestsDto implements EntityDataInterface
         return $this->id;
     }
 
-    public function getFestivalId(): Uuid
+    public function getFestivalId(): ?Uuid
     {
         return $this->festivalId;
     }

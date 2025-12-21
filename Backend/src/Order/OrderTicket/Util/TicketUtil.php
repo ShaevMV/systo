@@ -12,10 +12,9 @@ class TicketUtil
     /**
      * @param Uuid $uuid
      * @param array $rawGuests
-     * @param Uuid $festivalId
      * @return GuestsDto|null
      */
-    public static function findGuestByUuid(Uuid $uuid, array $rawGuests, Uuid $festivalId): ?GuestsDto
+    public static function findGuestByUuid(Uuid $uuid, array $rawGuests): ?GuestsDto
     {
         foreach ($rawGuests as $guest) {
             if($uuid->equals(new Uuid($guest['id']))) {
@@ -23,7 +22,7 @@ class TicketUtil
                     $guest['value'],
                     $guest['email'],
                     new Uuid($guest['id']),
-                    $festivalId
+                    null
                 );
             }
         }
