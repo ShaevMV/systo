@@ -4,7 +4,7 @@
     <h1 class="card-title" v-else> Заказы пользователей </h1>
   </div>
   <div class="row">
-    <div class="col-lg-12 mx-auto">
+    <div class="col-lg-12 mx-auto" id="filter-results">
       <div class="card">
         <div class="card-body">
           <p>На этой странице ты можешь просмотреть все свои заказы на регистрацию оргвзносов.<br>

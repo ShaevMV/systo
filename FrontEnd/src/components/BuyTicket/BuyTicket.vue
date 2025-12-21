@@ -135,7 +135,7 @@
                     <div class="in-choice">
                       <div
                           class="ticket-choice"
-                          v-for="(typeTickets, index) in getTicketType"
+                          v-for="typeTickets in getTicketType"
                           v-bind:key="typeTickets.id"
                       >
                         <div class="form-check">
@@ -146,7 +146,6 @@
                             <input
                                 type="radio"
                                 class="form-check-input"
-                                :checked="index === 0"
                                 v-model="selectTypeTicket"
                                 v-bind:value="typeTickets.id"
                                 v-bind:id="typeTickets.id"
@@ -320,7 +319,7 @@
                       <div class="in-choice">
                         <div
                             class="payment-choice"
-                            v-for="(typesOfPayment, index) in getTypesOfPayment"
+                            v-for="typesOfPayment in getTypesOfPayment"
                             v-bind:key="typesOfPayment.id"
                         >
                           <div class="form-check">
@@ -331,7 +330,6 @@
                               <input
                                   type="radio"
                                   class="form-check-input"
-                                  :checked="index === 0"
                                   v-model="selectTypesOfPayment"
                                   v-bind:value="typesOfPayment.id"
                                   v-bind:id="typesOfPayment.id"
@@ -618,6 +616,7 @@ export default {
      */
     isNotCorrect: function () {
       let group = true;
+
       if (this.getSelectTicketType !== null) {
         if (!this.isAllowedGuestMin(this.guests.length)) {
           group = false;

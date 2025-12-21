@@ -1502,7 +1502,7 @@ select.form-select::after{
     border-radius: var(--radius);
 }
 
-#contact-form .col-12 button, #reg-form .btn{
+#contact-form .col-12 button, #reg-form .btn, #main-quest .btn{
     width: 100%;
     margin-top: 2vw;
 }
@@ -1512,6 +1512,22 @@ select.form-select::after{
     color: red;
     display: inline-block;
     margin-top: 5px;
+}
+
+
+#filter-results table{
+    table-layout: fixed;
+}
+
+#filter-results table tr td{
+    width: 10% !important;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+
+#filter-results table tr th{
+    width: 5%;
 }
 
 .pp1{
@@ -1802,7 +1818,7 @@ select.form-select::after{
     height: 100px;
 }
 
-#contact-form .reg-btn{
+#contact-form .reg-btn, #main-quest .reg-btn{
     background-color: var(--c-green);
     text-transform: uppercase;
     color: #ebedf4;
@@ -1811,7 +1827,7 @@ select.form-select::after{
     padding-bottom: 20px;
 }
 
-#contact-form .reg-btn.btn-block{
+#contact-form .reg-btn.btn-block, #main-quest .reg-btn.btn-block{
     background-color: #1e871c;
 }
 
@@ -2339,7 +2355,7 @@ input[readonly]{
         font-size: 15px
     }
 
-    #contact-form .col-12 button, #reg-form .btn{
+    #contact-form .col-12 button, #reg-form .btn, #main-quest .btn{
         margin-top: 5vw;
     }
 
