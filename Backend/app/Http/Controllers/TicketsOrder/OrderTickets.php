@@ -285,11 +285,6 @@ class OrderTickets extends Controller
         $data = $request->toArray();
         try {
             if(isset($data['questionnaire'])) {
-                $order = $this->getOrder->getItemById(new Uuid($orderId));
-                $name = TicketUtil::findGuestByUuid(
-                    new Uuid($ticketId),
-                    $order->getGuests(),
-                )?->getValue();
                 $this->questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire'],
@@ -304,7 +299,7 @@ class OrderTickets extends Controller
             ]);
         } catch (Throwable $throwable) {
             return response()->json([
-                'success' => true,
+                'success' => false,
                 'message' => $throwable->getMessage()
             ], 422);
         }
