@@ -27,7 +27,7 @@
                   <td>{{ getQuestionnaireItem.howManyTimes }}</td>
                   <td>{{ getQuestionnaireItem.musicStyles }}</td>
                   <td>{{ getQuestionnaireItem.questionForSysto }}</td>
-                  <td><a :href="getQuestionnaireItem.link">{{ getQuestionnaireItem.link }} </a></td>
+                  <td><a :href="getQuestionnaireItem.link">Анкета</a></td>
                 </tr>
                 </tbody>
               </table>
