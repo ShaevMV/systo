@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Repositories;
 
+use App\Models\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\QuestionnaireModel;
 use Carbon\Carbon;
 use Exception;
@@ -11,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 use Tickets\Order\OrderTicket\Responses\QuestionnaireGetItemQueryResponse;
+use Tickets\Order\OrderTicket\Util\TicketUtil;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
@@ -25,7 +28,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         DB::beginTransaction();
         $data = $questionnaireTicketDto->toArray();
         try {
-            $rawModel =$this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
+            $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
                 ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
             if($rawModel->exists()) {
                 $rawModel->update($data);
@@ -49,16 +52,35 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     public function getByOrderId(Uuid $orderId): QuestionnaireGetItemQueryResponse
     {
         $result = [];
-        foreach ($this->model::whereOrderId($orderId->value())->get() as $item) {
+        $rawData = $this->model::whereOrderId($orderId->value())
+            ->leftJoin(OrderTicketModel::TABLE,
+            $this->model::TABLE . '.order_id',
+            '=',
+            OrderTicketModel::TABLE . '.id')
+            ->select([
+                $this->model->getTable().'.*',
+                OrderTicketModel::TABLE . '.festival_id',
+                OrderTicketModel::TABLE . '.guests'
+            ])->get()
+            ->toArray();
+
+        foreach ($rawData as $item) {
             $result[] = new QuestionnaireTicketDto(
-                new Uuid($item->ticket_id),
-                new Uuid($item->order_id),
-                $item->agy,
-                $item->howManyTimes,
-                $item->questionForSysto,
-                $item->telegram,
-                $item->vk,
-                $item->musicStyles
+                new Uuid($item['ticket_id']),
+                new Uuid($item['order_id']),
+                $item['agy'],
+                $item['howManyTimes'],
+                $item['questionForSysto'],
+                $item['phone'],
+                $item['telegram'],
+                $item['vk'],
+                $item['musicStyles'],
+                TicketUtil::findGuestByUuid(
+                    new Uuid($item['ticket_id']),
+                    json_decode($item['guests'], true),
+                    new Uuid($item['festival_id'])
+                )?->getValue() ?? null,
+
             );
         }
 

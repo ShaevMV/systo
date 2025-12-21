@@ -56,8 +56,13 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected int     $questionnaireCount = 0,
     )
     {
-        $this->count = count($guests);
+        $this->count = self::getGuestsCount($guests);
         $this->humanStatus = $this->status->getHumanStatus();
+    }
+
+    private static function getGuestsCount(array $guests): int
+    {
+        return count($guests);
     }
 
     /**
@@ -70,7 +75,12 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         foreach ($guestsRaw as $guest) {
             $guests[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
-        $status = new Status($data['status']);
+        if($data['status'] === Status::NEW) {
+            $status = new Status((int)$data['questionnaire_count'] === self::getGuestsCount($guests) ? Status::QUESTIONNAIRE_FULL : Status::QUESTIONNAIRE_NOT_FULL);
+        } else {
+            $status = new Status($data['status']);
+        }
+
         return new self(
             new Uuid($data['id']),
             $data['kilter'],

@@ -6,16 +6,20 @@
               <table class="table table-hover">
                 <thead>
                 <tr>
+                  <th scope="col">Имя</th>
+                  <th scope="col">Телефон</th>
                   <th scope="col">Возраст</th>
                   <th scope="col">Telegram-аккаунт:</th>
                   <th scope="col">Профайл Вконтакте</th>
-                  <th scope="col">Сколько раз ты уже бывал на Систо?</th>
-                  <th scope="col">Стили музыки, которые предпочитаешь в лесу</th>
-                  <th scope="col">Ответь кратко и честно на простой вопрос "Зачем ты едешь на Систо?"</th>
+                  <th scope="col">Сколько раз на Систо?</th>
+                  <th scope="col">Стили музыки</th>
+                  <th scope="col">"Зачем ты на Систо?"</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr v-for="getQuestionnaireItem in getQuestionnaireList" v-bind:key="getQuestionnaireItem.id">
+                  <td>{{ getQuestionnaireItem.name }}</td>
+                  <td>{{ getQuestionnaireItem.phone }}</td>
                   <td>{{ getQuestionnaireItem.agy }}</td>
                   <td>{{ getQuestionnaireItem.telegram }}</td>
                   <td>{{ getQuestionnaireItem.vk }}</td>

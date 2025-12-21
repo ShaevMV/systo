@@ -18,6 +18,7 @@ class QuestionnaireTicketDto
         protected ?string $telegram = null,
         protected ?string $vk = null,
         protected ?string $musicStyles = null,
+        protected ?string $name = null,
         protected ?Uuid $id = null,
     )
     {
@@ -40,7 +41,8 @@ class QuestionnaireTicketDto
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
             $data['musicStyles'] ?? null,
-            $id
+            $data['name'] ?? null,
+            $id,
         );
     }
 
@@ -56,6 +58,7 @@ class QuestionnaireTicketDto
             'telegram' => $this->telegram,
             'vk' => $this->vk,
             'musicStyles' => $this->musicStyles,
+            'name' => $this->name,
         ];
     }
 

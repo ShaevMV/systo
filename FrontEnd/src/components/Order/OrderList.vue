@@ -172,6 +172,12 @@ export default {
         case 'new':
           color = '#333333';
           break;
+        case 'questionnaire_not_full':
+          color = '#7d7d7d';
+          break;
+        case 'questionnaire_full':
+          color = '#0000ff';
+          break;
         case 'paid':
           color = '#1e871c';
           break;
