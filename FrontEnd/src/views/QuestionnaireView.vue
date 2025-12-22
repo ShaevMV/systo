@@ -116,12 +116,22 @@ export default {
       'sendQuestionnaire'
     ]),
     send(){
+      self = this;
       this.sendQuestionnaire({
         questionnaire: this.questionnaire,
         orderId: this.order_id,
         ticketId: this.ticket_id,
         callback: function () {
           document.getElementById('modalOpenBtn').click();
+          self.questionnaire = {
+            agy: null,
+            telegram: null,
+            vk: null,
+            phone: null,
+            howManyTimes: null,
+            musicStyles: null,
+            questionForSysto: null,
+          };
       },
       })
     },
