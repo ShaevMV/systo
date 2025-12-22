@@ -116,7 +116,7 @@ export default {
       'sendQuestionnaire'
     ]),
     send(){
-      self = this;
+      let self = this;
       this.sendQuestionnaire({
         questionnaire: this.questionnaire,
         orderId: this.order_id,
