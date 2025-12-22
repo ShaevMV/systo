@@ -1,32 +1,55 @@
 <template>
   <div class="container-fluid">
-    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
-            data-target="#exampleModal">
+    <button
+      type="button"
+      class="btn btn-primary"
+      v-show="false"
+      data-toggle="modal"
+      id="modalOpenBtn"
+      data-target="#exampleModal"
+    >
       Launch demo modal
     </button>
 
-
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="exampleModalLabel">Успех</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true">х</span>
             </button>
           </div>
-          <div class="modal-body" v-html="massage">
-          </div>
+          <div class="modal-body" v-html="massage"></div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Закрыть
+            </button>
           </div>
         </div>
       </div>
     </div>
     <div class="text-center title-block">
       <h1>Форма подтверждения добровольного оргвзноса</h1>
-      <small class="form-text text-muted">на создание туристического слёта Solar Systo Togathering 2024</small>
+      <small class="form-text text-muted"
+        >на создание туристического слёта Solar Systo Togathering 2024</small
+      >
     </div>
     <div class="row" id="main-form">
       <div class="col-md-10 mx-auto">
@@ -35,62 +58,72 @@
             <div id="contact-form" role="form">
               <div class="controls">
                 <div class="pp1 row">
-                  <span>ШАГ 1.</span> Введи свои контактные данные, после чего система автоматически
-                  создаст тебе
-                  аккаунт:
+                  <span>ШАГ 1.</span> Введи свои контактные данные, после чего
+                  система автоматически создаст тебе аккаунт:
                 </div>
                 <div class="row y-row">
                   <div class="col-md-4">
                     <div class="form-group">
                       <label for="form_email" class="hidder">Email *</label>
-                      <input id="form_email"
-                             type="email"
-                             name="email"
-                             class="form-control"
-                             placeholder="Email: *"
-                             required="required"
-                             v-model="email"
-                             v-bind:readonly="isAuth"
-                             data-error="Valid email is required.">
-                      <small class="form-text text-muted"> {{ getError('email') }}</small>
+                      <input
+                        id="form_email"
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        placeholder="Email: *"
+                        required="required"
+                        v-model="email"
+                        v-bind:readonly="isAuth"
+                        data-error="Valid email is required."
+                      />
+                      <small class="form-text text-muted">
+                        {{ getError('email') }}</small
+                      >
                     </div>
                   </div>
 
                   <div class="col-md-4">
                     <div class="form-group">
                       <label for="form_phone" class="hidder">Телефон *</label>
-                      <input id="form_phone"
-                             type="email"
-                             name="phone"
-                             class="form-control"
-                             placeholder="Телефон:*"
-                             required="required"
-                             v-bind:readonly="getUserData('phone') !== null"
-                             v-model="phone"
-                             data-error="Valid phone is required.">
-                      <small class="form-text text-muted"> {{ getError('phone') }}</small>
+                      <input
+                        id="form_phone"
+                        type="email"
+                        name="phone"
+                        class="form-control"
+                        placeholder="Телефон:*"
+                        required="required"
+                        v-bind:readonly="getUserData('phone') !== null"
+                        v-model="phone"
+                        data-error="Valid phone is required."
+                      />
+                      <small class="form-text text-muted">
+                        {{ getError('phone') }}</small
+                      >
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-group">
                       <label for="form_phone" class="hidder">Город *</label>
-                      <input id="form_phone"
-                             type="text"
-                             name="city"
-                             class="form-control"
-                             placeholder="Город:*"
-                             required="required"
-                             v-bind:readonly="getUserData('city') !== null"
-                             v-model="city"
-                             data-error="Valid phone is required.">
-                      <small class="form-text text-muted"> {{ getError('city') }}</small>
+                      <input
+                        id="form_phone"
+                        type="text"
+                        name="city"
+                        class="form-control"
+                        placeholder="Город:*"
+                        required="required"
+                        v-bind:readonly="getUserData('city') !== null"
+                        v-model="city"
+                        data-error="Valid phone is required."
+                      />
+                      <small class="form-text text-muted">
+                        {{ getError('city') }}</small
+                      >
                     </div>
                   </div>
                 </div>
                 <div class="pp1 row">
-                  <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные каждого гостя, за которого
-                  будешь вносить
-                  средства:
+                  <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные
+                  каждого гостя, за которого будешь вносить средства:
                 </div>
 
                 <div class="row mb-3">
@@ -99,23 +132,30 @@
                   </div>
 
                   <div class="col-9">
-                    <select id="form_need"
-                            name="need"
-                            class="col-md-8 form-select"
-                            required="required"
-                            v-model="selectTypeTicket"
-                            data-error="Please specify your need.">
-                      <option disabled value="null">Выберите тип оргвзноса</option>
-                      <option v-for="(typeTickets) in getTicketType"
-                              v-bind:key="typeTickets.id"
-                              v-bind:value="typeTickets.id">{{ typeTickets.name }} /
-                        {{ typeTickets.price }} руб.
+                    <select
+                      id="form_need"
+                      name="need"
+                      class="col-md-8 form-select"
+                      required="required"
+                      v-model="selectTypeTicket"
+                      data-error="Please specify your need."
+                    >
+                      <option disabled value="null">
+                        Выберите тип оргвзноса
+                      </option>
+                      <option
+                        v-for="typeTickets in getTicketType"
+                        v-bind:key="typeTickets.id"
+                        v-bind:value="typeTickets.id"
+                      >
+                        {{ typeTickets.name }} / {{ typeTickets.price }} руб.
                       </option>
                     </select>
-                    <small class="form-text text-muted"> {{ getError('ticket_type_id') }}</small>
+                    <small class="form-text text-muted">
+                      {{ getError('ticket_type_id') }}</small
+                    >
                   </div>
                 </div>
-
 
                 <!--                  Промокод-->
                 <div class="row">
@@ -124,21 +164,28 @@
                   </div>
                   <div class="col-4">
                     <div class="input-group" id="promo-input">
-                      <input type="text"
-                             id="form_promo_cod"
-                             class="form-control"
-                             placeholder="Промокод"
-                             aria-label="Промокод"
-                             v-model="promoCode"
-                             aria-describedby="basic-addon1"
-                             @blur="sendPromoCode">
-                      <span class="input-group-text"
-                            @click="sendPromoCode"
-                            id="basic-addon1"></span>
+                      <input
+                        type="text"
+                        id="form_promo_cod"
+                        class="form-control"
+                        placeholder="Промокод"
+                        aria-label="Промокод"
+                        v-model="promoCode"
+                        aria-describedby="basic-addon1"
+                        @blur="sendPromoCode"
+                      />
+                      <span
+                        class="input-group-text"
+                        @click="sendPromoCode"
+                        id="basic-addon1"
+                      ></span>
                     </div>
                   </div>
                   <div class="col-5">
-                    <small class="form-text text-muted id-info" v-show="massageForPromoCode!==null">
+                    <small
+                      class="form-text text-muted id-info"
+                      v-show="massageForPromoCode !== null"
+                    >
                       {{ massageForPromoCode }}
                     </small>
                   </div>
@@ -146,22 +193,29 @@
 
                 <div class="row mt-3 mb-3">
                   <div class="col-5">
-                    <label for="newGuest" class="reg-label">Данные о гостях:</label>
+                    <label for="newGuest" class="reg-label"
+                      >Данные о гостях:</label
+                    >
                   </div>
                   <div class="input-group mb-3">
-                    <input type="text"
-                           id="newGuest"
-                           class="form-control"
-                           placeholder="Введи Имена и Фамилии себя и своих гостей"
-                           aria-label="Введи Имена и Фамилии себя и своих гостей"
-                           v-model="newGuest"
-                           :disabled="!isAllowedNewGuest"
-                           aria-describedby="basic-addon1"
-                           @blur="addGuest">
+                    <input
+                      type="text"
+                      id="newGuest"
+                      class="form-control"
+                      placeholder="Введи Имена и Фамилии себя и своих гостей"
+                      aria-label="Введи Имена и Фамилии себя и своих гостей"
+                      v-model="newGuest"
+                      :disabled="!isAllowedNewGuest"
+                      aria-describedby="basic-addon1"
+                      @blur="addGuest"
+                    />
                     <div class="input-group-prepend">
-                              <span class="input-group-text btn"
-                                    @click="addGuest()"
-                                    id="basic-addon1">Добавить</span>
+                      <span
+                        class="input-group-text btn"
+                        @click="addGuest()"
+                        id="basic-addon1"
+                        >Добавить</span
+                      >
                     </div>
                   </div>
                 </div>
@@ -169,105 +223,148 @@
                 <div class="row x-row" v-show="guests.length > 0">
                   <div class="col-12">
                     <div class="form-group">
-                      <div class="input-group mb-3"
-                           v-for="(itemGuest,index) in guests" v-bind:key="index">
-                        <input type="text"
-                               class="form-control"
-                               readonly
-                               v-bind:value="itemGuest.value"
-                               aria-describedby="basic-addon2">
+                      <div
+                        class="input-group mb-3"
+                        v-for="(itemGuest, index) in guests"
+                        v-bind:key="index"
+                      >
+                        <input
+                          type="text"
+                          class="form-control"
+                          readonly
+                          v-bind:value="itemGuest.value"
+                          aria-describedby="basic-addon2"
+                        />
                         <div class="input-group-prepend">
-                              <span class="input-group-text btn"
-                                    @click="delGuest(index)"
-                                    id="basic-addon2">
-                                <i class="fa fa-trash"></i>
-                              </span>
+                          <span
+                            class="input-group-text btn"
+                            @click="delGuest(index)"
+                            id="basic-addon2"
+                          >
+                            <i class="fa fa-trash"></i>
+                          </span>
                         </div>
                       </div>
-                      <small class="form-text text-muted"> {{ getError('guests') }}</small>
+                      <small class="form-text text-muted">
+                        {{ getError('guests') }}</small
+                      >
                     </div>
                   </div>
                 </div>
 
                 <div class="row itog-row mb-4" v-show="totalPrice !== null">
                   <div class="col-4">
-                    <h4 class="my-lg-2 font-weight-normal">Итого к внесению: {{ totalPrice }} <small
-                        class="text-muted">
-                      руб.</small></h4>
-
+                    <h4 class="my-lg-2 font-weight-normal">
+                      Итого к внесению: {{ totalPrice }}
+                      <small class="text-muted"> руб.</small>
+                    </h4>
                   </div>
                   <div class="col-4">
-                    <h4 class="my-lg-2 font-weight-normal">Кол-во гостей: <small class="text-muted">{{
-                        countGuests
-                      }}</small></h4>
+                    <h4 class="my-lg-2 font-weight-normal">
+                      Кол-во гостей:
+                      <small class="text-muted">{{ countGuests }}</small>
+                    </h4>
                   </div>
 
                   <div class="col-4" v-show="getDiscountByPromoCode > 0">
-                    <h4 class="my-lg-2 font-weight-normal">Скидка по промокоду: <small
-                        class="text-muted">{{ getDiscountByPromoCode * countGuests }}
-                      рублей</small></h4>
+                    <h4 class="my-lg-2 font-weight-normal">
+                      Скидка по промокоду:
+                      <small class="text-muted"
+                        >{{
+                          getDiscountByPromoCode * countGuests
+                        }}
+                        рублей</small
+                      >
+                    </h4>
                   </div>
-
                 </div>
 
-
                 <div class="pp1 row">
-                  <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства, осуществи перевод и
-                  заполни данные о
-                  платеже!
+                  <span>ШАГ 3.</span> Выбери куда ты будешь переводить средства,
+                  осуществи перевод и заполни данные о платеже!
                 </div>
                 <div class="row">
                   <div class="col-12">
                     <div class="form-group">
-                      <label for="form_need" class="hidder">Способ оплаты: *</label>
+                      <label for="form_need" class="hidder"
+                        >Способ оплаты: *</label
+                      >
                       <div class="in-choice">
-                        <div class="payment-choice" v-for="typesOfPayment in getTypesOfPayment"
-                             v-bind:key="typesOfPayment.id">
+                        <div
+                          class="payment-choice"
+                          v-for="typesOfPayment in getTypesOfPayment"
+                          v-bind:key="typesOfPayment.id"
+                        >
                           <div class="form-check">
-                            <label class="form-check-label" v-bind:for="typesOfPayment.id">
-                              <input type="radio"
-                                     class="form-check-input"
-                                     v-model="selectTypesOfPayment"
-                                     v-bind:value="typesOfPayment.id"
-                                     v-bind:id="typesOfPayment.id">
+                            <label
+                              class="form-check-label"
+                              v-bind:for="typesOfPayment.id"
+                            >
+                              <input
+                                type="radio"
+                                class="form-check-input"
+                                v-model="selectTypesOfPayment"
+                                v-bind:value="typesOfPayment.id"
+                                v-bind:id="typesOfPayment.id"
+                              />
                               <span>
-                              {{ typesOfPayment.name }}
-                              <i class="copy-payment" title="Нажми, чтобы скопировать реквизиты"
-                                 @click="CopyTypesOfPayment(typesOfPayment.name)"></i>
-                                </span>
+                                {{ typesOfPayment.name }}
+                                <i
+                                  class="copy-payment"
+                                  title="Нажми, чтобы скопировать реквизиты"
+                                  @click="
+                                    CopyTypesOfPayment(typesOfPayment.name)
+                                  "
+                                ></i>
+                              </span>
                             </label>
 
                             <small class="form-text text-muted">
-                              {{ getError('types_of_payment_id') }}</small>
+                              {{ getError('types_of_payment_id') }}</small
+                            >
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div class="copy-btn">Нажми на <span></span> чтобы скопировать реквизиты</div>
+                    <div class="copy-btn">
+                      Нажми на <span></span> чтобы скопировать реквизиты
+                    </div>
                   </div>
                 </div>
-                <div class="row flex-flex justify-content-center mt-2"
-                     style="color:var(--c-red); text-align: center;  font-weight: bold;">ТЕПЕРЬ СОВЕРШИ
-                  ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ БАНКА
+                <div
+                  class="row flex-flex justify-content-center mt-2"
+                  style="
+                    color: var(--c-red);
+                    text-align: center;
+                    font-weight: bold;
+                  "
+                >
+                  ТЕПЕРЬ СОВЕРШИ ПЕРЕВОД СРЕДСТВ САМОСТОЯТЕЛЬНО В ПРИЛОЖЕНИИ
+                  БАНКА
                 </div>
-                <div class="row mb-4 flex-flex justify-content-center"
-                     style="text-align: center;  font-weight: bold;">и только после этого заполни поля
-                  ниже
+                <div
+                  class="row mb-4 flex-flex justify-content-center"
+                  style="text-align: center; font-weight: bold"
+                >
+                  и только после этого заполни поля ниже
                 </div>
                 <div class="row mb-4 flex-flex">
                   <div class="col-3">
                     <label for="idBuy">Идентификатор платежа:</label>
                   </div>
                   <div class="col-3">
-                    <input class="form-control" v-model="idBuy" id="idBuy">
+                    <input class="form-control" v-model="idBuy" id="idBuy" />
                   </div>
                   <div class="col-6">
                     <small class="form-text text-muted id-info">
-                      При переводах на Сбербанк напиши сюда <b>последние 4 цифры номера карты</b>,
-                      с которой был сделан перевод
+                      При переводах на Сбербанк напиши сюда
+                      <b>последние 4 цифры номера карты</b>, с которой был
+                      сделан перевод
                     </small>
                   </div>
-                  <small class="form-text text-muted"> {{ getError('idBuy') }}</small>
+                  <small class="form-text text-muted">
+                    {{ getError('idBuy') }}</small
+                  >
                 </div>
                 <!--                  Дата платежа -->
                 <div class="row mt-4">
@@ -275,12 +372,17 @@
                     <label for="form_message">Когда был сделан платеж?</label>
                   </div>
                   <div class="col-9 flex-flex">
-                    <input type="text" class="form-control"
-                           placeholder="Например: 18 февраля в 13.20"
-                           aria-label="Дата и время перевода"
-                           v-model="date">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Например: 18 февраля в 13.20"
+                      aria-label="Дата и время перевода"
+                      v-model="date"
+                    />
                   </div>
-                  <small class="form-text text-muted"> {{ getError('date') }}</small>
+                  <small class="form-text text-muted">
+                    {{ getError('date') }}</small
+                  >
                 </div>
 
                 <div class="row">
@@ -289,57 +391,80 @@
                   </div>
 
                   <div class="col-9">
-                                        <textarea class="form-control order-text" v-model="comment"
-                                                  id="idBuy"></textarea>
+                    <textarea
+                      class="form-control order-text"
+                      v-model="comment"
+                      id="idBuy"
+                    ></textarea>
                   </div>
-
-
                 </div>
                 <div class="row mt-4">
                   <div class="form-check" id="check-check">
-                    <input class="form-check-input"
-                           type="checkbox"
-                           value=""
-                           v-model="confirm"
-                           id="defaultCheck1">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      value=""
+                      v-model="confirm"
+                      id="defaultCheck1"
+                    />
                     <label class="form-check-label" for="defaultCheck1">
-                      Регистрируя добровольный оргвзнос, ты соглашаешься с &nbsp;<a
-                        href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
+                      Регистрируя добровольный оргвзнос, ты соглашаешься с
+                      &nbsp;<a href="/conditions" target="_blank"
+                        ><b>условиями туристического слёта</b></a
+                      >
                     </label>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="col-12">
-                    <button type="button"
-                            :disabled="preload || !isNotCorrect"
-                            @click="orderTicket"
-                            class="btn btn-lg btn-block btn-outline-primary reg-btn">
-                                            <span class="spinner-border spinner-border-sm" role="status"
-                                                  aria-hidden="true" v-show="preload"></span>
+                    <button
+                      type="button"
+                      :disabled="preload || !isNotCorrect"
+                      @click="orderTicket"
+                      class="btn btn-lg btn-block btn-outline-primary reg-btn"
+                    >
+                      <span
+                        class="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                        v-show="preload"
+                      ></span>
                       Зарегистрировать оргвзнос
                     </button>
                   </div>
                 </div>
-                <div class="row justify-content-center" v-if="!isNotCorrect"
-                     style="text-align: center;">Если кнопка не активна проверь все ли поля заполнены!
+                <div
+                  class="row justify-content-center"
+                  v-if="!isNotCorrect"
+                  style="text-align: center"
+                >
+                  Если кнопка не активна проверь все ли поля заполнены!
                 </div>
                 <div class="row mt-4">
                   <div class="after-order">
                     <p>
-                      После оплаты в течение 3-4 дней на твой e-mail придет подтверждение
-                      оргвзноса и <br><strong>электронный билет с QR-кодом</strong> для входа на Solar Systo Togathering 2024!
+                      После оплаты в течение 3-4 дней на твой e-mail придет
+                      подтверждение оргвзноса и <br /><strong
+                        >электронный билет с QR-кодом</strong
+                      >
+                      для входа на Solar Systo Togathering 2024!
                     </p>
                     <p>
                       <b>Живые билеты" можно приобрести в Санкт-Петербурге</b>
-                      <br/>
-                      ЧАЙНОЕ ПРОСТРАНСТВО "ЛЕСИСТОЕ"<br/>
-                      м.Петроградская, Большой Проспект П.С., 79 (цокольный этаж, вывеска Maze, левая дверь).<br/>
-                      Чайная открыта с 14.00 до 22.00.<br/>
-                      +7 (906) 274-27-98<br/>
-                      https://vk.com/lesystoe<br/>
-                      <br/>
-                      "Живой билет" является таким же видом оргвзноса, как и электронный, просто в этом случае вы получите конверт внутри которого будет карта участника с номером и сувенирная продукция. При регистрации оргвзноса электронно - отдельно покупать "живой билет" не нужно!
+                      <br />
+                      ЧАЙНОЕ ПРОСТРАНСТВО "ЛЕСИСТОЕ"<br />
+                      м.Петроградская, Большой Проспект П.С., 79 (цокольный
+                      этаж, вывеска Maze, левая дверь).<br />
+                      Чайная открыта с 14.00 до 22.00.<br />
+                      +7 (906) 274-27-98<br />
+                      https://vk.com/lesystoe<br />
+                      <br />
+                      "Живой билет" является таким же видом оргвзноса, как и
+                      электронный, просто в этом случае вы получите конверт
+                      внутри которого будет карта участника с номером и
+                      сувенирная продукция. При регистрации оргвзноса электронно
+                      - отдельно покупать "живой билет" не нужно!
                     </p>
                   </div>
                 </div>
@@ -355,7 +480,12 @@
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title">Успех</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
                 <span aria-hidden="true">x</span>
               </button>
             </div>
@@ -363,22 +493,29 @@
               <p>Modal body text goes here.</p>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-primary">Save changes</button>
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">
+                Save changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
 </template>
 
 <script>
-import {mapGetters, mapActions} from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  name: "BuyTicket",
+  name: 'BuyTicket',
   data() {
     return {
       preload: false,
@@ -405,7 +542,21 @@ export default {
       promoCode: null,
       massageForPromoCode: null,
       comment: null,
-    }
+    };
+  },
+  watch: {
+    getTypesOfPayment: {
+      immediate: true,
+      handler(types) {
+        const typeOfPayment = types?.find((type) =>
+          type.name.includes('Сбербанк')
+        );
+
+        if (typeOfPayment) {
+          this.selectTypesOfPayment = typeOfPayment.id;
+        }
+      },
+    },
   },
   computed: {
     ...mapGetters('appFestivalTickets', [
@@ -419,14 +570,8 @@ export default {
       'getDiscountByPromoCode',
       'getPromoCodeName',
     ]),
-    ...mapGetters('appUser', [
-      'isAuth',
-      'getEmail',
-      'getUserData'
-    ]),
-    ...mapGetters('appOrder', [
-      'getError'
-    ]),
+    ...mapGetters('appUser', ['isAuth', 'getEmail', 'getUserData']),
+    ...mapGetters('appOrder', ['getError']),
     /**
      * Проверка на ведение всех данных
      * @returns {false|*|null}
@@ -435,18 +580,20 @@ export default {
       let group = true;
       if (this.getSelectTicketType !== null) {
         if (!this.isAllowedGuestMin(this.guests.length)) {
-          group = false
+          group = false;
         }
       }
-      return this.selectTypeTicket !== null &&
-          this.selectTypesOfPayment !== null &&
-          this.guests.length > 0 &&
-          this.date !== null &&
-          this.confirm === true &&
-          this.idBuy !== null &&
-          this.phone !== null &&
-          group &&
-          (this.isAuth || this.email)
+      return (
+        this.selectTypeTicket !== null &&
+        this.selectTypesOfPayment !== null &&
+        this.guests.length > 0 &&
+        this.date !== null &&
+        this.confirm === true &&
+        this.idBuy !== null &&
+        this.phone !== null &&
+        group &&
+        (this.isAuth || this.email)
+      );
     },
     /**
      * Выбранный тип билета
@@ -461,7 +608,10 @@ export default {
         this.setSelectTicketType(newValue);
         if (this.getSelectTicketType !== null) {
           if (!this.isAllowedGuest(this.guests.length)) {
-            alert('Привышен лимин по данному типу доступна только ' + this.getSelectTicketTypeLimit);
+            alert(
+              'Привышен лимин по данному типу доступна только ' +
+                this.getSelectTicketTypeLimit
+            );
             this.setSelectTicketType(oldId);
           }
         }
@@ -475,8 +625,9 @@ export default {
 
       if (this.getSelectTicketType !== null) {
         price = this.getSelectTicketType.price;
-        let count = this.getSelectTicketTypeLimit !== null ? 1 : this.guests.length;
-        return (price * count) - (this.getDiscountByPromoCode * count);
+        let count =
+          this.getSelectTicketTypeLimit !== null ? 1 : this.guests.length;
+        return price * count - this.getDiscountByPromoCode * count;
       }
 
       return null;
@@ -494,7 +645,10 @@ export default {
      */
     isAllowedNewGuest: function () {
       if (this.getSelectTicketType !== null) {
-        return this.getSelectTicketTypeLimit === null || this.getSelectTicketTypeLimit >= this.countGuests + 1
+        return (
+          this.getSelectTicketTypeLimit === null ||
+          this.getSelectTicketTypeLimit >= this.countGuests + 1
+        );
       }
       return false;
     },
@@ -504,23 +658,18 @@ export default {
       'loadDataForOrderingTickets',
       'setSelectTicketType',
       'checkPromoCode',
-      'clearPromoCode'
+      'clearPromoCode',
     ]),
-    ...mapActions('appOrder', [
-      'goToCreateOrderTicket',
-      'clearError',
-    ]),
-    ...mapActions('appUser', [
-      'loadUserData',
-    ]),
+    ...mapActions('appOrder', ['goToCreateOrderTicket', 'clearError']),
+    ...mapActions('appUser', ['loadUserData']),
     CopyTypesOfPayment: function (name) {
-      let card = name.replace(/[^0-9, ]/g, "");
+      let card = name.replace(/[^0-9, ]/g, '');
       let area = document.createElement('textarea');
 
       document.body.appendChild(area);
       area.value = card;
       area.select();
-      document.execCommand("copy");
+      document.execCommand('copy');
       document.body.removeChild(area);
     },
     /**
@@ -533,7 +682,7 @@ export default {
         typeOrder: this.getSelectTicketTypeId,
         callback: function (massage) {
           self.massageForPromoCode = massage;
-        }
+        },
       });
     },
     /**
@@ -541,7 +690,7 @@ export default {
      */
     addGuest: function () {
       if (this.newGuest.length > 0) {
-        this.guests.push({value: this.newGuest});
+        this.guests.push({ value: this.newGuest });
         this.newGuest = null;
       }
     },
@@ -559,26 +708,26 @@ export default {
       let self = this;
       this.preload = true;
       this.goToCreateOrderTicket({
-        'email': this.email,
-        'ticket_type_id': this.getSelectTicketTypeId,
-        'guests': this.guests,
-        'promo_code': this.promoCode,
-        'date': this.date,
-        'id_buy': this.idBuy,
-        'city': this.city,
-        'phone': this.phone,
-        'comment': this.comment,
-        'types_of_payment_id': this.selectTypesOfPayment,
-        'festival_id': '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
-        'callback': function (result, massage) {
+        email: this.email,
+        ticket_type_id: this.getSelectTicketTypeId,
+        guests: this.guests,
+        promo_code: this.promoCode,
+        date: this.date,
+        id_buy: this.idBuy,
+        city: this.city,
+        phone: this.phone,
+        comment: this.comment,
+        types_of_payment_id: this.selectTypesOfPayment,
+        festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+        callback: function (result, massage) {
           if (result) {
             self.clearData();
           }
           self.massage = massage;
           document.getElementById('modalOpenBtn').click();
           self.preload = false;
-        }
-      })
+        },
+      });
     },
     /**
      * Очистить данные
@@ -602,7 +751,9 @@ export default {
     },
   },
   async created() {
-    await this.loadDataForOrderingTickets({festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b5'});
+    await this.loadDataForOrderingTickets({
+      festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b5',
+    });
     await this.clearError();
     if (this.isAuth) {
       let self = this;
@@ -610,14 +761,13 @@ export default {
         callback: function (data) {
           self.phone = data.phone;
           self.city = data.city;
-        }
+        },
       });
       this.email = this.getEmail;
     }
   },
-}
+};
 </script>
-
 
 <style scoped>
 body {
@@ -636,5 +786,4 @@ label {
   margin-left: 10px;
   margin-right: 10px;
 }
-
 </style>
