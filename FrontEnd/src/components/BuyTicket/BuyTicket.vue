@@ -557,8 +557,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
 import QuestionnaireTicket from "@/components/BuyTicket/QuestionnaireTicket.vue";
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'BuyTicket',
@@ -600,12 +600,8 @@ export default {
     getTypesOfPayment: {
       immediate: true,
       handler(types) {
-        const typeOfPayment = types?.find((type) =>
-          type.name.includes('Сбербанк')
-        );
-
-        if (typeOfPayment) {
-          this.selectTypesOfPayment = typeOfPayment.id;
+        if (types && types.length > 0) {
+          this.selectTypesOfPayment = types[0].id;
         }
       },
     },
