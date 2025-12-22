@@ -145,6 +145,7 @@ export const sendQuestionnaire = (context, payload) => {
         });
         return promise.then(function (response) {
             context.commit('setMessage', response.data.message)
+            payload.callback();
         }).catch(function (error) {
             //console.error(error);
             context.commit('setError', error.response.data.errors);
