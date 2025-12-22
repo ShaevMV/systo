@@ -596,6 +596,20 @@ export default {
       }
     };
   },
+  watch: {
+    getTypesOfPayment: {
+      immediate: true,
+      handler(types) {
+        const typeOfPayment = types?.find((type) =>
+          type.name.includes('Сбербанк')
+        );
+
+        if (typeOfPayment) {
+          this.selectTypesOfPayment = typeOfPayment.id;
+        }
+      },
+    },
+  },
   computed: {
     ...mapGetters('appFestivalTickets', [
       'getTypesOfPayment',
