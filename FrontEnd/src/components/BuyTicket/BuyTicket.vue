@@ -204,7 +204,7 @@
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="col-5">
                     <label for="newGuest" class="reg-label"
-                    >Введи данные о гостях:</label>
+                    >Введи данные каждого из гостей, за которых ты вносишь оргвзнос, в том числе и свои:</label>
                   </div>
                   <div :class="!isFirstGuestAdded ? 'first-guest input-group mb-3' : 'not-first-guest input-group mb-3'">
                     <input

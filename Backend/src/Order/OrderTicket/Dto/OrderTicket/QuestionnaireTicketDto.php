@@ -23,7 +23,7 @@ class QuestionnaireTicketDto
         protected ?Uuid $id = null,
     )
     {
-        $this->link ='https://org.spaceofjoy.ru/'.$orderId->value().'/'.$ticketId->value();
+        $this->link ='https://org.spaceofjoy.ru/questionnaire/'.$orderId->value().'/'.$ticketId->value();
     }
 
     public static function fromState(

@@ -295,7 +295,7 @@ class OrderTickets extends Controller
             }
             return response()->json([
                 'success' => true,
-                'message' => 'Ваша анкета заполнена'
+                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
             ]);
         } catch (Throwable $throwable) {
             return response()->json([

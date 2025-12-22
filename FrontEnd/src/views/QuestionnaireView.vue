@@ -1,5 +1,49 @@
 <template>
   <div class="container-fluid" id="main-quest">
+    <button
+        type="button"
+        class="btn btn-primary"
+        v-show="false"
+        data-toggle="modal"
+        id="modalOpenBtn"
+        data-target="#exampleModal"
+    >
+      Launch demo modal
+    </button>
+    <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Успех</h5>
+            <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+            >
+              <span aria-hidden="true">х</span>
+            </button>
+          </div>
+          <div class="modal-body" v-html="getMessageForQuestionnaire"></div>
+          <div class="modal-footer">
+            <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="text-center title-block">
       <h1>Заполни анкетные данные для подтверждения участия в туристическом слёте:</h1>
     </div>
@@ -25,9 +69,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
 
-    </div>
   </div>
 </template>
 
@@ -35,7 +77,7 @@
 <script>
 
 import QuestionnaireTicket from "@/components/BuyTicket/QuestionnaireTicket.vue";
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: 'QuestionnaireView',
@@ -60,6 +102,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('appOrder', [
+      'getMessageForQuestionnaire',
+    ]),
     isCorrect() {
       return this.questionnaire.agy !== null &&
           this.questionnaire.howManyTimes !== null &&
@@ -75,6 +120,9 @@ export default {
         questionnaire: this.questionnaire,
         orderId: this.order_id,
         ticketId: this.ticket_id,
+        callback: function (result) {
+          document.getElementById('modalOpenBtn').click();
+      },
       })
     },
     updateQuestionnaire(updatedQuestionnaire) {

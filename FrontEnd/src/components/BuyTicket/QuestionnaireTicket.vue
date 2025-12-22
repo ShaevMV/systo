@@ -107,15 +107,13 @@
                         @input="updateParent('questionForSysto', $event.target.value)"
                     ></textarea>
         </div>
-
-      <span> {{getMessageForQuestionnaire}} </span>
     </div>
   </div>
 
 </template>
 
 <script>
-import {mapGetters} from "vuex";
+
 
 export default {
   name: "QuestionnaireTicket",
@@ -128,11 +126,6 @@ export default {
       };
       this.$emit('update-questionnaire', updated);
     }
-  },
-  computed: {
-    ...mapGetters('appOrder', [
-      'getMessageForQuestionnaire',
-    ])
   }
 }
 </script>
