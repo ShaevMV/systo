@@ -120,7 +120,7 @@ export default {
         questionnaire: this.questionnaire,
         orderId: this.order_id,
         ticketId: this.ticket_id,
-        callback: function (result) {
+        callback: function () {
           document.getElementById('modalOpenBtn').click();
       },
       })
