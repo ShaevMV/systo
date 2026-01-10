@@ -130,15 +130,25 @@
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="col-5">
                     <label for="newGuest" class="reg-label"
-                    >Введи данные каждого из гостей, за которых ты вносишь оргвзнос, в том числе и свои:</label>
-                  </div>
-                  <div :class="!isFirstGuestAdded ? 'first-guest input-group mb-3' : 'not-first-guest input-group mb-3'">
+                    >Введи своё имя:</label>
                     <input
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        :placeholder="isFirstGuestAdded ? 'Имя и фамилия твоего гостя' : 'Твои имя и фамилия'"
-                        aria-label="Введи Имена и Фамилии себя и своих гостей"
+                        placeholder="Твои имя и фамилия"
+                        aria-label="Твои имя и фамилия"
+                        v-model="masterName"
+                        aria-describedby="basic-addon1"
+                        @blur="addGuest"
+                    />
+                  </div>
+                  <div class="not-first-guest input-group mb-3">
+                    <input
+                        type="text"
+                        id="newGuest"
+                        class="form-control"
+                        placeholder="Имя и фамилия твоего гостя"
+                        aria-label="Имя и фамилия твоего гостя"
                         v-model="newGuest"
                         :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
@@ -148,10 +158,10 @@
                         type="email"
                         id="newEmailGuest"
                         class="form-control"
-                        :placeholder="isFirstGuestAdded ? 'Введи Email твоего гостя' : ''"
+                        placeholder="Введи Email твоего гостя"
                         aria-label="Введите e-mail этого гостя"
                         v-model="newGuestEmail"
-                        :disabled="!isAllowedNewGuest || !isFirstGuestAdded"
+                        :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
                         :show="guests.length > 0"
                         @blur="addGuest"
@@ -570,6 +580,7 @@ export default {
       minute: null,
       selectTypesOfPayment: null,
       guests: [],
+      masterName: '',
       newGuest: '',
       newGuestEmail: '',
       isFirstGuestAdded: false,
@@ -638,6 +649,7 @@ export default {
           this.confirm === true &&
           this.idBuy !== null &&
           this.phone !== null &&
+          this.masterName.length > 0 &&
           this.questionnaire.agy !== null &&
           this.questionnaire.howManyTimes !== null &&
           this.questionnaire.questionForSysto  !== null &&
@@ -697,7 +709,7 @@ export default {
       if (this.getSelectTicketType !== null) {
         return (
             this.getSelectTicketTypeLimit === null ||
-            this.getSelectTicketTypeLimit >= this.countGuests + 1
+            this.getSelectTicketTypeLimit >= this.countGuests + 2
         );
       }
       return false;
@@ -740,18 +752,13 @@ export default {
      * Добавить нового гостя
      */
     addGuest: function () {
-      if (this.newGuest.length > 0 && (this.newGuestEmail.length > 0 || !this.isFirstGuestAdded)) {
+      if (this.newGuest.length > 0 && this.newGuestEmail.length > 0) {
         this.guests.push({
           value: this.newGuest,
           email: this.newGuestEmail,
         });
         this.newGuest = '';
         this.newGuestEmail = '';
-
-        // После добавления первого гостя меняем состояние
-        if (!this.isFirstGuestAdded) {
-          this.isFirstGuestAdded = true;
-        }
       }
     },
     /**
@@ -767,10 +774,17 @@ export default {
     orderTicket: function () {
       let self = this;
       this.preload = true;
+      let guests = this.guests;
+
+      guests.unshift({
+        value: this.masterName,
+        email: null,
+      })
+
       this.goToCreateOrderTicket({
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
-        guests: this.guests,
+        guests: guests,
         promo_code: this.promoCode,
         date: this.date,
         id_buy: this.idBuy,
@@ -804,6 +818,7 @@ export default {
       this.guests = [];
       this.preload = false;
       this.newGuest = '';
+      this.masterName = '';
       this.newGuestEmail = '';
       this.email = this.getEmail;
       this.promoCode = null;
