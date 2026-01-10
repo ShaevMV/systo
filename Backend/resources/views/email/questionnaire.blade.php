@@ -40,15 +40,16 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">С этого года мы хотим познакомиться поближе и просим тебя заполнить анкету участника.
-                            Твой друг уже внес оргвзнос, тебе остается только заполнить данные о себе. Как только данные будут внесены, твои QR-коды будут активированы.  </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">
+                            Твой друг уже внес оргвзнос на Систо, тебе остается только заполнить данные о себе. Как только внесешь свои данные и согласишься с правилами пребывания на Систо, твои QR-коды для входа на событие будут активированы.  </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}"> ссылка на анкету </a>  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи на Solar Systo!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи на Solar Systo 2026!</p>
 
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">По всем вопросам пиши в ТГ <a href="https://t.me/systo_vznos">@systo_vznos</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
+
                 <tr>
                     <td style="padding: 20px 10px 10px 20px;">
                         <table style="border: none; width: 100%; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">

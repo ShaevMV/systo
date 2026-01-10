@@ -44,6 +44,7 @@
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с qr-кодом на каждого гостя прикреплены к этому письму.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">А также доступны в разделе Мои оргвзносы https://org.solarsysto.ru/myOrders</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 22px;">ВНИМАНИЕ! С этого года все ваши дополнительные гости должны заполнить небольшие анкеты для активации QR-кода. Пожалуйста сообщите своим гостям о том, что у них на почте есть письмо от нас со ссылкой на анкету. Гости не заполнившие анкету и не подтвердившие согласие с правилами пребывания на Систо - не будут допущены на событие.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде! Позаботься об этом заранее!</p>
                         @if($promocode)
                             <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Чтобы зарегистрироваться на трансфер, перейдите по ссылке spacetransfer.ru, выберете нужные даты и рейсы, при оплате введите промокод {{$promocode}}, стоимость изменится на 0, дополнительно оплачивать ничего не нужно!</p>
@@ -52,6 +53,7 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
+
                 </tr>
                 <tr>
                     <td style="padding: 20px 10px 10px 20px;">
