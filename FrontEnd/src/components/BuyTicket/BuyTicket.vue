@@ -120,6 +120,52 @@
                       >
                     </div>
                   </div>
+                  <div class="row mt-3 mb-3" id="enter-guests">
+                    <div class="col-5">
+                      <label for="newGuest" class="reg-label"
+                      >Введи данные каждого из гостей, за которых ты вносишь оргвзнос, в том числе и свои:</label>
+                    </div>
+                    <div :class="!isFirstGuestAdded ? 'first-guest input-group mb-3' : 'not-first-guest input-group mb-3'">
+                      <input
+                          type="text"
+                          id="newGuest"
+                          class="form-control"
+                          :placeholder="isFirstGuestAdded ? 'Имя и фамилия твоего гостя' : 'Твои имя и фамилия'"
+                          aria-label="Введи Имена и Фамилии себя и своих гостей"
+                          v-model="newGuest"
+                          :disabled="!isAllowedNewGuest"
+                          aria-describedby="basic-addon1"
+                          @blur="addGuest"
+                      />
+                      <input
+                          type="email"
+                          id="newEmailGuest"
+                          class="form-control"
+                          :placeholder="isFirstGuestAdded ? 'Введи Email твоего гостя' : ''"
+                          aria-label="Введите e-mail этого гостя"
+                          v-model="newGuestEmail"
+                          :disabled="!isAllowedNewGuest || !isFirstGuestAdded"
+                          aria-describedby="basic-addon1"
+                          :show="guests.length > 0"
+                          @blur="addGuest"
+                      />
+                      <div class="input-group-prepend">
+                      <span
+                          class="input-group-text btn"
+                          @click="addGuest()"
+                          id="basic-addon1"
+                      >Добавить</span
+                      >
+                      </div>
+                    </div>
+                  </div>
+                  <div>  “После оформления заказа на почту твоих гостей придет ссылка на анкету, которую необходимо заполнить всем гостям!” </div>
+                  <div class="col-4">
+                    <h4 class="my-lg-2 font-weight-normal">
+                      Кол-во гостей:
+                      <small class="text-muted">{{ countGuests }}</small>
+                    </h4>
+                  </div>
                 </div>
                 <div class="pp1 row">
                   <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные
@@ -201,46 +247,6 @@
                   </div>
                 </div>
 
-                <div class="row mt-3 mb-3" id="enter-guests">
-                  <div class="col-5">
-                    <label for="newGuest" class="reg-label"
-                    >Введи данные каждого из гостей, за которых ты вносишь оргвзнос, в том числе и свои:</label>
-                  </div>
-                  <div :class="!isFirstGuestAdded ? 'first-guest input-group mb-3' : 'not-first-guest input-group mb-3'">
-                    <input
-                        type="text"
-                        id="newGuest"
-                        class="form-control"
-                        :placeholder="isFirstGuestAdded ? 'Имя и фамилия твоего гостя' : 'Твои имя и фамилия'"
-                        aria-label="Введи Имена и Фамилии себя и своих гостей"
-                        v-model="newGuest"
-                        :disabled="!isAllowedNewGuest"
-                        aria-describedby="basic-addon1"
-                        @blur="addGuest"
-                    />
-                    <input
-                        type="email"
-                        id="newEmailGuest"
-                        class="form-control"
-                        :placeholder="isFirstGuestAdded ? 'Введи Email твоего гостя' : ''"
-                        aria-label="Введите e-mail этого гостя"
-                        v-model="newGuestEmail"
-                        :disabled="!isAllowedNewGuest || !isFirstGuestAdded"
-                        aria-describedby="basic-addon1"
-                        :show="guests.length > 0"
-                        @blur="addGuest"
-                    />
-                    <div class="input-group-prepend">
-                      <span
-                          class="input-group-text btn"
-                          @click="addGuest()"
-                          id="basic-addon1"
-                      >Добавить</span
-                      >
-                    </div>
-                  </div>
-                </div>
-                <div>  “После оформления заказа на почту твоих гостей придет ссылка на анкету, которую необходимо заполнить всем гостям!” </div>
                 <div class="row x-row" v-show="guests.length > 0">
                   <div class="col-12">
                     <div class="form-group">
@@ -287,12 +293,7 @@
                       <small class="text-muted"> руб.</small>
                     </h4>
                   </div>
-                  <div class="col-4">
-                    <h4 class="my-lg-2 font-weight-normal">
-                      Кол-во гостей:
-                      <small class="text-muted">{{ countGuests }}</small>
-                    </h4>
-                  </div>
+
 
                   <div class="col-4" v-show="getDiscountByPromoCode > 0">
                     <h4 class="my-lg-2 font-weight-normal">
