@@ -557,8 +557,8 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
 import QuestionnaireTicket from "@/components/BuyTicket/QuestionnaireTicket.vue";
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'BuyTicket',
@@ -595,6 +595,16 @@ export default {
         questionForSysto: null,
       }
     };
+  },
+  watch: {
+    getTypesOfPayment: {
+      immediate: true,
+      handler(types) {
+        if (types && types.length > 0) {
+          this.selectTypesOfPayment = types[0].id;
+        }
+      },
+    },
   },
   computed: {
     ...mapGetters('appFestivalTickets', [
