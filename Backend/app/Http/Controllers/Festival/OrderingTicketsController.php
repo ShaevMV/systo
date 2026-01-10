@@ -55,7 +55,7 @@ class OrderingTicketsController extends Controller
      */
     public function getTicketTypeList(): array
     {
-        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'))->toArray();
+        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b8'))->toArray();
     }
 
     /**
@@ -74,7 +74,7 @@ class OrderingTicketsController extends Controller
                 !empty($promoCode) ? trim($promoCode) : null,
                 $price->getPrice(),
                 new Uuid($request->input('typeOrder')),
-                new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b7'),
+                new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b8'),
             )->toArray();
     }
 
@@ -114,7 +114,7 @@ class OrderingTicketsController extends Controller
     {
         $id = $this->getPromoCodes->createOrUpdatePromoCode(
             $createPromoCodeRequest->toArray(),
-            '9d679bcf-b438-4ddb-ac04-023fa9bff4b7'
+            '9d679bcf-b438-4ddb-ac04-023fa9bff4b8'
         );
         $message = $createPromoCodeRequest->id ? 'промокод обновлён' : 'промокод добавлен';
 
