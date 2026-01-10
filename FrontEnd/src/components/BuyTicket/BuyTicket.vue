@@ -379,6 +379,7 @@
                     </div>
                   </div>
                 </div>
+                <div v-show="!selectTypesOfPaymentIsBilling">
                 <div
                     class="row flex-flex justify-content-center mt-7"
                     style="
@@ -446,6 +447,8 @@
                     ></textarea>
                   </div>
                 </div>
+                </div>
+
                 <div class="row" style="justify-content: center">
                     <div class="form-check" id="check-check">
                       <input
@@ -632,6 +635,15 @@ export default {
     ]),
     ...mapGetters('appUser', ['isAuth', 'getEmail', 'getUserData']),
     ...mapGetters('appOrder', ['getError']),
+    selectTypesOfPaymentIsBilling: function () {
+      let typesOfPaymentList = this.getTypesOfPayment;
+      if(this.selectTypesOfPayment.length > 0 ) {
+        let select = typesOfPaymentList.find(user => user.id == this.selectTypesOfPayment);
+        return select.is_billing ?? false;
+      }
+      return false;
+    },
+
     /**
      * Проверка на ведение всех данных
      * @returns {false|*|null}
@@ -644,12 +656,11 @@ export default {
           group = false;
         }
       }
-      return (
+
+      let result = (
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
-          this.date !== null &&
-          this.confirm === true &&
-          this.idBuy !== null &&
+
           this.phone !== null &&
           this.masterName.length > 0 &&
           this.questionnaire.agy !== null &&
@@ -657,7 +668,16 @@ export default {
           this.questionnaire.questionForSysto  !== null &&
           group &&
           (this.isAuth || this.email)
-      );
+      )
+
+      if(!this.selectTypesOfPaymentIsBilling) {
+        result = result &&
+            this.date !== null &&
+            this.confirm === true &&
+            this.idBuy !== null;
+      }
+
+      return result;
     },
     /**
      * Выбранный тип билета

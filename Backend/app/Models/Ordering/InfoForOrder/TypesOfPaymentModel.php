@@ -27,6 +27,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property int $active
  * @property int $sort
  * @property string $card
+ * @property boolean $is_billing
  * @method static Builder|TypesOfPaymentModel whereActive($value)
  * @method static Builder|TypesOfPaymentModel whereCard($value)
  * @method static Builder|TypesOfPaymentModel whereSort($value)
