@@ -76,6 +76,7 @@ class QuestionnaireTicketDto
             'phone' => $this->phone,
             'telegram' => $this->telegram,
             'vk' => $this->vk,
+            'name' => $this->name,
             'musicStyles' => $this->musicStyles,
         ];
     }

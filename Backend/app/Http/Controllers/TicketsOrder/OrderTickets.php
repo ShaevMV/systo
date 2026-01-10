@@ -68,21 +68,23 @@ class OrderTickets extends Controller
                 AccountDto::fromState($createOrderTicketsRequest->toArray())
             )->value());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
+            $guests = $createOrderTicketsRequest->guests;
+            array_unshift($guests,[
+                'value' => $createOrderTicketsRequest->masterName,
+                'email' => $createOrderTicketsRequest->email,
+            ]);
+
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
                 $ticketTypeId,
-                count($createOrderTicketsRequest->guests),
+                count($guests),
                 $createOrderTicketsRequest->promo_code
             );
 
             $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
 
             $data = $createOrderTicketsRequest->toArray();
-
-            $data['guests'] = $this->ticketService->initFestivalId(
-                $createOrderTicketsRequest->guests,
-                $ticketType->getFestivalListId()
-            );
+            $data['guests'] = $guests;
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
@@ -152,6 +154,8 @@ class OrderTickets extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
+                'link' => $exception->getLine(),
+                'file' => $exception->getFile(),
             ]);
         }
     }

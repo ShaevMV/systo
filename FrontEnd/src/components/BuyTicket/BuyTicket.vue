@@ -129,20 +129,22 @@
                 />
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="col-5">
-                    <label for="newGuest" class="reg-label"
-                    >Введи своё имя:</label>
+                    <label for="masterName" class="reg-label">Введи имя и фамилию основного гостя</label>
                     <input
                         type="text"
-                        id="newGuest"
+                        id="masterName"
                         class="form-control"
                         placeholder="Твои имя и фамилия"
                         aria-label="Твои имя и фамилия"
                         v-model="masterName"
                         aria-describedby="basic-addon1"
-                        @blur="addGuest"
                     />
+                    <small class="form-text text-muted">
+                      {{ getError('masterName') }}</small
+                    >
                   </div>
                   <div class="not-first-guest input-group mb-3">
+                    <label for="newGuest" class="reg-label">Введи имена, фамилии и e-mail дополнительных гостей.</label>
                     <input
                         type="text"
                         id="newGuest"
@@ -177,6 +179,44 @@
                   </div>
                 </div>
                 <div>  “После оформления заказа на почту твоих гостей придет ссылка на анкету, которую необходимо заполнить всем гостям!” </div>
+                <div class="row x-row" v-show="guests.length > 0">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <div
+                          class="input-group mb-3"
+                          v-for="(itemGuest, index) in guests"
+                          v-bind:key="index"
+                      >
+                        <input
+                            type="text"
+                            class="form-control"
+                            readonly
+                            v-bind:value="itemGuest.value"
+                            aria-describedby="basic-addon2"
+                        />
+                        <input
+                            type="email"
+                            class="form-control"
+                            readonly
+                            v-bind:value="itemGuest.email"
+                            aria-describedby="basic-addon2"
+                        />
+                        <div class="input-group-prepend">
+                          <span
+                              class="input-group-text btn"
+                              @click="delGuest(index)"
+                              id="basic-addon2"
+                          >
+                            <i class="fa fa-trash"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <small class="form-text text-muted">
+                        {{ getError('guests') }}</small
+                      >
+                    </div>
+                  </div>
+                </div>
                 <div class="col-4">
                   <h4 class="my-lg-2 font-weight-normal">
                     Кол-во гостей:
@@ -264,44 +304,7 @@
                   </div>
                 </div>
 
-                <div class="row x-row" v-show="guests.length > 0">
-                  <div class="col-12">
-                    <div class="form-group">
-                      <div
-                          class="input-group mb-3"
-                          v-for="(itemGuest, index) in guests"
-                          v-bind:key="index"
-                      >
-                        <input
-                            type="text"
-                            class="form-control"
-                            readonly
-                            v-bind:value="itemGuest.value"
-                            aria-describedby="basic-addon2"
-                        />
-                        <input
-                            type="email"
-                            class="form-control"
-                            readonly
-                            v-bind:value="itemGuest.email"
-                            aria-describedby="basic-addon2"
-                        />
-                        <div class="input-group-prepend">
-                          <span
-                              class="input-group-text btn"
-                              @click="delGuest(index)"
-                              id="basic-addon2"
-                          >
-                            <i class="fa fa-trash"></i>
-                          </span>
-                        </div>
-                      </div>
-                      <small class="form-text text-muted">
-                        {{ getError('guests') }}</small
-                      >
-                    </div>
-                  </div>
-                </div>
+
 
                 <div class="row itog-row mb-4" v-show="totalPrice !== null">
                   <div class="col-4">
@@ -637,14 +640,13 @@ export default {
       let group = true;
 
       if (this.getSelectTicketType !== null) {
-        if (!this.isAllowedGuestMin(this.guests.length)) {
+        if (!this.isAllowedGuestMin(this.guests.length + 1)) {
           group = false;
         }
       }
       return (
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
-          this.guests.length > 0 &&
           this.date !== null &&
           this.confirm === true &&
           this.idBuy !== null &&
@@ -684,11 +686,11 @@ export default {
      */
     totalPrice: function () {
       let price = null;
-
+      let countTicket = this.guests.length + (this.masterName.length > 0 ? 1 : 0);
       if (this.getSelectTicketType !== null) {
         price = this.getSelectTicketType.price;
         let count =
-            this.getSelectTicketTypeLimit !== null ? 1 : this.guests.length;
+            this.getSelectTicketTypeLimit !== null ? 1 : countTicket;
         return price * count - this.getDiscountByPromoCode * count;
       }
 
@@ -699,7 +701,7 @@ export default {
      * @returns {number}
      */
     countGuests: function () {
-      return this.guests.length;
+      return this.guests.length + (this.masterName.length > 0 ? 1 : 0);
     },
     /**
      * Проверка на добавление нового гостя
@@ -776,14 +778,10 @@ export default {
       this.preload = true;
       let guests = this.guests;
 
-      guests.unshift({
-        value: this.masterName,
-        email: null,
-      })
-
       this.goToCreateOrderTicket({
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
+        masterName: this.masterName,
         guests: guests,
         promo_code: this.promoCode,
         date: this.date,
