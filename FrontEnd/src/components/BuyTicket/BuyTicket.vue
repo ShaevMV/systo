@@ -121,6 +121,11 @@
                     </div>
                   </div>
                 </div>
+                <div class="pp1 row">Заполни анкетные данные для подтверждения участия в туристическом слёте:</div>
+                <questionnaire-ticket
+                    :questionnaire="questionnaire"
+                    @update-questionnaire="updateQuestionnaire"
+                />
                 <div class="pp1 row">
                   <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные
                   каждого гостя, за которого будешь вносить средства:
@@ -425,32 +430,22 @@
                     ></textarea>
                   </div>
                 </div>
-                <div class="pp1 row">
-                  <span>ШАГ 4.</span> Заполни анкетные данные для подтверждения участия в туристическом слёте:
-                </div>
-                <questionnaire-ticket
-                    :questionnaire="questionnaire"
-                    @update-questionnaire="updateQuestionnaire"
-                />
-                <div class="row mt-4">
-                  <div class="form-check" id="check-check">
-                    <input
-                        class="form-check-input"
-                        type="checkbox"
-                        value=""
-                        v-model="confirm"
-                        id="defaultCheck1"
-                    />
-                    <label class="form-check-label" for="defaultCheck1">
-                      Регистрируя добровольный оргвзнос, ты соглашаешься с
-                      &nbsp;<a href="/conditions" target="_blank"
-                    ><b>условиями туристического слёта</b></a
-                    >
-                    </label>
+                <div class="row" style="justify-content: center">
+                    <div class="form-check" id="check-check">
+                      <input
+                          class="form-check-input"
+                          type="checkbox"
+                          value=""
+                          v-model="confirm"
+                          id="defaultCheck1"
+                      />
+                      <label class="form-check-label" for="defaultCheck1">
+                        Регистрируя добровольный оргвзнос, ты соглашаешься с
+                        &nbsp;<a href="/conditions" target="_blank"
+                      ><b>условиями туристического слёта</b></a
+                      >
+                      </label>
                   </div>
-                </div>
-
-                <div class="row">
                   <div class="col-12">
                     <button
                         type="button"
