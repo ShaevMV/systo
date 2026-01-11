@@ -50,6 +50,7 @@ Route::prefix('v1/festival')->group(static function (): void {
     Route::post('/ticketsOrder/questionnaire/{orderId}/{ticketId}', [OrderTickets::class, 'setQuestionnaire']);
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);
     Route::get('/ticketsOrder/getUserList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
+    Route::get('/getInviteLink', [OrderingTicketsController::class, 'getInviteLink'])->middleware('auth:api');
     Route::post('/ticketsOrder/getList', [OrderTickets::class, 'getList'])->middleware('auth:api')
         ->middleware('admin');
 
@@ -65,6 +66,8 @@ Route::prefix('v1/festival')->group(static function (): void {
 
     Route::post('/savePromoCodeForBot/{idPromoCode?}',
         [OrderingTicketsController::class, 'savePromoCodeForBot'])->middleware('bot');
+
+
 });
 
 Route::any('/v1/order/succes',[BillingController::class, 'webHook']);
