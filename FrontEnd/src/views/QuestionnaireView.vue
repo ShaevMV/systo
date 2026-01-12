@@ -91,6 +91,7 @@ export default {
   data() {
     return {
       questionnaire: {
+        namey: null,    // Добавил дату для имени и фамилии
         agy: null,
         telegram: null,
         vk: null,
@@ -98,6 +99,7 @@ export default {
         howManyTimes: null,
         musicStyles: null,
         questionForSysto: null,
+        whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
       }
     }
   },

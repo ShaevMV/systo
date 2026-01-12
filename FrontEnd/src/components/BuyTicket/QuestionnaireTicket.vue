@@ -1,6 +1,42 @@
 <template>
-  <div>
+  <div class="row">
     <div class="mb-12" id="quest">
+
+
+<!--      <div class="col-5">-->
+<!--        <label for="masterName" class="reg-label">Твои имя и Фамилия *</label>-->
+<!--        <input-->
+<!--            type="text"-->
+<!--            id="masterName"-->
+<!--            class="form-control"-->
+<!--            placeholder="Твои имя и фамилия"-->
+<!--            aria-label="Твои имя и фамилия"-->
+<!--            v-model="masterName"-->
+<!--            aria-describedby="basic-addon1"-->
+<!--        />-->
+<!--        <small class="form-text text-muted">-->
+<!--          {{ getError('masterName') }}</small-->
+<!--        >-->
+<!--      </div>-->
+
+      <div class="quest-item">
+        <label for="questionnaire_namey">Твои Имя и Фамилия: *</label>
+
+        <!-- Сюда добавил поле Имя и Фамилия -->
+        <div class="input-group" id="promo-input">
+          <input
+              type="number"
+              id="questionnaire_namey"
+              class="form-control"
+              placeholder="Твои Имя и Фамилия"
+              aria-label="Твои Имя и Фамилия"
+              :value="questionnaire.namey"
+              @input="updateParent('namey', $event.target.value)"
+              aria-describedby="basic-addon1"
+          />
+        </div>
+      </div>
+
       <div class="quest-item">
         <label for="questionnaire_agy">Возраст: *</label>
 
@@ -89,24 +125,45 @@
       <div class="quest-item">
         <label for="questionnaire_musicStyles">Стили музыки, которые предпочитаешь в лесу:</label>
 
-                    <textarea
-                        class="form-control order-text"
+                    <input
+                        type="text"
+                        class="form-control"
                         :value="questionnaire.musicStyles"
                         id="questionnaire_musicStyles"
+                        placeholder="Стили музыки, которые предпочитаешь в лесу?"
+                        aria-label="Стили музыки, которые предпочитаешь в лесу?"
                         @input="updateParent('musicStyles', $event.target.value)"
-                    ></textarea>
+                    >
       </div>
 
-      <div class="quest-item last-item">
+      <div class="quest-item">
         <label for="questionnaire_questionForSysto">Ответь кратко и честно на простой вопрос "Зачем ты едешь на Систо?": *</label>
 
-                    <textarea
-                        class="form-control order-text"
+                    <input
+                        type="text"
+                        class="form-control"
                         :value="questionnaire.questionForSysto"
                         id="questionnaire_questionForSysto"
+                        placeholder="Зачем ты едешь на Систо?"
+                        aria-label="Зачем ты едешь на Систо?"
                         @input="updateParent('questionForSysto', $event.target.value)"
-                    ></textarea>
+                    >
         </div>
+
+      <!-- Добавил вопрос Откуда ты узнал о Систо? -->
+      <div class="quest-item">
+        <label for="questionnaire_whereSysto">Откуда ты узнал о Систо?:</label>
+
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.whereSysto"
+            id="questionnaire_whereSysto"
+            placeholder="Откуда ты узнал о Систо?"
+            aria-label="Откуда ты узнал о Систо?"
+            @input="updateParent('whereSysto', $event.target.value)"
+        >
+      </div>
     </div>
   </div>
 

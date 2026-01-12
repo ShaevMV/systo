@@ -122,37 +122,28 @@
                   </div>
 
                 </div>
-                <div class="pp1 row">Заполни анкетные данные для подтверждения участия в туристическом слёте:</div>
+                <div class="pp2 row">Заполни анкетные данные, как основного гостя:</div>
+
+                <label id="my-own" class="row">
+                  <input type="checkbox" class="form-check-input">
+                  <span>Мне не нужно заполнять анкету, я хочу внести оргвзнос только за своих друзей</span>
+                </label>
+
                 <questionnaire-ticket
                     :questionnaire="questionnaire"
                     @update-questionnaire="updateQuestionnaire"
                 />
                 <div class="row mt-3 mb-3" id="enter-guests">
-                  <div class="col-5">
-                    <label for="masterName" class="reg-label">Введи имя и фамилию основного гостя</label>
-                    <input
-                        type="text"
-                        id="masterName"
-                        class="form-control"
-                        placeholder="Твои имя и фамилия"
-                        aria-label="Твои имя и фамилия"
-                        v-model="masterName"
-                        aria-describedby="basic-addon1"
-                    />
-                    <small class="form-text text-muted">
-                      {{ getError('masterName') }}</small
-                    >
-                  </div>
+                  <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
                   <div class="not-first-guest input-group mb-3">
-                    <label for="newGuest" class="reg-label">Введи имена, фамилии и e-mail дополнительных гостей.</label>
+
                     <input
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        placeholder="Имя и фамилия твоего гостя"
-                        aria-label="Имя и фамилия твоего гостя"
+                        placeholder="Имя и фамилия твоего друга"
+                        aria-label="Имя и фамилия твоего друга"
                         v-model="newGuest"
-                        :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
                         @blur="addGuest"
                     />
@@ -160,12 +151,10 @@
                         type="email"
                         id="newEmailGuest"
                         class="form-control"
-                        placeholder="Введи Email твоего гостя"
-                        aria-label="Введите e-mail этого гостя"
+                        placeholder="Email твоего друга"
+                        aria-label="E-mail этого друга"
                         v-model="newGuestEmail"
-                        :disabled="!isAllowedNewGuest"
                         aria-describedby="basic-addon1"
-                        :show="guests.length > 0"
                         @blur="addGuest"
                     />
                     <div class="input-group-prepend">
@@ -178,8 +167,7 @@
                     </div>
                   </div>
                 </div>
-                <div>  “После оформления заказа на почту твоих гостей придет ссылка на анкету, которую необходимо заполнить всем гостям!” </div>
-                <div class="row x-row" v-show="guests.length > 0">
+                <div class="row x-row" v-show="guests.length > 0" id="adding-guests">
                   <div class="col-12">
                     <div class="form-group">
                       <div
@@ -218,10 +206,14 @@
                   </div>
                 </div>
                 <div class="col-4">
-                  <h4 class="my-lg-2 font-weight-normal">
-                    Кол-во гостей:
-                    <small class="text-muted">{{ countGuests }}</small>
+                  <h4 class="font-weight-normal" id="count-label">
+                    Общее количество гостей в твоем заказе:
+                    <span>{{ countGuests }}</span>
                   </h4>
+                </div>
+
+                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на почту твоих друзей придёт ссылка на анкету, которую им необходимо заполнить для активации их QR-кодов при входе на Систо. Сами же QR-коды придут на твою почту и будут доступны в твоём личном кабинете.
+                  От твоих друзей требуется только заполнить анкетные данные по аналогии с теми, что ты заполнял выше. Спасибо за понимание.
                 </div>
 
                 <div class="pp1 row">
@@ -309,8 +301,8 @@
                 <div class="row itog-row mb-4" v-show="totalPrice !== null">
                   <div class="col-4">
                     <h4 class="my-lg-2 font-weight-normal">
-                      Итого к внесению: {{ totalPrice }}
-                      <small class="text-muted"> руб.</small>
+                      Итого к внесению:
+                      <small class="text-muted">{{ totalPrice }} руб.</small>
                     </h4>
                   </div>
 
@@ -601,6 +593,7 @@ export default {
       messageForPromoCode: null,
       comment: null,
       questionnaire: {
+        namey: null,
         agy: null,
         telegram: null,
         vk: null,
@@ -608,6 +601,7 @@ export default {
         howManyTimes: null,
         musicStyles: null,
         questionForSysto: null,
+        whereSysto: null,
       }
     };
   },
@@ -850,12 +844,14 @@ export default {
       this.confirm = true;
       this.isFirstGuestAdded = false; // сбросить состояние до первого участника
       this.questionnaire = {
+        namey: null,
         agy: null,
         telegram: null,
         vk: null,
         howManyTimes: null,
         musicStyles: null,
         questionForSysto: null,
+        whereSysto: null,
       };
       this.clearPromoCode();
     },

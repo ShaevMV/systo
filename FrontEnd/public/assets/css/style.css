@@ -1623,6 +1623,18 @@ select.form-select::after {
     justify-content: flex-start;
 }
 
+#app .pp2{
+    font-weight: bold;
+}
+
+#adding-guests .btn{
+    background-color: #750008;
+}
+
+#adding-gusts .btn:hover{
+    background-color: #fd3845;
+}
+
 #promo-input small {
     align-self: center;
     margin-left: 30px;
@@ -1665,6 +1677,11 @@ select.form-select::after {
     background-size: 25px;
 }
 
+.in-choice > div:nth-of-type(3) span {
+    background-image: url('../img/therium-icon.png');
+    background-size: 25px;
+}
+
 .in-choice > div:last-of-type span {
     background-image: url('../img/sticker.webp');
     background-size: 25px;
@@ -1681,7 +1698,7 @@ select.form-select::after {
     border-radius: 10px;
     border: 3px solid transparent;
     margin-left: 20px;
-    min-width: 540px;
+    min-width: 590px;
     position: relative;
 }
 
@@ -1716,14 +1733,18 @@ select.form-select::after {
 }
 
 .itog-row h4 {
-    font-size: 18px;
-    font-weight: normal;
+    font-size: 20px;
     color: #333;
+    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .itog-row h4 small {
     font-weight: bold;
     color: #86201c;
+    font-size: 36px;
+    position: relative;
+    top: 5px;
 }
 
 .itog-row {
@@ -1819,10 +1840,6 @@ select.form-select::after {
     opacity: 1;
     margin-left: 20px;
     display: block;
-}
-
-.order-text {
-    height: 100px;
 }
 
 #contact-form .reg-btn, #main-quest .reg-btn {
@@ -1946,6 +1963,62 @@ input[readonly] {
     align-items: center;
     justify-content: center;
     padding: 30px;
+    flex-direction: column;
+    padding: 30px 10%;
+    color: white;
+    font-family: 'Arial';
+}
+
+
+#intro span{
+    display: block;
+    margin-bottom: 30px;
+}
+
+
+#intro h2{
+    font-weight: bold;
+    margin-bottom: 3vw;
+    font-size: 36px;
+    line-height: 1.5;
+}
+
+#intro h3{
+    font-size: 24px;
+    margin-top: 0;
+    font-weight: normal;
+    line-height: 1.5;
+}
+
+#intro h3 a{
+    font-weight: bold;
+    text-decoration: underline;
+    color: white;
+}
+
+#intro h3 a:hover{
+    text-decoration: none;
+}
+
+#tg-intro-btn{
+    background: url(../img/tg-main-icon.png) 55px center no-repeat;
+    background-color: #c5eeff;
+    text-decoration: none;
+    font-size: 24px;
+    width: 400px;
+    color: #1e1e38;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 3vw;
+    height: 70px;
+    padding-top: 16px;
+    padding-left: 40px;
+    border-radius: 10px;
+}
+
+
+#tg-intro-btn:hover{
+    background-color: #09adf1;
 }
 
 #quest {
@@ -1972,10 +2045,6 @@ input[readonly] {
     width: 25%;
 }
 
-#main-quest .last-item {
-    width: 100% !important;
-}
-
 #main-quest #questionnaire_musicStyles {
     height: 50px !important;
 }
@@ -1999,12 +2068,50 @@ input[readonly] {
 }
 
 
+.sub-warn{
+    padding: 20px;
+    background-color: #dfd784;
+    border-radius: 7px;
+    color: #7b8587;
+    display: block !important;
+    font-weight: 500;
+    margin: 2vw 0;
+}
+
+#count-label{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#count-label span{
+    font-size: 36px;
+    position: relative;
+    top: 8px;
+}
+
+#my-own{
+    justify-content: flex-start !important;
+}
+
+#my-own input[type="check"]
+
+
+
+
 /* SHANTIX ADAPTIVE */
 
 
-@media (max-width: 1200px) {
+@media (max-width: 1210px) {
     .sidebar {
         left: -300px;
+    }
+
+    #intro h2{
+        font-size: 30px;
+    }
+
+    #intro span{
+        margin-bottom: 20px;
     }
 
     .sidebar.active {
@@ -2021,7 +2128,7 @@ input[readonly] {
 }
 
 
-@media (max-width: 1100px) {
+@media (max-width: 1110px) {
     #main h1 {
         font-size: 27px;
     }
@@ -2047,10 +2154,27 @@ input[readonly] {
 
 }
 
-@media (max-width: 900px) {
+@media (max-width: 905px) {
     #main h1 {
         font-size: 25px;
     }
+
+    #intro span{
+        margin-bottom: 14px;
+    }
+
+    #intro h2{
+        font-size: 25px;
+    }
+
+    #intro h3{
+        font-size: 21px;
+    }
+
+    #intro{
+        padding: 30px 6%;
+    }
+
 
     #main .title-block small {
         font-size: 17px
@@ -2176,9 +2300,31 @@ input[readonly] {
 
 }
 
-@media (max-width: 600px) {
+@media (max-width: 605px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    #intro h2{
+        font-size: 22px;
+    }
+
+    #intro h3{
+        font-size: 17px;
+    }
+
+    #tg-intro-btn{
+        height: 64px;
+        width: 333px;
+        font-size: 19px;
+        padding-top: 17px;
+        padding-left: 30px;
+        background-size: 34px;
+        background-position: 55px center;
+    }
+
+    #intro span{
+        margin-bottom: 14px;
     }
 
     #newEmailGuest[show="false"] {
@@ -2390,9 +2536,47 @@ input[readonly] {
 }
 
 
-@media (max-width: 400px) {
+@media(max-width: 455px){
+    #intro h2{
+        font-size: 19px;
+        line-height: 1.4;
+        margin-bottom: 6vw;
+    }
+
+    #intro h3 {
+        font-size: 16px;
+    }
+
+    #tg-intro-btn{
+        margin-top: 5vw;
+    }
+}
+
+
+@media (max-width: 405px) {
     #main h1 {
         font-size: 20px;
+    }
+
+
+    #intro h2{
+        font-size: 18px;
+    }
+
+    #intro h3{
+        line-height: 1.4;
+        font-size: 16px;
+    }
+
+    #tg-intro-btn {
+        background-position: 38px center;
+        background-size: 27px;
+        font-size: 18px;
+        width: 260px;
+        margin-top: 5vw;
+        height: 58px;
+        padding-top: 15px;
+        padding-left: 28px;
     }
 
 
@@ -2459,9 +2643,21 @@ input[readonly] {
 }
 
 
-@media (max-width: 360px) {
+@media (max-width: 365px) {
     #main h1 {
         font-size: 19px;
+    }
+
+    #intro span{
+        margin-bottom: 8px;
+    }
+
+    #intro h3{
+        font-size: 15px;
+    }
+
+    #intro h2{
+        font-size: 17px;
     }
 
     #contact-form .id-info {
