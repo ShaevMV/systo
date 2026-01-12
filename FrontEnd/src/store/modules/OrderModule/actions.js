@@ -154,6 +154,21 @@ export const sendQuestionnaire = (context, payload) => {
     });
 };
 
+
+// получение персональной ссылки
+export const pullInviteLink = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.get('/api/v1/festival/getInviteLink');
+        return promise.then(function (response) {
+            console.log(response.data);
+            payload.callback(response.data);
+        }).catch(function (error) {
+            context.commit('setError', error);
+            reject(error);
+        });
+    });
+};
+
 export const clearError = (context) => {
     context.commit('setError', []);
 };

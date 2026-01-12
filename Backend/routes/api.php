@@ -51,6 +51,7 @@ Route::prefix('v1/festival')->group(static function (): void {
     Route::post('/ticketsOrder/create', [OrderTickets::class, 'create']);
     Route::get('/ticketsOrder/getUserList', [OrderTickets::class, 'getUserList'])->middleware('auth:api');
     Route::get('/getInviteLink', [OrderingTicketsController::class, 'getInviteLink'])->middleware('auth:api');
+    Route::get('/isCorrectInviteLink/{userId}', [OrderingTicketsController::class, 'isCorrectInviteLink']);
     Route::post('/ticketsOrder/getList', [OrderTickets::class, 'getList'])->middleware('auth:api')
         ->middleware('admin');
 

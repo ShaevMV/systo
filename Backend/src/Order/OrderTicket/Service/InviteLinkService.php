@@ -21,4 +21,9 @@ class InviteLinkService
     {
         return $this->repository->isPaidOrderByUserId($userId) ? self::LINK_PATCH . $userId->value() : null;
     }
+
+    public function isPaidOrderByUserId(Uuid $userId): bool
+    {
+        return $this->repository->isPaidOrderByUserId($userId);
+    }
 }

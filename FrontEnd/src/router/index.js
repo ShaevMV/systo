@@ -16,6 +16,7 @@ import QuestionnaireView from "../views/QuestionnaireView.vue";
 import store from '../store';
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
+import InviteLinkView from "@/views/auth/InviteLinkView.vue";
 
 const routes = [
     {
@@ -27,6 +28,11 @@ const routes = [
         path: '/hfjlsd65t4732',
         name: 'home',
         component: HomeView
+    },
+    {
+        path: '/invite/:userId',
+        name: 'homeInvite',
+        component: HomeView,
     },
     {
         path: '/login',
@@ -72,6 +78,14 @@ const routes = [
         path: '/profile',
         name: 'Profile',
         component: ProfileView,
+        meta: {
+            'requiresAuth': true,
+        }
+    },
+    {
+        path: '/invite',
+        name: 'InviteLink',
+        component: InviteLinkView,
         meta: {
             'requiresAuth': true,
         }

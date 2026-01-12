@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreatePromoCodeForBotRequest;
 use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
 use DomainException;
@@ -163,9 +162,10 @@ class OrderingTicketsController extends Controller
 
     public function getInviteLink(Request $request, InviteLinkService $inviteLinkService): JsonResponse
     {
-        if(!$userId = $request->user()?->getId()) {
+        if(!$userId = $request->user()?->id) {
             return response()->json([
-                'message' => 'страница доступна только для зарегистрированного пользователя'
+                'message' => 'страница доступна только для зарегистрированного пользователя',
+                'link' => null
             ]);
         }
 
@@ -180,6 +180,12 @@ class OrderingTicketsController extends Controller
             'message' => 'Формирование ссылки-приглашения будет доступно после одобрения хотя бы одного из ваших заказов',
             'link' => null
         ]);
+    }
 
+    public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
+    {
+        return response()->json([
+            'success' => $inviteLinkService->isPaidOrderByUserId(new Uuid($userId))
+        ]);
     }
 }
