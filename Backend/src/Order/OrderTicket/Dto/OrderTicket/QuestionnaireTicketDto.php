@@ -21,6 +21,7 @@ class QuestionnaireTicketDto
         protected ?string $musicStyles = null,
         protected ?string $name = null,
         protected ?Uuid $id = null,
+        protected ?string $whereSysto = null,
     )
     {
         $this->link ='https://org.spaceofjoy.ru/questionnaire/'.$orderId->value().'/'.$ticketId->value();
@@ -45,6 +46,7 @@ class QuestionnaireTicketDto
             $data['musicStyles'] ?? null,
             $data['name'] ?? null,
             $id,
+            $data['whereSysto'] ?? null
         );
     }
 
@@ -62,6 +64,7 @@ class QuestionnaireTicketDto
             'vk' => $this->vk,
             'musicStyles' => $this->musicStyles,
             'name' => $this->name,
+            'whereSysto' => $this->whereSysto
         ];
     }
 
@@ -78,6 +81,7 @@ class QuestionnaireTicketDto
             'vk' => $this->vk,
             'name' => $this->name,
             'musicStyles' => $this->musicStyles,
+            'whereSysto' => $this->whereSysto,
         ];
     }
 

@@ -55,6 +55,20 @@
                 :questionnaire="questionnaire"
                 @update-questionnaire="updateQuestionnaire"
             />
+            <div class="form-check" id="check-check">
+              <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value=""
+                  v-model="confirm"
+                  id="defaultCheck1"
+              />
+              <label class="form-check-label" for="defaultCheck1">
+                Регистрируя добровольный оргвзнос, ты соглашаешься с
+                &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
+                и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
+              </label>
+            </div>
             <div class="col-12">
               <button
                   type="button"
@@ -91,7 +105,7 @@ export default {
   data() {
     return {
       questionnaire: {
-        namey: null,    // Добавил дату для имени и фамилии
+        name: null,    // Добавил дату для имени и фамилии
         agy: null,
         telegram: null,
         vk: null,
@@ -100,7 +114,8 @@ export default {
         musicStyles: null,
         questionForSysto: null,
         whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
-      }
+      },
+      confirm: false,
     }
   },
   computed: {
@@ -110,7 +125,8 @@ export default {
     isCorrect() {
       return this.questionnaire.agy !== null &&
           this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto !== null
+          this.questionnaire.questionForSysto !== null &&
+          this.confirm;
     }
   },
   methods: {

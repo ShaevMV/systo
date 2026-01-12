@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $questionForSysto Ответь кратко и честно на простой вопрос Зачем ты едешь на Систо?
  * @property string|null $telegram Telegram
  * @property string|null $vk Вконтакте
+ * @property string|null $whereSysto Откуда ты узнал о Систо
  * @property string|null $musicStyles Стили музыки, которые предпочитаешь в лесу
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -51,5 +52,6 @@ class QuestionnaireModel extends Model
         'telegram',
         'vk',
         'musicStyles',
+        'whereSysto'
     ];
 }

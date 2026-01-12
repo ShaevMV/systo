@@ -457,11 +457,10 @@
                       />
                       <label class="form-check-label" for="defaultCheck1">
                         Регистрируя добровольный оргвзнос, ты соглашаешься с
-                        &nbsp;<a href="/conditions" target="_blank"
-                      ><b>условиями туристического слёта</b></a
-                      >
+                        &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
+                        и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
                       </label>
-                  </div>
+                    </div>
                   <div class="col-12">
                     <button
                         type="button"
@@ -593,7 +592,7 @@ export default {
       phone: null,
       city: null,
       idBuy: null,
-      confirm: true,
+      confirm: false,
       message: null,
       promoCode: null,
       messageForPromoCode: null,
@@ -803,7 +802,7 @@ export default {
       let data = {
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
-        masterName: this.questionnaire.namey,
+        masterName: this.questionnaire.name,
         guests: guests,
         promo_code: this.promoCode,
         date: this.date,
@@ -850,7 +849,7 @@ export default {
       this.messageForPromoCode = null;
       this.idBuy = null;
       this.comment = null;
-      this.confirm = true;
+      this.confirm = false;
       this.isFirstGuestAdded = false; // сбросить состояние до первого участника
       this.questionnaire = {
         namey: null,

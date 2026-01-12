@@ -102,7 +102,6 @@ class OrderTickets extends Controller
                 $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
                     array_merge($data['questionnaire'],[
                         'phone' => $createOrderTicketsRequest->phone,
-                        'name' => $ticket->getValue(),
                     ]),
                     $orderTicketDto->getId(),
                     $ticket->getId(),

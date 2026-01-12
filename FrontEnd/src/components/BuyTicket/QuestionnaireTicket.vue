@@ -25,13 +25,13 @@
         <!-- Сюда добавил поле Имя и Фамилия -->
         <div class="input-group" id="promo-input">
           <input
-              type="number"
+              type="text"
               id="questionnaire_namey"
               class="form-control"
               placeholder="Твои Имя и Фамилия"
               aria-label="Твои Имя и Фамилия"
-              :value="questionnaire.namey"
-              @input="updateParent('namey', $event.target.value)"
+              :value="questionnaire.name"
+              @input="updateParent('name', $event.target.value)"
               aria-describedby="basic-addon1"
           />
         </div>

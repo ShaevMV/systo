@@ -124,8 +124,8 @@ const routes = [
         component: AboutView,
     },
     {
-        path: '/privacy',
-        name: 'Privacy',
+        path: '/private',
+        name: 'Private',
         component: PrivateView,
     },
     {
