@@ -631,7 +631,7 @@ export default {
     ...mapGetters('appOrder', ['getError']),
     selectTypesOfPaymentIsBilling: function () {
       let typesOfPaymentList = this.getTypesOfPayment;
-      if(this.selectTypesOfPayment.length > 0 ) {
+      if(this.selectTypesOfPayment !== null ) {
         let select = typesOfPaymentList.find(user => user.id == this.selectTypesOfPayment);
         return select.is_billing ?? false;
       }

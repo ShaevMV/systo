@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\CreatePromoCodeForBotRequest;
 use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
 use DomainException;
@@ -16,6 +15,7 @@ use Nette\Utils\JsonException;
 use Throwable;
 use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Tickets\Order\OrderTicket\Service\InviteLinkService;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
@@ -158,5 +158,34 @@ class OrderingTicketsController extends Controller
         }
 
         return $this->allInfoForOrderingTicketsSearcher->getAllPrice(new Uuid($request->get('festival_id')))->toArray();
+    }
+
+    public function getInviteLink(Request $request, InviteLinkService $inviteLinkService): JsonResponse
+    {
+        if(!$userId = $request->user()?->id) {
+            return response()->json([
+                'message' => 'страница доступна только для зарегистрированного пользователя',
+                'link' => null
+            ]);
+        }
+
+        if($link = $inviteLinkService->getLink(new Uuid($userId))) {
+            return response()->json([
+                'message' => 'Вам доступна ссылка для приглашение друга',
+                'link' => $link
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Формирование ссылки-приглашения будет доступно после одобрения хотя бы одного из ваших заказов',
+            'link' => null
+        ]);
+    }
+
+    public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
+    {
+        return response()->json([
+            'success' => $inviteLinkService->isPaidOrderByUserId(new Uuid($userId))
+        ]);
     }
 }
