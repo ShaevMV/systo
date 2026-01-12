@@ -33,7 +33,6 @@ class CreateOrderTicketsRequest extends FormRequest
             'email' => 'required|email',
             'phone' => 'required',
             'city' => 'required',
-            'masterName' => 'required',
             'guests' => 'array',
             'ticket_type_id' => 'exists:App\Models\Ordering\InfoForOrder\TicketTypesModel,id',
             'types_of_payment_id' => 'exists:App\Models\Ordering\InfoForOrder\TypesOfPaymentModel,id',

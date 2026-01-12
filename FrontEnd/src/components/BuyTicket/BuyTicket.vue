@@ -125,11 +125,16 @@
                 <div class="pp2 row">Заполни анкетные данные, как основного гостя:</div>
 
                 <label id="my-own" class="row">
-                  <input type="checkbox" class="form-check-input">
+                  <input
+                      type="checkbox"
+                      class="form-check-input"
+                      v-model="isNotNeedQuestionnaire"
+                  >
                   <span>Мне не нужно заполнять анкету, я хочу внести оргвзнос только за своих друзей</span>
                 </label>
 
                 <questionnaire-ticket
+                    v-show="!isNotNeedQuestionnaire"
                     :questionnaire="questionnaire"
                     @update-questionnaire="updateQuestionnaire"
                 />
@@ -571,6 +576,7 @@ export default {
   components: {QuestionnaireTicket},
   data() {
     return {
+      isNotNeedQuestionnaire: false,
       preload: false,
       day: null,
       mount: null,
@@ -593,7 +599,7 @@ export default {
       messageForPromoCode: null,
       comment: null,
       questionnaire: {
-        namey: null,
+        namey: '',
         agy: null,
         telegram: null,
         vk: null,
@@ -646,7 +652,7 @@ export default {
       let group = true;
 
       if (this.getSelectTicketType !== null) {
-        if (!this.isAllowedGuestMin(this.guests.length + 1)) {
+        if (!this.isAllowedGuestMin(this.guests.length)) {
           group = false;
         }
       }
@@ -654,16 +660,19 @@ export default {
       let result = (
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
-
           this.phone !== null &&
-          this.masterName.length > 0 &&
-          this.questionnaire.agy !== null &&
-          this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto  !== null &&
           group &&
           (this.isAuth || this.email)
       )
-
+      if(!this.isNotNeedQuestionnaire) {
+        result = result &&
+            this.questionnaire.namey.length > 0 &&
+            this.questionnaire.agy !== null &&
+            this.questionnaire.howManyTimes !== null &&
+            this.questionnaire.questionForSysto  !== null;
+      } else {
+        result = result && this.guests.length > 0;
+      }
       if(!this.selectTypesOfPaymentIsBilling) {
         result = result &&
             this.date !== null &&
@@ -791,11 +800,10 @@ export default {
       let self = this;
       this.preload = true;
       let guests = this.guests;
-
-      this.goToCreateOrderTicket({
+      let data = {
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
-        masterName: this.masterName,
+        masterName: this.questionnaire.namey,
         guests: guests,
         promo_code: this.promoCode,
         date: this.date,
@@ -804,7 +812,6 @@ export default {
         phone: this.phone,
         comment: this.comment,
         types_of_payment_id: this.selectTypesOfPayment,
-        questionnaire: this.questionnaire,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
         callback: function (result, message, link) {
           if (result) {
@@ -814,13 +821,16 @@ export default {
             window.location.href = link;
           } else {
             self.message = message;
-
             document.getElementById('modalOpenBtn').click();
-
             self.preload = false;
           }
         },
-      });
+      };
+      if(!this.isNotNeedQuestionnaire) {
+        data.questionnaire = this.questionnaire;
+      }
+
+      this.goToCreateOrderTicket(data);
     },
     /**
      * Очистить данные
@@ -830,7 +840,6 @@ export default {
       this.guests = [];
       this.preload = false;
       this.newGuest = '';
-      this.masterName = '';
       this.newGuestEmail = '';
       this.email = this.getEmail;
       this.promoCode = null;

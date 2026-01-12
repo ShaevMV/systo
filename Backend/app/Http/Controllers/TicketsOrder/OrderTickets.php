@@ -69,10 +69,12 @@ class OrderTickets extends Controller
             )->value());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             $guests = $createOrderTicketsRequest->guests;
-            array_unshift($guests,[
-                'value' => $createOrderTicketsRequest->masterName,
-                'email' => $createOrderTicketsRequest->email,
-            ]);
+            if($createOrderTicketsRequest->masterName) {
+                array_unshift($guests,[
+                    'value' => $createOrderTicketsRequest->masterName,
+                    'email' => $createOrderTicketsRequest->email,
+                ]);
+            }
 
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
