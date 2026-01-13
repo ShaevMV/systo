@@ -1,6 +1,6 @@
 <template>
   <div id="left-logo">
-    <a href="/">
+    <a :href="getLinkHome">
     <img src="/assets/img/logo-main.png" alt="main logo" class="left-logo">
     </a>
   </div>
@@ -9,7 +9,7 @@
       <router-link
           class="nav-link"
           active-class="active"
-          to="/">Регистрация оргвзноса
+          :to="getLinkHome">Регистрация оргвзноса
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
@@ -89,6 +89,9 @@ export default {
       'isAdmin',
       'isManager'
     ]),
+    getLinkHome: function () {
+      return this.isAuth ? '/hfjlsd65t4732' : '/';
+    }
   },
   methods: {
     ...mapActions('appUser', [

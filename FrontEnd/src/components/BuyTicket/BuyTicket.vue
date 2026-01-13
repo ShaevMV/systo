@@ -123,21 +123,30 @@
 
                 </div>
                 <div class="pp2 row">Заполни анкетные данные, как основного гостя:</div>
+                <div class="quest-item" v-show="!isNotNeedQuestionnaire">
+                  <label for="questionnaire_namey">Твои Имя и Фамилия: *</label>
 
+                  <!-- Сюда добавил поле Имя и Фамилия -->
+                  <div class="input-group" id="promo-input">
+                    <input
+                        type="text"
+                        id="questionnaire_namey"
+                        class="form-control"
+                        placeholder="Твои Имя и Фамилия"
+                        aria-label="Твои Имя и Фамилия"
+                        v-model="masterName"
+                        aria-describedby="basic-addon1"
+                    />
+                  </div>
+                </div>
                 <label id="my-own" class="row">
                   <input
                       type="checkbox"
                       class="form-check-input"
                       v-model="isNotNeedQuestionnaire"
                   >
-                  <span>Мне не нужно заполнять анкету, я хочу внести оргвзнос только за своих друзей</span>
+                  <span>Я хочу внести оргвзнос только за своих друзей</span>
                 </label>
-
-                <questionnaire-ticket
-                    v-show="!isNotNeedQuestionnaire"
-                    :questionnaire="questionnaire"
-                    @update-questionnaire="updateQuestionnaire"
-                />
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
                   <div class="not-first-guest input-group mb-3">
@@ -567,12 +576,10 @@
 </template>
 
 <script>
-import QuestionnaireTicket from "@/components/BuyTicket/QuestionnaireTicket.vue";
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'BuyTicket',
-  components: {QuestionnaireTicket},
   data() {
     return {
       isNotNeedQuestionnaire: false,
@@ -597,17 +604,6 @@ export default {
       promoCode: null,
       messageForPromoCode: null,
       comment: null,
-      questionnaire: {
-        namey: '',
-        agy: null,
-        telegram: null,
-        vk: null,
-        phone: null,
-        howManyTimes: null,
-        musicStyles: null,
-        questionForSysto: null,
-        whereSysto: null,
-      }
     };
   },
   watch: {
@@ -663,15 +659,13 @@ export default {
           group &&
           (this.isAuth || this.email)
       )
+
       if(!this.isNotNeedQuestionnaire) {
-        result = result &&
-            this.questionnaire.namey.length > 0 &&
-            this.questionnaire.agy !== null &&
-            this.questionnaire.howManyTimes !== null &&
-            this.questionnaire.questionForSysto  !== null;
+        result = result && this.masterName.length > 0;
       } else {
         result = result && this.guests.length > 0;
       }
+
       if(!this.selectTypesOfPaymentIsBilling) {
         result = result &&
             this.date !== null &&
@@ -708,7 +702,7 @@ export default {
      */
     totalPrice: function () {
       let price = null;
-      let countTicket = this.guests.length + (this.masterName.length > 0 ? 1 : 0);
+      let countTicket = this.guests.length + ((!this.isNotNeedQuestionnaire && this.masterName.length > 0) ? 1 : 0);
       if (this.getSelectTicketType !== null) {
         price = this.getSelectTicketType.price;
         let count =
@@ -723,7 +717,7 @@ export default {
      * @returns {number}
      */
     countGuests: function () {
-      return this.guests.length + (this.masterName.length > 0 ? 1 : 0);
+      return this.guests.length + ((!this.isNotNeedQuestionnaire && this.masterName.length > 0) > 0 ? 1 : 0);
     },
     /**
      * Проверка на добавление нового гостя
@@ -802,7 +796,7 @@ export default {
       let data = {
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
-        masterName: this.questionnaire.name,
+        masterName: this.masterName,
         guests: guests,
         promo_code: this.promoCode,
         date: this.date,
@@ -851,16 +845,6 @@ export default {
       this.comment = null;
       this.confirm = false;
       this.isFirstGuestAdded = false; // сбросить состояние до первого участника
-      this.questionnaire = {
-        namey: null,
-        agy: null,
-        telegram: null,
-        vk: null,
-        howManyTimes: null,
-        musicStyles: null,
-        questionForSysto: null,
-        whereSysto: null,
-      };
       this.clearPromoCode();
     },
   },
