@@ -1,24 +1,30 @@
 <template>
   <div class="container-fluid">
     <div class="text-center title-block">
-      <h1>Странница получение персональной ссылке</h1>
-      <small class="form-text text-muted">на создание туристического слёта Solar Systo Togathering 2026</small>
+      <h1>Страница получения персональной ссылки-приглашения</h1>
+      <small class="form-text text-muted">для участия ваших друзей в туристическом слёте Solar Systo Togathering
+        2026</small>
     </div>
     <div class="row" id="main-form">
       <div class="col-md-10 mx-auto">
         <div class="card mt-2 mx-auto">
-          <div class="card-body">
-            <div v-html="message"></div>
+          <div class="card-body" id="invite-content">
+            <p>Дорогой друг, тебе доступна ссылка для приглашение своих друзей.</p>
+            <p>Просим тебя быть предельно бдительным и внимательным в том, кому ты будешь отправлять эту ссылку.</p>
+            <p>Нажми на кнопку, чтобы перейти в браузер</p>
+<!--            <div v-html="message"></div>-->
             <div v-if="link !== null">
-              <a :href="link" target="_blank">Ссылка для покупки билета</a>
+              <a :href="link" target="_blank" class="blue-btn">ССЫЛКА-ПРИГЛАШЕНИЕ ДЛЯ РЕГИСТРАЦИИ ОРГВЗНОСА</a>
+              <div id="invite-link">
+                <p>или скопируй вручную и отправь своему другу любым удобным тебе способом!</p>
               <span>
-                                {{ link }}
+                                {{ link }}</span>
                                 <i
                                     class="copy-payment"
                                     title="Нажми, чтобы скопировать"
                                     @click="CopyTypesOfPayment(link)"
                                 ></i>
-                              </span>
+              </div>
             </div>
           </div>
         </div>

@@ -16,7 +16,7 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{ name: 'InviteLink' }">Инвайт ссылка
+          :to="{ name: 'InviteLink' }">Ссылка-Приглашение
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
