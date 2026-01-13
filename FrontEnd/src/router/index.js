@@ -6,7 +6,6 @@ import OrderView from "../views/order/OrderView";
 import AdminDashboard from "../views/admin/AdminDashboard";
 import OrderItemView from "@/views/order/OrderItemView";
 import OrderListForAdmin from "@/views/order/OrderListForAdmin.vue";
-import RegView from "@/views/auth/RegView.vue";
 import Error404 from "@/views/error/Error404.vue";
 import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
@@ -39,14 +38,6 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
-        meta: {
-            'guest': true
-        }
-    },
-    {
-        path: '/registration',
-        name: 'registration',
-        component: RegView,
         meta: {
             'guest': true
         }

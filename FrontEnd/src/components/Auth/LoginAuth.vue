@@ -9,10 +9,6 @@
           <div class="card-body">
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
-              Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку
-              <router-link
-                  to="/registration"><b style="text-transform:uppercase">Зарегистрироваться</b>
-              </router-link>
             </p>
               <div id="contact-form" role="form">
                 <div class="d-flex y-row">
