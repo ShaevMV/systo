@@ -14,6 +14,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $phone
  * @property string $masterName
  * @property string $city
+ * @property string $invite
  * @property string|null $comment
  * @property array $guests
  * @property string|null $promo_code

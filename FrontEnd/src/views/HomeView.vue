@@ -1,5 +1,5 @@
 <template>
-    <BuyTicket/>
+    <BuyTicket :userId="userId"/>
 </template>
 <script>
 import BuyTicket from "@/components/BuyTicket/BuyTicket";

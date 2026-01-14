@@ -94,6 +94,9 @@ class OrderTickets extends Controller
                 $priceDto,
                 $ticketType->isLiveTicket(),
             );
+            if($createOrderTicketsRequest->invite !== 'undefined' && $createOrderTicketsRequest->invite !== null) {
+                $orderTicketDto->setInviteLink(new Uuid($createOrderTicketsRequest->invite));
+            }
 
             $this->createOrder->createAndSave($orderTicketDto);
             // Добавляем анкету

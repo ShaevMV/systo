@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\DB;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
+use Tickets\Order\OrderTicket\Application\AddOrderInInvite\AddOrderInInviteCommand;
+use Tickets\Order\OrderTicket\Application\AddOrderInInvite\AddOrderInInviteCommandHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
@@ -22,13 +24,15 @@ final class CreateOrder
     private InMemorySymfonyQueryBus $queryBus;
 
     public function __construct(
-        CreatingOrderCommandHandler $creatingOrderCommandHandler,
-        OrderItemQueryHandler       $itemQueryHandler,
-        private Bus                 $bus,
+        CreatingOrderCommandHandler    $creatingOrderCommandHandler,
+        OrderItemQueryHandler          $itemQueryHandler,
+        AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
+        private Bus                    $bus,
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            CreatingOrderCommand::class => $creatingOrderCommandHandler
+            CreatingOrderCommand::class => $creatingOrderCommandHandler,
+            AddOrderInInviteCommand::class => $addOrderInInviteCommandHandler,
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
@@ -52,16 +56,24 @@ final class CreateOrder
             if (is_null($orderTicketItem)) {
                 throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
             }
+
+            if(null !== $orderTicketDto->getInviteLink()) {
+                $this->commandBus->dispatch(new AddOrderInInviteCommand(
+                    $orderTicketDto->getInviteLink(),
+                    $orderTicketDto->getId(),
+                ));
+            }
+
+            $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
+
+            $this->bus::chain($orderTicket->pullDomainEvents())
+                ->dispatch();
+
             DB::commit();
         } catch (Throwable $throwable) {
             DB::rollBack();
             throw $throwable;
         }
-
-        $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
-
-        $this->bus::chain($orderTicket->pullDomainEvents())
-            ->dispatch();
 
         return true;
     }

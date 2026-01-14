@@ -145,6 +145,36 @@
             @input="updateParent('whereSysto', $event.target.value)"
         >
       </div>
+
+      <div class="quest-item">
+        <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании события?:</label>
+
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.activeOfEvent"
+            id="questionnaire_activeOfEvent"
+            placeholder="Готовы принимать более активное или творческое участие в создании события?"
+            aria-label="Откуда ты узнал о Систо?"
+            @input="updateParent('activeOfEvent', $event.target.value)"
+        >
+      </div>
+
+      <div class="quest-item">
+        <label for="questionnaire_creationOfSisto"> Считаете ли вы себя участвующим в сотворении Систо?:</label>
+
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.creationOfSisto"
+            id="questionnaire_creationOfSisto"
+            placeholder="Считаете ли вы себя участвующим в сотворении Систо?"
+            aria-label="Считаете ли вы себя участвующим в сотворении Систо?"
+            @input="updateParent('creationOfSisto', $event.target.value)"
+        >
+      </div>
+
+
     </div>
   </div>
 

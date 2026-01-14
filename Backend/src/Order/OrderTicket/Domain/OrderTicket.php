@@ -62,19 +62,6 @@ final class OrderTicket extends AggregateRoot
                 $result->festival_id,
             )
         );
-        $orderId = $orderTicketDto->getId();
-
-        foreach ($orderTicketDto->getTicket() as $item) {
-            if(null !== $item->getEmail()) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail(),
-                        $orderId->value(),
-                        $item->getId()->value(),
-                    )
-                );
-            }
-        }
-
 
         return $result;
     }
@@ -110,6 +97,19 @@ final class OrderTicket extends AggregateRoot
                 $externalPromoCodeDto?->getPromocode(),
             )
         );
+
+        $orderId = $orderTicketDto->getId();
+
+        foreach ($orderTicketDto->getTicket() as $item) {
+            if(null !== $item->getEmail()) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail(),
+                        $orderId->value(),
+                        $item->getId()->value(),
+                    )
+                );
+            }
+        }
 
         return $result;
     }
