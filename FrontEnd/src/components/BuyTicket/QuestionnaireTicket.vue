@@ -2,27 +2,9 @@
   <div class="row">
     <div class="mb-12" id="quest">
 
-
-<!--      <div class="col-5">-->
-<!--        <label for="masterName" class="reg-label">Твои имя и Фамилия *</label>-->
-<!--        <input-->
-<!--            type="text"-->
-<!--            id="masterName"-->
-<!--            class="form-control"-->
-<!--            placeholder="Твои имя и фамилия"-->
-<!--            aria-label="Твои имя и фамилия"-->
-<!--            v-model="masterName"-->
-<!--            aria-describedby="basic-addon1"-->
-<!--        />-->
-<!--        <small class="form-text text-muted">-->
-<!--          {{ getError('masterName') }}</small-->
-<!--        >-->
-<!--      </div>-->
-
       <div class="quest-item">
         <label for="questionnaire_namey">Твои Имя и Фамилия: *</label>
 
-        <!-- Сюда добавил поле Имя и Фамилия -->
         <div class="input-group" id="promo-input">
           <input
               type="text"
@@ -137,7 +119,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_questionForSysto">Ответь кратко и честно на простой вопрос "Зачем ты едешь на Систо?": *</label>
+        <label for="questionnaire_questionForSysto">Ответь кратко на вопрос "Зачем ты едешь на Систо?": *</label>
 
                     <input
                         type="text"
@@ -150,7 +132,6 @@
                     >
         </div>
 
-      <!-- Добавил вопрос Откуда ты узнал о Систо? -->
       <div class="quest-item">
         <label for="questionnaire_whereSysto">Откуда ты узнал о Систо?:</label>
 

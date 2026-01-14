@@ -219,7 +219,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col-4">
+                <div class="row col-12">
                   <h4 class="font-weight-normal" id="count-label">
                     Общее количество гостей в твоем заказе:
                     <span>{{ countGuests }}</span>
@@ -313,7 +313,7 @@
 
 
                 <div class="row itog-row mb-4" v-show="totalPrice !== null">
-                  <div class="col-4">
+                  <div class="col-12">
                     <h4 class="my-lg-2 font-weight-normal">
                       Итого к внесению:
                       <small class="text-muted">{{ totalPrice }} руб.</small>
