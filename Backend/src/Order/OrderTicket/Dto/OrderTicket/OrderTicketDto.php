@@ -44,6 +44,7 @@ class OrderTicketDto
         protected ?string  $promo_code = null,
         protected bool     $is_live_ticket = false,
         ?Uuid              $id = null,
+        protected ?Uuid    $inviteLink = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -187,5 +188,15 @@ class OrderTicketDto
     public function isBilling(): bool
     {
         return $this->types_of_payment_id->equals(new Uuid('3fcded69-4aef-4c4a-a041-52c91e5afd91'));
+    }
+
+    public function getInviteLink(): ?Uuid
+    {
+        return $this->inviteLink;
+    }
+
+    public function setInviteLink(?Uuid $inviteLink): void
+    {
+        $this->inviteLink = $inviteLink;
     }
 }

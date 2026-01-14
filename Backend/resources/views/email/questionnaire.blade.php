@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Анкета </td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Анкета участника Solar Systo Togathering </td>
                             </tr>
                         </table>
                     </td>
@@ -40,12 +40,12 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">
-                            Твой друг уже внес оргвзнос на Систо, тебе остается только заполнить данные о себе. Как только внесешь свои данные и согласишься с правилами пребывания на Систо, твои QR-коды для входа на событие будут активированы.  </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В 2026-м году для доступа на Систо, всем гостям необходимо заполнить небольшую анкету, а также согласиться с правилами поведения и пребывания на территории события.
+                            <br>Как только данные будут внесены, твои QR-коды будут активированы, а также ты получишь доступ в новый закрытый чат Solar Systo Togathering 2026!   </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}"> ссылка на анкету </a>  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи на Solar Systo 2026!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи в лесу!</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">По всем вопросам пиши в ТГ <a href="https://t.me/systo_vznos">@systo_vznos</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у тебя остались вопрос - пиши в ТГ <a href="https://t.me/systo_vznos">@systo_vznos</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>

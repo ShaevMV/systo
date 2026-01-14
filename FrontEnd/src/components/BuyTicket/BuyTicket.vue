@@ -580,6 +580,9 @@ import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'BuyTicket',
+  props: {
+    'userId': String
+  },
   data() {
     return {
       isNotNeedQuestionnaire: false,
@@ -656,6 +659,7 @@ export default {
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.phone !== null &&
+          this.confirm === true &&
           group &&
           (this.isAuth || this.email)
       )
@@ -668,9 +672,8 @@ export default {
 
       if(!this.selectTypesOfPaymentIsBilling) {
         result = result &&
-            this.date !== null &&
-            this.confirm === true &&
-            this.idBuy !== null;
+            (this.date !== null && this.date.length > 0) &&
+            (this.idBuy !== null && this.idBuy.length > 0);
       }
 
       return result;
@@ -804,6 +807,7 @@ export default {
         city: this.city,
         phone: this.phone,
         comment: this.comment,
+        invite: this.$route.params.userId,
         types_of_payment_id: this.selectTypesOfPayment,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
         callback: function (result, message, link) {
@@ -819,10 +823,7 @@ export default {
           }
         },
       };
-      if(!this.isNotNeedQuestionnaire) {
-        data.questionnaire = this.questionnaire;
-      }
-
+      console.log(data);
       this.goToCreateOrderTicket(data);
     },
     /**

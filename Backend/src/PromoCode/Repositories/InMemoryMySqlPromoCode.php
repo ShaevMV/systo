@@ -121,7 +121,7 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
     {
         DB::beginTransaction();
         try {
-            $rawModel =$this->model::whereId($promoCodeDto->getId()->value());
+            $rawModel = $this->model::whereId($promoCodeDto->getId()->value());
             if (!$rawModel->exists()) {
                 $data = $promoCodeDto->toArrayForTable();
                 $this->model->insert(
