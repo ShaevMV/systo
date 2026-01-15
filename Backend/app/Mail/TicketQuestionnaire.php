@@ -23,7 +23,7 @@ class TicketQuestionnaire extends Mailable
      */
     public function build(): static
     {
-        $this->subject('Анкета пользователя');
+        $this->subject('Анкеты участника Solar Systo Togathering');
 
         return $this->view('email.questionnaire', [
             'link' => $this->link,

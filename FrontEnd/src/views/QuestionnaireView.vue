@@ -113,6 +113,8 @@ export default {
         howManyTimes: null,
         musicStyles: null,
         questionForSysto: null,
+        creationOfSisto: null,
+        activeOfEvent: null,
         whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
       },
       confirm: false,
@@ -126,6 +128,7 @@ export default {
       return this.questionnaire.agy !== null &&
           this.questionnaire.howManyTimes !== null &&
           this.questionnaire.questionForSysto !== null &&
+          this.questionnaire.phone !== null &&
           this.confirm;
     }
   },
@@ -149,6 +152,8 @@ export default {
             howManyTimes: null,
             musicStyles: null,
             questionForSysto: null,
+            creationOfSisto: null,
+            activeOfEvent: null,
           };
       },
       })
@@ -158,7 +163,7 @@ export default {
     }
   },
   created() {
-    document.title = "Анкета участника Systo"
+    document.title = "Анкеты участника Solar Systo Togathering"
   },
 }
 </script>

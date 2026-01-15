@@ -40,8 +40,8 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В 2026-м году для доступа на Систо, всем гостям необходимо заполнить небольшую анкету, а также согласиться с правилами поведения и пребывания на территории события.
-                            <br>Как только данные будут внесены, твои QR-коды будут активированы, а также ты получишь доступ в новый закрытый чат Solar Systo Togathering 2026!   </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В этом году для доступа на Систо, всем гостям необходимо заполнить небольшую анкету, а также согласиться с правилами поведения и пребывания на территории события.
+                            <br>Как только данные будут внесены, твои QR-коды будут активированы, а также ты получишь доступ в новый закрытый чат Solar Systo Togathering!   </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}"> ссылка на анкету </a>  </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи в лесу!</p>
 
