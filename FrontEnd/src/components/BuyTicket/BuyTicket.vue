@@ -122,12 +122,11 @@
                   </div>
 
                 </div>
-                <div class="pp2 row">Заполни анкетные данные, как основного гостя:</div>
-                <div class="quest-item" v-show="!isNotNeedQuestionnaire">
-                  <label for="questionnaire_namey">Твои Имя и Фамилия: *</label>
+                <div class="pp2 row">Введи свои Имя и Фамилию, если вносишь оргвзнос за себя</div>
+                <div class="quest-item row" id="first-item-row">
+                  <label for="questionnaire_namey" style="display: none">Твои Имя и Фамилия: *</label>
 
-                  <!-- Сюда добавил поле Имя и Фамилия -->
-                  <div class="input-group" id="promo-input">
+                  <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
                     <input
                         type="text"
                         id="questionnaire_namey"
@@ -138,15 +137,16 @@
                         aria-describedby="basic-addon1"
                     />
                   </div>
+
+                  <label id="my-own">
+                    <input
+                        type="checkbox"
+                        class="form-check-input"
+                        v-model="isNotNeedQuestionnaire"
+                    >
+                    <span>Я хочу внести оргвзнос только за своих друзей</span>
+                  </label>
                 </div>
-                <label id="my-own" class="row">
-                  <input
-                      type="checkbox"
-                      class="form-check-input"
-                      v-model="isNotNeedQuestionnaire"
-                  >
-                  <span>Я хочу внести оргвзнос только за своих друзей</span>
-                </label>
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
                   <div class="not-first-guest input-group mb-3">
@@ -226,8 +226,9 @@
                   </h4>
                 </div>
 
-                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на почту твоих друзей придёт ссылка на анкету, которую им необходимо заполнить для активации их QR-кодов при входе на Систо. Сами же QR-коды придут на твою почту и будут доступны в твоём личном кабинете.
-                  От твоих друзей требуется только заполнить анкетные данные по аналогии с теми, что ты заполнял выше. Спасибо за понимание.
+                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на твою почту и почты твоих друзей придёт ссылка на анкету, которую необходимо заполнить, чтобы
+                  активировать ваши QR-коды, а также получить доступ к новому закрытому чату гостей Solar Systo Togathering 2026.
+
                 </div>
 
                 <div class="pp1 row">
@@ -497,11 +498,7 @@
                 <div class="row mt-4" id="sub-order">
                   <div class="after-order">
                     <p>
-                      После оплаты в течение 3-4 дней на твой e-mail придет
-                      подтверждение оргвзноса и <br /><strong
-                    >электронный билет с QR-кодом</strong
-                    >
-                      для входа на Solar Systo Togathering 2026!
+                      После подтверждения перевода на твой e-mail придет <strong>электронный билет с QR-кодом</strong><br> для входа на Solar Systo Togathering 2026! А также ссылка на анкету для добавления в новый закрытый чат
                     </p>
                     <!--p>
                       <b>«Живые билеты» в виде памятной карточки можно будет приобрести в </b>
