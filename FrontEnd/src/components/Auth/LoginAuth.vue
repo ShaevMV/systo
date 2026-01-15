@@ -98,7 +98,7 @@ export default {
             if (isAdmin === true) {
               location.href = '/orders';
             } else {
-              location.href = '/myOrders';
+              location.href = '/hfjlsd65t4732';
             }
           }
         }
