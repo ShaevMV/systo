@@ -75,7 +75,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         foreach ($guestsRaw as $guest) {
             $guests[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
-        if($data['status'] === Status::NEW) {
+        if($data['status'] === Status::PAID) {
             $status = new Status((int)$data['questionnaire_count'] === self::getGuestsCount($guests) ? Status::QUESTIONNAIRE_FULL : Status::QUESTIONNAIRE_NOT_FULL);
         } else {
             $status = new Status($data['status']);

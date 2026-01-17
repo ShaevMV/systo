@@ -467,7 +467,7 @@
                       />
                       <label class="form-check-label" for="defaultCheck1">
                         Регистрируя добровольный оргвзнос, ты соглашаешься с
-                        &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
+                        &nbsp;<a href="/conditions" target="_blank"><b>Правилами и условиями участия в туристическом слёте</b></a>
                         и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
                       </label>
                     </div>
