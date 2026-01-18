@@ -48,7 +48,6 @@ class OrderToPaid extends Mailable
         ]);
 
         foreach ($this->tickets as $ticket) {
-            throw new \Exception($ticket->getFestivalView());
             if ($ticket->getFestivalView() === null) {
                 continue;
             }
