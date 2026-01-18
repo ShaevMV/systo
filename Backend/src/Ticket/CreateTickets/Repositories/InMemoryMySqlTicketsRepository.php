@@ -157,7 +157,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['pdf'],
             $result['emailView'],
             new Uuid($result['festival_id']),
-            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada04', '222abc0c-fc8e-4a1d-a4b0-d345cafada02']),
+            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             new Uuid($result['ticket_type_id']),
             $result['name_type']
         );

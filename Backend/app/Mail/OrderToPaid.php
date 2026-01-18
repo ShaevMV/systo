@@ -48,6 +48,9 @@ class OrderToPaid extends Mailable
         ]);
 
         foreach ($this->tickets as $ticket) {
+            if($ticket->getFestivalView() === null) {
+                continue;
+            }
             $contents = $qrCodeService->createPdf($ticket);
             $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
             \Log::info('Отправлен билет на имя '. $ticket->getName());
