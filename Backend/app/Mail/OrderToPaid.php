@@ -48,7 +48,8 @@ class OrderToPaid extends Mailable
         ]);
 
         foreach ($this->tickets as $ticket) {
-            if($ticket->getFestivalView() === null) {
+            throw new \Exception($ticket->getFestivalView());
+            if ($ticket->getFestivalView() === null) {
                 continue;
             }
             $contents = $qrCodeService->createPdf($ticket);
