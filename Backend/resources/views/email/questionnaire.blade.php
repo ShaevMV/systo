@@ -45,7 +45,7 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}"> ссылка на анкету </a>  </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи в лесу!</p>
 
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у тебя остались вопрос - пиши в ТГ <a href="https://t.me/systo_vznos">@systo_vznos</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у тебя остались вопрос - пиши в ТГ <a href="https://t.me/systo_club">@systo_club</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
