@@ -22,7 +22,7 @@ class TicketResponse extends AbstractionEntity implements Response
         protected string $city,
         protected ?string $comment,
         protected Carbon $date_order,
-        protected ?string $festivalView,
+        protected ?string $festivalView = null,
         protected ?string $emailView = null,
         protected ?Uuid $festival_id = null,
         protected bool $is_need_seedling = false,
@@ -67,7 +67,7 @@ class TicketResponse extends AbstractionEntity implements Response
 
     public function getFestivalView(): ?string
     {
-        return $this->festivalView;
+        return $this->festivalView ?? null;
     }
 
     /**
