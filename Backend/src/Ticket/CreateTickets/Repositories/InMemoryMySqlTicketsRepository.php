@@ -154,7 +154,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['city'],
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            empty($result['pdf']) ? null : $result['pdf'],
+            empty(trim($result['pdf'])) ? null : $result['pdf'],
             $result['emailView'],
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
