@@ -12,6 +12,7 @@ import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
 import PrivateView from "@/views/PrivateView.vue";
+import FaqView from "@/views/FaqView.vue";
 import QuestionnaireView from "../views/QuestionnaireView.vue";
 import store from '../store';
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
@@ -113,6 +114,11 @@ const routes = [
         path: '/conditions',
         name: 'Conditions',
         component: AboutView,
+    },
+    {
+        path: '/faq',
+        name: 'Faq',
+        component: FaqView,
     },
     {
         path: '/private',
