@@ -121,7 +121,6 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             ->leftJoin(TicketTypesModel::TABLE, OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE . '.id')
             ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
                 $join->on($this->model::TABLE . '.festival_id', '=', TicketTypeFestivalModel::TABLE . '.festival_id');
-                $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
             })
             ->select([
                 $this->model::TABLE . '.id',
