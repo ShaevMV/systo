@@ -362,7 +362,8 @@
                                   v-bind:value="typesOfPayment.id"
                                   v-bind:id="typesOfPayment.id"
                               />
-                              <span v-html="typesOfPayment.name">
+                              <span >
+                                <span v-html="typesOfPayment.name"></span>
                                 <i
                                     class="copy-payment"
                                     title="Нажми, чтобы скопировать реквизиты"
