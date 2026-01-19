@@ -25,8 +25,8 @@ class CreateOrUpdatePromoCodeCommand implements Command
     public static function fromState(array $data): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : Uuid::random();
-        $ticketTypeId = !empty($data['ticket_type_id'] ?? null) ? new Uuid($data['ticket_type_id']) : null;
-        $festivalId = !empty($data['festival_id'] ?? null) ? new Uuid($data['festival_id']) : null;
+        $ticketTypeId = !empty($data['ticket_type_id']) ? new Uuid($data['ticket_type_id']) : null;
+        $festivalId = !empty($data['festival_id']) ? new Uuid($data['festival_id']) : null;
         return new self(
             $data['name'],
             $data['discount'],
