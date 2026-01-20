@@ -88,7 +88,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['name'],
             (int)$data['price'] - (int)$data['discount'],
             $guests,
-            $data['payment_name'],
+            \Illuminate\Support\Str::limit(strip_tags($data['payment_name']),10),
             $status,
             $data['date'],
             $status->getListNextStatus(),
