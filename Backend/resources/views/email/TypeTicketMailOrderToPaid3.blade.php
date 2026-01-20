@@ -31,7 +31,7 @@
                     <td style="padding: 20px;">
                         <table style="border: none; border-collapse: collapse;" border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Билеты соорганизатора на {{$festivalName}}</td>
+                                <td style="padding-left: 20px; font-size: 30px; font-family: Tahoma, sans-serif;">Лесная карта на {{$festivalName}}</td>
                             </tr>
                         </table>
                     </td>
@@ -43,8 +43,8 @@
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой большой вклад в создание Систо</p>
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В ближайшее время с тобой свяжется куратор лесных карт Инесса, чтобы обсудить печать новой лесной карты на 2026 год, а также расскажет как получить все остальные бонусы и скидки годового оргвзноса</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напишите в телеграмм <a href="https://t.me/systo_club" target="_blank">@systo_club</a></p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи, на фестивале!</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напиши ей в телеграмм <a href="https://t.me/Nessa_Asseni" target="_blank">@Nessa_Asseni</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи в лесу!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
                 </tr>
