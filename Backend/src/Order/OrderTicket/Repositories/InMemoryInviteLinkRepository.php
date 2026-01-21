@@ -45,8 +45,9 @@ class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
             $orderList = json_decode($orderList, true);
         }
         $orderList[] = $orderId->value();
-        DB::beginTransaction();
+
         try {
+            DB::beginTransaction();
             $rawModel = $this->model::whereId($id->value());
             if (!$rawModel->exists()) {
                 $this->model::create([

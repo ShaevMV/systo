@@ -20,8 +20,9 @@ class InMemoryMySqlCommentRepository implements CommentRepositoryInterface
      */
     public function addComment(CommentDto $commentDto): bool
     {
-        DB::beginTransaction();
+
         try {
+            DB::beginTransaction();
             $this->model::create($commentDto->toArray());
             DB::commit();
             return true;

@@ -42,9 +42,10 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function create(OrderTicketDto $orderTicketDto): bool
     {
-        DB::beginTransaction();
+
         $data = $orderTicketDto->toArray();
         try {
+            DB::beginTransaction();
             $this->model->insert(
                 array_merge($data,
                     [
@@ -225,7 +226,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool
     {
-        DB::beginTransaction();
+
         $arrGuests = [];
         foreach ($guests as $guest) {
             $arrGuests[] = [
@@ -235,6 +236,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
 
         try {
+            DB::beginTransaction();
             $order = $this->model::find($orderId->value());
             $order->status = (string)$newStatus;
             $order->guests = $arrGuests;

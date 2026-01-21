@@ -25,9 +25,10 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
     public function create(QuestionnaireTicketDto $questionnaireTicketDto): bool
     {
-        DB::beginTransaction();
+
         $data = $questionnaireTicketDto->toArrayForMySql();
         try {
+            DB::beginTransaction();
             $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
                 ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
             if($rawModel->exists()) {

@@ -29,8 +29,9 @@ final class InMemoryMySqlAccount implements AccountInterface
         string $password
     ): bool
     {
-        DB::beginTransaction();
+
         try {
+            DB::beginTransaction();
             $this->model::insert(
                 array_merge(
                     $accountDto->toArray(),

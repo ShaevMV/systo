@@ -23,8 +23,9 @@ class InMemoryMySqlExternalPromoCode implements ExternalPromoCodeInterface
      */
     public function insertOrder(Uuid $ticketTypeId): bool
     {
-        DB::beginTransaction();
+
         try {
+            DB::beginTransaction();
             $rawModel = $this->model::whereOrderTicketsId(null)->first();
             $rawModel?->update([
                 'order_tickets_id' => $ticketTypeId->value()
