@@ -85,7 +85,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             new Uuid($data['id']),
             $data['kilter'],
             $data['email'],
-            $data['name'],
+            $data['name'] ?? '',
             (int)$data['price'] - (int)$data['discount'],
             $guests,
             \Illuminate\Support\Str::limit(strip_tags($data['payment_name']),10),
