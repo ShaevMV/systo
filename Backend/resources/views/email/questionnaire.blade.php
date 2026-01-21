@@ -39,11 +39,11 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В этом году для доступа на Систо, всем гостям необходимо заполнить небольшую анкету, а также согласиться с правилами поведения и пребывания на территории события.
-                            <br>Как только данные будут внесены, твои QR-коды будут активированы, а также ты получишь доступ в новый закрытый чат Solar Systo Togathering!   </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}"> ссылка на анкету </a>  </p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо за понимание и до встречи в лесу!</p>
+                        <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Поздравляем тебя с зарегистрированным членством в нашем приватном клубе. Благодарим за поддержку нашего любимого Систо.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Просим тебя так же заполнить небольшую анкету, это поможет нам улучшить совместное взаимодействие.
+                            <br/>При введении данных твоего телеграмм аккаунта ты получишь доступ в новый приватный чат Solar Systo Togathering.  Если не планируешь участвовать в общем чате, можно отписаться от него, это не повлияет на твои права и возможности.
+                            </p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ссылка на анкету: <a href="{{ $link }}" target="_blank"> ссылка на анкету </a>  </p>
 
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у тебя остались вопрос - пиши в ТГ <a href="https://t.me/systo_club">@systo_club</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
