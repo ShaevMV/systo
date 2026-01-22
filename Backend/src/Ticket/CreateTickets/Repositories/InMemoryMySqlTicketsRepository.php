@@ -139,9 +139,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 User::TABLE . '.email',
                 User::TABLE . '.city',
                 TicketTypesModel::TABLE . '.name as name_type',
-            ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
-            ->first()?->toArray();
+            ])->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
+        \Log::info('Билет '. $ticketId->value() .' : '. $result->toSql());
+        $result = $result->first()?->toArray();
         if (is_null($result)) {
             throw new DomainException("Билет {$ticketId->value()} не найден");
         }
