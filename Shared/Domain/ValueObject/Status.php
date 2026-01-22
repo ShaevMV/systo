@@ -42,7 +42,6 @@ final class Status implements EntityDataInterface
             self::PAID, self::PAID_FOR_LIVE => [
                 self::DIFFICULTIES_AROSE,
                 self::LIVE_TICKET_ISSUED,
-                self::PAID,
             ],
             self::DIFFICULTIES_AROSE => [
                 self::CANCEL,
