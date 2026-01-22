@@ -51,7 +51,7 @@ class ChanceStatusCommandHandler implements CommandHandler
             Status::PAID => OrderTicket::toPaid(
                 $orderTicketDto,
                 $command->getComment(),
-                $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada07')) ?
+                $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
                     $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()) :
                     null,
             ),
