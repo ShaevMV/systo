@@ -1670,32 +1670,32 @@ select.form-select::after {
     margin-top: 0;
 }
 
-.in-choice > div:first-of-type span {
+.in-choice > div.payment-choice:first-of-type label > span {
     background-image: url('../img/icon-sber.png');
     background-size: 25px;
 }
 
-.in-choice > div:nth-of-type(2) span {
+.in-choice > div.payment-choice:nth-of-type(2) label > span {
     background-image: url('../img/icon-umoney.png');
     background-size: 25px;
 }
 
-.in-choice > div:nth-of-type(3) span {
+.in-choice > div.payment-choice:nth-of-type(3) label > span {
     background-image: url('../img/therium-icon.png');
     background-size: 25px;
 }
 
-.in-choice > div:last-of-type span {
+.in-choice > div.payment-choice:nth-of-type(4) label > span {
     background-image: url('../img/icon-paypal.png');
     background-size: 25px;
 }
 
-/*.in-choice > div:nth-of-type(2) span {*/
-/*    background-image: url('../img/sticker.webp');*/
-/*    background-size: 25px;*/
-/*}*/
+.in-choice > div.payment-choice:last-of-type label > span {
+    background-image: url('../img/operator.png');
+    background-size: 25px;
+}
 
-.payment-choice label span {
+.payment-choice label > span {
     display: inline-block;
     box-sizing: border-box;
     background-color: rgba(235, 237, 244, 0.7);
@@ -1820,6 +1820,11 @@ select.form-select::after {
     border: 2px solid rgba(197, 198, 206, 0.7);
     position: relative;
     top: 4px;
+}
+
+.strongest{
+    font-size: 22px;
+    color: var(--c-purple);
 }
 
 #defaultCheck1 + label {
@@ -2251,6 +2256,10 @@ input[readonly] {
     overflow: hidden;
 }
 
+.faq-container + p {
+    margin-top: 2vw;
+}
+
 .faq-list {
     padding: 10px 0;
 }
@@ -2624,7 +2633,7 @@ input[readonly] {
         font-weight: bold;
     }
 
-    .payment-choice label span {
+    .payment-choice label > span {
         margin-left: 10px;
         min-width: auto;
         width: 100%;
@@ -2642,7 +2651,7 @@ input[readonly] {
         padding-left: 0;
     }
 
-    .payment-choice label span {
+    .payment-choice label > span {
         margin-left: 0;
         background-position: 3px center;
     }
@@ -3012,7 +3021,7 @@ input[readonly] {
         font-size: 13px;
     }
 
-    .payment-choice label span {
+    .payment-choice label > span {
         padding: 6px 18px 6px 30px;
         font-size: 14px;
     }

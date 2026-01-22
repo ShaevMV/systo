@@ -163,7 +163,7 @@ export default {
     }
   },
   created() {
-    document.title = "Анкеты участника Solar Systo Togathering"
+    document.title = "Анкета участника Solar Systo Togathering"
   },
 }
 </script>

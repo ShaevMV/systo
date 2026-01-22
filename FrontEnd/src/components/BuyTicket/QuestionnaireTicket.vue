@@ -37,7 +37,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_tellegram">Telegram-аккаунт:</label>
+        <label for="questionnaire_tellegram">Telegram-аккаунт: (для доступа в новый закрытый чат Систо)</label>
 
         <div class="input-group" id="promo-input">
           <input
@@ -147,20 +147,6 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании события?:</label>
-
-        <input
-            type="text"
-            class="form-control"
-            :value="questionnaire.activeOfEvent"
-            id="questionnaire_activeOfEvent"
-            placeholder="Готовы принимать более активное или творческое участие в создании события?"
-            aria-label="Откуда ты узнал о Систо?"
-            @input="updateParent('activeOfEvent', $event.target.value)"
-        >
-      </div>
-
-      <div class="quest-item">
         <label for="questionnaire_creationOfSisto"> Считаете ли вы себя участвующим в сотворении Систо?:</label>
 
         <input
@@ -171,6 +157,20 @@
             placeholder="Считаете ли вы себя участвующим в сотворении Систо?"
             aria-label="Считаете ли вы себя участвующим в сотворении Систо?"
             @input="updateParent('creationOfSisto', $event.target.value)"
+        >
+      </div>
+
+      <div class="quest-item">
+        <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании события?:</label>
+
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.activeOfEvent"
+            id="questionnaire_activeOfEvent"
+            placeholder="Готовы принимать более активное или творческое участие в создании события?"
+            aria-label="Откуда ты узнал о Систо?"
+            @input="updateParent('activeOfEvent', $event.target.value)"
         >
       </div>
 

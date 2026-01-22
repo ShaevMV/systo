@@ -11,6 +11,7 @@ import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
+import OrgsView from "@/views/OrgsView.vue";
 import PrivateView from "@/views/PrivateView.vue";
 import FaqView from "@/views/FaqView.vue";
 import QuestionnaireView from "../views/QuestionnaireView.vue";
@@ -114,6 +115,11 @@ const routes = [
         path: '/conditions',
         name: 'Conditions',
         component: AboutView,
+    },
+    {
+        path: '/orgvznos',
+        name: 'Orgvznos',
+        component: OrgsView,
     },
     {
         path: '/faq',

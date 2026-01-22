@@ -30,6 +30,7 @@
               </div>
             </div>
           </div>
+          <p>Если у Вас остались вопросы, прочитайте раздел <a href="/faq" target="_blank" style="font-weight: bold;">FAQ (Ответы на часто задаваемые вопросы)</a> или напишите в поддержку <a href="tg://resolve?domain=systo_club" target="_blank" style="font-weight: bold;">@systo_club</a></p>
         </div>
       </div>
     </div>

@@ -5,6 +5,13 @@
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
+    <li class="nav-item" v-if="isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'Orgvznos' }">Типы Оргвзносов
+      </router-link>
+    </li>
     <li class="nav-item">
       <router-link
           class="nav-link" v-if="isAuth"
@@ -17,6 +24,13 @@
           class="nav-link"
           active-class="active"
           :to="{ name: 'InviteLink' }">Ссылка-Приглашение
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'Conditions' }">Правила участия
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
