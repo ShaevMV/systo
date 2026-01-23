@@ -118,7 +118,7 @@
 <img src="https://api.spaceofjoy.ru/images/top-img.png" alt="top" id="top-img">
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
-<p id="top-class-title">Привет дорогой друг, это твой электронный билет на Solar Systo Togathering {{date('Y')}}!</p>
+<p id="top-class-title">Привет дорогой друг, это твой электронный оргвзнос на Solar Systo Togathering {{date('Y')}}!</p>
 
 <div class="name">
     Имя: {{$name}}
@@ -137,9 +137,9 @@
     font-size: 23px;
     display: inline-block;
     margin-bottom: 20px;">Внимание!</strong><br>
-    На входе на фестиваль каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде!
+    На входе на Систо каждому гостю необходимо будет показать свой qr-код на экране телефона или в распечатанном виде!
     Позаботься об этом заранее!<br><br>
-    До встречи, на фестивале!</p>
+    До встречи в лесу!</p>
 <footer></footer>
 </body>
 </html>

@@ -52,7 +52,7 @@ class OrderToPaid extends Mailable
                 continue;
             }
             $contents = $qrCodeService->createPdf($ticket);
-            $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
+            $mail->attachData($contents->output(), 'Оргвзнос ' . $ticket->getName() . '.pdf');
             \Log::info('Отправлен билет на имя '. $ticket->getName());
         }
 
