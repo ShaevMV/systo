@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\Questionnaire\Create;
+namespace Tickets\Questionnaire\Application\Questionnaire\Create;
 
-use Tickets\Order\OrderTicket\Repositories\QuestionnaireRepositoryInterface;
+use QuestionnaireRepositoryInterface;
 
 class QuestionnaireCreateCommandHandler
 {

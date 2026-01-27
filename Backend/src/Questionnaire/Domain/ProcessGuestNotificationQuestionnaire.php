@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Domain;
+namespace Tickets\Questionnaire\Domain;
 
 use App\Mail\TicketQuestionnaire;
 use Illuminate\Bus\Queueable;

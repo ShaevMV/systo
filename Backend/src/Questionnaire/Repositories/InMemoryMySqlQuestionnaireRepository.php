@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Repositories;
+namespace Tickets\Questionnaire\Repositories;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Ordering\QuestionnaireModel;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
-use Tickets\Order\OrderTicket\Responses\QuestionnaireGetItemQueryResponse;
 use Tickets\Order\OrderTicket\Util\TicketUtil;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
@@ -84,5 +84,35 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
 
         return new QuestionnaireGetItemQueryResponse($result);
+    }
+
+    public function getList(Filters $filters): array
+    {
+        $builder = $this->model;
+        foreach ($filters as $filter) {
+            if (null !== $filter->value()->value()) {
+                $builder = $builder->where(
+                    $filter->field()->value(),
+                    $filter->operator()->value(),
+                    $filter->value()->value()
+                );
+            }
+        }
+
+        $rawData = $builder
+            ->get()
+            ->toArray();
+
+        $result = [];
+
+        foreach ($rawData as $datum) {
+            $result[] = QuestionnaireTicketDto::fromState(
+                $datum,
+                new Uuid($datum['order_id']),
+                new Uuid($datum['ticket_id']),
+            );
+        }
+
+        return $result;
     }
 }

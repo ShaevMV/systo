@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Responses;
+namespace Tickets\Questionnaire\Responses;
 
 use Illuminate\Support\Collection;
 use Shared\Domain\Bus\Query\Response;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireGetItemQueryResponse implements Response
 {

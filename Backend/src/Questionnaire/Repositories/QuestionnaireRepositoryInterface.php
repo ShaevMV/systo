@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Repositories;
+namespace Tickets\Questionnaire\Repositories;
 
+use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
-use Tickets\Order\OrderTicket\Responses\QuestionnaireGetItemQueryResponse;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
 
 interface QuestionnaireRepositoryInterface
 {
@@ -25,4 +26,12 @@ interface QuestionnaireRepositoryInterface
      * @return QuestionnaireGetItemQueryResponse|null
      */
     public function getByOrderId(Uuid $orderId): ?QuestionnaireGetItemQueryResponse;
+
+    /**
+     * Получить список всех анкет
+     *
+     * @param Filters $filters
+     * @return QuestionnaireTicketDto[]
+     */
+    public function getList(Filters $filters): array;
 }

@@ -11,6 +11,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $order_id
  * @property string $ticket_id
+ * @property string|null $email
+ * @property bool $is_have_in_club
+ * @property string|null $user_id
+ * @property string $status
  * @property int $agy Возраст
  * @property int $howManyTimes Сколько раз ты уже бывал на Систо
  * @property string $questionForSysto Ответь кратко и честно на простой вопрос Зачем ты едешь на Систо?
@@ -52,6 +56,10 @@ class QuestionnaireModel extends Model
         'telegram',
         'vk',
         'musicStyles',
-        'whereSysto'
+        'whereSysto',
+        'email',
+        'user_id',
+        'status',
+        'is_have_in_club',
     ];
 }

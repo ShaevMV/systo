@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\Questionnaire;
+namespace Tickets\Questionnaire\Application\Questionnaire;
 
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
-use Tickets\Order\OrderTicket\Application\Questionnaire\Create\QuestionnaireCreateCommand;
-use Tickets\Order\OrderTicket\Application\Questionnaire\Create\QuestionnaireCreateCommandHandler;
-use Tickets\Order\OrderTicket\Application\Questionnaire\GetItem\QuestionnaireGetItemQuery;
-use Tickets\Order\OrderTicket\Application\Questionnaire\GetItem\QuestionnaireGetItemQueryHandler;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
-use Tickets\Order\OrderTicket\Responses\QuestionnaireGetItemQueryResponse;
+use Tickets\Questionnaire\Application\Questionnaire\Create\QuestionnaireCreateCommand;
+use Tickets\Questionnaire\Application\Questionnaire\Create\QuestionnaireCreateCommandHandler;
+use Tickets\Questionnaire\Application\Questionnaire\GetItem\QuestionnaireGetItemQuery;
+use Tickets\Questionnaire\Application\Questionnaire\GetItem\QuestionnaireGetItemQueryHandler;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
 
 class QuestionnaireApplication
 {

@@ -25,7 +25,6 @@ use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
@@ -202,8 +201,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 );
             }
         }
-        //$sql = $builder->toSql();
-        //dump($sql);
+
         $rawData = $builder
             ->get()
             ->toArray();

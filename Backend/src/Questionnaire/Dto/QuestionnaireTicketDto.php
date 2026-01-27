@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Dto\OrderTicket;
+namespace Tickets\Questionnaire\Dto;
 
 use Shared\Domain\ValueObject\Uuid;
 
@@ -16,6 +16,8 @@ class QuestionnaireTicketDto
         protected int $howManyTimes,
         protected string $questionForSysto,
         protected string $phone,
+        protected bool $is_have_in_club,
+        protected ?string $email = null,
         protected ?string $telegram = null,
         protected ?string $vk = null,
         protected ?string $musicStyles = null,
@@ -24,6 +26,7 @@ class QuestionnaireTicketDto
         protected ?string $whereSysto = null,
         protected ?string $creationOfSisto = null,
         protected ?string $activeOfEvent = null,
+        protected ?Uuid $userId = null,
     )
     {
         $this->link ='https://org.spaceofjoy.ru/questionnaire/'.$orderId->value().'/'.$ticketId->value();
@@ -36,6 +39,7 @@ class QuestionnaireTicketDto
     ): self
     {
         $id = (empty($data['id'])) ? null : new Uuid($data['id']);
+        $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
         return new self(
             $orderId,
             $ticketId,
@@ -43,6 +47,8 @@ class QuestionnaireTicketDto
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
+            $data['is_have_in_club'] ?? null,
+            $data['email'] ?? null,
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
             $data['musicStyles'] ?? null,
@@ -51,7 +57,7 @@ class QuestionnaireTicketDto
             $data['whereSysto'] ?? null,
             $data['creationOfSisto'] ?? null,
             $data['activeOfEvent'] ?? null,
-
+            $userId
         );
     }
 
@@ -65,13 +71,16 @@ class QuestionnaireTicketDto
             'questionForSysto' => $this->questionForSysto,
             'link' => $this->link,
             'phone' => $this->phone,
+            'is_have_in_club' => $this->is_have_in_club,
+            'email' => $this->email,
             'telegram' => $this->telegram,
             'vk' => $this->vk,
-            'musicStyles' => $this->musicStyles,
             'name' => $this->name,
+            'musicStyles' => $this->musicStyles,
             'whereSysto' => $this->whereSysto,
             'creationOfSisto' => $this->creationOfSisto,
             'activeOfEvent' => $this->activeOfEvent,
+            'user_id' => $this->userId,
         ];
     }
 
@@ -84,6 +93,8 @@ class QuestionnaireTicketDto
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
             'phone' => $this->phone,
+            'is_have_in_club' => $this->is_have_in_club,
+            'email' => $this->email,
             'telegram' => $this->telegram,
             'vk' => $this->vk,
             'name' => $this->name,

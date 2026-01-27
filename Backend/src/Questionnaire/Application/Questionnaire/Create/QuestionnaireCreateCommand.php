@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\Questionnaire\Create;
+namespace Tickets\Questionnaire\Application\Questionnaire\Create;
 
 use Shared\Domain\Bus\Command\Command;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireCreateCommand implements Command
 {

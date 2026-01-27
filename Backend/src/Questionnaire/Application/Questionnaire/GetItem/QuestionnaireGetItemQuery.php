@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\Questionnaire\GetItem;
+namespace Tickets\Questionnaire\Application\Questionnaire\GetItem;
 
 
 use Shared\Domain\Bus\Query\Query;

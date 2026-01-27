@@ -24,14 +24,12 @@ use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
-use Tickets\Order\OrderTicket\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\QuestionnaireTicketDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Tickets\Order\OrderTicket\Service\TicketService;
-use Tickets\Order\OrderTicket\Util\TicketUtil;
+use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -41,7 +39,6 @@ class OrderTickets extends Controller
     public function __construct(
         private CreateOrder        $createOrder,
         private GetTicketType      $getTicketType,
-        private TicketService      $ticketService,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
         private GetOrder           $getOrder,
