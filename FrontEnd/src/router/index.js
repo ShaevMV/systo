@@ -19,6 +19,7 @@ import store from '../store';
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 import InviteLinkView from "@/views/auth/InviteLinkView.vue";
+import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
 
 const routes = [
     {
@@ -145,6 +146,15 @@ const routes = [
         name: 'Questionnaire',
         props: true,
         component: QuestionnaireView,
+    },
+    {
+        path: '/questionnaires/',
+        name: 'Questionnaire',
+        component: QuestionnaireListView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
     },
     {
         path: '/promoCode/:id?',
