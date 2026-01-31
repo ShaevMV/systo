@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace App\Models;
+namespace App\Models\User;
 
 use Database\Factories\UserFactory;
 use Eloquent;
@@ -21,44 +21,40 @@ use Shared\Infrastructure\Models\HasUuid;
 
 
 /**
- * App\Models\User
+ * App\Models\User\User
  *
  * @property string $id
  * @property string|null $name
+ * @property string|null $phone
+ * @property string|null $city
  * @property string $email
  * @property Carbon|null $email_verified_at
  * @property string $password
+ * @property int $is_admin
  * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property int $is_manager
  * @property-read DatabaseNotificationCollection|DatabaseNotification[] $notifications
  * @property-read int|null $notifications_count
  * @property-read Collection|PersonalAccessToken[] $tokens
  * @property-read int|null $tokens_count
- * @method static UserFactory factory(...$parameters)
  * @method static Builder|User newModelQuery()
  * @method static Builder|User newQuery()
  * @method static Builder|User query()
+ * @method static Builder|User whereCity($value)
  * @method static Builder|User whereCreatedAt($value)
  * @method static Builder|User whereEmail($value)
  * @method static Builder|User whereEmailVerifiedAt($value)
  * @method static Builder|User whereId($value)
+ * @method static Builder|User whereIsAdmin($value)
+ * @method static Builder|User whereIsManager($value)
  * @method static Builder|User whereName($value)
  * @method static Builder|User wherePassword($value)
+ * @method static Builder|User wherePhone($value)
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
- * @method static Builder|User create(array $toArray)
  * @mixin Eloquent
- * @property bool $is_admin
- * @property bool $is_manager
- * @method static Builder|User whereIsAdmin($value)
- * @property string|null $phone
- * @property string|null $city
- * @method static Builder|User whereCity($value)
- * @method static Builder|User wherePhone($value)
- * @property string|null $project
- * @method static Builder|User whereProject($value)
- * @method static Builder|User whereIsManager($value)
  */
 class User extends Authenticatable implements JWTSubject
 {

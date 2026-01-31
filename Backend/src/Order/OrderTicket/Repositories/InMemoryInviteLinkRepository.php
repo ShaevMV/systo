@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Repositories;
 
+use App\Models\Invite\InviteModel;
 use App\Models\Ordering\InviteLinkModel;
-use App\Models\Ordering\InviteModel;
 use App\Models\Ordering\OrderTicketModel;
-use Carbon\Carbon;
-use DomainException;
 use Illuminate\Support\Facades\DB;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;

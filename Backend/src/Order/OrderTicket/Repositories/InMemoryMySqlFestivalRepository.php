@@ -3,10 +3,9 @@
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
-use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
+use App\Models\Festival\TicketTypesModel;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 
 class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
 {

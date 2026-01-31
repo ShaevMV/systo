@@ -67,7 +67,7 @@ class ApplicationTicketTest extends TestCase
     {
         $this->expectNotToPerformAssertions();
         $service = new CreatingQrCodeService();
-        for($i = 1;$i<=500;$i++) {
+        for($i = 1;$i<=4000;$i++) {
             $number = $this->addZero($i);
             $qrCode = $service->createQrCode($number,'');
             $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");

@@ -4,15 +4,15 @@ declare(strict_types=1);
 namespace Tickets\PromoCode\Repositories;
 
 use App\Models\Festival\FestivalModel;
-use App\Models\Ordering\InfoForOrder\PromoCodeModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
+use App\Models\PromoCode\PromoCodeModel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlPromoCode implements PromoCodeInterface
 {

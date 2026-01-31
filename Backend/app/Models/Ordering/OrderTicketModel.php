@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models\Ordering;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Festival\TicketTypesModel;
+use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User;
+use App\Models\User\User;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -20,53 +20,51 @@ use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
- * App\Models\Tickets\Ordering\OrderTicket
+ * App\Models\Ordering\OrderTicketModel
  *
+ * @property int $kilter
  * @property string $id
  * @property mixed $guests
+ * @property string $festival_id
  * @property string $user_id
  * @property string $ticket_type_id
- * @property string $promo_code
+ * @property string|null $promo_code
+ * @property string $id_buy
+ * @property string $phone
  * @property string $types_of_payment_id
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @method static Builder|OrderTicketModel newModelQuery()
- * @method static Builder|OrderTicketModel newQuery()
- * @method static Builder|OrderTicketModel query()
- * @method static Builder|OrderTicketModel whereCreatedAt($value)
- * @method static Builder|OrderTicketModel whereGuests($value)
- * @method static Builder|OrderTicketModel whereId($value)
- * @method static Builder|OrderTicketModel wherePromoCodeId($value)
- * @method static Builder|OrderTicketModel whereTicketTypeId($value)
- * @method static Builder|OrderTicketModel whereTypesOfPaymentId($value)
- * @method static Builder|OrderTicketModel whereUpdatedAt($value)
- * @method static Builder|OrderTicketModel whereUserId($value)
- * @method static create(array $toArray)
  * @property float $price
  * @property float $discount
  * @property string $status
  * @property string $date
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|\App\Models\Ordering\CommentOrderTicketModel[] $comments
+ * @property-read int|null $comments_count
+ * @property-read TicketTypesModel|null $ticketType
+ * @property-read Collection|TicketModel[] $tickets
+ * @property-read int|null $tickets_count
+ * @property-read TypesOfPaymentModel|null $typeOfPayment
+ * @property-read User|null $users
+ * @method static Builder|OrderTicketModel newModelQuery()
+ * @method static Builder|OrderTicketModel newQuery()
+ * @method static Builder|OrderTicketModel query()
+ * @method static Builder|OrderTicketModel whereCreatedAt($value)
  * @method static Builder|OrderTicketModel whereDate($value)
  * @method static Builder|OrderTicketModel whereDiscount($value)
+ * @method static Builder|OrderTicketModel whereFestivalId($value)
+ * @method static Builder|OrderTicketModel whereGuests($value)
+ * @method static Builder|OrderTicketModel whereId($value)
+ * @method static Builder|OrderTicketModel whereIdBuy($value)
+ * @method static Builder|OrderTicketModel whereKilter($value)
+ * @method static Builder|OrderTicketModel wherePhone($value)
  * @method static Builder|OrderTicketModel wherePrice($value)
  * @method static Builder|OrderTicketModel wherePromoCode($value)
  * @method static Builder|OrderTicketModel whereStatus($value)
+ * @method static Builder|OrderTicketModel whereTicketTypeId($value)
+ * @method static Builder|OrderTicketModel whereTypesOfPaymentId($value)
+ * @method static Builder|OrderTicketModel whereUpdatedAt($value)
+ * @method static Builder|OrderTicketModel whereUserId($value)
  * @mixin Eloquent
- * @property-read Collection|CommentOrderTicketModel[] $comments
- * @property-read int|null $comments_count
- * @property-read TicketTypesModel $ticketType
- * @property-read TypesOfPaymentModel $typeOfPayment
- * @property string $festival_id
- * @property string $id_buy
- * @property string $phone
- * @property-read User $users
- * @method static Builder|OrderTicketModel whereFestivalId($value)
- * @method static Builder|OrderTicketModel whereIdBuy($value)
- * @method static Builder|OrderTicketModel wherePhone($value)
- * @property int $kilter
- * @method static Builder|OrderTicketModel whereKilter($value)
- * @property-read Collection|TicketModel[] $tickets
- * @property-read int|null $tickets_count
  */
 final class OrderTicketModel extends Model
 {

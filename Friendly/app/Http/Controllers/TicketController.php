@@ -9,23 +9,22 @@ use App\Models\Auto;
 use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\LiveTicket;
-use App\Models\User;
+use App\Models\User\User;
 use App\Services\CsvFileService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Log;
-use Redirect;
-use Shared\Services\CreatingQrCodeService;
-use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\Translation\Loader\CsvFileLoader;
-use Throwable;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Redirect;
+use Shared\Services\CreatingQrCodeService;
+use Shared\Services\TicketService;
+use Throwable;
 
 class TicketController extends Controller
 {

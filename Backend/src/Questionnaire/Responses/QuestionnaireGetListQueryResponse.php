@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 use Shared\Domain\Bus\Query\Response;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
-class QuestionnaireGetItemQueryResponse implements Response
+class QuestionnaireGetListQueryResponse implements Response
 {
     /**
      * @var Collection

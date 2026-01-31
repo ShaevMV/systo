@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Ordering;
+namespace App\Models\Festival;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\Ordering\TicketTypeFestivalModel
+ * App\Models\Festival\TicketTypeFestivalModel
  *
  * @property int $id
  * @property string $festival_id

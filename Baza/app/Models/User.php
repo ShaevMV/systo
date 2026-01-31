@@ -34,20 +34,20 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static UserFactory factory($count = null, $state = [])
- * @method static Builder|User newModelQuery()
- * @method static Builder|User newQuery()
- * @method static Builder|User query()
- * @method static Builder|User whereCreatedAt($value)
- * @method static Builder|User whereEmail($value)
- * @method static Builder|User whereEmailVerifiedAt($value)
- * @method static Builder|User whereId($value)
- * @method static Builder|User whereName($value)
- * @method static Builder|User wherePassword($value)
- * @method static Builder|User whereRememberToken($value)
- * @method static Builder|User whereUpdatedAt($value)
+ * @method static Builder|User\User newModelQuery()
+ * @method static Builder|User\User newQuery()
+ * @method static Builder|User\User query()
+ * @method static Builder|User\User whereCreatedAt($value)
+ * @method static Builder|User\User whereEmail($value)
+ * @method static Builder|User\User whereEmailVerifiedAt($value)
+ * @method static Builder|User\User whereId($value)
+ * @method static Builder|User\User whereName($value)
+ * @method static Builder|User\User wherePassword($value)
+ * @method static Builder|User\User whereRememberToken($value)
+ * @method static Builder|User\User whereUpdatedAt($value)
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read Collection<int, PersonalAccessToken> $tokens
- * @method static Builder|User whereIsAdmin($value)
+ * @method static Builder|User\User whereIsAdmin($value)
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications

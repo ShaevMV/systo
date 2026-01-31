@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Ordering\InfoForOrder;
+namespace App\Models\PromoCode;
 
 use App\Models\Ordering\OrderTicketModel;
 use Eloquent;
@@ -14,34 +14,34 @@ use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
- * App\Models\Tickets\Ordering\InfoForOrder\Models\PromoCod
+ * App\Models\PromoCode\PromoCodeModel
  *
  * @property string $id
  * @property string $name
  * @property float $discount
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
- * @method static Builder|PromoCodeModel newModelQuery()
- * @method static Builder|PromoCodeModel newQuery()
- * @method static Builder|PromoCodeModel query()
- * @method static Builder|PromoCodeModel whereCreatedAt($value)
- * @method static Builder|PromoCodeModel whereDiscount($value)
- * @method static Builder|PromoCodeModel whereId($value)
- * @method static Builder|PromoCodeModel whereName($value)
- * @method static Builder|PromoCodeModel whereUpdatedAt($value)
- * @mixin Eloquent
  * @property int $is_percent
  * @property int $active
  * @property int|null $limit
- * @method static Builder|PromoCodeModel whereActive($value)
- * @method static Builder|PromoCodeModel whereIsPercent($value)
- * @method static Builder|PromoCodeModel whereLimit($value)
- * @property-read \Illuminate\Database\Eloquent\Collection|OrderTicketModel[] $orderTickets
- * @property-read int|null $order_tickets_count
  * @property string|null $ticket_type_id
  * @property string|null $festival_id
+ * @property-read \Illuminate\Database\Eloquent\Collection|OrderTicketModel[] $orderTickets
+ * @property-read int|null $order_tickets_count
+ * @method static Builder|PromoCodeModel newModelQuery()
+ * @method static Builder|PromoCodeModel newQuery()
+ * @method static Builder|PromoCodeModel query()
+ * @method static Builder|PromoCodeModel whereActive($value)
+ * @method static Builder|PromoCodeModel whereCreatedAt($value)
+ * @method static Builder|PromoCodeModel whereDiscount($value)
  * @method static Builder|PromoCodeModel whereFestivalId($value)
+ * @method static Builder|PromoCodeModel whereId($value)
+ * @method static Builder|PromoCodeModel whereIsPercent($value)
+ * @method static Builder|PromoCodeModel whereLimit($value)
+ * @method static Builder|PromoCodeModel whereName($value)
  * @method static Builder|PromoCodeModel whereTicketTypeId($value)
+ * @method static Builder|PromoCodeModel whereUpdatedAt($value)
+ * @mixin Eloquent
  */
 class PromoCodeModel extends Model
 {

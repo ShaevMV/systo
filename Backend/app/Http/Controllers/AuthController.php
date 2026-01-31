@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Mail\UserPasswordResets;
-use App\Models\PasswordResets;
+use App\Models\User\PasswordResets;
+use App\Models\User\User;
 use Bus;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use Mail;
 use Nette\Utils\JsonException;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Domain\ProcessPasswordResets;

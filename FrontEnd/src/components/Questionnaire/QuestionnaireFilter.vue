@@ -12,7 +12,7 @@
               <div class="input-group">
                 <span class="input-group-text" id="inputGroupPrepend2">@</span>
                 <input type="text"
-                       v-model="email"
+                       v-model="filter.email"
                        class="form-control"
                        id="validationDefaultUsername"
                        aria-describedby="inputGroupPrepend2">
@@ -22,7 +22,7 @@
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Статус анкеты</label>
               <select class="form-select"
-                      v-model="status"
+                      v-model="filter.status"
                       id="validationDefault01">
                 <option value="">Выберите статус</option>
                 <option value="new">Новый</option>
@@ -38,7 +38,7 @@
               <div class="input-group">
                 <span class="input-group-text" id="inputGroupPrepend2">@</span>
                 <input type="text"
-                       v-model="telegram"
+                       v-model="filter.telegram"
                        class="form-control"
                        id="validationDefaultUsername"
                        aria-describedby="inputGroupPrepend2">
@@ -50,7 +50,7 @@
               <div class="input-group">
                 <span class="input-group-text" id="inputGroupPrepend2">@</span>
                 <input type="text"
-                       v-model="vk"
+                       v-model="filter.vk"
                        class="form-control"
                        id="validationDefaultUsername"
                        aria-describedby="inputGroupPrepend2">
@@ -60,7 +60,7 @@
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Хочет в ступить в клуб</label>
               <select class="form-select"
-                      v-model="is_have_in_club"
+                      v-model="filter.is_have_in_club"
                       id="validationDefault01">
                 <option value="">Выберите статус</option>
                 <option value="true">Хочет</option>
@@ -87,15 +87,29 @@
 </template>
 
 <script>
+import {mapGetters, mapActions} from 'vuex';
+
 export default {
-  name: "FilterQuestionnaire",
+  name: "QuestionnaireFilter",
   data() {
     return {
-      email: null,
-      vk: null,
-      status: '',
-      is_have_in_club: '',
-      telegram: null,
+      filter: {
+        email: null,
+        vk: null,
+        status: '',
+        is_have_in_club: '',
+        telegram: null,
+      }
+    }
+  },
+  methods: {
+    ...mapActions('appQuestionnaire',[
+        'loadQuestionnaire'
+    ]),
+    sendFilter: function () {
+      this.loadQuestionnaire({
+        filter: this.filter,
+      })
     }
   },
 }

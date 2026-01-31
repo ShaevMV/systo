@@ -54,6 +54,13 @@
           :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'QuestionnaireList'}">Все анкеты
+      </router-link>
+    </li>
     <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
       <router-link
           class="nav-link"

@@ -8,14 +8,19 @@ use Shared\Domain\Bus\Query\Query;
 
 class QuestionnaireGetListQuery implements Query
 {
+    private ?bool $is_have_in_club = null;
+
     public function __construct(
         private ?string $email = null,
         private ?string $telegram = null,
         private ?string $vk = null,
-        private ?bool $is_have_in_club = null,
+        ?string $is_have_in_club = null,
         private ?string $status = null,
     )
     {
+        if(!empty($is_have_in_club)) {
+            $this->is_have_in_club = boolval($is_have_in_club);
+        }
     }
 
     public function getEmail(): ?string

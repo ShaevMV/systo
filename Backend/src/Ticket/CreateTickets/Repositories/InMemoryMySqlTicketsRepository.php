@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Repositories;
 
 use App\Models\Festival\FestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User;
+use App\Models\User\User;
 use Carbon\Carbon;
 use DomainException;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use JsonException;
-use Throwable;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 

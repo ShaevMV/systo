@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Repositories;
 
-use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Festival\TypesOfPaymentModel;
 use Tickets\Order\InfoForOrder\Response\TypesOfPaymentDto;
 
 class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface

@@ -11,7 +11,7 @@ const API = '/api/v1/festival/questionnaire';
  */
 export const sendNotitificationUser = (context, payload) => {
     return new Promise((resolve, reject) => {
-        let promise = axios.post(API + '/notification/' + payload.id ,{
+        let promise = axios.post(API + '/notification/' + payload.id, {
             'questionnaire': payload.questionnaire
         });
         return promise.then(function (response) {
@@ -31,8 +31,7 @@ export const sendNotitificationUser = (context, payload) => {
  * @param payload
  */
 export const loadQuestionnaire = (context, payload) => {
-    let promise = axios.get(API + '/load',
-        {fillter: payload.fillter});
+    let promise = axios.get(API + '/load', payload.filter);
     promise.then(function (response) {
         context.commit('setQuestionnaireList', response.data.questionnaireList);
     })
@@ -47,7 +46,7 @@ export const loadQuestionnaire = (context, payload) => {
  */
 export const sendQuestionnaire = (context, payload) => {
     return new Promise((resolve, reject) => {
-        let promise = axios.post(API + '/send/' + payload.orderId + '/' + payload.ticketId,{
+        let promise = axios.post(API + '/send/' + payload.orderId + '/' + payload.ticketId, {
             'questionnaire': payload.questionnaire
         });
         return promise.then(function (response) {
@@ -69,7 +68,7 @@ export const sendQuestionnaire = (context, payload) => {
  */
 export const editQuestionnaire = (context, payload) => {
     return new Promise((resolve, reject) => {
-        let promise = axios.post(API + '/edit/' + payload.id ,{
+        let promise = axios.post(API + '/edit/' + payload.id, {
             'questionnaire': payload.questionnaire
         });
         return promise.then(function (response) {

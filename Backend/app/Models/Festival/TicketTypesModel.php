@@ -2,11 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Ordering\InfoForOrder;
+namespace App\Models\Festival;
 
-use App\Models\Festival\FestivalModel;
-use App\Models\Ordering\CommentOrderTicketModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,7 +14,7 @@ use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
- * App\Models\Tickets\Ordering\InfoForOrder\Models\TicketTypes
+ * App\Models\Festival\TicketTypesModel
  *
  * @property string $id
  * @property string $name
@@ -25,28 +22,26 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property int|null $groupLimit
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property int $sort
+ * @property int $active
+ * @property int $is_live_ticket
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Festival\FestivalModel[] $festivals
+ * @property-read int|null $festivals_count
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Festival\TicketTypesPriceModel[] $ticketTypePrice
+ * @property-read int|null $ticket_type_price_count
  * @method static Builder|TicketTypesModel newModelQuery()
  * @method static Builder|TicketTypesModel newQuery()
  * @method static Builder|TicketTypesModel query()
+ * @method static Builder|TicketTypesModel whereActive($value)
  * @method static Builder|TicketTypesModel whereCreatedAt($value)
  * @method static Builder|TicketTypesModel whereGroupLimit($value)
  * @method static Builder|TicketTypesModel whereId($value)
+ * @method static Builder|TicketTypesModel whereIsLiveTicket($value)
  * @method static Builder|TicketTypesModel whereName($value)
  * @method static Builder|TicketTypesModel wherePrice($value)
+ * @method static Builder|TicketTypesModel whereSort($value)
  * @method static Builder|TicketTypesModel whereUpdatedAt($value)
  * @mixin Eloquent
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Ordering\InfoForOrder\TicketTypesPriceModel[] $ticketTypePrice
- * @property-read int|null $ticket_type_price_count
- * @property string $festival_id
- * @property int $sort
- * @property int $active
- * @property bool $is_live_ticket
- * @method static Builder|TicketTypesModel whereActive($value)
- * @method static Builder|TicketTypesModel whereFestivalId($value)
- * @method static Builder|TicketTypesModel whereSort($value)
- * @property-read \Illuminate\Database\Eloquent\Collection|FestivalModel[] $festivals
- * @property-read int|null $festivals_count
- * @method static Builder|TicketTypesModel whereIsLiveTicket($value)
  */
 class TicketTypesModel extends Model
 {

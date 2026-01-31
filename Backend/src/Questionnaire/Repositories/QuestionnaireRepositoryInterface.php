@@ -7,7 +7,7 @@ namespace Tickets\Questionnaire\Repositories;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
-use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
+use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
 
 interface QuestionnaireRepositoryInterface
 {
@@ -23,12 +23,12 @@ interface QuestionnaireRepositoryInterface
      * Подучить заполненную анкету по номеру заказа
      *
      * @param Uuid $orderId
-     * @return QuestionnaireGetItemQueryResponse
+     * @return QuestionnaireGetListQueryResponse
      */
     public function getByOrderId(
         Uuid $orderId,
         ?Uuid $ticketId,
-    ): QuestionnaireGetItemQueryResponse;
+    ): QuestionnaireGetListQueryResponse;
 
     /**
      * Получить список всех анкет

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypesModel;
+use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Ordering\CommentOrderTicketModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\QuestionnaireModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
-use App\Models\User;
+use App\Models\Questionnaire\QuestionnaireModel;
+use App\Models\User\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;

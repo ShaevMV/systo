@@ -7,7 +7,7 @@ namespace App\Http\Controllers\TicketsOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
-use App\Models\User;
+use App\Models\User\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

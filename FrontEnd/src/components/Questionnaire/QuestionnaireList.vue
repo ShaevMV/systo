@@ -58,7 +58,9 @@ export default {
     },
   },
   async created() {
-    await this.loadQuestionnaire();
+    await this.loadQuestionnaire({
+      filter: {}
+    });
   },
 }
 </script>

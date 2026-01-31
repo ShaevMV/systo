@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Changes;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\User\User;
 use Baza\Changes\Applications\OpenAndClose\OpenAndCloseChanges;
 use Baza\Changes\Applications\Report\ReportForChanges;
 use Baza\Changes\Applications\SaveChange\SaveChange;

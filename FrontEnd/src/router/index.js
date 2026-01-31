@@ -152,7 +152,7 @@ const routes = [
     // список всех анкет (АДМИН ПАНЕЛЬ)
     {
         path: '/questionnaires/',
-        name: 'Questionnaire',
+        name: 'QuestionnaireList',
         component: QuestionnaireListView,
         meta: {
             'requiresAuth': true,

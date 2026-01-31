@@ -8,12 +8,37 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
 use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireController extends Controller
 {
+
+    public function loadQuestionnaireList(
+        Request $request,
+        QuestionnaireApplication $application,
+    ): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'questionnaireList' => $application->getList(new QuestionnaireGetListQuery(
+                    $request->get('email'),
+                    $request->get('telegram'),
+                    $request->get('vk'),
+                    $request->get('is_have_in_club'),
+                    $request->get('status'),
+                ))->toArray()
+            ]);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'message' => $throwable->getMessage(),
+            ]);
+        }
+    }
 
     /**
      * Записать анкету

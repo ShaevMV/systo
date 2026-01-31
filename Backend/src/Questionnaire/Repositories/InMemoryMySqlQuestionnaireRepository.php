@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Questionnaire\Repositories;
 
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\QuestionnaireModel;
+use App\Models\Questionnaire\QuestionnaireModel;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +13,7 @@ use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Util\TicketUtil;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
-use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
+use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
@@ -53,7 +53,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     public function getByOrderId(
         Uuid $orderId,
         ?Uuid $ticketId,
-    ): QuestionnaireGetItemQueryResponse
+    ): QuestionnaireGetListQueryResponse
     {
 
         $rawData = $this->model::whereOrderId($orderId->value())
@@ -91,7 +91,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
             );
         }
 
-        return new QuestionnaireGetItemQueryResponse($result);
+        return new QuestionnaireGetListQueryResponse($result);
     }
 
     public function getList(Filters $filters): array

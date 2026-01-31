@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
+use App\Models\Festival\TicketTypesModel;
 use Illuminate\Database\Seeder;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 

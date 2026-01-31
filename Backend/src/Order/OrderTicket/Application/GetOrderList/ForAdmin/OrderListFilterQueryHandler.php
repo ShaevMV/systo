@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
-use App\Models\User;
+use App\Models\User\User;
+use Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Criteria\FilterOperator;
+use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Shared\Domain\Bus\Query\QueryHandler;
-use Shared\Domain\Criteria\FilterOperator;
-use Shared\Domain\Criteria\Filters;
-use const Lambdish\Phunctional\any;
 
 class OrderListFilterQueryHandler implements QueryHandler
 {

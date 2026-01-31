@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire\GetList;
 
-use App\Models\Ordering\QuestionnaireModel;
+use App\Models\Questionnaire\QuestionnaireModel;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;

@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use Carbon\Carbon;
+use App\Models\Festival\TicketTypesModel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class TypeTicketsSeeder extends Seeder

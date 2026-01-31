@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Tickets\PromoCode\Repositories;
 
-use App\Models\Ordering\InfoForOrder\ExternalPromoCodeModel;
+use App\Models\PromoCode\ExternalPromoCodeModel;
 use Illuminate\Support\Facades\DB;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\PromoCode\Response\ExternalPromoCodeDto;
-use Shared\Domain\ValueObject\Uuid;
 
 class InMemoryMySqlExternalPromoCode implements ExternalPromoCodeInterface
 {

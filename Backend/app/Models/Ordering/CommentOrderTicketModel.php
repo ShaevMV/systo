@@ -13,7 +13,7 @@ use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
- * App\Models\Tickets\Ordering\CommentOrderTicket
+ * App\Models\Ordering\CommentOrderTicketModel
  *
  * @property string $id
  * @property string $user_id
@@ -22,6 +22,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property int $is_checkin
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property-read \App\Models\Ordering\OrderTicketModel|null $order
  * @method static Builder|CommentOrderTicketModel newModelQuery()
  * @method static Builder|CommentOrderTicketModel newQuery()
  * @method static Builder|CommentOrderTicketModel query()
@@ -33,7 +34,6 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|CommentOrderTicketModel whereUpdatedAt($value)
  * @method static Builder|CommentOrderTicketModel whereUserId($value)
  * @mixin Eloquent
- * @property-read OrderTicketModel|null $order
  */
 final class CommentOrderTicketModel extends Model
 {

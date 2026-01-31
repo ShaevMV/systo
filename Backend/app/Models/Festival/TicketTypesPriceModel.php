@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Models\Ordering\InfoForOrder;
+namespace App\Models\Festival;
 
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
 /**
- * App\Models\Ordering\InfoForOrder\TicketTypesPriceModel
+ * App\Models\Festival\TicketTypesPriceModel
  *
  * @property string $id
  * @property string $ticket_type_id

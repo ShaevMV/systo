@@ -16,34 +16,32 @@ use Shared\Infrastructure\Models\HasUuid;
 /**
  * App\Models\Tickets\TicketModel
  *
- * @method static Builder|TicketModel newModelQuery()
- * @method static Builder|TicketModel newQuery()
- * @method static Builder|TicketModel query()
- * @mixin Eloquent
- * @property int $id
+ * @property int $kilter
+ * @property string $id
  * @property string $order_ticket_id
- * @property string $festival_id
- * @property int $number
  * @property string $name
  * @property string $status
+ * @property Carbon|null $deleted_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ * @property string|null $festival_id
+ * @property-read OrderTicketModel|null $orderTicket
+ * @method static Builder|TicketModel newModelQuery()
+ * @method static Builder|TicketModel newQuery()
+ * @method static \Illuminate\Database\Query\Builder|TicketModel onlyTrashed()
+ * @method static Builder|TicketModel query()
  * @method static Builder|TicketModel whereCreatedAt($value)
+ * @method static Builder|TicketModel whereDeletedAt($value)
+ * @method static Builder|TicketModel whereFestivalId($value)
  * @method static Builder|TicketModel whereId($value)
+ * @method static Builder|TicketModel whereKilter($value)
  * @method static Builder|TicketModel whereName($value)
- * @method static Builder|TicketModel whereNumber($value)
  * @method static Builder|TicketModel whereOrderTicketId($value)
  * @method static Builder|TicketModel whereStatus($value)
  * @method static Builder|TicketModel whereUpdatedAt($value)
- * @property Carbon|null $deleted_at
- * @method static \Illuminate\Database\Query\Builder|TicketModel onlyTrashed()
- * @method static Builder|TicketModel whereDeletedAt($value)
  * @method static \Illuminate\Database\Query\Builder|TicketModel withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TicketModel withoutTrashed()
- * @property int $kilter
- * @method static Builder|TicketModel whereKilter($value)
- * @property-read OrderTicketModel|null $orderTicket
- * @method static Builder|TicketModel whereFestivalId($value)
+ * @mixin Eloquent
  */
 class TicketModel extends Model
 {

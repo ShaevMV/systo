@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesPriceModel;
+use App\Models\Festival\TicketTypesModel;
+use App\Models\Festival\TicketTypesPriceModel;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Shared\Domain\ValueObject\Uuid;
 
 class TypeTicketsPriceThirdWaveSeeder extends Seeder

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tickets\Order\InfoForOrder\Repositories;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypesModel;
 use Carbon\Carbon;
 use DomainException;
-use Illuminate\Database\Query\JoinClause;
-use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
-use Shared\Domain\ValueObject\Uuid;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
+use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\InfoForOrder\Response\TicketTypeDto;
 
 class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
 {
