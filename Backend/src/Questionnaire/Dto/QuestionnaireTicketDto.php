@@ -5,25 +5,27 @@ declare(strict_types=1);
 namespace Tickets\Questionnaire\Dto;
 
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 
 class QuestionnaireTicketDto
 {
     protected ?string $link;
     public function __construct(
-        protected int $agy,
-        protected int $howManyTimes,
-        protected string $questionForSysto,
-        protected string $phone,
-        protected ?bool $is_have_in_club = null,
-        protected ?string $email = null,
-        protected ?string $telegram = null,
-        protected ?string $vk = null,
-        protected ?string $musicStyles = null,
-        protected ?string $name = null,
-        protected ?string $whereSysto = null,
-        protected ?string $creationOfSisto = null,
-        protected ?string $activeOfEvent = null,
-        protected ?Uuid $userId = null,
+        protected int                 $agy,
+        protected int                 $howManyTimes,
+        protected string              $questionForSysto,
+        protected string              $phone,
+        protected QuestionnaireStatus $status = QuestionnaireStatus::NEW,
+        protected ?bool               $is_have_in_club = null,
+        protected ?string             $email = null,
+        protected ?string             $telegram = null,
+        protected ?string             $vk = null,
+        protected ?string             $musicStyles = null,
+        protected ?string             $name = null,
+        protected ?string             $whereSysto = null,
+        protected ?string             $creationOfSisto = null,
+        protected ?string             $activeOfEvent = null,
+        protected ?Uuid               $userId = null,
         protected ?Uuid $orderId = null,
         protected ?Uuid $ticketId = null,
         protected ?int $id = null,
@@ -45,6 +47,7 @@ class QuestionnaireTicketDto
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
+            QuestionnaireStatus::from($data['status']),
             empty($data['is_have_in_club']) ? null : (bool)$data['is_have_in_club'],
             $data['email'] ?? null,
             $data['telegram'] ?? null,
@@ -69,6 +72,7 @@ class QuestionnaireTicketDto
             'questionForSysto' => $this->questionForSysto,
             'link' => $this->link,
             'phone' => $this->phone,
+            'status' => $this->status,
             'is_have_in_club' => $this->is_have_in_club,
             'email' => $this->email,
             'telegram' => $this->telegram,
@@ -92,6 +96,7 @@ class QuestionnaireTicketDto
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
             'phone' => $this->phone,
+            'status' => $this->status ?? QuestionnaireStatus::APPROVE,
             'is_have_in_club' => $this->is_have_in_club,
             'email' => $this->email,
             'telegram' => $this->telegram,

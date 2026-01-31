@@ -20,6 +20,7 @@ import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 import InviteLinkView from "@/views/auth/InviteLinkView.vue";
 import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
+import QuestionnaireItemView from "@/views/questionnaire/QuestionnaireItemView.vue"
 
 const routes = [
     {
@@ -159,7 +160,16 @@ const routes = [
             'role': ['admin']
         }
     },
-
+    // определённая анкет (АДМИН ПАНЕЛЬ)
+    {
+        path: '/questionnaire/get/:id',
+        name: 'QuestionnaireItemView',
+        component: QuestionnaireItemView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
     // статические ссылки
     {
         path: '/conditions',

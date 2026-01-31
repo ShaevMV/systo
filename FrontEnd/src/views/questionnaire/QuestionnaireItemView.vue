@@ -3,8 +3,7 @@
 </template>
 
 <script>
-import FilterQuestionnaire from "@/components/Questionnaire/FilterQuestionnaire.vue";
-import QuestionnaireList from "@/components/Questionnaire/QuestionnaireList.vue";
+
 import QuestionnaireItem from "@/components/Questionnaire/QuestionnaireItem.vue";
 
 export default {

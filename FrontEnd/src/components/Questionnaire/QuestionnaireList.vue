@@ -19,8 +19,6 @@
                 <th scope="col">Telegram-аккаунт:</th>
                 <th scope="col">Профайл Вконтакте</th>
                 <th scope="col">Сколько раз на Систо?</th>
-                <th scope="col">Стили музыки</th>
-                <th scope="col">"Зачем ты на Систо?"</th>
                 <th scope="col">Откуда</th>
                 <th scope="col">Ссылка на анкету</th>
               </tr>
@@ -29,7 +27,40 @@
             <tr v-for="(item,index) in getQuestionnaireList"
                 v-bind:key="index"
                 @click="goItemOrderForUser(item.id)">
+
+              <th scope="row" class="mobile">
+                {{ item.id }}
+              </th>
+
+              <td class="mobile">
+                <div class="btn-group" v-show="item.status !== 'APPRUVE' ">
+                  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                    ...
+                  </button>
+                  <div class="dropdown-menu">
+                  <span class="dropdown-item btn-link"
+                        role="button"
+                        v-for="(statusItem, key) in listCorrectNextStatus" v-bind:key="key"
+                        @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+                  </div>
+                </div>
+              </td>
+
+
+              <td>{{ item.email }}</td>
+
+              <td>{{ item.name }}</td>
+              <td>{{ item.phone }} рублей</td>
+              <td>{{ item.agy }}</td>
+              <td>{{ item.telegram }}</td>
+              <td>{{ item.vk }}</td>
+              <td>{{ item.howManyTimes }}</td>
+              <td>{{ item.whereSysto }}</td>
             </tr>
+
+
             </tbody>
           </table>
 
@@ -48,6 +79,11 @@ export default {
     ...mapGetters('appQuestionnaire', [
        'getQuestionnaireList'
     ]),
+    listCorrectNextStatus: function () {
+      return [{
+        "APPRUVE" : "Подвердить"
+      }]
+    }
   },
   methods: {
     ...mapActions('appQuestionnaire', [

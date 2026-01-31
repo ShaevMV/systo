@@ -58,6 +58,8 @@ class QuestionnaireController extends Controller
         $data = $request->toArray();
         try {
             if(isset($data['questionnaire'])) {
+                $data['questionnaire']['ticket_id'] = $ticketId;
+                $data['questionnaire']['order_id'] = $orderId;
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire']
