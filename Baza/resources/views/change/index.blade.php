@@ -27,7 +27,10 @@
                                     Списки
                                 </th>
                                 <th>
-                                    Авто
+                                    Парковка плат.
+                                </th>
+                                <th>
+                                    Парковка б/п.
                                 </th>
                                 <th>
                                     Время начала смены
@@ -60,7 +63,10 @@
                                             {{$item['count_spisok_tickets']}}
                                         </td>
                                         <td>
-                                            {{$item['count_auto_tickets']}}
+                                            {{$item['count_parking_tickets']}}
+                                        </td>
+                                        <td>
+                                            {{$item['count_parking_free_tickets']}}
                                         </td>
                                         <td>
                                             {{$item['start']}}
@@ -103,11 +109,10 @@
                                         <b>{{$total['spisok']}} </b>
                                     </td>
                                     <td>
-                                        <b>{{$total['auto']}} </b>
+                                        <b>{{$total['parking']}} </b>
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td><b>{{$total['parkingFree']}}</b></td>
+
                                 </tr>
                                 </tbody>
                             </table>

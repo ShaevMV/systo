@@ -13,6 +13,16 @@ export const setTypesOfPayment = (state, payload) => {
 };
 
 /**
+ * Запись данные о cиске фестивалей
+ *
+ * @param state
+ * @param payload
+ */
+export const setFestivalList = (state, payload) => {
+    state.festivalList = payload;
+};
+
+/**
  * Запись данные о типах билета
  *
  * @param state
@@ -20,8 +30,8 @@ export const setTypesOfPayment = (state, payload) => {
  */
 export const setTicketType = (state, payload) => {
     state.ticketType = payload;
-
 };
+
 
 /**
  * Записать данные о выбранном типе билета
@@ -31,6 +41,16 @@ export const setTicketType = (state, payload) => {
  */
 export const setSelectTicketType = (state, payload) => {
     state.selectTicketType = payload;
+};
+
+/**
+ * Запись данные о выбранном видае оплаты
+ *
+ * @param state
+ * @param payload
+ */
+export const setSelectTypesOfPayment = (state, payload) => {
+    state.selectTypeOfPayment = payload;
 };
 
 /**

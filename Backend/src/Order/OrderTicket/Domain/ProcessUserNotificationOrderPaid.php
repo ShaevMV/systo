@@ -27,6 +27,8 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
         private string $email,
         private array  $tickets,
         private Uuid $ticketTypeId,
+        private ?string $comment = null,
+        private ?string $promocode = null,
     )
     {
     }
@@ -43,7 +45,9 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
 
         Mail::to($this->email)->send(new OrderToPaid(
             $result,
-            $this->ticketTypeId
+            $this->ticketTypeId,
+            null,
+            $this->promocode,
         ));
     }
 }

@@ -9,7 +9,7 @@ use Shared\Domain\ValueObject\Uuid;
 
 interface PromoCodeInterface
 {
-    public function find(string $name): ?PromoCodeDto;
+    public function find(string $name, Uuid $ticketTypeId, Uuid $festivalId): ?PromoCodeDto;
 
     /**
      * @return PromoCodeDto[]

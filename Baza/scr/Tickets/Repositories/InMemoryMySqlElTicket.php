@@ -11,7 +11,7 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
-    private const UUID_FESTIVAL = null;
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b7';
 
     public function __construct(
         private ElTicketsModel $elTicketsModel,
@@ -19,7 +19,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     )
     {
     }
-    private function addFestivalUuid(): ElTicketsModel
+    private function addFestivalUuid()
     {
         if($this->festivalId) {
             return $this->elTicketsModel->where('festival_id', '=', self::UUID_FESTIVAL);

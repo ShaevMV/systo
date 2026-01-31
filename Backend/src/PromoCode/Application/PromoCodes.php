@@ -60,9 +60,13 @@ class PromoCodes
     /**
      * @throws Throwable
      */
-    public function createOrUpdatePromoCode(array $request): Uuid
+    public function createOrUpdatePromoCode(array $request, string $festivalId): Uuid
     {
-        $promoCode = CreateOrUpdatePromoCodeCommand::fromState($request);
+        $promoCode = CreateOrUpdatePromoCodeCommand::fromState(
+            array_merge($request,[
+                'festival_id' => $festivalId
+            ])
+        );
         $this->commandBus->dispatch($promoCode);
 
         return $promoCode->getId();

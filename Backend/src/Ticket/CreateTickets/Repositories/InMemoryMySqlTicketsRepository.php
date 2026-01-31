@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Tickets\Ticket\CreateTickets\Repositories;
 
 use App\Models\Festival\FestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User;
+use App\Models\User\User;
 use Carbon\Carbon;
 use DomainException;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use JsonException;
-use Throwable;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 
@@ -34,12 +36,13 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
      */
     public function createTickets(TicketDto $ticketDto): bool
     {
-        DB::beginTransaction();
+
         if ($this->model::whereId($ticketDto->getId())->exists()) {
             return true;
         }
 
         try {
+            DB::beginTransaction();
             $this->model::insert($ticketDto->toArray());
             DB::commit();
             return true;
@@ -54,8 +57,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
      */
     public function deleteTicketsByOrderId(Uuid $orderId): bool
     {
-        DB::beginTransaction();
+
         try {
+            DB::beginTransaction();
             $this->model::whereOrderTicketId($orderId->value())->delete();
             DB::commit();
             return true;
@@ -116,20 +120,29 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
             ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
+            ->leftJoin(TicketTypesModel::TABLE, OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE . '.id')
+            ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
+                $join->on($this->model::TABLE . '.festival_id', '=', TicketTypeFestivalModel::TABLE . '.festival_id');
+                $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
+            })
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
-                FestivalModel::TABLE . '.view',
+                TicketTypeFestivalModel::TABLE . '.pdf',
+                TicketTypeFestivalModel::TABLE . '.email as emailView',
                 OrderTicketModel::TABLE . '.phone',
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
+                OrderTicketModel::TABLE . '.ticket_type_id',
                 $this->model::TABLE . '.festival_id',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
-            ])->selectSub($this->getSubQueryLastComment(), 'last_comment')
-            ->first()?->toArray();
+                TicketTypesModel::TABLE . '.name as name_type',
+            ])->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
+        \Log::info('Билет '. $ticketId->value() .' : '. $result->toSql());
+        $result = $result->first()?->toArray();
         if (is_null($result)) {
             throw new DomainException("Билет {$ticketId->value()} не найден");
         }
@@ -144,8 +157,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['city'],
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            $result['view'],
+            empty($result['pdf']) ? null : $result['pdf'],
+            $result['emailView'],
             new Uuid($result['festival_id']),
+            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
+            new Uuid($result['ticket_type_id']),
+            $result['name_type']
         );
     }
 
@@ -167,10 +184,15 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     );
             } else {
                 DB::connection('mysqlBaza')->table('el_tickets')
-                    ->where('uuid', '=', $ticketsDto->getId()->value())->update([
-                        'status' => $data['status'],
-                        'festival_id' => $data['festival_id'],
-                    ]);
+                    ->where('uuid', '=', $ticketsDto->getId()->value())
+                    ->update([
+                            'status' => $data['status'],
+                            'festival_id' => $data['festival_id'],
+                            'is_need_seedling' => $data['is_need_seedling'],
+                            'type_ticket_id' => $data['type_ticket_id'],
+                            'type_ticket' => $data['type_ticket'],
+                            'name' => $data['name']
+                        ]);
             }
         } catch (\Exception $e) {
             return false;

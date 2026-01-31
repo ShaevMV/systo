@@ -1,15 +1,36 @@
 <template>
   <div id="left-logo">
-    <a href="/">
-    <img src="/assets/img/logo-main.png" alt="main logo" class="left-logo">
+    <a :href="getLinkHome">
+    <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
-    <li class="nav-item">
+    <li class="nav-item" v-if="isAuth">
       <router-link
           class="nav-link"
           active-class="active"
-          to="/">Регистрация оргвзноса
+          :to="{ name: 'Orgvznos' }">Типы Оргвзносов
+      </router-link>
+    </li>
+    <li class="nav-item">
+      <router-link
+          class="nav-link" v-if="isAuth"
+          active-class="active"
+          :to="getLinkHome">Регистрация оргвзноса
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'InviteLink' }">Ссылка-Приглашение
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'Conditions' }">Правила участия
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
@@ -30,20 +51,14 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{
-                  name: 'AllOrders',
-                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b4'}
-          }">Все оргвзносы (Весна)
+          :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
     <li class="nav-item" v-if="isAdmin && isAuth">
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{
-                  name: 'AllOrders',
-                  params: {id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b5'}
-          }">Все оргвзносы (Осень)
+          :to="{name: 'QuestionnaireList'}">Все анкеты
       </router-link>
     </li>
     <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
@@ -68,8 +83,8 @@
   <div id="left-sub">
     <p>Если у вас возникли трудности <br>с внесением оргвзноса напишите нам:</p>
     <ul>
-      <li><a href="mailto:tickets@spaceofjoy.ru" class="mailer" target="_blank">tickets@spaceofjoy.ru</a></li>
-      <li><a href="tg://resolve?domain=systo_vznos" class="telegram" target="_blank">@systo_vznos</a></li>
+      <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank" >FAQ (Вопрос-Ответ)</a></li>
+      <li><a href="tg://resolve?domain=systo_club" class="telegram" target="_blank">@systo_club</a></li>
     </ul>
 
   </div>
@@ -95,6 +110,9 @@ export default {
       'isAdmin',
       'isManager'
     ]),
+    getLinkHome: function () {
+      return this.isAuth ? '/hfjlsd65t4732' : '/';
+    }
   },
   methods: {
     ...mapActions('appUser', [

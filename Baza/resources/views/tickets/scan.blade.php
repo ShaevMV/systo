@@ -46,6 +46,10 @@
                     <p id="name"></p>
                     <b>Email: </b>
                     <p id="email"></p>
+                    <b>Тип билета: </b>
+                    <p id="type_ticket"></p>
+                    <b>Тип парковки: </b>
+                    <p id="type"></p>
                     <b>Дата получение билета: </b>
                     <p id="date-order"></p>
                     <b>Телефон: </b>
@@ -58,7 +62,8 @@
                     <p id="curator"></p>
                     <b>Комментарий: </b>
                     <p id="comment"></p>
-
+                    <b>Нужен сажанец: </b>
+                    <p id="is_need_seedling"></p>
                 </div>
                 <div class="card-footer">
                     <button id="enter-result" class="btn btn-fill btn-primary" style="display: none;"> ПРОПУСТИТЬ
@@ -151,6 +156,8 @@
         const alreadyPassedResult = document.getElementById('already-passed');
         const massageResult = document.getElementById('massage-result');
 
+
+
         var idTicket = null;
         var typeTicket = null;
 
@@ -192,9 +199,12 @@
         const emailResult = document.getElementById('email');
         const dateOrderResult = document.getElementById('date-order');
         const phoneResult = document.getElementById('phone');
+        const typeResult = document.getElementById('type');
         const statusResult = document.getElementById('status');
         const commentResult = document.getElementById('comment');
+        const is_need_seedling = document.getElementById('is_need_seedling');
         const colorResult = document.getElementById('color');
+        const typeTicketResult = document.getElementById('type_ticket');
 
         function showResult(data) {
             if (data.date_change === null && data.status === 'paid') {
@@ -218,6 +228,9 @@
             phoneResult.textContent = data.phone || '';
             statusResult.textContent = data.status_human || '';
             emailResult.textContent = data.email;
+            typeTicketResult.textContent = data.type_ticket;
+            typeResult.textContent = data.humanType;
+            is_need_seedling.textContent = data.is_need_seedling || false ? 'Нужен' : 'Не нужен';
             commentResult.textContent = data.comment;
             dateOrderResult.textContent = data.date_order || '';
             colorResult.style.background = data.color || '';
@@ -233,8 +246,10 @@
             projectResult.textContent = '';
             curatorResult.textContent = '';
             emailResult.textContent = '';
+            typeTicketResult.textContent = '';
             dateOrderResult.textContent = '';
             commentResult.textContent = '';
+            is_need_seedling.textContent = '';
             phoneResult.textContent = '';
             statusResult.textContent = '';
             idTicket = null;

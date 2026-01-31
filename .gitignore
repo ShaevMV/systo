@@ -6,3 +6,6 @@
 /Docker/mysqlFriendly/db/
 /Docker/mysqlFriendly/log/
 /Docker/mysql/db/
+/Friendly/bootstrap/cache/
+/Backend/bootstrap/cache/
+/Baza/bootstrap/cache/

@@ -21,9 +21,13 @@
                         <th>{{ __('ФИО покупателя') }}</th>
                         <th>{{ __('Стоимость') }}</th>
                     @endif
+                    @if(in_array($type, ['friendly_tickets', 'live_tickets']))
+                        <th>{{ __('Нужен сажанец') }}</th>
+                    @endif
                     <th>{{ __('Комментарий') }}</th>
                     <th>{{ __('Дата') }}</th>
                     <th>{{ __('Действие') }}</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -46,6 +50,15 @@
                         @if($type !== 'list_tickets')
                             <td>{{$ticket->fio_friendly}}</td>
                             <td>{{$ticket->price}}</td>
+                        @endif
+                        @if(in_array($type, ['friendly_tickets', 'live_tickets']))
+                           <td>
+                               @if($ticket->is_need_seedling)
+                                   {{ __('Нужен') }}
+                               @else
+                                   {{ __('Не нужен') }}
+                               @endif
+                           </td>
                         @endif
                         <td title="{{$ticket->comment}}">{{mb_substr($ticket->comment ?? '',0,10)}}</td>
                         <td>{{$ticket->created_at}}</td>

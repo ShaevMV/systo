@@ -21,7 +21,7 @@ class CreateUser extends Mailable
         private string $login,
         private string $password,
     ) {
-        $this->subject('Solar Systo Togathering '. date('Y'));
+        $this->subject('Solar Systo Togathering');
     }
 
     /**

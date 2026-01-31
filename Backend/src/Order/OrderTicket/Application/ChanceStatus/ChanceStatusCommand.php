@@ -14,6 +14,7 @@ class ChanceStatusCommand implements Command
         public Uuid $userId,
         public ?string $comment = null,
         public bool $now = false,
+        public int $delayMinute = 0,
     ){
     }
 
@@ -40,5 +41,10 @@ class ChanceStatusCommand implements Command
     public function isNow(): bool
     {
         return $this->now;
+    }
+
+    public function getDelayMinute(): int
+    {
+        return $this->delayMinute;
     }
 }

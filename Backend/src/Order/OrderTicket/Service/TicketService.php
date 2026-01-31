@@ -19,7 +19,11 @@ class TicketService
         foreach ($festivalIds as $festivalId) {
             foreach ($guests as $guest) {
                 $guest['festival_id'] = $festivalId->value();
-                $result[] = $guest;
+                $result[] = [
+                    'festival_id' => $festivalId->value(),
+                    'value' => $guest['value'],
+                    'email' => $guest['email'],
+                ];
             }
         }
 

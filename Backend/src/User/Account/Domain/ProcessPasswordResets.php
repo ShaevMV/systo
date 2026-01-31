@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Domain;
 
 use App\Mail\UserPasswordResets;
-use App\Models\PasswordResets;
-use App\Models\User;
+use App\Models\User\PasswordResets;
+use App\Models\User\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Hash;
 use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
-use Shared\Domain\ValueObject\Uuid;
 
 class ProcessPasswordResets implements ShouldQueue, DomainEvent
 {

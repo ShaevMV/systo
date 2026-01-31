@@ -62,3 +62,11 @@ Route::get('/clear', function() {
     exec('rm -f ' . base_path('.log'));
     return "Cache is cleared";
 })->name('clear.cache');
+
+
+Route::get('/pas', function (Request $request) {
+    for ($i=1; $i<50 ; $i++){
+        echo Hash::make('znaytvse'.$i)."";
+        echo "<br/>";
+    };
+});

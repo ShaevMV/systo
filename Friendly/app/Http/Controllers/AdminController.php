@@ -6,7 +6,7 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\Auto;
-use App\Models\User;
+use App\Models\User\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -45,10 +45,12 @@ class AdminController extends Controller
     {
         $usersFriendly = User::leftJoin('friendly_tickets', function (JoinClause $join) use ($festival_id){
             $join->on('friendly_tickets.user_id', '=', 'users.id')
-                ->where('friendly_tickets.festival_id', '=', $festival_id);
+                ->where('friendly_tickets.festival_id', '=', $festival_id)
+                ->where('friendly_tickets.price','>',0);
         })->select(['users.*',
                 DB::raw('SUM(friendly_tickets.price) AS sum_price_friendly'),
                 DB::raw('COUNT(friendly_tickets.id) AS count_tickets_friendly'),
+                DB::raw('SUM(friendly_tickets.is_need_seedling) AS count_is_need_seedling'),
             ])
             ->groupBy('users.id')
             ->get()
@@ -76,20 +78,41 @@ class AdminController extends Controller
             ->toArray();
 
         $users = [];
+        $total = [
+            'friendly' => [
+                'sum' => 0,
+                'count' => 0,
+                'count_is_need_seedling' => 0,
+            ],
+            'list' => [
+                'count' => 0,
+            ],
+            'live' => [
+                'count' => 0,
+                'sum' => 0,
+            ],
+        ];
         foreach ($usersFriendly as $value) {
             $users[$value['id']] = $value;
+            $total['friendly']['sum'] = $total['friendly']['sum'] + $value['sum_price_friendly'];
+            $total['friendly']['count'] = $total['friendly']['count'] + $value['count_tickets_friendly'];
+            $total['friendly']['count_is_need_seedling'] = $total['friendly']['count_is_need_seedling'] + $value['count_is_need_seedling'];
         }
 
         foreach ($usersList as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
+            $total['list']['count'] = $total['list']['count'] + $value['count_tickets_list'];
         }
 
         foreach ($usersLive as $value) {
             $users[$value['id']] = array_merge($users[$value['id']], $value);
+            $total['live']['count'] = $total['live']['count'] + $value['count_tickets_live'];
+            $total['live']['sum'] = $total['live']['sum'] + $value['sum_price_live'];
         }
 
         return view('admin.users', [
             'users' => $users,
+            'total' => $total,
         ]);
     }
 
@@ -129,7 +152,7 @@ class AdminController extends Controller
 
         User::destroy($id);
 
-        return redirect()->route('adminUser',['9d679bcf-b438-4ddb-ac04-023fa9bff4b5']);
+        return redirect()->route('adminUser',['9d679bcf-b438-4ddb-ac04-023fa9bff4b7']);
     }
 
     public function getAuto(Request $request): View|Factory|Application

@@ -37,4 +37,9 @@ class FestivalDto extends AbstractionEntity
     {
         return $this->year;
     }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
 }

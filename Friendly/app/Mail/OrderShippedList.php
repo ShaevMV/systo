@@ -28,7 +28,7 @@ class OrderShippedList extends Mailable
         $this->ids = $ids;
         $this->email = trim($email);
         $this->project = $project;
-        $this->subject('Ваше участие в Solar Systo Togathering. Осень. '.date('Y').' подтверждено ');
+        $this->subject('Ваше участие в Solar Systo Togathering. '.date('Y').' подтверждено ');
     }
 
     /**
@@ -43,7 +43,7 @@ class OrderShippedList extends Mailable
         $mail = $this->from('ticket@solarsysto.ru', 'solarsysto')->view('emails.orders.orderListToPaid');
 
         foreach ($this->ids as $id => $name) {
-            $contents = $service->createPdf($id, $name, $this->email, $this->project);
+            $contents = $service->createPdf($id, $name, $this->email, 's', $this->project);
             $mail->attachData($contents->output(), 'Билет ' . $name . '.pdf');
         }
 

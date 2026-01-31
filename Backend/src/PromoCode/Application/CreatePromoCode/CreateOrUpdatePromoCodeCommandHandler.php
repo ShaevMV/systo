@@ -24,7 +24,11 @@ class CreateOrUpdatePromoCodeCommandHandler implements CommandHandler
             $command->getName(),
             $command->getDiscount(),
             $command->isActive(),
-            $command->isPercent()
+            $command->isPercent(),
+            $command->getTicketTypeId(),
+            null,
+            null,
+            $command->getFestivalId(),
         ));
     }
 }

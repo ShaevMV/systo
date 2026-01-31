@@ -20,7 +20,7 @@
                 <tbody>
                 <tr>
                   <td>{{ getName }}</td>
-                  <td>{{ getGuests }}</td>
+                  <td v-html="getGuests"></td>
                   <td>{{ getTypeOfPayment }}</td>
                   <td>{{ getDateBuy }}</td>
                   <td class="text-right">{{ getDiscount }}</td>
@@ -73,8 +73,8 @@ export default {
       let result = '';
       let sign = '';
       this.getOrderItem.guests.forEach(function (elm) {
-        result = result + sign + elm.value;
-        sign = ', '
+        result = result + sign + elm.value + ' ' + (elm.email ?? '');
+        sign = '<br/> '
       })
 
       return result;

@@ -15,4 +15,9 @@ interface FestivalRepositoryInterface
      * @return FestivalDto[]
      */
     public function getFestivalByTicketTypeId(Uuid $ticketTypeId): array;
+
+    /**
+     * @return FestivalDto[]
+     */
+    public function getFestivalList(): array;
 }

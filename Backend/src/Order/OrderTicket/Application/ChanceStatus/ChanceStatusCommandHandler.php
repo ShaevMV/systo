@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use Bus;
+use Carbon\Carbon;
 use DomainException;
 use Illuminate\Validation\ValidationException;
 use JsonException;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Shared\Domain\Bus\Command\CommandHandler;
 use Shared\Domain\ValueObject\Status;
+use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
 class ChanceStatusCommandHandler implements CommandHandler
@@ -23,6 +26,7 @@ class ChanceStatusCommandHandler implements CommandHandler
         private Bus                            $bus,
         private AddComment                     $addComment,
         private PushTicket                     $pushTicket,
+        private ExternalPromocode              $externalPromocode,
     )
     {
     }
@@ -44,7 +48,13 @@ class ChanceStatusCommandHandler implements CommandHandler
         }
 
         $orderTicket = match ((string)$command->getNextStatus()) {
-            Status::PAID => OrderTicket::toPaid($orderTicketDto),
+            Status::PAID => OrderTicket::toPaid(
+                $orderTicketDto,
+                $command->getComment(),
+                $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
+                    $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()) :
+                    null,
+            ),
             Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto),
@@ -68,10 +78,17 @@ class ChanceStatusCommandHandler implements CommandHandler
             $orderTicket->getTicket()
         );
 
-        if($command->isNow()) {
+        if ($command->isNow()) {
             $this->bus::chain($list)->onConnection('sync')->dispatch();
         } else {
-            $this->bus::chain($list)->dispatch();
+            if ($command->getDelayMinute() > 0) {
+                $this->bus::chain($list)
+                    ->delay(
+                        now()->addMinutes($command->getDelayMinute())
+                    )->dispatch();
+            } else {
+                $this->bus::chain($list)->dispatch();
+            }
 
         }
 

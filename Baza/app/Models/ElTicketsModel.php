@@ -21,6 +21,9 @@ use Illuminate\Support\Carbon;
  * @property string $date_order
  * @property string $status
  * @property string $comment
+ * @property string $type_ticket
+ * @property string $type_ticket_id
+ * @property boolean $is_need_seedling
  * @property int|null $change_id
  * @property string|null $date_change
  * @property Carbon|null $created_at
@@ -37,6 +40,8 @@ use Illuminate\Support\Carbon;
  * @method static Builder|ElTicketsModel whereKilter($value)
  * @method static Builder|ElTicketsModel whereName($value)
  * @method static Builder|ElTicketsModel wherePhone($value)
+ * @method static Builder|ElTicketsModel whereTypeTicket($value)
+ * @method static Builder|ElTicketsModel whereTypeTicketId($value)
  * @method static Builder|ElTicketsModel whereStatus($value)
  * @method static Builder|ElTicketsModel whereUpdatedAt($value)
  * @method static Builder|ElTicketsModel whereUuid($value)
@@ -62,5 +67,8 @@ class ElTicketsModel extends Model
         'status',
         'change_id',
         'date_change',
+        'is_need_seedling',
+        'type_ticket',
+        'type_ticket_id',
     ];
 }

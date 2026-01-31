@@ -28,6 +28,17 @@ export const getOrderItem = state => {
     return state.orderItem;
 };
 
+
+/**
+ * проверим прошла ли загрузка
+ *
+ * @param state
+ * @returns {Array}
+ */
+export const getIsLoading = state => {
+    return state.isLoading;
+};
+
 /**
  * Вывести комментарии
  *
@@ -46,4 +57,11 @@ export const getComment = state => {
  */
 export const getTotalNumber = state => {
     return state.totalNumber;
+};
+
+/**
+ * Вывести данные о сообщение после заполнения анкеты
+ */
+export const getMessageForQuestionnaire = state => {
+    return state.questionnaireItem.message;
 };

@@ -21,6 +21,8 @@ class OrderToPaid extends Mailable
     public function __construct(
         private array $tickets,
         private Uuid $ticketTypeId,
+        private ?string $comment = null,
+        private ?string $promocode = null,
     )
     {
     }
@@ -38,14 +40,19 @@ class OrderToPaid extends Mailable
         ini_set('memory_limit', '-1');
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
 
-        $this->subject('Ваш оргвзнос на Систо '.date('Y').' подтверждён');
-        $mail = $this->view('email.orderToPaid',[
+        $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
+        $mail = $this->view('email.'. ($this->tickets[0]->getEmailView() ?? 'orderToPaid'),[
             'festivalName' => $festivalName,
+            'comment' => $this->comment,
+            'promocode' => $this->promocode,
         ]);
 
         foreach ($this->tickets as $ticket) {
+            if ($ticket->getFestivalView() === null) {
+                continue;
+            }
             $contents = $qrCodeService->createPdf($ticket);
-            $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
+            $mail->attachData($contents->output(), 'Оргвзнос ' . $ticket->getName() . '.pdf');
             \Log::info('Отправлен билет на имя '. $ticket->getName());
         }
 

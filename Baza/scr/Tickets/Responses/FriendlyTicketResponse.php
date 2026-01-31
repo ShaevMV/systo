@@ -23,7 +23,8 @@ class FriendlyTicketResponse implements TicketResponseInterface
         protected Status  $status,
         protected ?string $comment = null,
         protected ?int    $change_id = null,
-        protected ?Carbon $date_change = null
+        protected ?Carbon $date_change = null,
+        protected bool  $is_need_seedling = false,
     )
     {
     }
@@ -44,6 +45,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
             'seller' => $this->seller,
             'color' => Color::COLOR_FRIENDLY,
+            'is_need_seedling' => $this->is_need_seedling,
         ];
     }
 
@@ -61,7 +63,8 @@ class FriendlyTicketResponse implements TicketResponseInterface
             new Status($data['status']),
             ShowSearchWordService::insertTag($data['comment'], $q),
             $data['change_id'] ?? null,
-            $date_change
+            $date_change,
+            (bool)($data['is_need_seedling'] ?? false),
         );
     }
 }

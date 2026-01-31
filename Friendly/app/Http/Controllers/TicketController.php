@@ -9,23 +9,22 @@ use App\Models\Auto;
 use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\LiveTicket;
-use App\Models\User;
+use App\Models\User\User;
 use App\Services\CsvFileService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Log;
-use Redirect;
-use Shared\Services\CreatingQrCodeService;
-use Shared\Services\TicketService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Symfony\Component\Translation\Loader\CsvFileLoader;
-use Throwable;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Redirect;
+use Shared\Services\CreatingQrCodeService;
+use Shared\Services\TicketService;
+use Throwable;
 
 class TicketController extends Controller
 {
@@ -42,16 +41,16 @@ class TicketController extends Controller
         $this->middleware('auth');
         $this->ticketService = $ticketService;
         $this->creatingQrCodeService = $creatingQrCodeService;
-        $this->festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
+        $this->festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b7';
     }
 
     public function view(Request $request)
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->is_list && !$user->is_admin) {
-            return Redirect::route('viewListTickets');
-        }
+        /*if ($user->is_list && !$user->is_admin) {
+            //return Redirect::route('viewListTickets');
+        }*/
 
         return view('tickets/form', [
             'user' => $user,
@@ -74,9 +73,9 @@ class TicketController extends Controller
     {
         /** @var User $user */
         $user = Auth::user();
-        if ($user->is_list && !$user->is_admin) {
-            return Redirect::route('viewListTickets');
-        }
+        /*if ($user->is_list && !$user->is_admin) {
+            //return Redirect::route('viewListTickets');
+        }*/
 
         return view('live/form', [
             'user' => $user,
@@ -210,6 +209,7 @@ class TicketController extends Controller
                 $model->festival_id = $this->festivalId;
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
+                $model->is_need_seedling = (bool)($request->post('is_need_seedling') ?? false);
                 $model->saveOrFail();
                 $this->ticketService->pushTicketFriendly($model, $this->festivalId);
                 $ids['f' . $model->id] = $value;
@@ -225,6 +225,7 @@ class TicketController extends Controller
             $success = true;
             DB::commit();
         } catch (Throwable $e) {
+
             DB::rollback();
             $success = false;
         }
@@ -262,6 +263,7 @@ class TicketController extends Controller
                 $model->festival_id = $this->festivalId;
                 $model->phone = $request->post('phone') ?? '';
                 $model->user_id = Auth::id();
+                $model->is_need_seedling = (bool)($request->post('is_need_seedling') ?? false);
                 $model->kilter = (int)$value;
                 $model->saveOrFail();
             }

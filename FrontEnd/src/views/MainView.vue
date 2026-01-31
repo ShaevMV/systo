@@ -1,6 +1,6 @@
 <template>
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <a href="/" class="logo d-flex"><span>Система регистрации оргвзносов на систо</span><img
+    <a :href="getLinkHome" class="logo d-flex"><span>Система регистрации оргвзносов на систо</span><img
         src="/assets/img/systo-nota.png" alt="systo-nota"></a>
 
     <button type="button" aria-label="Меню" id="menu-btn" @click.stop="toggleMenu"></button>
@@ -13,9 +13,9 @@
     <router-view/>
   </main>
 </template>
-
 <script>
 import MenuView from "@/views/MenuView";
+import {mapGetters} from "vuex";
 
 export default {
   name: "MainView",
@@ -25,11 +25,17 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('appUser', [
+      'isAuth',
+    ]),
     classObject: function () {
       return {
         'active': this.$store.getters.isShowMenu,
         'sidebar': true
       }
+    },
+    getLinkHome: function () {
+      return this.isAuth ? '/hfjlsd65t4732' : '/';
     }
   },
   methods: {

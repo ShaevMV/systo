@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $count
  * @property float $price
  * @property int $user_id
+ * @property float $is_need_seedling
  * @property string $comment
  * @property string $festival_id
  * @property Carbon $created_at
@@ -42,6 +43,7 @@ class LiveTicket extends Model
         'fio_friendly',
         'festival_id',
         'comment',
-        'phone'
+        'phone',
+        'is_need_seedling',
     ];
 }

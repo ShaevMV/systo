@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
-use App\Models\User;
+use App\Models\User\User;
+use Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\Criteria\FilterOperator;
+use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
-use Shared\Domain\Bus\Query\QueryHandler;
-use Shared\Domain\Criteria\FilterOperator;
-use Shared\Domain\Criteria\Filters;
 
 class OrderListFilterQueryHandler implements QueryHandler
 {
@@ -41,6 +39,9 @@ class OrderListFilterQueryHandler implements QueryHandler
             $result[] = $value->setGuests($value->getGuestsByFestivalId($filterQuery->getFestivalId()));
         }
 
+        if (!empty($filterQuery->getQuestionnaire())) {
+            $result = $this->filterByQuestionnaire($filterQuery->getQuestionnaire(),$result);
+        }
 
         return count($result) > 0 ? new ListResponse($result) : null;
     }
@@ -83,7 +84,7 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTypeOrder()?->value(),
             ],
             [
-                'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
+                'field' => OrderTicketModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],
@@ -121,4 +122,22 @@ class OrderListFilterQueryHandler implements QueryHandler
 
         return $result;
     }
+
+    /**
+     * @param string $questionnaire
+     * @param OrderTicketItemForListResponse[] $orderTicketItem
+     * @return OrderTicketItemForListResponse[]
+     */
+    private function filterByQuestionnaire(
+        string $questionnaire,
+        array $orderTicketItem,
+    ): array
+    {
+        if($questionnaire === 'empty') {
+            return array_filter($orderTicketItem, fn(OrderTicketItemForListResponse $listResponse) => $listResponse->getCount() > $listResponse->getQuestionnaireCount());
+        }
+
+        return array_filter($orderTicketItem, fn(OrderTicketItemForListResponse $listResponse) => $listResponse->getCount() === $listResponse->getQuestionnaireCount());
+    }
+
 }

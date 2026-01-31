@@ -71,12 +71,35 @@
                      class="form-control"
                      id="validationDefault04">
             </div>
+            <div class="col-md-4">
+              <label for="validationDefault05" class="form-label">Выберите фестиваль</label>
+              <select class="form-select"
+                      v-model="festival_id"
+                      id="validationDefault05">
+                <option v-for="(festivalItem) in getFestivalList"
+                        v-bind:key="festivalItem.id"
+                        :selected="festivalItem.id == festival_id"
+                        v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label for="validationDefault06" class="form-label">Анкета</label>
+              <select class="form-select"
+                      v-model="questionnaire"
+                      id="validationDefault06">
+                <option value="">Выберите заполнености анкеты</option>
+                <option value="empty">Не заполненая</option>
+                <option value="full">Заполнено</option>
+              </select>
+            </div>
           </div>
 
           <div class="row b-row mt-2">
             <button class="btn btn-primary"
-                    @click="sendFilter"
-                    type="submit">Применить фильтр
+                    @click="sendFilter" :disabled="getIsLoading"
+                    type="submit"><span v-if="getIsLoading">Загрузка...</span>
+              <span v-else>Отправить</span>
             </button>
             <button class="btn btn-primary"
                     @click="clearFilter"
@@ -95,9 +118,6 @@ import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "FilterOrder",
-  props: {
-    'festivalId': String
-  },
   data() {
     return {
       email: null,
@@ -106,13 +126,30 @@ export default {
       promoCode: null,
       typesOfPayment: null,
       city: null,
+      selectFestivalId: null,
+      questionnaire: '',
     }
   },
   computed: {
     ...mapGetters('appFestivalTickets', [
       'getTypesOfPayment',
+      'getFestivalList',
       'getTicketType',
     ]),
+    ...mapGetters('appOrder', [
+      'getIsLoading'
+    ]),
+    festival_id: {
+      get: function () {
+        if (this.selectFestivalId === null) {
+          return '9d679bcf-b438-4ddb-ac04-023fa9bff4b8'
+        }
+        return this.selectFestivalId;
+      },
+      set: function (newValue) {
+        this.selectFestivalId = newValue;
+      },
+    }
     /*typeOrder: {
         get: function () {
           return this.price;
@@ -129,29 +166,37 @@ export default {
     ...mapActions('appFestivalTickets', [
       'getListTypesOfPayment',
       'getListPriceFor',
+      'getListFestival',
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
+      'loading'
     ]),
     /**
      * Отправить данные для фильтра
      */
     sendFilter: function () {
-      let price = this.typeOrder !== null ? this.typeOrder.price : null;
-      let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
-      let self = this;
-      let festivalId = this.$route.params.id
-      this.getOrderListForAdmin({
-        'price': price,
-        'typePrice': typePrice,
-        'email': self.email,
-        'status': self.status,
-        'promoCode': self.promoCode,
-        'typesOfPayment': self.typesOfPayment,
-        'festivalId': festivalId,
-        'city': self.city,
-      });
-    },
+        this.loading();
+        let price = this.typeOrder !== null ? this.typeOrder.price : null;
+        let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
+        let self = this;
+        this.getOrderListForAdmin({
+          'price': price,
+          'typePrice': typePrice,
+          'email': self.email,
+          'status': self.status,
+          'promoCode': self.promoCode,
+          'typesOfPayment': self.typesOfPayment,
+          'festivalId': self.festival_id,
+          'city': self.city,
+          'questionnaire': self.questionnaire,
+        });
+        this.getListTypesOfPayment({
+          festival_id: self.festival_id,
+          is_admin: true,
+        });
+        this.getListPriceFor({festival_id: self.festival_id})
+      },
     clearFilter: function () {
       this.typePrice = null;
       this.price = null;
@@ -161,14 +206,19 @@ export default {
       this.typesOfPayment = null;
       this.typeOrder = null;
       this.city = null;
-      let festivalId = this.$route.params.id
+      let festivalId = this.festival_id;
       this.getOrderListForAdmin({
         'festivalId': festivalId,
       });
     }
   },
   async created() {
-    await this.getListTypesOfPayment({festival_id: this.$route.params.id});
+    await this.getListFestival();
+    await this.getListPriceFor({festival_id: this.festival_id})
+    await this.getListTypesOfPayment({
+      festival_id: this.festival_id,
+      is_admin: true,
+    });
   },
 }
 </script>

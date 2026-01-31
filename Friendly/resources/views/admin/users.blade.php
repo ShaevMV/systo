@@ -6,6 +6,32 @@
                     {{ __('Создать пользователя') }}
                 </x-jet-responsive-nav-link>
             </div>
+            <h3> ИТОГО: </h3>
+            <table class="table" style="width: 1136px;">
+                <thead>
+                <tr>
+                    <th>{{ __('Сумма за френдли') }}</th>
+                    <th>{{ __('Кол-во за френдли') }}</th>
+                    <th>{{ __('Кол-во сажанцев') }}</th>
+                    <th>{{ __('Сумма за живые') }}</th>
+                    <th>{{ __('Кол-во за живые') }}</th>
+                    <th>{{ __('Кол-во за списки') }}</th>
+                    <th>{{ __('ВСЕГО:') }}</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="width: 200px;"><b>{{number_format($total['friendly']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
+                    <td><b>{{$total['friendly']['count'] ?? 0}}</b></td>
+                    <td><b>{{$total['friendly']['count_is_need_seedling'] ?? 0}}</b></td>
+                    <td style="width: 200px;"><b>{{number_format($total['live']['sum'] ?? 0, 2, '.', ' ')}}</b></td>
+                    <td><b>{{$total['live']['count'] ?? 0}}</b></td>
+                    <td><b>{{$total['list']['count'] ?? 0}}</b></td>
+                    <td style="width: 200px;"><b>{{number_format(($total['live']['sum'] + $total['friendly']['sum']), 2, '.', ' ')}}</b></td>
+                </tr>
+                </tbody>
+
+            </table>
             <table class="table">
                 <thead>
                 <tr>

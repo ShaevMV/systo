@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Responses;
 
-use Carbon\Carbon;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
@@ -12,7 +11,6 @@ use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
-use function Ramsey\Uuid\v1;
 
 class OrderTicketItemForListResponse extends AbstractionEntity implements Response
 {
@@ -54,10 +52,17 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected ?string $promoCode = null,
         protected int     $discount = 0,
         protected ?string $city = null,
+        protected ?string $phone = null,
+        protected int     $questionnaireCount = 0,
     )
     {
-        $this->count = count($guests);
+        $this->count = self::getGuestsCount($guests);
         $this->humanStatus = $this->status->getHumanStatus();
+    }
+
+    private static function getGuestsCount(array $guests): int
+    {
+        return count($guests);
     }
 
     /**
@@ -71,14 +76,15 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $guests[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
         $status = new Status($data['status']);
+
         return new self(
             new Uuid($data['id']),
             $data['kilter'],
             $data['email'],
-            $data['name'],
+            $data['name'] ?? '',
             (int)$data['price'] - (int)$data['discount'],
             $guests,
-            $data['payment_name'],
+            \Illuminate\Support\Str::limit(strip_tags($data['payment_name']),10),
             $status,
             $data['date'],
             $status->getListNextStatus(),
@@ -87,7 +93,9 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
             (int)$data['discount'],
-            $data['city']
+            $data['city'],
+            $data['phone'],
+            (int)$data['questionnaire_count'] ?? 0,
         );
     }
 
@@ -151,5 +159,10 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         $this->guests = $guests;
         $this->count = count($guests);
         return $this;
+    }
+
+    public function getQuestionnaireCount(): int
+    {
+        return $this->questionnaireCount;
     }
 }

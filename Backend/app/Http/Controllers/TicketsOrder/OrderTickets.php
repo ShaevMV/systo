@@ -7,7 +7,7 @@ namespace App\Http\Controllers\TicketsOrder;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
-use App\Models\User;
+use App\Models\User\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,10 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Tickets\Billing\Application\Billing;
+use Tickets\Billing\DTO\PaymentRequestDTO;
+use Tickets\Billing\ValueObject\DeviceValueObject;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
@@ -23,10 +26,8 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Tickets\Order\OrderTicket\Service\TicketService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -36,7 +37,6 @@ class OrderTickets extends Controller
     public function __construct(
         private CreateOrder        $createOrder,
         private GetTicketType      $getTicketType,
-        private TicketService      $ticketService,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
         private GetOrder           $getOrder,
@@ -44,6 +44,7 @@ class OrderTickets extends Controller
         private ChanceStatus       $chanceStatus,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
+        private Billing            $billing,
     )
     {
     }
@@ -61,21 +62,25 @@ class OrderTickets extends Controller
                 AccountDto::fromState($createOrderTicketsRequest->toArray())
             )->value());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
+            $guests = $createOrderTicketsRequest->guests;
+            if ($createOrderTicketsRequest->name) {
+                array_unshift($guests, [
+                    'value' => $createOrderTicketsRequest->name,
+                    'email' => $createOrderTicketsRequest->email,
+                ]);
+            }
+
             // Получение цены
             $priceDto = $this->priceService->getPriceDto(
                 $ticketTypeId,
-                count($createOrderTicketsRequest->guests),
+                count($guests),
                 $createOrderTicketsRequest->promo_code
             );
 
             $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
 
             $data = $createOrderTicketsRequest->toArray();
-
-            $data['guests'] = $this->ticketService->initFestivalId(
-                $createOrderTicketsRequest->guests,
-                $ticketType->getFestivalListId()
-            );
+            $data['guests'] = $guests;
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
@@ -84,7 +89,13 @@ class OrderTickets extends Controller
                 $ticketType->isLiveTicket(),
             );
 
+            if ($createOrderTicketsRequest->invite !== 'undefined' &&
+                $createOrderTicketsRequest->invite !== null) {
+                $orderTicketDto->setInviteLink(new Uuid($createOrderTicketsRequest->invite));
+            }
+
             $this->createOrder->createAndSave($orderTicketDto);
+
             // Добавления комментария
             if ($createOrderTicketsRequest->comment) {
                 $this->addComment->send(
@@ -94,16 +105,42 @@ class OrderTickets extends Controller
                 );
             }
 
+            if ($orderTicketDto->isBilling()) {
+                $billingResponse = $this->billing->creatingLink(
+                    new PaymentRequestDTO(
+                        $orderTicketDto->getId(),
+                        $priceDto->getPriceItem(),
+                        $priceDto->getCount(),
+                        $createOrderTicketsRequest->email,
+                        $createOrderTicketsRequest->phone,
+                    ),
+                    new DeviceValueObject(
+                        request()->userAgent(),
+                    ),
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Через несколько секунд откроется QR-код для оплаты. Откройте приложение вашего банка и совершите перевод. <br/>
+                Если окно не открылось нажмите на кнопку ниже.<br/>
+              Если Вы зарегистрировали нового пользователя, то Вы также получите на почту данные для авторизации<br/>
+              <a href="' . $billingResponse->getLinkToReceipt() . '" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>',
+                    'link' => $billingResponse->getLinkToReceipt(),
+                ]);
+            }
+
             return response()->json([
                 'success' => true,
-                'massage' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
+                'message' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
               Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
             ]);
 
         } catch (Throwable $exception) {
             return response()->json([
                 'success' => false,
-                'massage' => $exception->getMessage(),
+                'message' => $exception->getMessage(),
+                'link' => $exception->getLine(),
+                'file' => $exception->getFile(),
             ]);
         }
     }
@@ -149,7 +186,8 @@ class OrderTickets extends Controller
      */
     public function getOrderItem(string $id): JsonResponse
     {
-        $orderItem = $this->getOrder->getItemById(new Uuid($id));
+        $orderUuid = new Uuid($id);
+        $orderItem = $this->getOrder->getItemById($orderUuid);
         /** @var User $user */
         $user = Auth::user();
         if (is_null($orderItem) ||
@@ -161,7 +199,9 @@ class OrderTickets extends Controller
             ], 404);
         }
 
-        return response()->json($orderItem->toArray());
+        return response()->json([
+            'order' => $orderItem->toArray()
+        ]);
     }
 
     /**
@@ -218,8 +258,10 @@ class OrderTickets extends Controller
         } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
-                'massage' => $throwable->getMessage()
+                'message' => $throwable->getMessage()
             ], 422);
         }
     }
+
+
 }

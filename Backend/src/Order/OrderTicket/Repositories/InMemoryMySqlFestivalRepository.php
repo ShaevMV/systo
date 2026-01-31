@@ -3,9 +3,9 @@
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
+use App\Models\Festival\TicketTypesModel;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 
 class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
 {
@@ -37,6 +37,20 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
 
         foreach ($ticketTypesModelItem->festivals as $value) {
             $result[] = FestivalDto::fromState($value->toArray());
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array|FestivalDto[]
+     */
+    public function getFestivalList(): array
+    {
+        $list = $this->model->get()?->toArray() ?? [];
+        $result = [];
+        foreach ($list as $item) {
+            $result[] = FestivalDto::fromState($item);
         }
 
         return $result;

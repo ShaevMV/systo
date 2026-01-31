@@ -119,6 +119,9 @@
                                                 <th>
                                                     Коммент
                                                 </th>
+                                                <th>
+                                                    Нужен сажанец
+                                                </th>
                                                 </thead>
                                                 <tbody>
                                                 @foreach($result[DefineService::ELECTRON_TICKET] as $ticket)
@@ -167,6 +170,13 @@
                                                         </td>
                                                         <td>
                                                             {!! $ticket['comment'] !!}
+                                                        </td>
+                                                        <td>
+                                                            @if($ticket['is_need_seedling'] ==true)
+                                                                Нужен
+                                                            @else
+                                                                Не нужен
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach
@@ -298,6 +308,9 @@
                                                 <th>
                                                     Коммент
                                                 </th>
+                                                <th>
+                                                    Нужен сажанец
+                                                </th>
                                                 </thead>
                                                 <tbody>
                                                 @foreach($result[DefineService::DRUG_TICKET] as $ticket)
@@ -345,6 +358,13 @@
                                                         </td>
                                                         <td>
                                                             {!! $ticket['comment'] !!}
+                                                        </td>
+                                                        <td>
+                                                            @if($ticket['is_need_seedling'] ==true)
+                                                                Нужен
+                                                            @else
+                                                                Не нужен
+                                                            @endif
                                                         </td>
                                                     </tr>
                                                 @endforeach

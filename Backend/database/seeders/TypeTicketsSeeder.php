@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use Carbon\Carbon;
+use App\Models\Festival\TicketTypesModel;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class TypeTicketsSeeder extends Seeder
@@ -33,7 +31,10 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос';
         $ticketTypes->price = self::DEFAULT_PRICE;
         $ticketTypes->sort = 1;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL, [
+            'pdf' => 'TypeTicketPdf1.black.php',
+            'email' => 'TypeTicketMailOrderToPaid1.black.php'
+        ]);
         $ticketTypes->save();
 
         $ticketTypes = new TicketTypesModel();
@@ -41,7 +42,10 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос для регионов';
         $ticketTypes->price = '3600';
         $ticketTypes->sort = 2;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL,[
+            'pdf' => 'TypeTicketPdf2.black.php',
+            'email' => 'TypeTicketMailOrderToPaid2.black.php'
+        ]);
         $ticketTypes->save();
 
         $ticketTypes = new TicketTypesModel();
@@ -49,7 +53,10 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос мульти фестиваль';
         $ticketTypes->price = self::DEFAULT_MULTI_FESTIVAL_PRICE;
         $ticketTypes->sort = 3;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL,[
+            'pdf' => 'TypeTicketPdf3.black.php',
+            'email' => 'TypeTicketMailOrderToPaid3.black.php'
+        ]);
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
         $ticketTypes->save();
 

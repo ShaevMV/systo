@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property string $name
  * @property string $date_order
  * @property string $status
+ * @property boolean $is_need_seedling
  * @property string $comment
  * @property int|null $change_id
  * @property string|null $date_change
@@ -59,5 +60,6 @@ class FriendlyTicketModel extends Model
         'date_order',
         'change_id',
         'date_change',
+        'is_need_seedling',
     ];
 }

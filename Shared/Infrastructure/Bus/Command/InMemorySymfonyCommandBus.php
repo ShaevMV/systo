@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shared\Infrastructure\Bus\Command;
 
+use Symfony\Component\Messenger\Stamp\HandledStamp;
 use Throwable;
 use Shared\Domain\Bus\Command\Command;
 use Shared\Domain\Bus\Command\CommandBus;
@@ -32,10 +33,12 @@ final class InMemorySymfonyCommandBus implements CommandBus
     /**
      * @throws Throwable
      */
-    public function dispatch(Command $command): void
+    public function dispatch(Command $command): ?CommandResponse
     {
         try {
-            $this->bus->dispatch($command);
+            /** @var HandledStamp $stamp */
+            $stamp = $this->bus->dispatch($command)->last(HandledStamp::class);;
+            return $stamp->getResult();
         } catch (NoHandlerForMessageException) {
             throw new CommandNotRegisteredError($command);
         } catch (HandlerFailedException $error) {

@@ -1,26 +1,53 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
 import AdminDashboard from "../views/admin/AdminDashboard";
 import OrderItemView from "@/views/order/OrderItemView";
 import OrderListForAdmin from "@/views/order/OrderListForAdmin.vue";
-import RegView from "@/views/auth/RegView.vue";
 import Error404 from "@/views/error/Error404.vue";
 import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
 import ProfileView from "@/views/user/ProfileView.vue";
 import AboutView from "@/views/AboutView.vue";
-import store from '../store'
+import OrgsView from "@/views/OrgsView.vue";
+import PrivateView from "@/views/PrivateView.vue";
+import FaqView from "@/views/FaqView.vue";
+import QuestionnaireView from "../views/questionnaire/QuestionnaireView.vue";
+import store from '../store';
 import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
+import InviteLinkView from "@/views/auth/InviteLinkView.vue";
+import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
+import QuestionnaireItemView from "@/views/questionnaire/QuestionnaireItemView.vue"
 
 const routes = [
     {
         path: '/',
+        name: 'stub',
+        component: StubView
+    },
+
+    // инвайт при старте покупка билета
+    {
+        path: '/hfjlsd65t4732',
         name: 'home',
         component: HomeView
     },
+    // инвайт от пользователя
+    {
+        path: '/invite/:userId',
+        name: 'homeInvite',
+        component: HomeView,
+    },
+    // инвайт на первый раз
+    {
+        path: '/invite/newUser/:userId',
+        name: 'homeInvite',
+        component: HomeView,
+    },
+    // авторизация
     {
         path: '/login',
         name: 'login',
@@ -29,14 +56,7 @@ const routes = [
             'guest': true
         }
     },
-    {
-        path: '/registration',
-        name: 'registration',
-        component: RegView,
-        meta: {
-            'guest': true
-        }
-    },
+    // сброс пароля
     {
         path: '/forgotPassword',
         name: 'forgotPassword',
@@ -53,14 +73,8 @@ const routes = [
             'guest': true
         }
     },
-    {
-        path: '/myOrders',
-        name: 'Orders',
-        component: OrderView,
-        meta: {
-            'requiresAuth': true,
-        }
-    },
+
+    // профиль
     {
         path: '/profile',
         name: 'Profile',
@@ -69,15 +83,29 @@ const routes = [
             'requiresAuth': true,
         }
     },
+
+
+    // создать инвайт ссылку
     {
-        path: '/orders/:id',
-        name: 'AllOrders',
-        component: OrderListForAdmin,
+        path: '/invite',
+        name: 'InviteLink',
+        component: InviteLinkView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin'],
         }
     },
+
+
+    // мои закзы - заказы авторизованого пользователя
+    {
+        path: '/myOrders',
+        name: 'Orders',
+        component: OrderView,
+        meta: {
+            'requiresAuth': true,
+        }
+    },
+    // просмотр определённого заказа
     {
         path: '/order/:id',
         name: 'orderItems',
@@ -87,6 +115,85 @@ const routes = [
             'requiresAuth': true,
         }
     },
+    // список всех закаов (АДМИН ПАНЕЛЬ)
+    {
+        path: '/orders',
+        name: 'AllOrders',
+        component: OrderListForAdmin,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin'],
+        }
+    },
+
+
+    // анктеты
+    // Анкета нового пользователя
+    {
+        path: '/questionnaire/newUser',
+        name: 'Questionnaire',
+        props: true,
+        component: QuestionnaireView,
+    },
+    // Анкета от заказа
+    {
+        path: '/questionnaire/quest/:order_id/:ticket_id',
+        name: 'Questionnaire',
+        props: true,
+        component: QuestionnaireView,
+    },
+    // Редактирование анкеты
+    {
+        path: '/questionnaire/edit/:id',
+        name: 'QuestionnaireEdit',
+        props: true,
+        component: QuestionnaireView,
+    },
+
+    // список всех анкет (АДМИН ПАНЕЛЬ)
+    {
+        path: '/questionnaires/',
+        name: 'QuestionnaireList',
+        component: QuestionnaireListView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    // определённая анкет (АДМИН ПАНЕЛЬ)
+    {
+        path: '/questionnaire/get/:id',
+        name: 'QuestionnaireItemView',
+        component: QuestionnaireItemView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    // статические ссылки
+    {
+        path: '/conditions',
+        name: 'Conditions',
+        component: AboutView,
+    },
+    {
+        path: '/orgvznos',
+        name: 'Orgvznos',
+        component: OrgsView,
+    },
+    {
+        path: '/faq',
+        name: 'Faq',
+        component: FaqView,
+    },
+    {
+        path: '/private',
+        name: 'Private',
+        component: PrivateView,
+    },
+
+
+
     {
         path: '/admin',
         name: 'adminDashboard',
@@ -96,11 +203,8 @@ const routes = [
             'role': ['admin']
         }
     },
-    {
-        path: '/conditions',
-        name: 'Conditions',
-        component: AboutView,
-    },
+
+
     {
         path: '/promo-codes',
         name: 'PromoCodes',
@@ -110,6 +214,7 @@ const routes = [
             'role': ['admin']
         }
     },
+
     {
         path: '/promoCode/:id?',
         name: 'promoCodeItem',

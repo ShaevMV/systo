@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
+use App\Models\Festival\TicketTypesModel;
+use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Ordering\CommentOrderTicketModel;
-use App\Models\Ordering\InfoForOrder\TicketTypesModel;
-use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\Ordering\TicketTypeFestivalModel;
-use App\Models\User;
+use App\Models\Questionnaire\QuestionnaireModel;
+use App\Models\User\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;
@@ -40,9 +41,10 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function create(OrderTicketDto $orderTicketDto): bool
     {
-        DB::beginTransaction();
+
         $data = $orderTicketDto->toArray();
         try {
+            DB::beginTransaction();
             $this->model->insert(
                 array_merge($data,
                     [
@@ -82,10 +84,12 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE . '.*',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
+                User::TABLE . '.phone',
                 TicketTypesModel::TABLE . '.name',
                 TypesOfPaymentModel::TABLE . '.name as payment_name',
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter')
             ->get()
             ->toArray();
@@ -113,6 +117,19 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     }
 
     /**
+     * Добавить под запрос на кол-во заполненных анкет
+     *
+     * @return Builder
+     */
+    private function getSubQueryCountQuestionnaire(): Builder
+    {
+        return QuestionnaireModel::select(DB::raw('count(*)'))
+            ->whereColumn('order_id', $this->model::TABLE . '.id')
+            ->groupBy(QuestionnaireModel::TABLE.'.order_id')
+            ->getQuery();
+    }
+
+    /**
      * @throws JsonException
      */
     public function findOrder(Uuid $uuid): ?OrderTicketDto
@@ -127,11 +144,15 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $rawDataArr = $rawData->toArray();
         $rawDataArr['email'] = $rawDataArr['users']['email'];
-
+        $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
         return $rawDataArr !== null ? OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
-            new PriceDto($rawData['price'], $rawData['discount']),
+            new PriceDto(
+                (int)($rawData['price'] / count($guests)),
+                count($guests),
+                $rawData['discount']
+            ),
             (bool)$rawData['ticketType']['is_live_ticket'],
         ) : null;
     }
@@ -162,10 +183,12 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $this->model::TABLE . '.*',
                 User::TABLE . '.email',
                 User::TABLE . '.city',
+                User::TABLE . '.phone',
                 TicketTypesModel::TABLE . '.name',
                 TypesOfPaymentModel::TABLE . '.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
         /** @var Filter $filter */
@@ -178,7 +201,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 );
             }
         }
-        //$sql = $builder->toSql();
+
         $rawData = $builder
             ->get()
             ->toArray();
@@ -201,7 +224,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool
     {
-        DB::beginTransaction();
+
         $arrGuests = [];
         foreach ($guests as $guest) {
             $arrGuests[] = [
@@ -211,6 +234,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
 
         try {
+            DB::beginTransaction();
             $order = $this->model::find($orderId->value());
             $order->status = (string)$newStatus;
             $order->guests = $arrGuests;

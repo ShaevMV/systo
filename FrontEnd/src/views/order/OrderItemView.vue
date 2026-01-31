@@ -24,7 +24,9 @@ export default {
   },
 
   beforeRouteEnter: (to, from, next) => {
-    window.store.dispatch('appOrder/loadOrderItem', to.params.id);
+    window.store.dispatch('appOrder/loadOrderItem', {
+      id:to.params.id
+    });
     next();
   },
 }

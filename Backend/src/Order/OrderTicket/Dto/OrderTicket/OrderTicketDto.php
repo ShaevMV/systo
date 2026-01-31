@@ -44,6 +44,7 @@ class OrderTicketDto
         protected ?string  $promo_code = null,
         protected bool     $is_live_ticket = false,
         ?Uuid              $id = null,
+        protected ?Uuid    $inviteLink = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -75,9 +76,9 @@ class OrderTicketDto
             new Uuid($data['types_of_payment_id']),
             new Uuid($data['ticket_type_id']),
             $tickets,
-            $data['id_buy'],
+            $data['id_buy'] ?? '',
             $priceDto,
-            $data['date'],
+            $data['date'] ?? '',
             new Status($status),
             $data['promo_code'],
             $isLiveTicket,
@@ -94,6 +95,7 @@ class OrderTicketDto
         foreach ($this->ticket as $item) {
             $tickets[] = [
                 'value' => $item->getValue(),
+                'email' => $item->getEmail(),
                 'id' => $item->getId()->value(),
                 'festival_id' => $item->getFestivalId()->value(),
             ];
@@ -181,5 +183,20 @@ class OrderTicketDto
     public function isIsLiveTicket(): bool
     {
         return $this->is_live_ticket;
+    }
+
+    public function isBilling(): bool
+    {
+        return $this->types_of_payment_id->equals(new Uuid('3fcded69-4aef-4c4a-a041-52c91e5afd91'));
+    }
+
+    public function getInviteLink(): ?Uuid
+    {
+        return $this->inviteLink;
+    }
+
+    public function setInviteLink(?Uuid $inviteLink): void
+    {
+        $this->inviteLink = $inviteLink;
     }
 }

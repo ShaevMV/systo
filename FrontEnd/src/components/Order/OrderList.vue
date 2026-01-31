@@ -4,7 +4,7 @@
     <h1 class="card-title" v-else> Заказы пользователей </h1>
   </div>
   <div class="row">
-    <div class="col-lg-12 mx-auto">
+    <div class="col-lg-12 mx-auto" id="filter-results">
       <div class="card">
         <div class="card-body">
           <p>На этой странице ты можешь просмотреть все свои заказы на регистрацию оргвзносов.<br>
@@ -23,7 +23,7 @@
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col" class="mobile">Статус</th>
+              <th scope="col" class="mobile">Телефон</th>
               <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
@@ -65,7 +65,7 @@
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
-                {{ itemOrder.humanStatus }}
+                {{ itemOrder.phone }}
               </td>
               <td v-if="isAdmin">
                 {{ itemOrder.city }}

@@ -14,7 +14,8 @@ class SaveChangeCommand implements Command
     public function __construct(
         array $userIdList,
         private Carbon $start,
-        private ?int $id = null
+        private string $festivalId,
+        private ?int $id = null,
     )
     {
         $this->userIdList = array_map(function ($item) {
@@ -35,5 +36,10 @@ class SaveChangeCommand implements Command
     public function getUserIdList(): array
     {
         return $this->userIdList;
+    }
+
+    public function getFestivalId(): string
+    {
+        return $this->festivalId;
     }
 }

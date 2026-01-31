@@ -15,7 +15,8 @@ use Baza\Tickets\Applications\Enter\ElTicket\ElTicketCommand;
 use Baza\Tickets\Applications\Enter\ElTicket\ElTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommand;
 use Baza\Tickets\Applications\Enter\LiveTicket\LiveTicketCommandHandler;
-
+use Baza\Tickets\Applications\Enter\ParkingTicket\ParkingTicketCommand;
+use Baza\Tickets\Applications\Enter\ParkingTicket\ParkingTicketCommandHandler;
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommand;
 use Baza\Tickets\Applications\Enter\SpisokTicket\SpisokTicketCommandHandler;
 
@@ -26,11 +27,12 @@ class EnterTicket
     private CommandBus $bus;
 
     public function __construct(
-        SpisokTicketCommandHandler $spisokTicketCommandHandler,
-        ElTicketCommandHandler     $elTicketCommandHandler,
-        DrugTicketCommandHandler   $drugTicketCommandHandler,
-        LiveTicketCommandHandler   $liveTicketCommandHandler,
-        AutoTicketCommandHandler $autoTicketCommandHandler
+        SpisokTicketCommandHandler  $spisokTicketCommandHandler,
+        ElTicketCommandHandler      $elTicketCommandHandler,
+        DrugTicketCommandHandler    $drugTicketCommandHandler,
+        LiveTicketCommandHandler    $liveTicketCommandHandler,
+        AutoTicketCommandHandler    $autoTicketCommandHandler,
+        ParkingTicketCommandHandler $parkingTicketHandler,
     )
     {
         $this->bus = new InMemorySymfonyCommandBus([
@@ -39,6 +41,7 @@ class EnterTicket
             DrugTicketCommand::class => $drugTicketCommandHandler,
             LiveTicketCommand::class => $liveTicketCommandHandler,
             AutoTicketCommand::class => $autoTicketCommandHandler,
+            ParkingTicketCommand::class => $parkingTicketHandler,
         ]);
     }
 
@@ -53,6 +56,9 @@ class EnterTicket
             DefineService::DRUG_TICKET => new DrugTicketCommand($id, $changeId),
             DefineService::LIVE_TICKET => new LiveTicketCommand($id, $changeId),
             DefineService::AUTO_TICKET => new AutoTicketCommand($id, $changeId),
+            DefineService::PARKING_TICKET,
+            DefineService::PARKING_FREE_TICKET,
+            DefineService::PARKING_CROSS_COUNTRY_TICKET => new ParkingTicketCommand($id, $changeId),
             default => throw new \DomainException('Не верный тип ' . $type),
         };
 

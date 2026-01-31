@@ -9,10 +9,6 @@
           <div class="card-body">
             <p class="pp1"><strong>Внимание!</strong> Твой пароль придёт вам в первом письме после регистрации
               оргвзноса.<br>
-              Либо ты можешь создать свой аккаунт отдельно, нажав на кнопку
-              <router-link
-                  to="/registration"><b style="text-transform:uppercase">Зарегистрироваться</b>
-              </router-link>
             </p>
               <div id="contact-form" role="form">
                 <div class="d-flex y-row">
@@ -100,10 +96,9 @@ export default {
             location.href = url;
           } else {
             if (isAdmin === true) {
-              // TODO: сделать нормально
-              location.href = '/orders/9d679bcf-b438-4ddb-ac04-023fa9bff4b5';
+              location.href = '/orders';
             } else {
-              location.href = '/myOrders';
+              location.href = '/hfjlsd65t4732';
             }
           }
         }

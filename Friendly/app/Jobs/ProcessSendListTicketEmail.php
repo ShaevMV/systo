@@ -42,7 +42,7 @@ class ProcessSendListTicketEmail implements ShouldQueue
     public function handle()
     {
         ini_set('memory_limit', '256M');
-        Mail::to($this->email)->send(new OrderShippedList(
+        Mail::to(trim($this->email))->send(new OrderShippedList(
             $this->ids,
             trim($this->email),
             $this->project

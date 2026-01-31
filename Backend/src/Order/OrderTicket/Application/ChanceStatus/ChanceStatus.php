@@ -30,6 +30,7 @@ class ChanceStatus
         Uuid $userId,
         ?string $comment = null,
         bool $now = false,
+        int $delay = 0,
     ): void
     {
         $this->commandBus->dispatch(new ChanceStatusCommand(
@@ -37,7 +38,8 @@ class ChanceStatus
             $status,
             $userId,
             $comment,
-            $now
+            $now,
+            $delay,
         ));
     }
 }

@@ -20,8 +20,21 @@ export const addCommentByOrderItem = (state, payload) => {
 };
 
 export const chanceStatus = (state, payload) => {
-    console.log(payload);
     state.orderList.find(item => item.id === payload.id).humanStatus = payload.humanStatus;
     state.orderList.find(item => item.id === payload.id).status = payload.status;
     state.orderList.find(item => item.id === payload.id).listCorrectNextStatus = payload.listCorrectNextStatus;
+};
+
+export const setMessage = (state, payload) => {
+    state.questionnaireItem.message = payload;
+};
+
+/**
+ * Установить Loaging
+ *
+ * @param state
+ * @param payload
+ */
+export const setLoaging = (state, payload) => {
+    state.isLoading = payload;
 };

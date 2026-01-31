@@ -53,7 +53,11 @@ class GetPromoCodesTest extends TestCase
 
     public function test_in_correct_fine_promoCode(): void
     {
-        $res = $this->isCorrectPromoCode->findPromoCode(PromoCodSeeder::NAME_FOR_SYSTO,1000);
+        $res = $this->isCorrectPromoCode->findPromoCode(
+            PromoCodSeeder::NAME_FOR_SYSTO,
+            1000,
+            new Uuid()
+        );
 
         self::assertTrue($res->isSuccess());
     }

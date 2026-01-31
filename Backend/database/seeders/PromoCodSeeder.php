@@ -28,7 +28,8 @@ class PromoCodSeeder extends Seeder
             'discount' => self::DISCOUNT_FOR_SYSTO,
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
-            'active' => true
+            'active' => true,
+            'ticket_type_id' => TypeTicketsPriceSeeder::ID_FOR_WAVE
         ]);
 
         DB::table('promo_code')->insert([
@@ -39,6 +40,7 @@ class PromoCodSeeder extends Seeder
             'updated_at' => new Carbon(),
             'is_percent' => false,
             'limit' => 20,
+            'ticket_type_id' => null
         ]);
     }
 }

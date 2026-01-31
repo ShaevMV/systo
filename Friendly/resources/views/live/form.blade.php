@@ -29,7 +29,6 @@
                 <form method="POST" action="{{ route('addLiveTicket') }}" id="main-former">
                     @csrf
                     <h2>Форма продажи живого билета</h2>
-                    <small>Гость должен получить от вас конверт с карточкой лично в руки, либо забрать его в Лесистой.</small>
                     <div class="mt-4">
                         <x-jet-label for="password" value="{{ __('Имя фамилия продавца:') }}"/>
                         <x-jet-input id="password" readonly class="block mt-1 w-full" type="text" name="seller" required
@@ -73,9 +72,16 @@
                     </div>
 
                     <div class="mt-4">
-                        <x-jet-label for="price" value="{{ __('Сумма, полученная за билеты:') }}"/>
+                        <b>
+                        <x-jet-label for="price" value="{{ __('Сумма, полученная за билеты: (за вычетом вашей комиссии, т.е. комиссию сюда не пишем):') }}"/>
+                        </b>
                         <x-jet-input id="price" class="block mt-1 w-full" type="number" name="price" required
                                      autocomplete="price"/>
+                    </div>
+                    <div class="mt-4">
+                        <x-jet-label for="is_need_seedling" value="{{ __('Нужен ли саженец?:') }}"/>
+                        <x-jet-checkbox id="is_need_seedling" class="block mt-1 w-full" name="is_need_seedling"
+                                        autocomplete="is_need_seedling"/>
                     </div>
                     <div class="mt-4">
                         <x-jet-label for="comment" value="{{ __('Комментарий:') }}"/>

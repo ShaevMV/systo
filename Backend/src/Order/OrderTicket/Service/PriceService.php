@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Service;
 
 use Carbon\Carbon;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Shared\Domain\ValueObject\Uuid;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
-use Shared\Domain\ValueObject\Uuid;
 
 class PriceService
 {
@@ -30,14 +30,17 @@ class PriceService
             $ticketTypeId,
             $dateTime ?? new Carbon()
         );
-        $totalPrice = $priceByType->getPrice() * ($priceByType->isGroupType() ? 1 : $count);
+
         $discount = $this->isCorrectPromoCode->findPromoCode(
-            $promoCode,
-            $priceByType->getPrice()
+            !empty($promoCode) ? trim($promoCode) : null,
+            $priceByType->getPrice(),
+            $ticketTypeId,
+            new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b8'),
         )?->getDiscount() ?? 0.00;
 
         return new PriceDto(
-            $totalPrice,
+            (int)$priceByType->getPrice(),
+            ($priceByType->isGroupType() ? 1 : $count),
             $discount * $count
         );
     }

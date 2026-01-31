@@ -15,7 +15,12 @@ class SaveChangeCommandHandler implements CommandHandler
 
     public function __invoke(SaveChangeCommand $command)
     {
-        if(!$this->changesRepository->updateOrCreate($command->getUserIdList(), $command->getStart(), $command->getId())){
+        if(!$this->changesRepository->updateOrCreate(
+            $command->getUserIdList(),
+            $command->getStart(),
+            $command->getFestivalId(),
+            $command->getId(),
+        )){
             throw new \DomainException('Не получилось сохранить смену');
         }
     }
