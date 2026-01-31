@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 const API_ORDER = '/api/v1/order'
-const API_FESTIVAL = '/api/v1/festival'
 const API_INVITE = '/api/v1/invite'
 /**
  * Отправить данные на создание билета

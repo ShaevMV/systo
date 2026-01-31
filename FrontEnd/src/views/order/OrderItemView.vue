@@ -9,12 +9,11 @@
 
 <script>
 import OrderItem from "@/components/Order/OrderItem";
-import QuestionnaireItem from "@/components/Order/QuestionnaireItem";
 import {mapGetters} from "vuex";
 
 export default {
   name: "OrderItemView",
-  components: {OrderItem, QuestionnaireItem},
+  components: {OrderItem},
   computed: {
     ...mapGetters('appOrder', [
       'getError',

@@ -90,7 +90,7 @@
 
 <script>
 
-import QuestionnaireTicket from "@/components/BuyTicket/QuestionnaireTicket.vue";
+import QuestionnaireTicket from "@/components/Questionnaire/QuestionnaireTicket.vue";
 import {mapActions, mapGetters} from "vuex";
 
 export default {

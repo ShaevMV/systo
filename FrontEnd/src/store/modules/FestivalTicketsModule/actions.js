@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-const API_ORDER = '/api/v1/order'
 const API_FESTIVAL = '/api/v1/festival'
 const API_PROMOCODE = '/api/v1/promocode'
 /**

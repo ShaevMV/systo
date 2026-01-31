@@ -29,7 +29,7 @@
             <tr v-for="(item,index) in getQuestionnaireList"
                 v-bind:key="index"
                 @click="goItemOrderForUser(item.id)">
-
+            </tr>
             </tbody>
           </table>
 
@@ -53,7 +53,7 @@ export default {
     ...mapActions('appQuestionnaire', [
       'loadQuestionnaire',
     ]),
-    goItemOrderForUser(idOrderItem, status) {
+    goItemOrderForUser(idOrderItem) {
       this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
     },
   },
