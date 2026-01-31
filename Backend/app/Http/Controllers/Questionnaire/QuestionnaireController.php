@@ -36,6 +36,9 @@ class QuestionnaireController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $throwable->getMessage(),
+                'line' => $throwable->getLine(),
+                'file' => $throwable->getFile(),
+                'trace' => $throwable->getTrace(),
             ]);
         }
     }

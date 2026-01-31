@@ -14,7 +14,7 @@ class QuestionnaireTicketDto
         protected int $howManyTimes,
         protected string $questionForSysto,
         protected string $phone,
-        protected bool $is_have_in_club,
+        protected ?bool $is_have_in_club = null,
         protected ?string $email = null,
         protected ?string $telegram = null,
         protected ?string $vk = null,
@@ -45,7 +45,7 @@ class QuestionnaireTicketDto
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
-            $data['is_have_in_club'] ?? null,
+            empty($data['is_have_in_club']) ? null : (bool)$data['is_have_in_club'],
             $data['email'] ?? null,
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
@@ -55,7 +55,9 @@ class QuestionnaireTicketDto
             $data['creationOfSisto'] ?? null,
             $data['activeOfEvent'] ?? null,
             $userId,
-            $id
+            $orderId,
+            $ticketId,
+            $id,
         );
     }
 
@@ -76,7 +78,7 @@ class QuestionnaireTicketDto
             'whereSysto' => $this->whereSysto,
             'creationOfSisto' => $this->creationOfSisto,
             'activeOfEvent' => $this->activeOfEvent,
-            'user_id' => $this->userId,
+            'user_id' => $this->userId?->value(),
             'order_id' => $this->orderId?->value(),
             'ticket_id' => $this->ticketId?->value(),
             'id' => $this->id

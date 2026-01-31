@@ -22,13 +22,12 @@ class QuestionnaireGetListQueryResponse implements Response
         $this->collection = new Collection($questionnaire);
     }
 
-    public function toArray():array
+    public function toArray(): array
     {
-        $result=[];
+        $result = [];
         /** @var QuestionnaireTicketDto $item */
-        foreach ($this->collection as $item)
-        {
-            $result[]=$item->toArray();
+        foreach ($this->collection as $item) {
+            $result[] = $item->toArray();
         }
         return $result;
     }

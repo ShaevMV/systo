@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Responses;
 
+use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Collection;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
-class QuestionnaireGetListResponse extends Collection
+class QuestionnaireGetListResponse extends Collection implements Response
 {
     protected function type(): string
     {

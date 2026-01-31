@@ -54,9 +54,9 @@ class QuestionnaireApplication
         return $result;
     }
 
-    public function getList(QuestionnaireGetListQuery $query):QuestionnaireGetListQueryResponse
+    public function getList(QuestionnaireGetListQuery $query):?QuestionnaireGetListQueryResponse
     {
-        /** @var QuestionnaireGetListQueryResponse $result */
+        /** @var QuestionnaireGetListQueryResponse|null $result */
         $result = $this->queryBus->ask($query);
 
         return $result;

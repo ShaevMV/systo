@@ -9,7 +9,7 @@ use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
-use Tickets\Questionnaire\Responses\QuestionnaireGetListResponse;
+use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
 
 class QuestionnaireGetListQueryHandler implements QueryHandler
 {
@@ -20,11 +20,11 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
     }
 
 
-    public function __invoke(QuestionnaireGetListQuery $query): QuestionnaireGetListResponse
+    public function __invoke(QuestionnaireGetListQuery $query): QuestionnaireGetListQueryResponse
     {
         $filter = Filters::fromValues($this->getFilterValues($query));
 
-        return new QuestionnaireGetListResponse($this->repository->getList($filter));
+        return new QuestionnaireGetListQueryResponse($this->repository->getList($filter));
     }
 
 

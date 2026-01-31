@@ -72,8 +72,6 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         foreach ($rawData as $datum) {
             $result[] = QuestionnaireTicketDto::fromState(
                 $datum,
-                new Uuid($datum['order_id']),
-                new Uuid($datum['ticket_id']),
             );
         }
 
