@@ -5,12 +5,12 @@ declare(strict_types = 1);
 namespace Tickets\User\Account\Application\Create;
 
 use Shared\Domain\Bus\Command\CommandHandler;
-use Tickets\User\Account\Repositories\AccountInterface;
+use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
 final class CreatingNewAccountCommandHandler implements CommandHandler
 {
     public function __construct(
-        private AccountInterface $account,
+        private UserRepositoriesInterface $account,
     ){
     }
 

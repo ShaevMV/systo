@@ -9,7 +9,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 
 class GetTicketTypeTest extends TestCase
 {

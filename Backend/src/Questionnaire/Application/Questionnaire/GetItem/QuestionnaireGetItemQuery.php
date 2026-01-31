@@ -10,19 +10,13 @@ use Shared\Domain\ValueObject\Uuid;
 class QuestionnaireGetItemQuery implements Query
 {
     public function __construct(
-        private Uuid $orderId,
-        private ?Uuid $ticketId = null,
+        private int $id,
     )
     {
     }
 
-    public function getOrderId(): ?Uuid
+    public function getId(): int
     {
-        return $this->orderId;
-    }
-
-    public function getTicketId(): ?Uuid
-    {
-        return $this->ticketId;
+        return $this->id;
     }
 }

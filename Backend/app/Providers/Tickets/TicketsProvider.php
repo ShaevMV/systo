@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types = 1);
 
 namespace App\Providers\Tickets;
 
 use Illuminate\Support\ServiceProvider;
-use Tickets\Order\InfoForOrder\Repositories\InMemoryMySqlTicketTypeRepository;
-use Tickets\Order\InfoForOrder\Repositories\InMemoryMySqlTypesOfPayment;
-use Tickets\Order\InfoForOrder\Repositories\TicketTypeInterfaceRepository;
-use Tickets\Order\InfoForOrder\Repositories\TypesOfPaymentInterface;
+use Tickets\Festival\Repositories\InMemoryMySqlTicketTypeRepository;
+use Tickets\Festival\Repositories\InMemoryMySqlTypesOfPayment;
+use Tickets\Festival\Repositories\TicketTypeInterfaceRepository;
+use Tickets\Festival\Repositories\TypesOfPaymentInterface;
 use Tickets\Order\OrderTicket\Repositories\CommentRepositoryInterface;
 use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
 use Tickets\Order\OrderTicket\Repositories\InMemoryInviteLinkRepository;
@@ -24,8 +25,8 @@ use Tickets\Questionnaire\Repositories\InMemoryMySqlQuestionnaireRepository;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
-use Tickets\User\Account\Repositories\AccountInterface;
-use Tickets\User\Account\Repositories\InMemoryMySqlAccount;
+use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
+use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
 class TicketsProvider extends ServiceProvider
 {
@@ -39,7 +40,7 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(TicketTypeInterfaceRepository::class, InMemoryMySqlTicketTypeRepository::class);
         $this->app->bind(TypesOfPaymentInterface::class, InMemoryMySqlTypesOfPayment::class);
         $this->app->bind(PromoCodeInterface::class, InMemoryMySqlPromoCode::class);
-        $this->app->bind(AccountInterface::class, InMemoryMySqlAccount::class);
+        $this->app->bind(UserRepositoriesInterface::class, InMemoryMySqlUserRepositories::class);
         $this->app->bind(OrderTicketRepositoryInterface::class, InMemoryMySqlOrderTicketRepository::class);
         $this->app->bind(CommentRepositoryInterface::class, InMemoryMySqlCommentRepository::class);
         $this->app->bind(TicketsRepositoryInterface::class, InMemoryMySqlTicketsRepository::class);

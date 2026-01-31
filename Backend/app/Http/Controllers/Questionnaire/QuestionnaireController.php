@@ -57,9 +57,7 @@ class QuestionnaireController extends Controller
             if(isset($data['questionnaire'])) {
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
-                        $data['questionnaire'],
-                        new Uuid($orderId),
-                        new Uuid($ticketId),
+                        $data['questionnaire']
                     )
                 );
             }
@@ -118,12 +116,12 @@ class QuestionnaireController extends Controller
 
     public function getQuestionnaire(
         QuestionnaireApplication $questionnaireApplication,
-        string $id,
+        int $id,
     ): JsonResponse
     {
         return response()->json([
             'success' => true,
-            'message' => 'Ссылка на анкету отправлена'
+            'questionnaire' => $questionnaireApplication->getItemId($id)->toArray(),
         ]);
     }
 }

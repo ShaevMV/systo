@@ -46,10 +46,10 @@ class QuestionnaireApplication
         $this->commandBus->dispatch(new QuestionnaireCreateCommand($questionnaireTicketDto));
     }
 
-    public function getItemByOrderId(Uuid $orderId): ?QuestionnaireGetListQueryResponse
+    public function getItemId(int $id): ?QuestionnaireGetListQueryResponse
     {
         /** @var  QuestionnaireGetListQueryResponse|null $result */
-        $result = $this->queryBus->ask(new QuestionnaireGetItemQuery($orderId));
+        $result = $this->queryBus->ask(new QuestionnaireGetItemQuery($id));
 
         return $result;
     }

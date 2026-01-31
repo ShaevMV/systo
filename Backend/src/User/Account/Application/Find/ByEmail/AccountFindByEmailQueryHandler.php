@@ -6,12 +6,12 @@ namespace Tickets\User\Account\Application\Find\ByEmail;
 
 use Shared\Domain\Bus\Query\QueryHandler;
 use Tickets\User\Account\Dto\UserInfoDto;
-use Tickets\User\Account\Repositories\AccountInterface;
+use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
 final class AccountFindByEmailQueryHandler implements QueryHandler
 {
     public function __construct(
-        private AccountInterface $account
+        private UserRepositoriesInterface $account
     ) {
     }
 

@@ -9,7 +9,7 @@ use DomainException;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
+use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\OrderTicket\Application\GetFestivalList\FestivalApplication;
 
 class FestivalController extends Controller

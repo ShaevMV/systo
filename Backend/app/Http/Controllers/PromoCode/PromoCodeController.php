@@ -13,15 +13,13 @@ use Illuminate\Support\Str;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
-use Tickets\Order\OrderTicket\Service\InviteLinkService;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
 
 class PromoCodeController extends Controller
 {
-
     public function __construct(
         private PromoCodes         $getPromoCodes,
         private IsCorrectPromoCode $isCorrectPromoCode,

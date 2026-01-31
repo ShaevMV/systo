@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = '/api/v1/festival/questionnaire';
+const API = '/api/v1/questionnaire';
 
 /**
  * Повторно выслать ссылку на анкету
@@ -31,7 +31,7 @@ export const sendNotitificationUser = (context, payload) => {
  * @param payload
  */
 export const loadQuestionnaire = (context, payload) => {
-    let promise = axios.get(API + '/load', payload.filter);
+    let promise = axios.post(API + '/load', payload.filter);
     promise.then(function (response) {
         context.commit('setQuestionnaireList', response.data.questionnaireList);
     })

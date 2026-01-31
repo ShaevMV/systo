@@ -18,7 +18,7 @@ use Throwable;
 use Tickets\Billing\Application\Billing;
 use Tickets\Billing\DTO\PaymentRequestDTO;
 use Tickets\Billing\ValueObject\DeviceValueObject;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
@@ -63,9 +63,9 @@ class OrderTickets extends Controller
             )->value());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             $guests = $createOrderTicketsRequest->guests;
-            if ($createOrderTicketsRequest->masterName) {
+            if ($createOrderTicketsRequest->name) {
                 array_unshift($guests, [
-                    'value' => $createOrderTicketsRequest->masterName,
+                    'value' => $createOrderTicketsRequest->name,
                     'email' => $createOrderTicketsRequest->email,
                 ]);
             }
@@ -88,7 +88,9 @@ class OrderTickets extends Controller
                 $priceDto,
                 $ticketType->isLiveTicket(),
             );
-            if ($createOrderTicketsRequest->invite !== 'undefined' && $createOrderTicketsRequest->invite !== null) {
+
+            if ($createOrderTicketsRequest->invite !== 'undefined' &&
+                $createOrderTicketsRequest->invite !== null) {
                 $orderTicketDto->setInviteLink(new Uuid($createOrderTicketsRequest->invite));
             }
 
@@ -122,13 +124,9 @@ class OrderTickets extends Controller
                     'message' => 'Через несколько секунд откроется QR-код для оплаты. Откройте приложение вашего банка и совершите перевод. <br/>
                 Если окно не открылось нажмите на кнопку ниже.<br/>
               Если Вы зарегистрировали нового пользователя, то Вы также получите на почту данные для авторизации<br/>
-              <a href="' . $billingResponse->getLinkToReceipt() . '" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>
-
-              ',
-
+              <a href="' . $billingResponse->getLinkToReceipt() . '" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>',
                     'link' => $billingResponse->getLinkToReceipt(),
                 ]);
-
             }
 
             return response()->json([

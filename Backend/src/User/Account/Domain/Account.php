@@ -29,7 +29,8 @@ class Account extends AggregateRoot
             $uuid,
             $accountDto->getEmail(),
             $accountDto->getPhone(),
-            $accountDto->getCity()
+            $accountDto->getCity(),
+            $accountDto->getName(),
         );
 
 

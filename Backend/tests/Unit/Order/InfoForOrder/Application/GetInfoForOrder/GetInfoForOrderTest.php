@@ -3,12 +3,11 @@
 namespace Tests\Unit\Order\InfoForOrder\Application\GetInfoForOrder;
 
 use Database\Seeders\TypeTicketsPriceSeeder;
-use Database\Seeders\TypeTicketsSecondFestivalSeeder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
-use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
+use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class GetInfoForOrderTest extends TestCase

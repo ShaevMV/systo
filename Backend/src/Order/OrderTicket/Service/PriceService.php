@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Service;
 
 use Carbon\Carbon;
-use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
+use Shared\Domain\ValueObject\Uuid;
+use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
-use Shared\Domain\ValueObject\Uuid;
 
 class PriceService
 {

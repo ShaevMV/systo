@@ -20,17 +20,6 @@ interface QuestionnaireRepositoryInterface
     public function create(QuestionnaireTicketDto $questionnaireTicketDto): bool;
 
     /**
-     * Подучить заполненную анкету по номеру заказа
-     *
-     * @param Uuid $orderId
-     * @return QuestionnaireGetListQueryResponse
-     */
-    public function getByOrderId(
-        Uuid $orderId,
-        ?Uuid $ticketId,
-    ): QuestionnaireGetListQueryResponse;
-
-    /**
      * Получить список всех анкет
      *
      * @param Filters $filters
@@ -44,4 +33,9 @@ interface QuestionnaireRepositoryInterface
      * @param string $email
      */
     public function existByEmail(string $email): bool;
+
+    /**
+     * Получить определённую анкету
+     */
+    public function get(int $id): QuestionnaireTicketDto;
 }

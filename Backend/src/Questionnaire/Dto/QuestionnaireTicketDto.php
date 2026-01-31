@@ -8,10 +8,8 @@ use Shared\Domain\ValueObject\Uuid;
 
 class QuestionnaireTicketDto
 {
-    protected string $link;
+    protected ?string $link;
     public function __construct(
-        protected Uuid $orderId,
-        protected Uuid $ticketId,
         protected int $agy,
         protected int $howManyTimes,
         protected string $questionForSysto,
@@ -22,27 +20,27 @@ class QuestionnaireTicketDto
         protected ?string $vk = null,
         protected ?string $musicStyles = null,
         protected ?string $name = null,
-        protected ?Uuid $id = null,
         protected ?string $whereSysto = null,
         protected ?string $creationOfSisto = null,
         protected ?string $activeOfEvent = null,
         protected ?Uuid $userId = null,
+        protected ?Uuid $orderId = null,
+        protected ?Uuid $ticketId = null,
+        protected ?int $id = null,
     )
     {
-        $this->link ='https://org.spaceofjoy.ru/questionnaire/'.$orderId->value().'/'.$ticketId->value();
+        $this->link = $this->getLink();
     }
 
     public static function fromState(
         array $data,
-        Uuid $orderId,
-        Uuid $ticketId
     ): self
     {
-        $id = (empty($data['id'])) ? null : new Uuid($data['id']);
+        $id = (empty($data['id'])) ? null : (int) $data['id'];
         $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
+        $ticketId = (empty($data['ticket_id'])) ? null : new Uuid($data['ticket_id']);
+        $orderId = (empty($data['order_id'])) ? null : new Uuid($data['order_id']);
         return new self(
-            $orderId,
-            $ticketId,
             (int)$data['agy'],
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
@@ -53,19 +51,17 @@ class QuestionnaireTicketDto
             $data['vk'] ?? null,
             $data['musicStyles'] ?? null,
             $data['name'] ?? null,
-            $id,
             $data['whereSysto'] ?? null,
             $data['creationOfSisto'] ?? null,
             $data['activeOfEvent'] ?? null,
-            $userId
+            $userId,
+            $id
         );
     }
 
     public function toArray(): array
     {
         return [
-            'order_id' => $this->orderId->value(),
-            'ticket_id' => $this->ticketId->value(),
             'agy' => $this->agy,
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
@@ -81,14 +77,15 @@ class QuestionnaireTicketDto
             'creationOfSisto' => $this->creationOfSisto,
             'activeOfEvent' => $this->activeOfEvent,
             'user_id' => $this->userId,
+            'order_id' => $this->orderId?->value(),
+            'ticket_id' => $this->ticketId?->value(),
+            'id' => $this->id
         ];
     }
 
     public function toArrayForMySql(): array
     {
         return [
-            'order_id' => $this->orderId->value(),
-            'ticket_id' => $this->ticketId->value(),
             'agy' => $this->agy,
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
@@ -102,6 +99,9 @@ class QuestionnaireTicketDto
             'whereSysto' => $this->whereSysto,
             'creationOfSisto' => $this->creationOfSisto,
             'activeOfEvent' => $this->activeOfEvent,
+            'order_id' => $this->orderId?->value(),
+            'ticket_id' => $this->ticketId?->value(),
+            'user_id' => $this->userId?->value(),
         ];
     }
 
@@ -118,5 +118,21 @@ class QuestionnaireTicketDto
     public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    public function getLink(): ?string
+    {
+        $host = \App::isLocal() ? 'http://org.tickets.loc/' : 'https://org.spaceofjoy.ru/';
+
+        if($this->ticketId?->value() && $this->orderId?->value()) {
+            return $host.'questionnaire/quest/'.$this->ticketId->value().'/'.$this->orderId->value();
+        }
+
+        return $this->id ? $host.'questionnaire/newUser/' : null;
+    }
+
+    public function setUserId(?Uuid $userId): void
+    {
+        $this->userId = $userId;
     }
 }

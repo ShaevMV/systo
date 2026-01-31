@@ -12,7 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $id_buy
  * @property string $festival_id
  * @property string $phone
- * @property string $masterName
+ * @property string|null $name
  * @property string $city
  * @property string $invite
  * @property string|null $comment

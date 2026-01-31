@@ -793,7 +793,7 @@ export default {
       let data = {
         email: this.email,
         ticket_type_id: this.getSelectTicketTypeId,
-        masterName: this.masterName,
+        name: this.masterName,
         guests: guests,
         promo_code: this.promoCode,
         date: this.date,

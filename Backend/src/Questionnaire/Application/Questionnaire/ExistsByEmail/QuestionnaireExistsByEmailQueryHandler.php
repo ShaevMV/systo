@@ -15,7 +15,6 @@ class QuestionnaireExistsByEmailQueryHandler implements QueryHandler
     {
     }
 
-
     public function __invoke(QuestionnaireExistsByEmailQuery $query): bool
     {
         return $this->repository->existByEmail($query->getEmail());
