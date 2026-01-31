@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire\Create;
 
-use QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 
 class QuestionnaireCreateCommandHandler
 {

@@ -12,7 +12,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\PromoCode\Response\ExternalPromoCodeDto;
-use Tickets\Questionnaire\Domain\ProcessGuestNotificationQuestionnaire;
+use Tickets\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 
@@ -81,7 +81,11 @@ final class OrderTicket extends AggregateRoot
     }
 
 
-    public static function toPaid(OrderTicketDto $orderTicketDto, ?string $comment = null, ?ExternalPromoCodeDto $externalPromoCodeDto = null): self
+    public static function toPaid(
+        OrderTicketDto $orderTicketDto,
+        ?string $comment = null,
+        ?ExternalPromoCodeDto $externalPromoCodeDto = null
+    ): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
@@ -102,14 +106,12 @@ final class OrderTicket extends AggregateRoot
         $orderId = $orderTicketDto->getId();
 
         foreach ($orderTicketDto->getTicket() as $item) {
-            if(null !== $item->getEmail()) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail(),
-                        $orderId->value(),
-                        $item->getId()->value(),
-                    )
-                );
-            }
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $item->getEmail(),
+                    $orderId->value(),
+                    $item->getId()->value(),
+                )
+            );
         }
 
         return $result;

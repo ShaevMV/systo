@@ -28,8 +28,6 @@ use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
-use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
-use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
@@ -46,8 +44,7 @@ class OrderTickets extends Controller
         private ChanceStatus       $chanceStatus,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
-        private Billing $billing,
-        private QuestionnaireApplication $questionnaireApplication,
+        private Billing            $billing,
     )
     {
     }
@@ -66,8 +63,8 @@ class OrderTickets extends Controller
             )->value());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             $guests = $createOrderTicketsRequest->guests;
-            if($createOrderTicketsRequest->masterName) {
-                array_unshift($guests,[
+            if ($createOrderTicketsRequest->masterName) {
+                array_unshift($guests, [
                     'value' => $createOrderTicketsRequest->masterName,
                     'email' => $createOrderTicketsRequest->email,
                 ]);
@@ -91,23 +88,11 @@ class OrderTickets extends Controller
                 $priceDto,
                 $ticketType->isLiveTicket(),
             );
-            if($createOrderTicketsRequest->invite !== 'undefined' && $createOrderTicketsRequest->invite !== null) {
+            if ($createOrderTicketsRequest->invite !== 'undefined' && $createOrderTicketsRequest->invite !== null) {
                 $orderTicketDto->setInviteLink(new Uuid($createOrderTicketsRequest->invite));
             }
 
             $this->createOrder->createAndSave($orderTicketDto);
-            // Добавляем анкету
-            if(isset($data['questionnaire'])) {
-                $ticket = $orderTicketDto->getTicket()[0];
-                $questionnaireTicketDto = QuestionnaireTicketDto::fromState(
-                    array_merge($data['questionnaire'],[
-                        'phone' => $createOrderTicketsRequest->phone,
-                    ]),
-                    $orderTicketDto->getId(),
-                    $ticket->getId(),
-                );
-                $this->questionnaireApplication->create($questionnaireTicketDto);
-            }
 
             // Добавления комментария
             if ($createOrderTicketsRequest->comment) {
@@ -117,7 +102,8 @@ class OrderTickets extends Controller
                     $createOrderTicketsRequest->comment
                 );
             }
-            if($orderTicketDto->isBilling()) {
+
+            if ($orderTicketDto->isBilling()) {
                 $billingResponse = $this->billing->creatingLink(
                     new PaymentRequestDTO(
                         $orderTicketDto->getId(),
@@ -136,7 +122,7 @@ class OrderTickets extends Controller
                     'message' => 'Через несколько секунд откроется QR-код для оплаты. Откройте приложение вашего банка и совершите перевод. <br/>
                 Если окно не открылось нажмите на кнопку ниже.<br/>
               Если Вы зарегистрировали нового пользователя, то Вы также получите на почту данные для авторизации<br/>
-              <a href="' .$billingResponse->getLinkToReceipt() .'" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>
+              <a href="' . $billingResponse->getLinkToReceipt() . '" target="_blank"> <b>Открыть ссылку для оплаты</b> </a><br/>
 
               ',
 
@@ -216,8 +202,7 @@ class OrderTickets extends Controller
         }
 
         return response()->json([
-            'order' => $orderItem->toArray(),
-            'questionnaire' => $this->questionnaireApplication->getItemByOrderId($orderUuid)->toArray(),
+            'order' => $orderItem->toArray()
         ]);
     }
 
@@ -280,34 +265,5 @@ class OrderTickets extends Controller
         }
     }
 
-    /**
-     * Записать анкету
-     *
-     * @throws Throwable
-     */
-    public function setQuestionnaire(Request $request, string $orderId, string $ticketId): JsonResponse
-    {
-        $data = $request->toArray();
-        try {
-            if(isset($data['questionnaire'])) {
-                $this->questionnaireApplication->create(
-                    QuestionnaireTicketDto::fromState(
-                        $data['questionnaire'],
-                        new Uuid($orderId),
-                        new Uuid($ticketId),
-                    )
-                );
-            }
-            return response()->json([
-                'success' => true,
-                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
-            ]);
-        } catch (Throwable $throwable) {
-            return response()->json([
-                'success' => false,
-                'message' => $throwable->getMessage()
-            ], 422);
-        }
 
-    }
 }

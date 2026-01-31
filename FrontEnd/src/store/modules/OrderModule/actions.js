@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+const API_ORDER = '/api/v1/order'
+const API_FESTIVAL = '/api/v1/festival'
+const API_INVITE = '/api/v1/invite'
 /**
  * Отправить данные на создание билета
  *
@@ -7,7 +10,7 @@ import axios from 'axios';
  * @param payload
  */
 export const goToCreateOrderTicket = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/ticketsOrder/create', payload);
+    let promise = axios.post(API_ORDER + '/create', payload);
     promise.then(function (response) {
         console.log(response.data.success);
         payload.callback(response.data.success, response.data.message, response.data.link ?? null);
@@ -24,7 +27,7 @@ export const goToCreateOrderTicket = (context, payload) => {
  * @param context
  */
 export const getOrderListForUser = (context) => {
-    let promise = axios.get('/api/v1/festival/ticketsOrder/getUserList');
+    let promise = axios.get(API_ORDER + '/getUserList');
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
     }).catch(function (error) {
@@ -41,7 +44,7 @@ export const getOrderListForUser = (context) => {
  */
 export const getOrderListForAdmin = (context, payload) => {
     console.log(payload);
-    let promise = axios.post('/api/v1/festival/ticketsOrder/getList', payload);
+    let promise = axios.post(API_ORDER + '/getList', payload);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
         context.commit('setTotalNumber', response.data.totalNumber);
@@ -60,37 +63,14 @@ export const getOrderListForAdmin = (context, payload) => {
  */
 export const loadOrderItem = (context, payload) => {
     if (payload !== null && payload.length > 0) {
-        let promise = axios.get('/api/v1/festival/ticketsOrder/getItem/' + payload);
+        let promise = axios.get(API_ORDER + '/getItem/' + payload.id);
         promise.then(function (response) {
             context.commit('setOrderItem', response.data.order);
-            context.commit('setQuestionnaireItem', response.data.questionnaire);
         }).catch(function (error) {
             console.error(error);
             context.commit('setError', error.response.data.errors);
         });
     }
-};
-
-/**
- * Отправить комментарий к заказу
- *
- *
- * @param context
- * @param payload
- */
-export const sendCommentByOrder = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/ticketsOrder/sendComment/', payload);
-    promise.then(function (response) {
-        context.commit('addCommentByOrderItem', {
-            'comment': payload.message,
-            'is_checkin': true,
-            'user_id': localStorage.getItem('user.id'),
-            'created_at': response.data.created_at
-        });
-    }).catch(function (error) {
-        console.error(error);
-        context.commit('setError', error.response.data.errors);
-    });
 };
 
 /**
@@ -100,7 +80,7 @@ export const sendCommentByOrder = (context, payload) => {
  * @param payload
  */
 export const sendToChanceStatus = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/ticketsOrder/toChanceStatus/' + payload.id, {
+    let promise = axios.post(API_ORDER + 'toChanceStatus/' + payload.id, {
         'status': payload.status,
         'comment': payload.comment
     });
@@ -122,7 +102,7 @@ export const sendToChanceStatus = (context, payload) => {
 
 export const getUrlForPdf = (context, payload) => {
     return new Promise((resolve, reject) => {
-    let promise = axios.get('/api/v1/festival/ticketsOrder/getTicketPdf/' + payload);
+    let promise = axios.get(API_ORDER + 'ticketsOrder/getTicketPdf/' + payload);
     return promise.then(function (response) {
         //console.log('in promise ', response);
         response.data.listUrl.forEach(function (item) {
@@ -137,28 +117,11 @@ export const getUrlForPdf = (context, payload) => {
     });
 };
 
-// отправить данные для анкеты
-export const sendQuestionnaire = (context, payload) => {
-    return new Promise((resolve, reject) => {
-        let promise = axios.post('/api/v1/festival/ticketsOrder/questionnaire/' + payload.orderId + '/' + payload.ticketId,{
-            'questionnaire': payload.questionnaire
-        });
-        return promise.then(function (response) {
-            context.commit('setMessage', response.data.message)
-            payload.callback();
-        }).catch(function (error) {
-            //console.error(error);
-            context.commit('setError', error.response.data.errors);
-            reject(error);
-        });
-    });
-};
-
 
 // получение персональной ссылки
 export const pullInviteLink = (context, payload) => {
     return new Promise((resolve, reject) => {
-        let promise = axios.get('/api/v1/festival/getInviteLink');
+        let promise = axios.get(API_INVITE + '/getInviteLink');
         return promise.then(function (response) {
             console.log(response.data);
             payload.callback(response.data);

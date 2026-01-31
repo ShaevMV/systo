@@ -33,6 +33,27 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
+            // анкеты
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/questionnaire.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/festival.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/invite.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/order.php'));
+
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/promoCode.php'));
+
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });

@@ -1,7 +1,6 @@
 <template>
   <div v-if="!getError('error')">
     <order-item/>
-    <questionnaire-item/>
   </div>
   <div v-else>
     {{ getError('error') }}
@@ -26,7 +25,9 @@ export default {
   },
 
   beforeRouteEnter: (to, from, next) => {
-    window.store.dispatch('appOrder/loadOrderItem', to.params.id);
+    window.store.dispatch('appOrder/loadOrderItem', {
+      id:to.params.id
+    });
     next();
   },
 }

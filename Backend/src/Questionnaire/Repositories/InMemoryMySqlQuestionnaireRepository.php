@@ -50,9 +50,12 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
     }
 
-    public function getByOrderId(Uuid $orderId): QuestionnaireGetItemQueryResponse
+    public function getByOrderId(
+        Uuid $orderId,
+        ?Uuid $ticketId,
+    ): QuestionnaireGetItemQueryResponse
     {
-        $result = [];
+
         $rawData = $this->model::whereOrderId($orderId->value())
             ->leftJoin(OrderTicketModel::TABLE,
             $this->model::TABLE . '.order_id',
@@ -61,10 +64,15 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
             ->select([
                 $this->model->getTable().'.*',
                 OrderTicketModel::TABLE . '.guests'
-            ])->get()
-            ->toArray();
+            ]);
 
-        foreach ($rawData as $item) {
+        if ($ticketId) {
+            $rawData = $rawData->whereTicketId($ticketId->value());
+        }
+
+        $result = [];
+
+        foreach ($rawData->get()->toArray() as $item) {
             $result[] = new QuestionnaireTicketDto(
                 new Uuid($item['ticket_id']),
                 new Uuid($item['order_id']),
@@ -114,5 +122,10 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
 
         return $result;
+    }
+
+    public function existByEmail(string $email): bool
+    {
+        return $this->model::whereEmail($email)->exists();
     }
 }

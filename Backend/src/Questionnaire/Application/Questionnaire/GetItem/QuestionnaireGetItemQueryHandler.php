@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire\GetItem;
 
-use QuestionnaireRepositoryInterface;
 use Shared\Domain\Bus\Query\QueryHandler;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Questionnaire\Responses\QuestionnaireGetItemQueryResponse;
 
 class QuestionnaireGetItemQueryHandler implements QueryHandler
@@ -18,6 +18,9 @@ class QuestionnaireGetItemQueryHandler implements QueryHandler
 
     public function __invoke(QuestionnaireGetItemQuery $query): QuestionnaireGetItemQueryResponse
     {
-        return $this->repository->getByOrderId($query->getOrderId());
+        return $this->repository->getByOrderId(
+            $query->getOrderId(),
+            $query->getTicketId(),
+        );
     }
 }

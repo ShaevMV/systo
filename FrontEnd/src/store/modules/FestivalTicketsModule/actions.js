@@ -1,5 +1,8 @@
 import axios from 'axios';
 
+const API_ORDER = '/api/v1/order'
+const API_FESTIVAL = '/api/v1/festival'
+const API_PROMOCODE = '/api/v1/promocode'
 /**
  * Загрузить список способов оплаты и типов билета
  *
@@ -7,7 +10,7 @@ import axios from 'axios';
  * @param payload
  */
 export const loadDataForOrderingTickets = (context, payload) => {
-    let promise = axios.get('/api/v1/festival/orderingTickets',
+    let promise = axios.get(API_FESTIVAL + '/load',
         {params: {
             festival_id: payload.festival_id,
             is_admin:    payload.is_admin,
@@ -21,27 +24,30 @@ export const loadDataForOrderingTickets = (context, payload) => {
 };
 
 
+export const getListTypesOfPayment = (context, payload) => {
+    let promise = axios.get(API_FESTIVAL + '/load',
+        {params: {
+                festival_id: payload.festival_id,
+                is_admin: true,
+            }});
+    promise.then(function (response) {
+        context.commit('setTypesOfPayment', response.data.typesOfPayment);
+    })
+};
+
+
 export const getListPriceFor = (context, payload) => {
-    let promise = axios.get('/api/v1/festival/getListPrice',
+    let promise = axios.get(API_FESTIVAL + '/getListPrice',
         {params: {festival_id: payload.festival_id}});
     promise.then(function (response) {
         context.commit('setTicketType', response.data.ticketType);
     })
 };
 
-export const getListTypesOfPayment = (context, payload) => {
-    let promise = axios.get('/api/v1/festival/orderingTickets',
-        {params: {
-            festival_id: payload.festival_id,
-            is_admin: true,
-        }});
-    promise.then(function (response) {
-        context.commit('setTypesOfPayment', response.data.typesOfPayment);
-    })
-};
+
 
 export const getListFestival = (context) => {
-    let promise = axios.get('/api/v1/festival/getFestivalList');
+    let promise = axios.get(API_FESTIVAL + '/getFestivalList');
     promise.then(function (response) {
         context.commit('setFestivalList', response.data.festivalDto);
     })
@@ -49,7 +55,7 @@ export const getListFestival = (context) => {
 
 
 export const getListTicketTypes = (context) => {
-    let promise = axios.get('/api/v1/festival/getTicketTypeList');
+    let promise = axios.get(API_FESTIVAL + '/getTicketTypeList');
     promise.then(function (response) {
         context.commit('setTicketType', response.data.ticketType);
     })
@@ -84,7 +90,7 @@ export const setSelectTypesOfPayment = (context, payload) => {
  * @param payload
  */
 export const checkPromoCode = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/findPromoCode/' + payload.promoCode, {
+    let promise = axios.post(API_PROMOCODE +  '/find/' + payload.promoCode, {
         typeOrder: payload.typeOrder
     });
 

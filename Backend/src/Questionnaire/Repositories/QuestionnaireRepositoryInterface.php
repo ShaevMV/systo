@@ -23,9 +23,12 @@ interface QuestionnaireRepositoryInterface
      * Подучить заполненную анкету по номеру заказа
      *
      * @param Uuid $orderId
-     * @return QuestionnaireGetItemQueryResponse|null
+     * @return QuestionnaireGetItemQueryResponse
      */
-    public function getByOrderId(Uuid $orderId): ?QuestionnaireGetItemQueryResponse;
+    public function getByOrderId(
+        Uuid $orderId,
+        ?Uuid $ticketId,
+    ): QuestionnaireGetItemQueryResponse;
 
     /**
      * Получить список всех анкет
@@ -34,4 +37,11 @@ interface QuestionnaireRepositoryInterface
      * @return QuestionnaireTicketDto[]
      */
     public function getList(Filters $filters): array;
+
+    /**
+     * Проверить наличие анкеты по email пользователя
+     *
+     * @param string $email
+     */
+    public function existByEmail(string $email): bool;
 }

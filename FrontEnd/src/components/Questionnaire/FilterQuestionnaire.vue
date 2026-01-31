@@ -6,6 +6,19 @@
           <h5 class="card-title">Фильтр</h5>
 
           <div class="d-flex flex-wrap">
+            <!--  email -->
+            <div class="col-md-4">
+              <label for="validationDefaultUsername" class="form-label">email</label>
+              <div class="input-group">
+                <span class="input-group-text" id="inputGroupPrepend2">@</span>
+                <input type="text"
+                       v-model="email"
+                       class="form-control"
+                       id="validationDefaultUsername"
+                       aria-describedby="inputGroupPrepend2">
+              </div>
+            </div>
+            <!--  статус -->
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Статус анкеты</label>
               <select class="form-select"
@@ -19,6 +32,7 @@
                 <option value="difficulties_arose">Возникли трудности</option>
               </select>
             </div>
+            <!--  telegram -->
             <div class="col-md-4">
               <label for="validationDefaultUsername" class="form-label">telegram</label>
               <div class="input-group">
@@ -30,6 +44,7 @@
                        aria-describedby="inputGroupPrepend2">
               </div>
             </div>
+            <!--  vk -->
             <div class="col-md-4">
               <label for="validationDefaultUsername" class="form-label">vk</label>
               <div class="input-group">
@@ -41,18 +56,7 @@
                        aria-describedby="inputGroupPrepend2">
               </div>
             </div>
-
-            <div class="col-md-4">
-              <label for="validationDefaultUsername" class="form-label">email</label>
-              <div class="input-group">
-                <span class="input-group-text" id="inputGroupPrepend2">@</span>
-                <input type="text"
-                       v-model="email"
-                       class="form-control"
-                       id="validationDefaultUsername"
-                       aria-describedby="inputGroupPrepend2">
-              </div>
-            </div>
+            <!--  Хочет в ступить в клуб -->
             <div class="col-md-4">
               <label for="validationDefault01" class="form-label">Хочет в ступить в клуб</label>
               <select class="form-select"
@@ -63,7 +67,8 @@
                 <option value="false">Не хочет</option>
               </select>
             </div>
-          <div class="row b-row mt-2">
+
+            <div class="row b-row mt-2">
             <button class="btn btn-primary"
                     @click="sendFilter" :disabled="getIsLoading"
                     type="submit"><span v-if="getIsLoading">Загрузка...</span>
@@ -74,7 +79,6 @@
                     type="submit">Сбросить фильтр
             </button>
           </div>
-
         </div>
       </div>
       </div>

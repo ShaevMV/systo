@@ -114,4 +114,9 @@ class QuestionnaireTicketDto
     {
         return $this->ticketId;
     }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
 }

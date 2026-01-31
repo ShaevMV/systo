@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Questionnaire\Domain;
+namespace Tickets\Questionnaire\Domain\DomainEvent;
 
 use App\Mail\TicketQuestionnaire;
 use Illuminate\Bus\Queueable;
@@ -12,14 +12,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 
-class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
+class ProcessReplayNotificationQuestionnaire implements ShouldQueue, DomainEvent
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
         private string $email,
-        private string $orderId,
-        private string $ticketId,
+        private string $id,
     )
     {
     }
@@ -27,7 +26,7 @@ class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
     public function handle(): void
     {
         $mail = new TicketQuestionnaire(
-            'https://org.spaceofjoy.ru/questionnaire/'. $this->orderId . '/' . $this->ticketId
+            'https://org.spaceofjoy.ru/questionnaire/edit/'. $this->id
         );
 
         \Mail::to($this->email)

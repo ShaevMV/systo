@@ -20,6 +20,23 @@
       </div>
 
       <div class="quest-item">
+        <label for="questionnaire_namey">Email: *</label>
+
+        <div class="input-group" id="promo-input">
+          <input
+              type="email"
+              id="questionnaire_email"
+              class="form-control"
+              placeholder="email"
+              aria-label="email"
+              :value="questionnaire.email"
+              @input="updateParent('email', $event.target.value)"
+              aria-describedby="basic-addon1"
+          />
+        </div>
+      </div>
+
+      <div class="quest-item">
         <label for="questionnaire_agy">Возраст: *</label>
 
         <div class="input-group" id="promo-input">

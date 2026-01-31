@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+const API = '/api/v1/promoCode';
+
 export const loadListPromoCode = (context) => {
-    let promise = axios.get('/api/v1/festival/getListPromoCode');
+    let promise = axios.get(API + '/getListPromoCode');
     promise.then(function (response) {
         console.log(response.data.success);
         context.commit('setListPromoCode', response.data.listPromoCode);
@@ -14,7 +16,7 @@ export const loadListPromoCode = (context) => {
 
 export const loadPromoCodeItem = (context, payload) => {
     if (payload !== null && payload.length > 0) {
-        let promise = axios.get('/api/v1/festival/getItemPromoCode/' + payload)
+        let promise = axios.get(API + '/getItemPromoCode/' + payload)
         promise.then(function (response) {
             console.log(response.data.success);
             context.commit('setItemPromoCode', response.data);
@@ -26,7 +28,7 @@ export const loadPromoCodeItem = (context, payload) => {
 };
 
 export const sendSavePromoCode = (context, payload) => {
-    let promise = axios.post('/api/v1/festival/savePromoCode/' + payload.id, {
+    let promise = axios.post(API + '/savePromoCode/' + payload.id, {
         'id' : payload.id,
         'name' : payload.name,
         'discount': payload.discount,

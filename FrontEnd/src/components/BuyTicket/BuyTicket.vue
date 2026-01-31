@@ -124,12 +124,12 @@
                 </div>
                 <div class="pp2 row">Введи свои Имя и Фамилию, если вносишь оргвзнос за себя</div>
                 <div class="quest-item row" id="first-item-row">
-                  <label for="questionnaire_namey" style="display: none">Твои Имя и Фамилия: *</label>
+                  <label for="name" style="display: none">Твои Имя и Фамилия: *</label>
 
                   <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
                     <input
                         type="text"
-                        id="questionnaire_namey"
+                        id="name"
                         class="form-control"
                         placeholder="Твои Имя и Фамилия"
                         aria-label="Твои Имя и Фамилия"
@@ -749,9 +749,6 @@ export default {
       area.select();
       document.execCommand('copy');
       document.body.removeChild(area);
-    },
-    updateQuestionnaire(updatedQuestionnaire) {
-      this.questionnaire = updatedQuestionnaire;
     },
     /**
      * Отправить промо код

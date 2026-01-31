@@ -15,12 +15,10 @@
                   <th scope="col">Стили музыки</th>
                   <th scope="col">"Зачем ты на Систо?"</th>
                   <th scope="col">Откуда</th>
-                  <th scope="col">Ссылка на анкету</th>
-
                 </tr>
                 </thead>
                 <tbody>
-                <tr v-for="getQuestionnaireItem in getQuestionnaireList" v-bind:key="getQuestionnaireItem.id">
+                <tr>
                   <td>{{ getQuestionnaireItem.name }}</td>
                   <td>{{ getQuestionnaireItem.phone }}</td>
                   <td>{{ getQuestionnaireItem.agy }}</td>
@@ -30,7 +28,6 @@
                   <td>{{ getQuestionnaireItem.musicStyles }}</td>
                   <td>{{ getQuestionnaireItem.questionForSysto }}</td>
                   <td>{{ getQuestionnaireItem.whereSysto }}</td>
-                  <td><a :href="getQuestionnaireItem.link">Анкета</a></td>
                 </tr>
                 </tbody>
               </table>
@@ -47,8 +44,8 @@ import {mapGetters} from "vuex";
 export default {
   name: "QuestionnaireItem",
   computed: {
-    ...mapGetters('appOrder', [
-      'getQuestionnaireList',
+    ...mapGetters('appQuestionnaire', [
+      'getQuestionnaireItem',
     ]),
   },
 }

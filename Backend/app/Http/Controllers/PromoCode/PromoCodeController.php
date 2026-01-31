@@ -2,61 +2,34 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Controllers\Festival;
+namespace App\Http\Controllers\PromoCode;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CreatePromoCodeRequest;
 use Carbon\Carbon;
-use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Nette\Utils\JsonException;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Order\InfoForOrder\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\InfoForOrder\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Service\InviteLinkService;
 use Tickets\PromoCode\Application\PromoCodes;
 use Tickets\PromoCode\Application\SearchPromoCode\IsCorrectPromoCode;
 use Tickets\PromoCode\Response\PromoCodeDto;
-use Shared\Domain\ValueObject\Uuid;
 
-class OrderingTicketsController extends Controller
+class PromoCodeController extends Controller
 {
+
     public function __construct(
-        private GetInfoForOrder    $allInfoForOrderingTicketsSearcher,
+        private PromoCodes         $getPromoCodes,
         private IsCorrectPromoCode $isCorrectPromoCode,
         private GetTicketType      $getTicketType,
-        private PromoCodes         $getPromoCodes,
     )
     {
     }
 
-    /**
-     * @throws JsonException
-     */
-    public function getInfoForOrder(Request $request): array
-    {
-        if (is_null($request->get('festival_id'))) {
-            throw new DomainException('Не задан идентификатор фестиваля');
-        }
-        $isAdmin = filter_var($request->get('is_admin', false),FILTER_VALIDATE_BOOLEAN);
-
-        return $this->allInfoForOrderingTicketsSearcher
-            ->getInfoForOrderingDto(
-                new Uuid($request->get('festival_id')),
-                $isAdmin,
-            )
-            ->toArray();
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public function getTicketTypeList(): array
-    {
-        return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b8'))->toArray();
-    }
 
     /**
      * @throws JsonException
@@ -78,7 +51,6 @@ class OrderingTicketsController extends Controller
             )->toArray();
     }
 
-
     /**
      * @throws JsonException
      */
@@ -86,6 +58,7 @@ class OrderingTicketsController extends Controller
     {
         return $this->getPromoCodes->getList()->toArray();
     }
+
 
     /**
      * @throws JsonException
@@ -104,6 +77,7 @@ class OrderingTicketsController extends Controller
 
         return response()->json([]);
     }
+
 
     /**
      * @throws Throwable
@@ -145,47 +119,6 @@ class OrderingTicketsController extends Controller
             'message' => $message,
             'id' => $id->value(),
             'name' => $data['name'],
-        ]);
-    }
-
-    /**
-     * @throws JsonException
-     */
-    public function getPriceList(Request $request): array
-    {
-        if (is_null($request->get('festival_id'))) {
-            throw new DomainException('Не задан идентификатор фестиваля');
-        }
-
-        return $this->allInfoForOrderingTicketsSearcher->getAllPrice(new Uuid($request->get('festival_id')))->toArray();
-    }
-
-    public function getInviteLink(Request $request, InviteLinkService $inviteLinkService): JsonResponse
-    {
-        if(!$userId = $request->user()?->id) {
-            return response()->json([
-                'message' => 'страница доступна только для зарегистрированного пользователя',
-                'link' => null
-            ]);
-        }
-
-        if($link = $inviteLinkService->getLink(new Uuid($userId))) {
-            return response()->json([
-                'message' => 'Вам доступна ссылка для приглашение друга',
-                'link' => $link
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Формирование ссылки-приглашения будет доступно после одобрения хотя бы одного из ваших заказов',
-            'link' => null
-        ]);
-    }
-
-    public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
-    {
-        return response()->json([
-            'success' => $inviteLinkService->isPaidOrderByUserId(new Uuid($userId))
         ]);
     }
 }
