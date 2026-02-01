@@ -20,6 +20,7 @@ import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 import InviteLinkView from "@/views/auth/InviteLinkView.vue";
 import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
+import QuestionnaireRegView from "@/views/questionnaire/QuestionnaireRegView.vue";
 
 const routes = [
     {
@@ -130,9 +131,12 @@ const routes = [
     // Анкета нового пользователя
     {
         path: '/questionnaire/newUser',
-        name: 'Questionnaire',
+        name: 'QuestionnaireNewUser',
         props: true,
-        component: QuestionnaireView,
+        component: QuestionnaireRegView,
+        meta: {
+            'requiresAuth': false
+        }
     },
     // Анкета от заказа
     {

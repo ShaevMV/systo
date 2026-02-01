@@ -11,6 +11,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
 use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireController extends Controller
@@ -60,6 +61,7 @@ class QuestionnaireController extends Controller
             if (isset($data['questionnaire'])) {
                 $data['questionnaire']['ticket_id'] = $ticketId;
                 $data['questionnaire']['order_id'] = $orderId;
+                $data['questionnaire']['status'] = QuestionnaireStatus::APPROVE;
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire']
@@ -78,6 +80,38 @@ class QuestionnaireController extends Controller
         }
     }
 
+
+    /**
+     * Записать анкету нового пользователя
+     *
+     * @throws \Throwable
+     */
+    public function setNewUserQuestionnaire(
+        Request                  $request,
+        QuestionnaireApplication $questionnaireApplication,
+    ): JsonResponse
+    {
+        $data = $request->toArray();
+        try {
+            if (isset($data['questionnaire'])) {
+                $data['questionnaire']['status'] = 'NEW';
+                $questionnaireApplication->create(
+                    QuestionnaireTicketDto::fromState(
+                        $data['questionnaire']
+                    )
+                );
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
+            ]);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'message' => $throwable->getMessage()
+            ], 422);
+        }
+    }
 
     /**
      * Повторно отправить письмо на заполнение анкеты

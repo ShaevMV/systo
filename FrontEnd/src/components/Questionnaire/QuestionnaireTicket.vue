@@ -110,7 +110,7 @@
       </div>
       </div>
 
-      <div class="quest-item">
+      <div class="quest-item" v-show="!isNewUser">
         <label for="questionnaire_howManyTimes">Сколько раз ты уже бывал на Систо? *</label>
 
         <div class="input-group" id="promo-input">
@@ -173,7 +173,7 @@
         >
       </div>
 
-      <div class="quest-item">
+      <div class="quest-item" v-show="!isNewUser">
         <label for="questionnaire_creationOfSisto"> Считаете ли вы себя участвующим в сотворении Систо?:</label>
 
         <input
@@ -220,6 +220,10 @@ export default {
       default: null,
     },
     isDisabled: {
+      type: [Boolean],
+      default: false
+    },
+    isNewUser: {
       type: [Boolean],
       default: false
     },

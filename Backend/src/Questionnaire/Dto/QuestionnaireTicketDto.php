@@ -16,7 +16,7 @@ class QuestionnaireTicketDto
         protected string              $questionForSysto,
         protected string              $phone,
         protected QuestionnaireStatus $status = QuestionnaireStatus::NEW,
-        protected ?bool               $is_have_in_club = null,
+        protected bool                $is_have_in_club = false,
         protected ?string             $email = null,
         protected ?string             $telegram = null,
         protected ?string             $vk = null,
@@ -40,15 +40,15 @@ class QuestionnaireTicketDto
     {
         $id = (empty($data['id'])) ? null : (int) $data['id'];
         $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
-        $ticketId = (empty($data['ticket_id'])) ? null : new Uuid($data['ticket_id']);
-        $orderId = (empty($data['order_id'])) ? null : new Uuid($data['order_id']);
+        $ticketId = (empty($data['ticket_id'] ?? null)) ? null : new Uuid($data['ticket_id']);
+        $orderId = (empty($data['order_id'] ?? null)) ? null : new Uuid($data['order_id']);
         return new self(
             (int)$data['agy'],
             (int)$data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
             QuestionnaireStatus::from($data['status']),
-            empty($data['is_have_in_club']) ? null : (bool)$data['is_have_in_club'],
+            (bool)($data['is_have_in_club'] ?? false),
             $data['email'] ?? null,
             $data['telegram'] ?? null,
             $data['vk'] ?? null,
@@ -113,12 +113,12 @@ class QuestionnaireTicketDto
         ];
     }
 
-    public function getOrderId(): Uuid
+    public function getOrderId(): ?Uuid
     {
         return $this->orderId;
     }
 
-    public function getTicketId(): Uuid
+    public function getTicketId(): ?Uuid
     {
         return $this->ticketId;
     }

@@ -38,7 +38,29 @@ export const loadQuestionnaire = (context, payload) => {
 };
 
 /**
- * отправить данные для анкеты
+ * отправить данные для анкеты по заказу
+ *
+ * @param context
+ * @param payload
+ * @returns {Promise<unknown>}
+ */
+export const sendNewUserQuestionnaire = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post(API + '/sendNewUser/', {
+            'questionnaire': payload.questionnaire
+        });
+        return promise.then(function (response) {
+            context.commit('setMessage', response.data.message)
+            payload.callback();
+        }).catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
+    });
+};
+
+/**
+ * отправить данные для анкеты по заказу
  *
  * @param context
  * @param payload

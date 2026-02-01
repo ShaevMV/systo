@@ -51,21 +51,13 @@
       <div class="col-10 col-md-12 col mx-auto">
         <div class="card">
           <div class="card-body pt-3">
-            <a class="nav-item"
-                 v-if="isAdmin"
-                 @click="goList"
-            >
-              Все анкеты
-            </a>
-
             <questionnaire-ticket
-                :questionnaire="isAdmin ? getQuestionnaireItem : questionnaire"
-                :is-disabled="isAdmin"
+                :questionnaire="questionnaire"
+                :is-newUser="true"
                 @update-questionnaire="updateQuestionnaire"
             />
             <div class="form-check"
                  id="check-check"
-                 v-show="!isAdmin"
             >
               <input
                   class="form-check-input"
@@ -102,24 +94,18 @@
 <script>
 
 import QuestionnaireTicket from "@/components/Questionnaire/QuestionnaireTicket.vue";
-import {mapActions, mapGetters} from "vuex";
+import {mapActions} from "vuex";
 
 export default {
-  name: 'QuestionnaireView',
+  name: 'QuestionnaireRegView',
   components: {
     QuestionnaireTicket
-  },
-  props: {
-    'order_id': String,
-    'ticket_id': String,
-    'id': String,
   },
   data() {
     return {
       questionnaire: {
         name: null,    // Добавил дату для имени и фамилии
         agy: null,
-        email: null,
         telegram: null,
         vk: null,
         phone: null,
@@ -128,22 +114,15 @@ export default {
         questionForSysto: null,
         creationOfSisto: null,
         activeOfEvent: null,
+        email: null,
         whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
       },
       confirm: false,
     }
   },
   computed: {
-    ...mapGetters('appUser', [
-      'isAdmin'
-    ]),
-    ...mapGetters('appQuestionnaire', [
-      'getQuestionnaireItem'
-    ]),
     isCorrect() {
       return this.questionnaire.agy !== null &&
-          this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto !== null &&
           this.questionnaire.email !== null &&
           this.questionnaire.phone !== null &&
           this.confirm;
@@ -151,7 +130,7 @@ export default {
   },
   methods: {
     ...mapActions('appQuestionnaire', [
-      'sendQuestionnaire',
+      'sendNewUserQuestionnaire',
       'editQuestionnaire'
     ]),
     goList() {
@@ -159,38 +138,24 @@ export default {
     },
     send() {
       let self = this;
-      if (this.order_id && this.ticket_id) {
-        this.sendQuestionnaire({
-          questionnaire: this.questionnaire,
-          orderId: this.order_id,
-          ticketId: this.ticket_id,
-          callback: function () {
-            document.getElementById('modalOpenBtn').click();
-            self.questionnaire = {
-              agy: null,
-              telegram: null,
-              vk: null,
-              phone: null,
-              howManyTimes: null,
-              musicStyles: null,
-              questionForSysto: null,
-              creationOfSisto: null,
-              activeOfEvent: null,
-            };
-          },
-        })
-      }
-
-      if (this.id) {
-        this.editQuestionnaire({
-          questionnaire: this.questionnaire,
-          id: this.id,
-          callback: function () {
-            document.getElementById('modalOpenBtn').click();
-          },
-        })
-      }
-
+      this.sendNewUserQuestionnaire({
+        questionnaire: this.questionnaire,
+        newUser: true,
+        callback: function () {
+          document.getElementById('modalOpenBtn').click();
+          self.questionnaire = {
+            agy: null,
+            telegram: null,
+            vk: null,
+            phone: null,
+            howManyTimes: null,
+            musicStyles: null,
+            questionForSysto: null,
+            creationOfSisto: null,
+            activeOfEvent: null,
+          };
+        },
+      })
     },
     updateQuestionnaire(updatedQuestionnaire) {
       this.questionnaire = updatedQuestionnaire;

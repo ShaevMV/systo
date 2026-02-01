@@ -5,6 +5,13 @@
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
+    <li class="nav-item" v-if="!isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'QuestionnaireNewUser' }">Подать анкету на регистрацию
+      </router-link>
+    </li>
     <li class="nav-item" v-if="isAuth">
       <router-link
           class="nav-link"

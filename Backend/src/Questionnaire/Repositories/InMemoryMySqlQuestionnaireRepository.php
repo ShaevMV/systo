@@ -28,9 +28,15 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         $data = $questionnaireTicketDto->toArrayForMySql();
         try {
             DB::beginTransaction();
-            $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
-                ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
-            if($rawModel->exists()) {
+            $rawModel = $this->model;
+            if ($questionnaireTicketDto->getTicketId() && $questionnaireTicketDto->getOrderId()) {
+                $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
+                    ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
+            }
+            if ($questionnaireTicketDto->getEmail()) {
+                $rawModel = $this->model::whereEmail($questionnaireTicketDto->getEmail());
+            }
+            if ($rawModel->exists()) {
                 $rawModel->update($data);
             } else {
                 $this->model->insert(
