@@ -9,7 +9,7 @@
       <router-link
           class="nav-link"
           active-class="active"
-          :to="{ name: 'QuestionnaireNewUser' }">Подать анкету на регистрацию
+          :to="{ name: 'QuestionnaireNewUser' }">Заявка на регистрацию в клубе
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">

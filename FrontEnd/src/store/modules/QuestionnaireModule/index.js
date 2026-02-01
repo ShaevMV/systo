@@ -15,6 +15,7 @@ export default {
             howManyTimes: null,
             musicStyles: null,
             questionForSysto: null,
+            is_have_in_club: false,
             message: '',
             link: null,
         },

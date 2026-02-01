@@ -127,6 +127,7 @@ export default {
         musicStyles: null,
         questionForSysto: null,
         creationOfSisto: null,
+        is_have_in_club: false,
         activeOfEvent: null,
         whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
       },
