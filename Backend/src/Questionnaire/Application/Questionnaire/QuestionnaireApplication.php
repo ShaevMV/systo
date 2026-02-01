@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire;
 
-use Shared\Domain\Criteria\Filter;
-use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Throwable;
+use Tickets\Questionnaire\Application\Questionnaire\Approve\QuestionnaireApproveCommand;
+use Tickets\Questionnaire\Application\Questionnaire\Approve\QuestionnaireApproveCommandHandler;
 use Tickets\Questionnaire\Application\Questionnaire\Create\QuestionnaireCreateCommand;
 use Tickets\Questionnaire\Application\Questionnaire\Create\QuestionnaireCreateCommandHandler;
 use Tickets\Questionnaire\Application\Questionnaire\GetItem\QuestionnaireGetItemQuery;
@@ -24,11 +25,14 @@ class QuestionnaireApplication
 
     public function __construct(
         QuestionnaireCreateCommandHandler $questionnaireCommandHandler,
+        QuestionnaireApproveCommandHandler $questionnaireApproveCommandHandler,
+
         QuestionnaireGetItemQueryHandler $questionnaireGetItemQueryHandler,
         QuestionnaireGetListQueryHandler $questionnaireGetListQueryHandler,
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
+            QuestionnaireApproveCommand::class => $questionnaireApproveCommandHandler,
             QuestionnaireCreateCommand::class => $questionnaireCommandHandler,
         ]);
 
@@ -39,7 +43,7 @@ class QuestionnaireApplication
     }
 
     /**
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function create(QuestionnaireTicketDto $questionnaireTicketDto): void
     {
@@ -62,4 +66,11 @@ class QuestionnaireApplication
         return $result;
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function approve(int $id): void
+    {
+        $this->commandBus->dispatch(new QuestionnaireApproveCommand($id));
+    }
 }

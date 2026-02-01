@@ -9,6 +9,7 @@ export default {
         questionnaireItem: {
             agy: null,
             telegram: null,
+            email: null,
             phone: null,
             vk: null,
             howManyTimes: null,
@@ -19,6 +20,7 @@ export default {
         },
         isLoading: false,
         dataError: [],
+        message: null,
     },
     getters,
     actions,

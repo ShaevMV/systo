@@ -12,11 +12,24 @@ const API = '/api/v1/questionnaire';
 export const sendNotitificationUser = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.post(API + '/notification/' + payload.id, {
-            'questionnaire': payload.questionnaire
+            'email': payload.email
         });
         return promise.then(function (response) {
             context.commit('setMessage', response.data.message)
             payload.callback();
+        }).catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
+    });
+};
+
+export const approve = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post(API + '/approve/' + payload.id);
+        return promise.then(function (response) {
+            context.commit('approve', payload)
+            payload.callback(response.data.message);
         }).catch(function (error) {
             context.commit('setError', error.response.data.errors);
             reject(error);

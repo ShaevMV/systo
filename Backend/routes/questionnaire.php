@@ -10,7 +10,8 @@ Route::prefix('v1/questionnaire')->group(static function (): void {
     Route::post('/load', [QuestionnaireController::class, 'loadQuestionnaireList']);
     Route::post('/send/{orderId}/{ticketId}', [QuestionnaireController::class, 'setQuestionnaire']);
     Route::post('/sendNewUser', [QuestionnaireController::class, 'setNewUserQuestionnaire']);
-    Route::post('/notification/{id}/{ticketId}', [QuestionnaireController::class, 'setQuestionnaire']);
+    Route::post('/notification/{id}', [QuestionnaireController::class, 'replayNotificationUser']);
+    Route::post('/approve/{id}', [QuestionnaireController::class, 'approve']);
     Route::get('/get/{id}', [QuestionnaireController::class, 'getQuestionnaire']);
 })->middleware('auth:api')
     ->middleware('admin');

@@ -3,7 +3,7 @@ import appFestivalTickets from './modules/FestivalTicketsModule/index';
 import appUserModule from './modules/UserModule/index';
 import appOrderModule from './modules/OrderModule/index';
 import appPromoCodeModule from './modules/PromoCodeModule/index';
-import appQuestionnaire from './modules/QuestionnaireModele/index';
+import appQuestionnaire from './modules/QuestionnaireModule/index';
 
 export default createStore({
     state: {

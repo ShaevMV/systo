@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
 use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
@@ -33,7 +34,7 @@ class QuestionnaireController extends Controller
                     $request->get('status'),
                 ))->toArray()
             ]);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
                 'message' => $throwable->getMessage(),
@@ -47,7 +48,7 @@ class QuestionnaireController extends Controller
     /**
      * Записать анкету
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function setQuestionnaire(
         Request                  $request,
@@ -72,7 +73,7 @@ class QuestionnaireController extends Controller
                 'success' => true,
                 'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
             ]);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
                 'message' => $throwable->getMessage()
@@ -84,7 +85,7 @@ class QuestionnaireController extends Controller
     /**
      * Записать анкету нового пользователя
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function setNewUserQuestionnaire(
         Request                  $request,
@@ -105,7 +106,7 @@ class QuestionnaireController extends Controller
                 'success' => true,
                 'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
             ]);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
                 'message' => $throwable->getMessage()
@@ -142,14 +143,19 @@ class QuestionnaireController extends Controller
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function approve(
         QuestionnaireApplication $questionnaireApplication,
-        string                   $id,
+        int                   $id,
     ): JsonResponse
     {
+        $questionnaireApplication->approve($id);
+
         return response()->json([
             'success' => true,
-            'message' => 'Ссылка на анкету отправлена'
+            'message' => 'Анкета одобрена'
         ]);
     }
 

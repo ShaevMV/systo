@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Util\TicketUtil;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
 
@@ -96,5 +97,15 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
 
         return QuestionnaireTicketDto::fromState($rawData);
+    }
+
+    public function cacheStatus(int $id, QuestionnaireStatus $questionnaireStatus): bool
+    {
+        $rawData = $this->model::find($id);
+        if(!$rawData) {
+            throw new \DomainException("Анкета с $id не найдена");
+        }
+        $rawData->status = $questionnaireStatus;
+        return $rawData->save();
     }
 }

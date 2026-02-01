@@ -6,6 +6,7 @@ namespace Tickets\Questionnaire\Repositories;
 
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
 
@@ -38,4 +39,6 @@ interface QuestionnaireRepositoryInterface
      * Получить определённую анкету
      */
     public function get(int $id): QuestionnaireTicketDto;
+
+    public function cacheStatus(int $id, QuestionnaireStatus $questionnaireStatus): bool;
 }
