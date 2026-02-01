@@ -202,23 +202,6 @@
             :disabled="isDisabled ? '' : disabled"
         >
       </div>
-
-
-
-      <div class="quest-item">
-        <label for="questionnaire_activeOfEvent"> </label>
-
-        <input
-            type="text"
-            class="form-control"
-            :value="questionnaire.activeOfEvent"
-            id="questionnaire_activeOfEvent"
-            placeholder="Готовы принимать более активное или творческое участие в создании события?"
-            aria-label="Откуда ты узнал о Систо?"
-            @input="updateParent('activeOfEvent', $event.target.value)"
-            :disabled="isDisabled ? '' : disabled"
-        >
-      </div>
       <div class="quest-item form-check"
            id="check-check"
            v-show="!isAdmin"
@@ -228,9 +211,10 @@
             type="checkbox"
             :value="questionnaire.is_have_in_club"
             id="defaultCheck1"
+            :disabled="isDisabled ? '' : disabled"
         />
         <label class="form-check-label" for="defaultCheck1">
-          Хочу вступить в приватный клуб
+          Хочу вступить в приватный клуб (18+)
         </label>
       </div>
     </div>
