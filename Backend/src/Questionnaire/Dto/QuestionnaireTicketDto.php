@@ -85,7 +85,8 @@ class QuestionnaireTicketDto
             'user_id' => $this->userId?->value(),
             'order_id' => $this->orderId?->value(),
             'ticket_id' => $this->ticketId?->value(),
-            'id' => $this->id
+            'id' => $this->id,
+            'message' => '',
         ];
     }
 

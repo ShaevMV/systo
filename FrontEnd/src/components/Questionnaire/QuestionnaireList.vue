@@ -26,7 +26,7 @@
             <tbody>
             <tr v-for="(item,index) in getQuestionnaireList"
                 v-bind:key="index"
-                @click="goItemOrderForUser(item.id)">
+                @click="goItemForUser(item.id)">
 
               <th scope="row" class="mobile">
                 {{ item.id }}
@@ -89,8 +89,8 @@ export default {
     ...mapActions('appQuestionnaire', [
       'loadQuestionnaire',
     ]),
-    goItemOrderForUser(idOrderItem) {
-      this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+    goItemForUser(id) {
+      this.$router.push({name: 'QuestionnaireEdit', params: {id: id}});
     },
   },
   async created() {

@@ -17,7 +17,7 @@ class QuestionnaireController extends Controller
 {
 
     public function loadQuestionnaireList(
-        Request $request,
+        Request                  $request,
         QuestionnaireApplication $application,
     ): JsonResponse
     {
@@ -49,15 +49,15 @@ class QuestionnaireController extends Controller
      * @throws \Throwable
      */
     public function setQuestionnaire(
-        Request $request,
+        Request                  $request,
         QuestionnaireApplication $questionnaireApplication,
-        string $orderId,
-        string $ticketId,
+        string                   $orderId,
+        string                   $ticketId,
     ): JsonResponse
     {
         $data = $request->toArray();
         try {
-            if(isset($data['questionnaire'])) {
+            if (isset($data['questionnaire'])) {
                 $data['questionnaire']['ticket_id'] = $ticketId;
                 $data['questionnaire']['order_id'] = $orderId;
                 $questionnaireApplication->create(
@@ -89,8 +89,8 @@ class QuestionnaireController extends Controller
      */
     public function replayNotificationUser(
         Request $request,
-        \Bus $bus,
-        string $id,
+        \Bus    $bus,
+        string  $id,
     ): JsonResponse
     {
         $request->validate([
@@ -110,7 +110,7 @@ class QuestionnaireController extends Controller
 
     public function approve(
         QuestionnaireApplication $questionnaireApplication,
-        string $id,
+        string                   $id,
     ): JsonResponse
     {
         return response()->json([
@@ -121,12 +121,12 @@ class QuestionnaireController extends Controller
 
     public function getQuestionnaire(
         QuestionnaireApplication $questionnaireApplication,
-        int $id,
+        int                      $id,
     ): JsonResponse
     {
         return response()->json([
             'success' => true,
-            'questionnaire' => $questionnaireApplication->getItemId($id)->toArray(),
+            'questionnaire' => $questionnaireApplication->getItemId($id)->first()->toArray(),
         ]);
     }
 }

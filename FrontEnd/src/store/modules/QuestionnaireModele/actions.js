@@ -93,9 +93,12 @@ export const getQuestionnaire = (context, payload) => {
         let promise = axios.get(API + '/get/' + payload.id);
         return promise.then(function (response) {
             context.commit('setQuestionnaireItem', response.data.questionnaire)
-            payload.callback();
+            if(response.callback !== undefined) {
+                response.callback(response.data.questionnaire);
+            }
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            console.error(error);
+            //context.commit('setError', error.response.data.errors);
             reject(error);
         });
     });

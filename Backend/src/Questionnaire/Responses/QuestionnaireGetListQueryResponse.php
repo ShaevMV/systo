@@ -31,4 +31,9 @@ class QuestionnaireGetListQueryResponse implements Response
         }
         return $result;
     }
+
+    public function first(): ?QuestionnaireTicketDto
+    {
+        return $this->collection->first();
+    }
 }

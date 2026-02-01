@@ -14,7 +14,7 @@ export default {
             howManyTimes: null,
             musicStyles: null,
             questionForSysto: null,
-            message: null,
+            message: '',
             link: null,
         },
         isLoading: false,

@@ -15,6 +15,7 @@
               :value="questionnaire.name"
               @input="updateParent('name', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
         </div>
       </div>
@@ -32,6 +33,7 @@
               :value="questionnaire.email"
               @input="updateParent('email', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
         </div>
       </div>
@@ -49,6 +51,7 @@
               :value="questionnaire.agy"
               @input="updateParent('agy', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
         </div>
       </div>
@@ -66,6 +69,7 @@
               :value="questionnaire.telegram"
               @input="updateParent('telegram', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
       </div>
       </div>
@@ -83,6 +87,7 @@
               :value="questionnaire.phone"
               @input="updateParent('phone', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
         </div>
       </div>
@@ -100,6 +105,7 @@
               :value="questionnaire.vk"
               @input="updateParent('vk', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
       </div>
       </div>
@@ -117,6 +123,7 @@
               :value="questionnaire.howManyTimes"
               @input="updateParent('howManyTimes', $event.target.value)"
               aria-describedby="basic-addon1"
+              :disabled="isDisabled ? '' : disabled"
           />
       </div>
       </div>
@@ -132,6 +139,7 @@
                         placeholder="Стили музыки, которые предпочитаешь в лесу?"
                         aria-label="Стили музыки, которые предпочитаешь в лесу?"
                         @input="updateParent('musicStyles', $event.target.value)"
+                        :disabled="isDisabled ? '' : disabled"
                     >
       </div>
 
@@ -146,6 +154,7 @@
                         placeholder="Зачем ты едешь на Систо?"
                         aria-label="Зачем ты едешь на Систо?"
                         @input="updateParent('questionForSysto', $event.target.value)"
+                        :disabled="isDisabled ? '' : disabled"
                     >
         </div>
 
@@ -160,6 +169,7 @@
             placeholder="Откуда ты узнал о Систо?"
             aria-label="Откуда ты узнал о Систо?"
             @input="updateParent('whereSysto', $event.target.value)"
+            :disabled="isDisabled ? '' : disabled"
         >
       </div>
 
@@ -174,6 +184,7 @@
             placeholder="Считаете ли вы себя участвующим в сотворении Систо?"
             aria-label="Считаете ли вы себя участвующим в сотворении Систо?"
             @input="updateParent('creationOfSisto', $event.target.value)"
+            :disabled="isDisabled ? '' : disabled"
         >
       </div>
 
@@ -188,6 +199,7 @@
             placeholder="Готовы принимать более активное или творческое участие в создании события?"
             aria-label="Откуда ты узнал о Систо?"
             @input="updateParent('activeOfEvent', $event.target.value)"
+            :disabled="isDisabled ? '' : disabled"
         >
       </div>
 
@@ -202,7 +214,16 @@
 
 export default {
   name: "QuestionnaireTicket",
-  props: ['questionnaire'],
+  props: {
+    questionnaire: {
+      type: [Object],
+      default: null,
+    },
+    isDisabled: {
+      type: [Boolean],
+      default: false
+    },
+  },
   methods: {
     updateParent(field, value) {
       const updated = {

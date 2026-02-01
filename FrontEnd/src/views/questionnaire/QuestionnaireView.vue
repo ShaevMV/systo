@@ -31,7 +31,7 @@
               <span aria-hidden="true">х</span>
             </button>
           </div>
-          <div class="modal-body" v-html="getMessageForQuestionnaire"></div>
+          <div class="modal-body">Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо</div>
           <div class="modal-footer">
             <button
                 type="button"
@@ -51,11 +51,22 @@
       <div class="col-10 col-md-12 col mx-auto">
         <div class="card">
           <div class="card-body pt-3">
+            <a class="nav-item"
+                 v-if="isAdmin"
+                 @click="goList"
+            >
+              Все анкеты
+            </a>
+
             <questionnaire-ticket
-                :questionnaire="questionnaire"
+                :questionnaire="isAdmin ? getQuestionnaireItem : questionnaire"
+                :is-disabled="isAdmin"
                 @update-questionnaire="updateQuestionnaire"
             />
-            <div class="form-check" id="check-check">
+            <div class="form-check"
+                 id="check-check"
+                 v-show="!isAdmin"
+            >
               <input
                   class="form-check-input"
                   type="checkbox"
@@ -69,7 +80,7 @@
                 и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
               </label>
             </div>
-            <div class="col-12">
+            <div class="col-12" v-show="!isAdmin">
               <button
                   type="button"
                   @click="send"
@@ -122,8 +133,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('appOrder', [
-      'getMessageForQuestionnaire',
+    ...mapGetters('appUser', [
+      'isAdmin'
+    ]),
+    ...mapGetters('appQuestionnaire', [
+      'getQuestionnaireItem'
     ]),
     isCorrect() {
       return this.questionnaire.agy !== null &&
@@ -138,6 +152,9 @@ export default {
       'sendQuestionnaire',
       'editQuestionnaire'
     ]),
+    goList() {
+      this.$router.push({name: 'QuestionnaireList'});
+    },
     send() {
       let self = this;
       if (this.order_id && this.ticket_id) {
@@ -179,6 +196,15 @@ export default {
   },
   created() {
     document.title = "Анкета участника Solar Systo Togathering"
+  },
+  beforeRouteEnter: (to, from, next) => {
+    if (to.params.id) {
+      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+        id: to.params.id,
+      });
+    }
+
+    next();
   },
 }
 </script>
