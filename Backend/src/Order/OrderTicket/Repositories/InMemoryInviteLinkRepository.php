@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Invite\InviteModel;
-use App\Models\Ordering\InviteLinkModel;
 use App\Models\Ordering\OrderTicketModel;
 use Illuminate\Support\Facades\DB;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\InviteLink\Domain\InviteLink;
-use Tickets\InviteLink\Responses\InviteLinkResponse;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderStatusListDto;
 
 class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface

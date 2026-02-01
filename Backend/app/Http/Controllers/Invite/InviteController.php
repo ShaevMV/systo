@@ -37,8 +37,12 @@ class InviteController extends Controller
 
     public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
     {
+        ;
         return response()->json([
-            'success' => $inviteLinkService->isPaidOrderByUserId(new Uuid($userId))
+            'success' => $inviteLinkService->isPaidOrderByUserId(
+                new Uuid($userId),
+                \Auth::user()->email
+            )
         ]);
     }
 }

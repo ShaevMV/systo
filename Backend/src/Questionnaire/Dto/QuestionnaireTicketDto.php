@@ -143,4 +143,9 @@ class QuestionnaireTicketDto
     {
         $this->userId = $userId;
     }
+
+    public function getStatus(): QuestionnaireStatus
+    {
+        return $this->status;
+    }
 }

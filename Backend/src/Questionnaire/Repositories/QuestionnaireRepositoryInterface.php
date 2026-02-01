@@ -35,6 +35,7 @@ interface QuestionnaireRepositoryInterface
      */
     public function existByEmail(string $email): bool;
 
+    public function findByEmail(string $email): ?QuestionnaireTicketDto;
     /**
      * Получить определённую анкету
      */

@@ -102,10 +102,19 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     public function cacheStatus(int $id, QuestionnaireStatus $questionnaireStatus): bool
     {
         $rawData = $this->model::find($id);
-        if(!$rawData) {
+        if (!$rawData) {
             throw new \DomainException("Анкета с $id не найдена");
         }
         $rawData->status = $questionnaireStatus;
         return $rawData->save();
+    }
+
+    public function findByEmail(string $email): ?QuestionnaireTicketDto
+    {
+        if (!$data = $this->model::whereEmail($email)->first()?->toArray()) {
+            return null;
+        }
+
+        return QuestionnaireTicketDto::fromState($data);
     }
 }
