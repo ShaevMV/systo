@@ -14,7 +14,7 @@ use Shared\Domain\Bus\EventJobs\DomainEvent;
 
 class ProcessInviteLinkQuestionnaire implements ShouldQueue, DomainEvent
 {
-    const UUID_USER = '00db9e1e-c55f-490c-a920-8a6a0edc276f'; // TODO: заменить на крис
+    const UUID_USER = '3a69674b-e062-4223-b2c2-b1a59777005c';
 
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
