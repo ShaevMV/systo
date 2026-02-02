@@ -110,16 +110,22 @@
       </div>
       </div>
 
-      <div class="quest-item" v-show="!isNewUser">
-        <label for="questionnaire_howManyTimes">Сколько раз ты уже бывал на Систо? *</label>
-
+      <div class="quest-item">
+        <label for="questionnaire_howManyTimes"  v-show="!isNewUser">
+          Сколько раз ты уже бывал на Систо? *
+        </label>
+        <label for="questionnaire_howManyTimes"  v-show="isNewUser">
+          Бывал ли ты ранее на Систо или иных лестных событиях
+        </label>
+        <label for="questionnaire_howManyTimes"  v-show="isDisabled">
+          Бывал ли ты ранее на Систо или иных лестных событиях / <br/>
+          Сколько раз ты уже бывал на Систо? *
+        </label>
         <div class="input-group" id="promo-input">
           <input
-              type="number"
+              type="text"
               id="questionnaire_howManyTimes"
               class="form-control"
-              placeholder="Сколько раз ты уже бывал на Систо? *"
-              aria-label="Сколько раз ты уже бывал на Систо? *"
               :value="questionnaire.howManyTimes"
               @input="updateParent('howManyTimes', $event.target.value)"
               aria-describedby="basic-addon1"

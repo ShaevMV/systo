@@ -12,7 +12,7 @@ class QuestionnaireTicketDto
     protected ?string $link;
     public function __construct(
         protected int                 $agy,
-        protected int                 $howManyTimes,
+        protected string              $howManyTimes,
         protected string              $questionForSysto,
         protected string              $phone,
         protected QuestionnaireStatus $status = QuestionnaireStatus::NEW,
@@ -44,7 +44,7 @@ class QuestionnaireTicketDto
         $orderId = (empty($data['order_id'] ?? null)) ? null : new Uuid($data['order_id']);
         return new self(
             (int)$data['agy'],
-            (int)$data['howManyTimes'],
+            $data['howManyTimes'],
             $data['questionForSysto'],
             $data['phone'],
             QuestionnaireStatus::from($data['status']),
