@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
 use App\Models\Ordering\OrderTicketModel;
-use App\Models\User\User;
+use App\Models\User;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;

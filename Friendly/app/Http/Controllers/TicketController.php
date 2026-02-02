@@ -9,7 +9,7 @@ use App\Models\Auto;
 use App\Models\FriendlyTicket;
 use App\Models\ListTicket;
 use App\Models\LiveTicket;
-use App\Models\User\User;
+use App\Models\User;
 use App\Services\CsvFileService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;

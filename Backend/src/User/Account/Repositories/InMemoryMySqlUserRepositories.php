@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Repositories;
 
-use App\Models\User\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Hash;

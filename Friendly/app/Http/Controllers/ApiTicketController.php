@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Middleware\Bot;
-use App\Models\User\User;
+use App\Models\User;
 use App\Services\ApiTicketService;
 use App\Services\DTO\CreateApiTicketDTO;
 use Illuminate\Http\Request;

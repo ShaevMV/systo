@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Models\User\PasswordResets;
-use App\Models\User\User;
+use App\Models\PasswordResets;
+use App\Models\User;
 use Bus;
 use DomainException;
 use Illuminate\Http\JsonResponse;

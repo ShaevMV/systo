@@ -34,20 +34,20 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
  * @method static UserFactory factory($count = null, $state = [])
- * @method static Builder|User\User newModelQuery()
- * @method static Builder|User\User newQuery()
- * @method static Builder|User\User query()
- * @method static Builder|User\User whereCreatedAt($value)
- * @method static Builder|User\User whereEmail($value)
- * @method static Builder|User\User whereEmailVerifiedAt($value)
- * @method static Builder|User\User whereId($value)
- * @method static Builder|User\User whereName($value)
- * @method static Builder|User\User wherePassword($value)
- * @method static Builder|User\User whereRememberToken($value)
- * @method static Builder|User\User whereUpdatedAt($value)
+ * @method static Builder|\App\Models\User newModelQuery()
+ * @method static Builder|\App\Models\User newQuery()
+ * @method static Builder|\App\Models\User query()
+ * @method static Builder|\App\Models\User whereCreatedAt($value)
+ * @method static Builder|\App\Models\User whereEmail($value)
+ * @method static Builder|\App\Models\User whereEmailVerifiedAt($value)
+ * @method static Builder|\App\Models\User whereId($value)
+ * @method static Builder|\App\Models\User whereName($value)
+ * @method static Builder|\App\Models\User wherePassword($value)
+ * @method static Builder|\App\Models\User whereRememberToken($value)
+ * @method static Builder|\App\Models\User whereUpdatedAt($value)
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read Collection<int, PersonalAccessToken> $tokens
- * @method static Builder|User\User whereIsAdmin($value)
+ * @method static Builder|\App\Models\User whereIsAdmin($value)
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications
  * @property-read Collection<int, PersonalAccessToken> $tokens
  * @property-read DatabaseNotificationCollection<int, DatabaseNotification> $notifications

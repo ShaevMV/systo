@@ -10,7 +10,7 @@ use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User\User;
+use App\Models\User;
 use Carbon\Carbon;
 use DomainException;
 use Exception;

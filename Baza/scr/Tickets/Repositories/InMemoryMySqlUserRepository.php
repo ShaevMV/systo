@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Repositories;
 
-use App\Models\User\User;
+use App\Models\User;
 
 class InMemoryMySqlUserRepository implements UserRepositoryInterface
 {

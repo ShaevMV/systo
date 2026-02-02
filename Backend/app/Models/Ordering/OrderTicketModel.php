@@ -7,7 +7,7 @@ namespace App\Models\Ordering;
 use App\Models\Festival\TicketTypesModel;
 use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User\User;
+use App\Models\User;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
