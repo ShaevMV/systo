@@ -230,6 +230,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             $arrGuests[] = [
                 'value' => $guest->getValue(),
                 'id' => $guest->getId()->value(),
+                'email' => $guest->getEmail(),
             ];
         }
 
