@@ -20,6 +20,7 @@ class TicketDto extends AbstractionEntity
         protected Uuid   $festival_id,
         ?Uuid            $id = null,
         protected ?int   $kilter = null,
+        protected ?string $email = null,
         ?Carbon          $created_at = null,
         ?Carbon          $updated_at = null,
     )
@@ -38,6 +39,7 @@ class TicketDto extends AbstractionEntity
             $festivalId,
             new Uuid($data['id']),
             $data['kilter'],
+            $data['email'] ?? null
         );
     }
 

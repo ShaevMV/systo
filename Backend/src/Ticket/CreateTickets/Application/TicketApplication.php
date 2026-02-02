@@ -60,6 +60,7 @@ class TicketApplication
                 $guest->getValue(),
                 $guest->getFestivalId(),
                 $guest->getId() ?? null,
+                $guest->getEmail() ?? null,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(
                 $ticketDto
