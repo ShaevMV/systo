@@ -62,7 +62,7 @@ class QuestionnaireController extends Controller
             if (isset($data['questionnaire'])) {
                 $data['questionnaire']['ticket_id'] = $ticketId;
                 $data['questionnaire']['order_id'] = $orderId;
-                $data['questionnaire']['status'] = QuestionnaireStatus::APPROVE;
+                $data['questionnaire']['status'] = 'APPROVE';
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire']
