@@ -140,7 +140,7 @@ const routes = [
     },
     // Анкета от заказа
     {
-        path: '/questionnaire/quest/:order_id/:ticket_id',
+        path: '/questionnaire/guest/:order_id/:ticket_id',
         name: 'Questionnaire',
         props: true,
         component: QuestionnaireView,
