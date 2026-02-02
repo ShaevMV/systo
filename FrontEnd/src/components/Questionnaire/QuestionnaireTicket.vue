@@ -111,10 +111,10 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_howManyTimes"  v-show="!isNewUser">
+        <label for="questionnaire_howManyTimes"  v-show="!isNewUser && !isDisabled">
           Сколько раз ты уже бывал на Систо? *
         </label>
-        <label for="questionnaire_howManyTimes"  v-show="isNewUser">
+        <label for="questionnaire_howManyTimes"  v-show="isNewUser && !isDisabled">
           Бывал ли ты ранее на Систо или иных лестных событиях
         </label>
         <label for="questionnaire_howManyTimes"  v-show="isDisabled">
