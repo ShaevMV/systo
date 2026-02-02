@@ -79,7 +79,7 @@ export const loadOrderItem = (context, payload) => {
  * @param payload
  */
 export const sendToChanceStatus = (context, payload) => {
-    let promise = axios.post(API_ORDER + 'toChanceStatus/' + payload.id, {
+    let promise = axios.post(API_ORDER + '/toChanceStatus/' + payload.id, {
         'status': payload.status,
         'comment': payload.comment
     });
