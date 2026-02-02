@@ -99,7 +99,7 @@ export const sendToChanceStatus = (context, payload) => {
 
 export const getUrlForPdf = (context, payload) => {
     return new Promise((resolve, reject) => {
-    let promise = axios.get(API_ORDER + 'ticketsOrder/getTicketPdf/' + payload);
+    let promise = axios.get(API_ORDER + '/getTicketPdf/' + payload);
     return promise.then(function (response) {
         //console.log('in promise ', response);
         response.data.listUrl.forEach(function (item) {
