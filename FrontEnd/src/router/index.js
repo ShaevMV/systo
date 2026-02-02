@@ -145,6 +145,13 @@ const routes = [
         props: true,
         component: QuestionnaireView,
     },
+    // Анкета от заказа
+    {
+        path: '/questionnaire/:order_id/:ticket_id',
+        name: 'QuestionnaireOld',
+        props: true,
+        component: QuestionnaireView,
+    },
     // Редактирование анкеты
     {
         path: '/questionnaire/edit/:id',
