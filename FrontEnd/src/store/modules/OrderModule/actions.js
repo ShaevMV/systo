@@ -61,15 +61,13 @@ export const getOrderListForAdmin = (context, payload) => {
  * @param payload
  */
 export const loadOrderItem = (context, payload) => {
-    if (payload !== null && payload.length > 0) {
-        let promise = axios.get(API_ORDER + '/getItem/' + payload.id);
-        promise.then(function (response) {
-            context.commit('setOrderItem', response.data.order);
-        }).catch(function (error) {
-            console.error(error);
-            context.commit('setError', error.response.data.errors);
-        });
-    }
+    let promise = axios.get(API_ORDER + '/getItem/' + payload.id);
+    promise.then(function (response) {
+        context.commit('setOrderItem', response.data.order);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
 };
 
 /**
