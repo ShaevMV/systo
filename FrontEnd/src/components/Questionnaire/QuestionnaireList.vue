@@ -50,7 +50,7 @@
               </td>
               <td>{{ item.email }}</td>
               <td>{{ item.name }}</td>
-              <td>{{ item.phone }} рублей</td>
+              <td>{{ item.phone }}</td>
               <td>{{ item.agy }}</td>
               <td>{{ item.telegram }}</td>
               <td>{{ item.vk }}</td>
