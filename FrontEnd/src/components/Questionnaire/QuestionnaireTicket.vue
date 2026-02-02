@@ -57,7 +57,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_tellegram">Telegram-аккаунт: (для доступа в новый закрытый чат Систо)</label>
+        <label for="questionnaire_tellegram">Telegram-аккаунт: <span v-show="!isNewUser">(для доступа в новый закрытый чат Систо)</span></label>
 
         <div class="input-group" id="promo-input">
           <input

@@ -67,7 +67,7 @@
                   id="defaultCheck1"
               />
               <label class="form-check-label" for="defaultCheck1">
-                Регистрируя добровольный оргвзнос, ты соглашаешься с
+                Отправляя заявку на вступление в клуб, ты соглашаешься с
                 &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
                 и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
               </label>
