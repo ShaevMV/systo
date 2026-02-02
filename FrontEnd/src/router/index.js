@@ -44,7 +44,7 @@ const routes = [
     // инвайт на первый раз
     {
         path: '/invite/newUser/:userId',
-        name: 'homeInvite',
+        name: 'homeInviteNewUser',
         component: HomeView,
     },
     // авторизация
