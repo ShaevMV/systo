@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_FESTIVAL = '/api/v1/festival'
-const API_PROMOCODE = '/api/v1/promocode'
+const API_PROMOCODE = '/api/v1/promoCode'
 /**
  * Загрузить список способов оплаты и типов билета
  *
