@@ -7,13 +7,12 @@ namespace App\Http\Controllers\Questionnaire;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Shared\Domain\ValueObject\Uuid;
+use Shared\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
+use Shared\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
+use Shared\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
+use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
+use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Throwable;
-use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
-use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
-use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
-use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
-use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireController extends Controller
 {
@@ -51,10 +50,11 @@ class QuestionnaireController extends Controller
      * @throws Throwable
      */
     public function setQuestionnaire(
-        Request                  $request,
-        QuestionnaireApplication $questionnaireApplication,
-        string                   $orderId,
-        string                   $ticketId,
+        Request                          $request,
+        QuestionnaireApplication         $questionnaireApplication,
+        QuestionnaireRepositoryInterface $questionnaireRepository,
+        string                           $orderId,
+        string                           $ticketId,
     ): JsonResponse
     {
         $data = $request->toArray();
@@ -68,6 +68,9 @@ class QuestionnaireController extends Controller
                         $data['questionnaire']
                     )
                 );
+                if ($questionnaireDto = $questionnaireRepository->findByEmail($data['questionnaire']['email'])) {
+                    $questionnaireApplication->sendTelegram($questionnaireDto->getId());
+                };
             }
             return response()->json([
                 'success' => true,
@@ -148,7 +151,7 @@ class QuestionnaireController extends Controller
      */
     public function approve(
         QuestionnaireApplication $questionnaireApplication,
-        int                   $id,
+        int                      $id,
     ): JsonResponse
     {
         $questionnaireApplication->approve($id);
