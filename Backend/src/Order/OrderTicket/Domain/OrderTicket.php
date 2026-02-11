@@ -9,6 +9,7 @@ use Shared\Domain\Aggregate\AggregateRoot;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
+use Shared\Questionnaire\Domain\DomainEvent\ProcessTelegramByQuestionnaireSend;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
@@ -110,6 +111,10 @@ final class OrderTicket extends AggregateRoot
                     $item->getEmail() ?? $orderTicketDto->getEmail(),
                     $orderId->value(),
                     $item->getId()->value(),
+                )
+            );
+            $result->record(new ProcessTelegramByQuestionnaireSend(
+                    $item->getEmail() ?? $orderTicketDto->getEmail()
                 )
             );
         }

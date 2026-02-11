@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Shared\Questionnaire\Domain;
 
-use App\Jobs\ProcessTelegramSend;
 use Shared\Domain\Aggregate\AggregateRoot;
 use Shared\Questionnaire\Domain\DomainEvent\ProcessInviteLinkQuestionnaire;
+use Shared\Questionnaire\Domain\DomainEvent\ProcessTelegramSend;
 use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class Questionnaire extends AggregateRoot
@@ -24,11 +24,6 @@ class Questionnaire extends AggregateRoot
                 $questionnaireTicketDto->getEmail(),
             )
         );
-        \Log::info('21321321');
-        if($questionnaireTicketDto->getTelegram()) {
-            $result->record(new ProcessTelegramSend($questionnaireTicketDto->getTelegram()));
-        }
-
 
         return $result;
     }

@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
 
 use Bus;
-use Carbon\Carbon;
 use DomainException;
 use Illuminate\Validation\ValidationException;
-use JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
