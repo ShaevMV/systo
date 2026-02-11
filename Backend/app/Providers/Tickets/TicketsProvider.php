@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Providers\Tickets;
 
 use Illuminate\Support\ServiceProvider;
+use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Festival\Repositories\InMemoryMySqlTicketTypeRepository;
 use Tickets\Festival\Repositories\InMemoryMySqlTypesOfPayment;
 use Tickets\Festival\Repositories\TicketTypeInterfaceRepository;
@@ -22,7 +23,6 @@ use Tickets\PromoCode\Repositories\InMemoryMySqlExternalPromoCode;
 use Tickets\PromoCode\Repositories\InMemoryMySqlPromoCode;
 use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\Questionnaire\Repositories\InMemoryMySqlQuestionnaireRepository;
-use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;

@@ -41,10 +41,10 @@ class PushListTickets extends Command
         TicketService $ticketService
     )
     {
-        $tickets = ListTicket::where('festival_id','=','9d679bcf-b438-4ddb-ac04-023fa9bff4b7')->get();
+        $tickets = ListTicket::where('festival_id','=','9d679bcf-b438-4ddb-ac04-023fa9bff4b8')->get();
 
         foreach ($tickets as $ticket) {
-            $ticketService->pushTicketList($ticket,'9d679bcf-b438-4ddb-ac04-023fa9bff4b7');
+            $ticketService->pushTicketList($ticket,'9d679bcf-b438-4ddb-ac04-023fa9bff4b8');
             $this->info('push '. $ticket->id);
         }
 

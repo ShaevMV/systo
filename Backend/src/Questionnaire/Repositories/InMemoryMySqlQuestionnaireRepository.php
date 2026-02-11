@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Repositories;
 
-use App\Models\Ordering\OrderTicketModel;
 use App\Models\Questionnaire\QuestionnaireModel;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Shared\Domain\Criteria\Filters;
-use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Util\TicketUtil;
-use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
-use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
-use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
+use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
+use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
+use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Throwable;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
@@ -24,6 +21,9 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     {
     }
 
+    /**
+     * @throws Throwable
+     */
     public function create(QuestionnaireTicketDto $questionnaireTicketDto): bool
     {
         $data = $questionnaireTicketDto->toArrayForMySql();
@@ -50,7 +50,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
             }
             DB::commit();
             return true;
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             DB::rollBack();
             throw $exception;
         }

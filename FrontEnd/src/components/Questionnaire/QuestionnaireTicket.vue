@@ -71,7 +71,7 @@
               aria-describedby="basic-addon1"
               :disabled="isDisabled ? '' : disabled"
           />
-      </div>
+        </div>
       </div>
 
       <div class="quest-item phone-item">
@@ -107,17 +107,17 @@
               aria-describedby="basic-addon1"
               :disabled="isDisabled ? '' : disabled"
           />
-      </div>
+        </div>
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_howManyTimes"  v-show="!isNewUser && !isDisabled">
+        <label for="questionnaire_howManyTimes" v-show="!isNewUser && !isDisabled">
           Сколько раз ты уже бывал на Систо? *
         </label>
-        <label for="questionnaire_howManyTimes"  v-show="isNewUser && !isDisabled">
+        <label for="questionnaire_howManyTimes" v-show="isNewUser && !isDisabled">
           Бывал ли ты ранее на Систо или иных лестных событиях
         </label>
-        <label for="questionnaire_howManyTimes"  v-show="isDisabled">
+        <label for="questionnaire_howManyTimes" v-show="isDisabled">
           Бывал ли ты ранее на Систо или иных лестных событиях / <br/>
           Сколько раз ты уже бывал на Систо? *
         </label>
@@ -131,27 +131,28 @@
               aria-describedby="basic-addon1"
               :disabled="isDisabled ? '' : disabled"
           />
-      </div>
+        </div>
       </div>
 
       <div class="quest-item">
         <label for="questionnaire_musicStyles">Стили музыки, которые предпочитаешь в лесу:</label>
 
-                    <input
-                        type="text"
-                        class="form-control"
-                        :value="questionnaire.musicStyles"
-                        id="questionnaire_musicStyles"
-                        placeholder="Стили музыки, которые предпочитаешь в лесу?"
-                        aria-label="Стили музыки, которые предпочитаешь в лесу?"
-                        @input="updateParent('musicStyles', $event.target.value)"
-                        :disabled="isDisabled ? '' : disabled"
-                    >
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.musicStyles"
+            id="questionnaire_musicStyles"
+            placeholder="Стили музыки, которые предпочитаешь в лесу?"
+            aria-label="Стили музыки, которые предпочитаешь в лесу?"
+            @input="updateParent('musicStyles', $event.target.value)"
+            :disabled="isDisabled ? '' : disabled"
+        >
       </div>
 
       <div class="quest-item">
         <label for="questionnaire_questionForSysto">Ответь кратко на вопрос "Зачем ты едешь на Систо?": *</label>
 
+<<<<<<< HEAD
                     <textarea
                         class="form-control"
                         :value="questionnaire.questionForSysto"
@@ -162,6 +163,19 @@
                         :disabled="isDisabled ? '' : disabled"
                     ></textarea>
         </div>
+=======
+        <input
+            type="text"
+            class="form-control"
+            :value="questionnaire.questionForSysto"
+            id="questionnaire_questionForSysto"
+            placeholder="Зачем ты едешь на Систо?"
+            aria-label="Зачем ты едешь на Систо?"
+            @input="updateParent('questionForSysto', $event.target.value)"
+            :disabled="isDisabled ? '' : disabled"
+        >
+      </div>
+>>>>>>> 1100d7de12c2c1fcf902447c5f85a956144421d0
 
       <div class="quest-item">
         <label for="questionnaire_whereSysto">Откуда ты узнал о Систо?:</label>
@@ -192,7 +206,8 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании события?:</label>
+        <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании
+          события?:</label>
 
         <textarea
             class="form-control"

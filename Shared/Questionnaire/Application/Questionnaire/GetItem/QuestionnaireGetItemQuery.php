@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Shared\Questionnaire\Application\Questionnaire\GetItem;
+
+use Shared\Domain\Bus\Query\Query;
+
+class QuestionnaireGetItemQuery implements Query
+{
+    public function __construct(
+        private int $id,
+    )
+    {
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+}
