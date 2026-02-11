@@ -57,6 +57,21 @@ class QuestionnaireController extends Controller
         string                           $ticketId,
     ): JsonResponse
     {
+        $request->validate([
+            'questionnaire.telegram' => [
+                'string',
+                'min:5',
+                'max:32',
+                'regex:/^[a-zA-Z0-9_]+$/',
+                'unique:questionnaire,telegram',
+            ],
+        ],[
+            'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
+            'questionnaire.telegram.max' => 'не может превышать 32 символа.',
+            'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
+            'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
+        ]);
+
         $data = $request->toArray();
         try {
             if (isset($data['questionnaire'])) {
@@ -95,6 +110,21 @@ class QuestionnaireController extends Controller
         QuestionnaireApplication $questionnaireApplication,
     ): JsonResponse
     {
+        $request->validate([
+            'questionnaire.telegram' => [
+                'string',
+                'min:5',
+                'max:32',
+                'regex:/^[a-zA-Z0-9_]+$/',
+                'unique:questionnaire,telegram',
+            ],
+        ],[
+            'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
+            'questionnaire.telegram.max' => 'не может превышать 32 символа.',
+            'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
+            'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
+        ]);
+
         $data = $request->toArray();
         try {
             if (isset($data['questionnaire'])) {

@@ -72,6 +72,7 @@
               :disabled="isDisabled ? '' : disabled"
           />
         </div>
+        <div class="messager" v-show="getError('questionnaire.telegram')">{{ getError('questionnaire.telegram') }}</div>
       </div>
 
       <div class="quest-item phone-item">
@@ -152,7 +153,6 @@
       <div class="quest-item">
         <label for="questionnaire_questionForSysto">Ответь кратко на вопрос "Зачем ты едешь на Систо?": *</label>
 
-<<<<<<< HEAD
                     <textarea
                         class="form-control"
                         :value="questionnaire.questionForSysto"
@@ -163,19 +163,7 @@
                         :disabled="isDisabled ? '' : disabled"
                     ></textarea>
         </div>
-=======
-        <input
-            type="text"
-            class="form-control"
-            :value="questionnaire.questionForSysto"
-            id="questionnaire_questionForSysto"
-            placeholder="Зачем ты едешь на Систо?"
-            aria-label="Зачем ты едешь на Систо?"
-            @input="updateParent('questionForSysto', $event.target.value)"
-            :disabled="isDisabled ? '' : disabled"
-        >
-      </div>
->>>>>>> 1100d7de12c2c1fcf902447c5f85a956144421d0
+
 
       <div class="quest-item">
         <label for="questionnaire_whereSysto">Откуда ты узнал о Систо?:</label>
@@ -242,6 +230,8 @@
 <script>
 
 
+import {mapGetters} from "vuex";
+
 export default {
   name: "QuestionnaireTicket",
   props: {
@@ -257,6 +247,11 @@ export default {
       type: [Boolean],
       default: false
     },
+  },
+  computed: {
+    ...mapGetters('appQuestionnaire', [
+      'getError'
+    ])
   },
   methods: {
     updateParent(field, value) {
