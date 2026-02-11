@@ -57,7 +57,9 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_tellegram">«Добавьте ваш ник в Телеграм строго в формате @никнейм» (номера телефонов не принимаются):
+        <label for="questionnaire_tellegram">«Добавьте ваш ник в Телеграм строго в формате @никнейм»
+          <br/>
+          (номера телефонов не принимаются):
           <span v-show="!isNewUser">(для доступа в новый закрытый чат Систо)</span></label>
 
         <div class="input-group" id="promo-input">
