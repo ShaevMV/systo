@@ -64,9 +64,9 @@
                   type="checkbox"
                   value=""
                   v-model="confirm"
-                  id="defaultCheck1"
+                  id="defaultCheck2"
               />
-              <label class="form-check-label" for="defaultCheck1">
+              <label class="form-check-label" for="defaultCheck2">
                 Отправляя заявку на вступление в клуб, ты соглашаешься с
                 &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
                 и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>

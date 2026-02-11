@@ -152,6 +152,18 @@
       <div class="quest-item">
         <label for="questionnaire_questionForSysto">Ответь кратко на вопрос "Зачем ты едешь на Систо?": *</label>
 
+<<<<<<< HEAD
+                    <textarea
+                        class="form-control"
+                        :value="questionnaire.questionForSysto"
+                        id="questionnaire_questionForSysto"
+                        placeholder="Зачем ты едешь на Систо?"
+                        aria-label="Зачем ты едешь на Систо?"
+                        @input="updateParent('questionForSysto', $event.target.value)"
+                        :disabled="isDisabled ? '' : disabled"
+                    ></textarea>
+        </div>
+=======
         <input
             type="text"
             class="form-control"
@@ -163,12 +175,12 @@
             :disabled="isDisabled ? '' : disabled"
         >
       </div>
+>>>>>>> 1100d7de12c2c1fcf902447c5f85a956144421d0
 
       <div class="quest-item">
         <label for="questionnaire_whereSysto">Откуда ты узнал о Систо?:</label>
 
-        <input
-            type="text"
+        <textarea
             class="form-control"
             :value="questionnaire.whereSysto"
             id="questionnaire_whereSysto"
@@ -176,14 +188,13 @@
             aria-label="Откуда ты узнал о Систо?"
             @input="updateParent('whereSysto', $event.target.value)"
             :disabled="isDisabled ? '' : disabled"
-        >
+        ></textarea>
       </div>
 
       <div class="quest-item" v-show="!isNewUser">
         <label for="questionnaire_creationOfSisto"> Считаете ли вы себя участвующим в сотворении Систо?:</label>
 
-        <input
-            type="text"
+        <textarea
             class="form-control"
             :value="questionnaire.creationOfSisto"
             id="questionnaire_creationOfSisto"
@@ -191,15 +202,14 @@
             aria-label="Считаете ли вы себя участвующим в сотворении Систо?"
             @input="updateParent('creationOfSisto', $event.target.value)"
             :disabled="isDisabled ? '' : disabled"
-        >
+        ></textarea>
       </div>
 
       <div class="quest-item">
         <label for="questionnaire_activeOfEvent"> Готовы принимать более активное или творческое участие в создании
           события?:</label>
 
-        <input
-            type="text"
+        <textarea
             class="form-control"
             :value="questionnaire.activeOfEvent"
             id="questionnaire_activeOfEvent"
@@ -207,7 +217,7 @@
             aria-label="Откуда ты узнал о Систо?"
             @input="updateParent('activeOfEvent', $event.target.value)"
             :disabled="isDisabled ? '' : disabled"
-        >
+        ></textarea>
       </div>
       <div class="quest-item form-check"
            id="check-check"
