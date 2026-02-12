@@ -137,15 +137,6 @@
                         aria-describedby="basic-addon1"
                     />
                   </div>
-
-                  <label id="my-own">
-                    <input
-                        type="checkbox"
-                        class="form-check-input"
-                        v-model="isNotNeedQuestionnaire"
-                    >
-                    <span>Я хочу внести оргвзнос только за своих друзей</span>
-                  </label>
                 </div>
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
