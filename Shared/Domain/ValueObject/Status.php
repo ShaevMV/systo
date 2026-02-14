@@ -11,8 +11,6 @@ final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
     public const NEW_FOR_LIVE = 'new_for_live';
-    public const QUESTIONNAIRE_NOT_FULL = 'questionnaire_not_full';
-    public const QUESTIONNAIRE_FULL = 'questionnaire_full';
     public const PAID = 'paid';
     public const PAID_FOR_LIVE = 'paid_for_live';
     public const CANCEL = 'cancel';
@@ -22,8 +20,6 @@ final class Status implements EntityDataInterface
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
         self::NEW_FOR_LIVE => 'Ожидает проверки',
-        self::QUESTIONNAIRE_NOT_FULL => 'Анкета не до заполнена',
-        self::QUESTIONNAIRE_FULL => 'Анкета заполнена',
         self::CANCEL => 'Отменён',
         self::PAID => 'Подверждён',
         self::PAID_FOR_LIVE => 'Подверждён',
@@ -34,11 +30,12 @@ final class Status implements EntityDataInterface
     private function getRoleChanceStatus(string $status): array
     {
         return match ($status) {
-            self::NEW, self::NEW_FOR_LIVE, self::QUESTIONNAIRE_NOT_FULL, self::QUESTIONNAIRE_FULL => [
+            self::NEW, self::NEW_FOR_LIVE => [
                 self::CANCEL,
                 self::PAID,
                 self::DIFFICULTIES_AROSE,
-                ],
+                self::LIVE_TICKET_ISSUED
+            ],
             self::PAID, self::PAID_FOR_LIVE => [
                 self::DIFFICULTIES_AROSE,
                 self::LIVE_TICKET_ISSUED,

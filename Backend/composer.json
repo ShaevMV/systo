@@ -15,7 +15,8 @@
         "laravel/tinker": "^2.7.3",
         "php-open-source-saver/jwt-auth": "^2.0",
         "sentry/sentry-laravel": "^3.2",
-        "symfony/messenger": "^6.0.16"
+        "symfony/messenger": "^6.0.16",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.12.3",
