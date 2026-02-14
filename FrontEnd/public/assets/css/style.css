@@ -2052,10 +2052,6 @@ input[readonly] {
     width: 25%;
 }
 
-#main-quest #questionnaire_musicStyles {
-    height: 50px !important;
-}
-
 .mt-7 {
     margin-top: 2vw !important;
 }
@@ -2066,6 +2062,10 @@ input[readonly] {
 
 .hidder {
     display: none !important;
+}
+
+.line-2{
+    min-height: 50px;
 }
 
 .logo img {
@@ -2492,6 +2492,10 @@ input[readonly] {
         font-size: 25px;
     }
 
+    .line-2 {
+        min-height: 75px;
+    }
+
     #invite-content {
         text-align: center;
     }
@@ -2651,6 +2655,10 @@ input[readonly] {
 @media (max-width: 605px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    .line-2 {
+        min-height: auto;
     }
 
     #contact-form #first-item-row #promo-input{

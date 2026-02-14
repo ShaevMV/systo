@@ -39,7 +39,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_agy">Возраст: *</label>
+        <label for="questionnaire_agy" class="line-2">Возраст: *</label>
 
         <div class="input-group" id="promo-input">
           <input
@@ -58,8 +58,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_tellegram">«Добавьте ваш ник в Телеграм строго в формате @никнейм»
-          <br/>
+        <label for="questionnaire_tellegram" class="line-2">«Добавьте ваш ник в Телеграм строго в формате @никнейм»
           (номера телефонов не принимаются):
           <span v-show="!isNewUser">(для доступа в новый закрытый чат Систо)</span></label>
 
@@ -122,36 +121,32 @@
         <label for="questionnaire_howManyTimes" v-show="isNewUser && !isDisabled">
           Бывал ли ты ранее на Систо или иных лестных событиях
         </label>
-        <label for="questionnaire_howManyTimes" v-show="isDisabled">
-          Бывал ли ты ранее на Систо или иных лестных событиях / <br/>
+        <label for="questionnaire_howManyTimes" v-show="isDisabled" class="line-2">
+          Бывал ли ты ранее на Систо или иных лестных событиях /
           Сколько раз ты уже бывал на Систо? *
         </label>
         <div class="input-group" id="promo-input">
-          <input
-              type="text"
+          <textarea
               id="questionnaire_howManyTimes"
               class="form-control"
               :value="questionnaire.howManyTimes"
               @input="updateParent('howManyTimes', $event.target.value)"
               aria-describedby="basic-addon1"
-              :disabled="isDisabled ? '' : disabled"
-          />
+              :disabled="isDisabled ? '' : disabled"></textarea>
         </div>
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_musicStyles">Стили музыки, которые предпочитаешь в лесу:</label>
+        <label for="questionnaire_musicStyles" class="line-2">Стили музыки, которые предпочитаешь в лесу:</label>
 
-        <input
-            type="text"
+        <textarea
             class="form-control"
             :value="questionnaire.musicStyles"
             id="questionnaire_musicStyles"
             placeholder="Стили музыки, которые предпочитаешь в лесу?"
             aria-label="Стили музыки, которые предпочитаешь в лесу?"
             @input="updateParent('musicStyles', $event.target.value)"
-            :disabled="isDisabled ? '' : disabled"
-        >
+            :disabled="isDisabled ? '' : disabled"></textarea>
       </div>
 
       <div class="quest-item">
@@ -227,6 +222,9 @@
         </label>
       </div>
     </div>
+    <div class="col-12" v-if="canApprove">
+      <button class="btn btn-success" @click="handleApprove">Подтвердить анкету</button>
+    </div>
   </div>
 
 </template>
@@ -234,7 +232,7 @@
 <script>
 
 
-import {mapGetters} from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: "QuestionnaireTicket",
@@ -253,16 +251,26 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('appQuestionnaire', [
-      'getError'
-    ])
+    ...mapGetters('appQuestionnaire', ['getError']),
+    canApprove() {
+      return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
+    }
   },
   methods: {
+    ...mapActions('appQuestionnaire', ['approve', 'getQuestionnaire']),
+    handleApprove() {
+      if (!this.questionnaire || !this.questionnaire.id) return;
+      this.approve({
+        id: this.questionnaire.id,
+        callback: (message) => {
+          console.log(message);
+          // Перезапрашиваем данные анкеты, чтобы получить актуальный статус
+          this.getQuestionnaire({ id: this.questionnaire.id });
+        }
+      });
+    },
     updateParent(field, value) {
-      const updated = {
-        ...this.questionnaire,
-        [field]: value
-      };
+      const updated = { ...this.questionnaire, [field]: value };
       this.$emit('update-questionnaire', updated);
     }
   }

@@ -99,7 +99,8 @@ export default {
       'approve',
     ]),
     goItemForUser(id) {
-      this.$router.push({name: 'QuestionnaireEdit', params: {id: id}});
+      const route = this.$router.resolve({ name: 'QuestionnaireEdit', params: { id: id } });
+      window.open(route.href, '_blank');
     },
     chanceStatus: function (data) {
 
