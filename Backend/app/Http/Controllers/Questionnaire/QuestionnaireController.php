@@ -65,11 +65,15 @@ class QuestionnaireController extends Controller
                 'regex:/^[a-zA-Z0-9_]+$/',
                 'unique:questionnaire,telegram',
             ],
+            'questionnaire.agy' => [
+                'integer',
+            ],
         ],[
             'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
             'questionnaire.telegram.max' => 'не может превышать 32 символа.',
             'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
             'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
+            'questionnaire.agy' => 'Возраст только цифрами',
         ]);
 
         $data = $request->toArray();
@@ -118,11 +122,15 @@ class QuestionnaireController extends Controller
                 'regex:/^[a-zA-Z0-9_]+$/',
                 'unique:questionnaire,telegram',
             ],
+            'questionnaire.agy' => [
+                'integer',
+            ],
         ],[
             'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
             'questionnaire.telegram.max' => 'не может превышать 32 символа.',
             'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
             'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
+            'questionnaire.agy' => 'Возраст только цифрами',
         ]);
 
         $data = $request->toArray();

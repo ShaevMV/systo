@@ -54,6 +54,7 @@
               :disabled="isDisabled ? '' : disabled"
           />
         </div>
+        <div class="messager" v-show="getError('questionnaire.agy')">{{ getError('questionnaire.agy') }}</div>
       </div>
 
       <div class="quest-item">
