@@ -24,5 +24,13 @@ export const setMessage = (state, payload) => {
 };
 
 export const approve = (state, payload) => {
-    state.questionnaireList.find(item => item.id === payload.id).status = 'APPROVE';
+    if (state.questionnaireList && Array.isArray(state.questionnaireList)) {
+        const item = state.questionnaireList.find(item => item.id === payload.id);
+        if (item) {
+            item.status = 'APPROVE';
+        }
+    }
+    if (state.questionnaireItem && state.questionnaireItem.id === payload.id) {
+        state.questionnaireItem.status = 'APPROVE';
+    }
 };
