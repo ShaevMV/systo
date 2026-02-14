@@ -21,6 +21,7 @@ import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 import InviteLinkView from "@/views/auth/InviteLinkView.vue";
 import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
 import QuestionnaireRegView from "@/views/questionnaire/QuestionnaireRegView.vue";
+import LiveTicketView from "@/views/ticket/LiveTicketView.vue";
 
 const routes = [
     {
@@ -194,9 +195,6 @@ const routes = [
         name: 'Private',
         component: PrivateView,
     },
-
-
-
     {
         path: '/admin',
         name: 'adminDashboard',
@@ -206,8 +204,6 @@ const routes = [
             'role': ['admin']
         }
     },
-
-
     {
         path: '/promo-codes',
         name: 'PromoCodes',
@@ -217,7 +213,6 @@ const routes = [
             'role': ['admin']
         }
     },
-
     {
         path: '/promoCode/:id?',
         name: 'promoCodeItem',
@@ -228,6 +223,13 @@ const routes = [
             'role': ['admin']
         }
     },
+    {
+        path: '/ticket/live/:id?',
+        name: 'liveTicketView',
+        component: LiveTicketView,
+        props: true,
+    },
+
     {
         path: '/:pathMatch(.*)*',
         component: Error404,
