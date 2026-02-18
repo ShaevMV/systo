@@ -54,6 +54,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|User whereRememberToken($value)
  * @method static Builder|User whereUpdatedAt($value)
  * @mixin Eloquent
+ * @property string $role Роль пользователя в системе
+ *                 Гость/менеджер/продавец/пушер(френдли реализатор)/админ
+ * @method static \Database\Factories\UserFactory factory(...$parameters)
+ * @method static Builder|User whereRole($value)
  */
 class User extends Authenticatable implements JWTSubject
 {
@@ -69,6 +73,7 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'name',
         'email',
+        'role',
         'city',
         'phone',
         'password',

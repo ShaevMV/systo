@@ -14,9 +14,12 @@ use Tickets\User\Account\Application\Create\CreatingNewAccountCommand;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommandHandler;
 use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQuery;
 use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQueryHandler;
+use Tickets\User\Account\Application\GetList\AccountGetListQuery;
+use Tickets\User\Account\Application\GetList\AccountGetListQueryHandler;
 use Tickets\User\Account\Domain\Account;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
+use Tickets\User\Account\Response\AccountGetListResponse;
 
 final class AccountApplication
 {
@@ -26,6 +29,7 @@ final class AccountApplication
     public function __construct(
         CreatingNewAccountCommandHandler $accountCommandHandler,
         AccountFindByEmailQueryHandler $accountFindQueryHandler,
+        AccountGetListQueryHandler $accountGetListQueryHandler,
         private Bus $bus
     ) {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -33,7 +37,8 @@ final class AccountApplication
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
-            AccountFindByEmailQuery::class => $accountFindQueryHandler
+            AccountGetListQuery::class => $accountGetListQueryHandler,
+            AccountFindByEmailQuery::class => $accountFindQueryHandler,
         ]);
     }
 
@@ -55,6 +60,8 @@ final class AccountApplication
     }
 
     /**
+     * Создать новый аккаунт
+     *
      * @throws Throwable
      */
     public function createNewAccount(
@@ -77,10 +84,31 @@ final class AccountApplication
             ->dispatch();
     }
 
+    /**
+     * Найти пользователя по email
+     *
+     * @param string $email
+     * @return UserInfoDto|null
+     */
     public function getUserByEmail(string $email): ?UserInfoDto
     {
         /** @var  UserInfoDto|null $resul */
         $resul = $this->queryBus->ask(new AccountFindByEmailQuery($email));
+
+        return $resul;
+    }
+
+
+    /**
+     * Получить список всех пользователей
+     *
+     * @param AccountGetListQuery $accountGetListQuery
+     * @return AccountGetListResponse
+     */
+    public function getList(AccountGetListQuery $accountGetListQuery): AccountGetListResponse
+    {
+        /** @var  AccountGetListResponse $resul */
+        $resul = $this->queryBus->ask($accountGetListQuery);
 
         return $resul;
     }

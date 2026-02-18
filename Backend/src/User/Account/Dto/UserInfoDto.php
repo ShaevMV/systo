@@ -11,13 +11,12 @@ use Shared\Domain\ValueObject\Uuid;
 final class UserInfoDto extends AbstractionEntity implements Response
 {
     public function __construct(
-        protected Uuid $id,
-        protected string $email,
-        protected string $city,
-        protected string $phone,
-        protected bool $admin,
-        protected bool $manager,
-        protected ?string $name = null,
+        public Uuid $id,
+        public string $email,
+        public string $city,
+        public string $role,
+        public ?string $phone = null,
+        public ?string $name = null,
     ) {
     }
 
@@ -27,9 +26,8 @@ final class UserInfoDto extends AbstractionEntity implements Response
             new Uuid($data['id']),
             $data['email'],
             $data['city'],
-            $data['phone'],
-            (bool) $data['is_admin'],
-            (bool) $data['is_manager'],
+            $data['role'],
+            $data['phone'] ?? null,
             $data['name'] ?? null
         );
     }
@@ -41,6 +39,6 @@ final class UserInfoDto extends AbstractionEntity implements Response
 
     public function isRole(string $role): bool
     {
-        return $this->$role ?? false;
+        return $this->role === $role;
     }
 }
