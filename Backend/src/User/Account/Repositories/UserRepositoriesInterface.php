@@ -19,4 +19,6 @@ interface UserRepositoriesInterface
      * @return UserInfoDto[]
      */
     public function getList(Filters $filters): array;
+
+    public function edit(Uuid $id, UserInfoDto $userInfoDto): bool;
 }

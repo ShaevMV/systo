@@ -4,19 +4,15 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Repositories;
 
-use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Hash;
 use Illuminate\Support\Facades\DB;
-use Shared\Domain\Criteria\FilterOperator;
+use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filters;
-use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
-use Tickets\User\Account\Application\GetList\AccountGetListQuery;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
 
@@ -98,5 +94,17 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function edit(Uuid $id, UserInfoDto $userInfoDto): bool
+    {
+        if(!$model = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('User not found for edit ' . $id->value());
+        }
+
+        return $model->update($userInfoDto->toArray()) > 0;
     }
 }

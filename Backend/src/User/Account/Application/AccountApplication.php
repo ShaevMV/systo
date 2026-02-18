@@ -112,4 +112,10 @@ final class AccountApplication
 
         return $resul;
     }
+
+    public function edit(Uuid $id, UserInfoDto $userInfoDto): bool
+    {
+
+        return true;
+    }
 }
