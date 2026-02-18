@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Invite;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
@@ -37,12 +38,18 @@ class InviteController extends Controller
 
     public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
     {
-        ;
+        $user = User::find($userId)->first()?->toArray();
+
+        if(empty($user['email'])) {
+            return response()->json([
+                'success' => false
+            ]);
+        }
         return response()->json([
             'success' => $inviteLinkService->isPaidOrderByUserId(
                 new Uuid($userId),
-                \Auth::user()->email
-            )
+                $user['email'],
+            ),
         ]);
     }
 }
