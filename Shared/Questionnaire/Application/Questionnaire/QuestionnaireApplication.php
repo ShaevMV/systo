@@ -76,7 +76,6 @@ class QuestionnaireApplication
     public function approve(int $id): void
     {
         $this->commandBus->dispatch(new QuestionnaireApproveCommand($id));
-        $this->commandBus->dispatch(new SendTelegramCommand($id));
     }
 
     /**
