@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Tickets\TicketType\Repository;
 
 use App\Models\Festival\TicketTypesModel;
+use Carbon\Carbon;
+use Doctrine\DBAL\Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\TicketType\Dto\TicketTypeDto;
-use Tickets\TicketType\Response\TicketTypeGetListResponse;
 
 class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
 {
@@ -31,21 +34,52 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
 
     public function getItem(Uuid $id): TicketTypeDto
     {
-        // TODO: Implement getItem() method.
+        if(!$rawData = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('TypesOfPayment not found ' . $id->value());
+        }
+
+        return TicketTypeDto::fromState($rawData->toArray());
     }
 
-    public function editItem(Uuid $id, TicketTypeDto $paymentDto): bool
+    /**
+     * @throws JsonException
+     */
+    public function editItem(Uuid $id, TicketTypeDto $data): bool
     {
-        // TODO: Implement editItem() method.
+        if(!$rawData = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('TypesOfPayment not found ' . $id->value());
+        }
+
+        return $rawData->fill($data->toArrayForEdit())->save();
     }
 
-    public function create(TicketTypeDto $paymentDto): bool
+    /**
+     * @throws \Throwable
+     * @throws JsonException
+     * @throws Exception
+     */
+    public function create(TicketTypeDto $data): bool
     {
-        // TODO: Implement create() method.
+        $data = $data->toArray();
+        try {
+            DB::beginTransaction();
+            $this->model->insert(
+                array_merge($data,
+                    [
+                        'created_at' => (string)(new Carbon()),
+                        'updated_at' => (string)(new Carbon()),
+                    ]
+                ));
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
     }
 
     public function remove(Uuid $id): bool
     {
-        // TODO: Implement remove() method.
+        return $this->model::whereId($id->value())->delete() ?? false;
     }
 }

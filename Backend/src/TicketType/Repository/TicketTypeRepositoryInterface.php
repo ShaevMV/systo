@@ -14,7 +14,7 @@ interface TicketTypeRepositoryInterface
 {
     public function getList(Filters $filters): Collection;
     public function getItem(Uuid $id): TicketTypeDto;
-    public function editItem(Uuid $id, TicketTypeDto $paymentDto): bool;
-    public function create(TicketTypeDto $paymentDto): bool;
+    public function editItem(Uuid $id, TicketTypeDto $data): bool;
+    public function create(TicketTypeDto $data): bool;
     public function remove(Uuid $id): bool;
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\TicketType\Application\GetItem;
+namespace Tickets\TicketType\Application\GetList;
 
 use App\Models\Festival\TicketTypesModel;
 use Shared\Domain\Bus\Query\QueryHandler;

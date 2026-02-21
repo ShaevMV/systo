@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\TicketType\Dto;
 
 use Carbon\Carbon;
+use Nette\Utils\JsonException;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;
@@ -38,5 +39,21 @@ class TicketTypeDto extends AbstractionEntity implements Response
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
         );
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function toArrayForEdit(): array
+    {
+        $result =  parent::toArray();
+        unset($result['id']);
+
+        return  $result;
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
     }
 }
