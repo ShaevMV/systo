@@ -51,6 +51,17 @@ class TicketTypesModel extends Model
 
     protected $table = self::TABLE;
 
+    protected $fillable = [
+        'id',
+        'name',
+        'price',
+        'created_at',
+        'updated_at',
+        'sort',
+        'active',
+        'is_live_ticket',
+        'groupLimit'
+    ];
 
     public function ticketTypePrice(): HasMany
     {

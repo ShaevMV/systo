@@ -80,6 +80,6 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
 
     public function remove(Uuid $id): bool
     {
-        return $this->model::whereId($id->value())->delete() ?? false;
+        return (bool)$this->model::whereId($id->value())->delete();
     }
 }
