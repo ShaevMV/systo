@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/account')->group(static function (): void {
     // получить список всех пользователей
-    Route::get('/getList',[AccountController::class, 'getList']);
+    Route::post('/getList',[AccountController::class, 'getList']);
         /*->middleware('auth:api')
         ->middleware('admin');*/
     // получить данные конкретного пользователя
@@ -16,7 +16,7 @@ Route::prefix('v1/account')->group(static function (): void {
     /*->middleware('auth:api')
         ->middleware('admin');*/
 
-    // получить данные конкретного пользователя
+    // записать данные отдельного пользователя
     Route::post('/edit/{id}',[AccountController::class, 'edit']);
     /*->middleware('auth:api')
         ->middleware('admin');*/

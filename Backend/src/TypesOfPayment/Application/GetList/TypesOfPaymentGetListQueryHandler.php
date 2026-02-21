@@ -9,7 +9,6 @@ use App\Models\Ordering\OrderTicketModel;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
-use Shared\Domain\ValueObject\Status;
 use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 use Tickets\TypesOfPayment\Response\TypesOfPaymentListResponse;
 

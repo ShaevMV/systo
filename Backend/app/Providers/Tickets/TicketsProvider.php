@@ -25,6 +25,8 @@ use Tickets\PromoCode\Repositories\PromoCodeInterface;
 use Tickets\Questionnaire\Repositories\InMemoryMySqlQuestionnaireRepository;
 use Tickets\Ticket\CreateTickets\Repositories\InMemoryMySqlTicketsRepository;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
+use Tickets\TypesOfPayment\Repositories\InMemoryMySqlTypesOfPaymentRepository;
+use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
@@ -48,5 +50,6 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(ExternalPromoCodeInterface::class, InMemoryMySqlExternalPromoCode::class);
         $this->app->bind(QuestionnaireRepositoryInterface::class, InMemoryMySqlQuestionnaireRepository::class);
         $this->app->bind(InviteLinkRepositoryInterface::class, InMemoryInviteLinkRepository::class);
+        $this->app->bind(TypesOfPaymentRepositoryInterface::class, InMemoryMySqlTypesOfPaymentRepository::class);
     }
 }

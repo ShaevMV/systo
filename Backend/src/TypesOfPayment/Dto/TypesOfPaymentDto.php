@@ -15,7 +15,7 @@ class TypesOfPaymentDto extends AbstractionEntity
         protected int $sort,
         protected bool $is_billing,
         protected ?string $card = null,
-        protected ?Uuid $user_id = null,
+        protected ?Uuid $user_external_id = null,
     )
     {
     }
@@ -24,11 +24,11 @@ class TypesOfPaymentDto extends AbstractionEntity
     {
         return new self(
             $data['name'],
-            $data['active'],
+            boolval($data['active']),
             $data['sort'],
-            $data['is_billing'],
+            boolval($data['is_billing']),
             $data['card'],
-            empty($data['user_id']) ? null : new Uuid($data['user_id']),
+            empty($data['user_external_id']) ? null : new Uuid($data['user_external_id']),
         );
     }
 }

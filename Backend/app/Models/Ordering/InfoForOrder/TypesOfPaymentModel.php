@@ -32,6 +32,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TypesOfPaymentModel whereSort($value)
  * @method static Builder|TypesOfPaymentModel whereUpdatedAt($value)
  * @mixin Eloquent
+ * @property string|null $user_external_id Связь с продавцом или реализатором
+ * @method static Builder|TypesOfPaymentModel whereUserExternalId($value)
  */
 class TypesOfPaymentModel extends Model
 {

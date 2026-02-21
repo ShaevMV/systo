@@ -13,7 +13,7 @@ class TypesOfPaymentGetListQuery implements Query
         private ?string $name = null,
         private ?bool $active = null,
         private ?bool $isBilling = null,
-        private ?Uuid $userExternal = null,
+        private ?Uuid $userExternalId = null,
     )
     {
     }
@@ -35,6 +35,16 @@ class TypesOfPaymentGetListQuery implements Query
 
     public function getUserExternal(): ?Uuid
     {
-        return $this->userExternal;
+        return $this->userExternalId;
+    }
+
+    public static function fromState(array $data): self
+    {
+        return new self(
+            $data['name'] ?? null,
+            empty($data['active']) ? null : boolval($data['active']),
+            empty($data['isBilling']) ? null : boolval($data['isBilling']),
+            empty($data['userExternalId']) ? null : new Uuid($data['userExternalId']),
+        );
     }
 }

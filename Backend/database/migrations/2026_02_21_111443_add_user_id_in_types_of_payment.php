@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('types_of_payment', function (Blueprint $table) {
-            $table->uuid('user_id')
+            $table->uuid('user_external_id')
                 ->nullable(true)
                 ->default(null)
                 ->comment('Связь с продавцом или реализатором');
@@ -29,7 +29,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('types_of_payment', function (Blueprint $table) {
-            $table->dropColumn('user_id');
+            $table->dropColumn('user_external_id');
         });
     }
 };
