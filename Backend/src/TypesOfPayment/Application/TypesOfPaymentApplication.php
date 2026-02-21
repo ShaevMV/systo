@@ -6,9 +6,13 @@ namespace Tickets\TypesOfPayment\Application;
 
 use Shared\Domain\Bus\Command\CommandBus;
 use Shared\Domain\Bus\Query\QueryBus;
+use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQueryHandler;
+use Tickets\TypesOfPayment\Application\GetItem\TypesOfPaymentGetItemQuery;
+use Tickets\TypesOfPayment\Application\GetItem\TypesOfPaymentGetItemQueryHandler;
+use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
 use Tickets\TypesOfPayment\Response\TypesOfPaymentListResponse;
 
 class TypesOfPaymentApplication
@@ -17,11 +21,13 @@ class TypesOfPaymentApplication
     private QueryBus $queryBus;
 
     public function __construct(
-        TypesOfPaymentGetListQueryHandler $typesOfPaymentGetListQueryHandler
+        TypesOfPaymentGetListQueryHandler $typesOfPaymentGetListQueryHandler,
+        TypesOfPaymentGetItemQueryHandler $typesOfPaymentGetItemQueryHandler
     )
     {
         $this->queryBus = new InMemorySymfonyQueryBus([
-            TypesOfPaymentGetListQuery::class => $typesOfPaymentGetListQueryHandler
+            TypesOfPaymentGetListQuery::class => $typesOfPaymentGetListQueryHandler,
+            TypesOfPaymentGetItemQuery::class => $typesOfPaymentGetItemQueryHandler,
         ]);
     }
 
@@ -29,6 +35,14 @@ class TypesOfPaymentApplication
     {
         /** @var TypesOfPaymentListResponse $result */
         $result = $this->queryBus->ask($query);
+
+        return $result;
+    }
+
+    public function getItem(Uuid $uuid): TypesOfPaymentDto
+    {
+        /** @var TypesOfPaymentDto $result */
+        $result = $this->queryBus->ask(new TypesOfPaymentGetItemQuery($uuid));
 
         return $result;
     }

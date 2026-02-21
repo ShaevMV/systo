@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tickets\TypesOfPayment\Dto;
 
+use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;
 
-class TypesOfPaymentDto extends AbstractionEntity
+class TypesOfPaymentDto extends AbstractionEntity implements Response
 {
     public function __construct(
         protected string $name,
@@ -16,6 +17,7 @@ class TypesOfPaymentDto extends AbstractionEntity
         protected bool $is_billing,
         protected ?string $card = null,
         protected ?Uuid $user_external_id = null,
+        protected ?Uuid $id = null,
     )
     {
     }
@@ -29,6 +31,7 @@ class TypesOfPaymentDto extends AbstractionEntity
             boolval($data['is_billing']),
             $data['card'],
             empty($data['user_external_id']) ? null : new Uuid($data['user_external_id']),
+            empty($data['id']) ? null : new Uuid($data['id']),
         );
     }
 }
