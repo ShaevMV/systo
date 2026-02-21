@@ -1,15 +1,22 @@
 <template>
-  <TicketTypeFilter/>
-  <ticket-type-list/>
+  <TicketTypeItem/>
 </template>
 
 <script>
-import TicketTypeFilter from "@/components/TicketType/TicketTypeFilter.vue";
-import TicketTypeList from "@/components/TicketType/TicketTypeList.vue";
+import TicketTypeItem from "@/components/TicketType/TicketTypeItem.vue";
 
 export default {
   name: "TicketTypeItemView",
-  components: {TicketTypeList, TicketTypeFilter}
+  components: {TicketTypeItem},
+  beforeRouteEnter: (to, from, next) => {
+    if (to.params.id) {
+      window.store.dispatch('appTicketType/loadItem', {
+        id: to.params.id,
+      });
+    }
+
+    next();
+  },
 }
 </script>
 

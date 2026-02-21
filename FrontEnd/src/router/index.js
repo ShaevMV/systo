@@ -245,7 +245,7 @@ const routes = [
         }
     },
     {
-        path: '/ticketType/:id',
+        path: '/ticketType/:id?',
         name: 'TicketTypeItemView',
         component: TicketTypeItemView,
         props: true,

@@ -42,6 +42,21 @@ export const create = (context, payload) => {
     });
 };
 
+export const edit = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post(API + '/edit/' + payload.id, {
+            'data': payload.data
+        });
+        return promise.then(function (response) {
+            context.commit('setMessage', response.data.message)
+            context.commit('setItem', response.data.item)
+        }).catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
+    });
+};
+
 export const remove = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.delete(API + '/delete/' + payload.id, {
@@ -55,3 +70,9 @@ export const remove = (context, payload) => {
         });
     });
 };
+
+
+export const clearError = (context) => {
+    context.commit('setError', []);
+};
+

@@ -61,6 +61,10 @@
                       @click="clearFilter"
                       type="submit">Сбросить фильтр
               </button>
+              <button class="btn btn-primary"
+                      @click="goToItem"
+                      type="submit">Добавить новый тип
+              </button>
             </div>
           </div>
         </div>
@@ -103,7 +107,12 @@ export default {
       this.loadList({
         'filter': this.filter,
       });
-    }
+    },
+    goToItem() {
+      const route = this.$router.resolve({ name: 'TicketTypeItemView' });
+      window.open(route.href, '_blank');
+    },
+
   },
 }
 </script>
