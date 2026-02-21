@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
 use Tickets\TypesOfPayment\Application\TypesOfPaymentApplication;
+use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
 
 class TypesOfPaymentController extends Controller
 {
@@ -34,6 +35,34 @@ class TypesOfPaymentController extends Controller
         return response()->json([
             'success' => true,
             'item' => $application->getItem(new Uuid($id))->toArray(),
+        ]);
+    }
+
+    public function edit(
+        string $id,
+        Request $request,
+        TypesOfPaymentApplication $application,
+    ): JsonResponse
+    {
+        return response()->json([
+            'success' => $application->edit(
+                new Uuid($id),
+                TypesOfPaymentDto::fromState($request->toArray())
+            ),
+        ]);
+    }
+
+    public function create(
+        string $id,
+        Request $request,
+        TypesOfPaymentApplication $application,
+    ): JsonResponse
+    {
+        return response()->json([
+            'success' => $application->edit(
+                new Uuid($id),
+                TypesOfPaymentDto::fromState($request->toArray())
+            ),
         ]);
     }
 }

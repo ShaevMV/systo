@@ -14,5 +14,6 @@ interface TypesOfPaymentRepositoryInterface
     public function getList(Filters $filters): Collection;
     public function getItem(Uuid $id): TypesOfPaymentDto;
     public function editItem(Uuid $id, TypesOfPaymentDto $paymentDto): bool;
+    public function create(TypesOfPaymentDto $paymentDto): bool;
     public function remove(Uuid $id): bool;
 }

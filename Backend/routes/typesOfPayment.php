@@ -12,4 +12,8 @@ Route::prefix('v1/typesOfPayment')->group(static function (): void {
     Route::post('/getList',[TypesOfPaymentController::class, 'getList']);
     Route::get('/getItem/{id}',[TypesOfPaymentController::class, 'getItem']);
 
+    Route::post('/edit/{id}',[TypesOfPaymentController::class, 'edit']);
+    Route::post('/create',[TypesOfPaymentController::class, 'create']);
+
+    Route::delete('/delete/{id}',[TypesOfPaymentController::class, 'delete']);
 });

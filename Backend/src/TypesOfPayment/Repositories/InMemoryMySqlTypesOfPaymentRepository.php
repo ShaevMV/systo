@@ -3,7 +3,10 @@
 namespace Tickets\TypesOfPayment\Repositories;
 
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use Carbon\Carbon;
+use Doctrine\DBAL\Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Filter\FilterBuilder;
@@ -45,6 +48,26 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
         }
 
         return $rawData->update($paymentDto->toArray());
+    }
+
+    public function create(TypesOfPaymentDto $paymentDto): bool
+    {
+        $data = $paymentDto->toArray();
+        try {
+            DB::beginTransaction();
+            $this->model->insert(
+                array_merge($data,
+                    [
+                        'created_at' => (string)(new Carbon()),
+                        'updated_at' => (string)(new Carbon()),
+                    ]
+                ));
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
     }
 
     public function remove(Uuid $id): bool
