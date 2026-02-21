@@ -9,6 +9,10 @@ use Shared\Domain\Bus\Query\QueryBus;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Tickets\TypesOfPayment\Application\Create\TypesOfPaymentCreateCommand;
+use Tickets\TypesOfPayment\Application\Create\TypesOfPaymentCreateCommandHandler;
+use Tickets\TypesOfPayment\Application\Delete\TypesOfPaymentDeleteCommand;
+use Tickets\TypesOfPayment\Application\Delete\TypesOfPaymentDeleteCommandHandler;
 use Tickets\TypesOfPayment\Application\Edit\TypesOfPaymentEditCommand;
 use Tickets\TypesOfPayment\Application\Edit\TypesOfPaymentEditCommandHandler;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
@@ -29,6 +33,7 @@ class TypesOfPaymentApplication
 
         TypesOfPaymentEditCommandHandler  $typesOfPaymentEditCommandHandler,
         TypesOfPaymentCreateCommandHandler  $typesOfPaymentCreateCommandHandler,
+        TypesOfPaymentDeleteCommandHandler  $typesOfPaymentDeleteCommandHandler,
     )
     {
         $this->queryBus = new InMemorySymfonyQueryBus([
@@ -39,6 +44,7 @@ class TypesOfPaymentApplication
         $this->commandBus = new InMemorySymfonyCommandBus([
             TypesOfPaymentEditCommand::class => $typesOfPaymentEditCommandHandler,
             TypesOfPaymentCreateCommand::class => $typesOfPaymentCreateCommandHandler,
+            TypesOfPaymentDeleteCommand::class => $typesOfPaymentDeleteCommandHandler,
         ]);
     }
 
@@ -64,6 +70,26 @@ class TypesOfPaymentApplication
     public function edit(Uuid $id, TypesOfPaymentDto $paymentDto): bool
     {
         $this->commandBus->dispatch(new TypesOfPaymentEditCommand($id, $paymentDto));
+        return true;
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function create(TypesOfPaymentDto $paymentDto): bool
+    {
+        $this->commandBus->dispatch(new TypesOfPaymentCreateCommand($paymentDto));
+
+        return true;
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    public function delete(Uuid $id): bool
+    {
+        $this->commandBus->dispatch(new TypesOfPaymentDeleteCommand($id));
+
         return true;
     }
 }

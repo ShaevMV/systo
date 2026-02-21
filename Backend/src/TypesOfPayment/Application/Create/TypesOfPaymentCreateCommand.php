@@ -11,15 +11,9 @@ use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
 class TypesOfPaymentCreateCommand implements Command
 {
     public function __construct(
-        private Uuid $id,
         private TypesOfPaymentDto $paymentDto,
     )
     {
-    }
-
-    public function getId(): Uuid
-    {
-        return $this->id;
     }
 
     public function getPaymentDto(): TypesOfPaymentDto

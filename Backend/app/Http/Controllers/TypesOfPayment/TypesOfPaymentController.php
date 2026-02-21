@@ -53,16 +53,24 @@ class TypesOfPaymentController extends Controller
     }
 
     public function create(
-        string $id,
         Request $request,
         TypesOfPaymentApplication $application,
     ): JsonResponse
     {
         return response()->json([
-            'success' => $application->edit(
-                new Uuid($id),
+            'success' => $application->create(
                 TypesOfPaymentDto::fromState($request->toArray())
             ),
+        ]);
+    }
+
+    public function delete(
+        string $id,
+        TypesOfPaymentApplication $application,
+    ): JsonResponse
+    {
+        return response()->json([
+            'success' => $application->delete(new Uuid($id)),
         ]);
     }
 }

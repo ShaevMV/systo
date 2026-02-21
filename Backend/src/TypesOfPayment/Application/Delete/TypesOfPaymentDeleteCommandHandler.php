@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tickets\TypesOfPayment\Application\Create;
+namespace Tickets\TypesOfPayment\Application\Delete;
 
 use Shared\Domain\Bus\Command\CommandHandler;
 use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 
-class TypesOfPaymentCreateCommandHandler implements CommandHandler
+class TypesOfPaymentDeleteCommandHandler implements CommandHandler
 {
     public function __construct(
         private TypesOfPaymentRepositoryInterface $repository
@@ -15,8 +15,8 @@ class TypesOfPaymentCreateCommandHandler implements CommandHandler
     {
     }
 
-    public function __invoke(TypesOfPaymentCreateCommand $command): void
+    public function __invoke(TypesOfPaymentDeleteCommand $command): void
     {
-        $this->repository->create($command->getPaymentDto());
+        $this->repository->remove($command->getId());
     }
 }
