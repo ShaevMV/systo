@@ -7,7 +7,9 @@ namespace App\Http\Controllers\TypesOfPayment;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
 use Tickets\TypesOfPayment\Application\TypesOfPaymentApplication;
 use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
@@ -22,8 +24,9 @@ class TypesOfPaymentController extends Controller
         return response()->json([
             'success' => true,
             'list' => $application->getList(
-                TypesOfPaymentGetListQuery::fromState($request->toArray())
-            )->getTypesOfPaymentList()->toArray(),
+                TypesOfPaymentGetListQuery::fromState($request->toArray()['filter'])
+            )->getTypesOfPaymentList()
+                ->toArray(),
         ]);
     }
 
@@ -32,38 +35,66 @@ class TypesOfPaymentController extends Controller
         TypesOfPaymentApplication $application,
     ): JsonResponse
     {
-        return response()->json([
-            'success' => true,
-            'item' => $application->getItem(new Uuid($id))->toArray(),
-        ]);
+        try {
+            return response()->json([
+                'success' => true,
+                'item' => $application->getItem(new Uuid($id))->toArray(),
+            ]);
+        } catch (\DomainException $exception) {
+            return response()->json([
+                'success' => false,
+                'massage' => $exception->getMessage(),
+            ]);
+        }
+
     }
 
+    /**
+     * @throws Throwable
+     * @throws JsonException
+     */
     public function edit(
         string $id,
         Request $request,
         TypesOfPaymentApplication $application,
     ): JsonResponse
     {
-        return response()->json([
-            'success' => $application->edit(
-                new Uuid($id),
-                TypesOfPaymentDto::fromState($request->toArray())
-            ),
-        ]);
+        try {
+            return response()->json([
+                'success' => $application->edit(
+                    new Uuid($id),
+                    TypesOfPaymentDto::fromState($request->toArray()['data'])
+                ),
+                'item' => $application->getItem(new Uuid($id))->toArray()
+            ]);
+        } catch (\DomainException $exception) {
+            return response()->json([
+                'success' => false,
+                'massage' => $exception->getMessage()
+            ]);
+        }
+
     }
 
+    /**
+     * @throws Throwable
+     */
     public function create(
         Request $request,
         TypesOfPaymentApplication $application,
     ): JsonResponse
     {
+        $paymentDto = TypesOfPaymentDto::fromState($request->toArray()['data']);
+
         return response()->json([
-            'success' => $application->create(
-                TypesOfPaymentDto::fromState($request->toArray())
-            ),
+            'success' => $application->create($paymentDto),
+            'item' => $application->getItem($paymentDto->getId())->toArray()
         ]);
     }
 
+    /**
+     * @throws Throwable
+     */
     public function delete(
         string $id,
         TypesOfPaymentApplication $application,

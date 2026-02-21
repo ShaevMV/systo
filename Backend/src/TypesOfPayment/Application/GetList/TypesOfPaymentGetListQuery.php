@@ -42,8 +42,8 @@ class TypesOfPaymentGetListQuery implements Query
     {
         return new self(
             $data['name'] ?? null,
-            empty($data['active']) ? null : boolval($data['active']),
-            empty($data['isBilling']) ? null : boolval($data['isBilling']),
+            empty($data['active']) ? null : $data['active'],
+            empty($data['isBilling']) ? null : $data['isBilling'],
             empty($data['userExternalId']) ? null : new Uuid($data['userExternalId']),
         );
     }

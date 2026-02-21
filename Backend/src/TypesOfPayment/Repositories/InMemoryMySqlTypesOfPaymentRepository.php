@@ -47,7 +47,7 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
             throw new \DomainException('TypesOfPayment not found ' . $id->value());
         }
 
-        return $rawData->update($paymentDto->toArray());
+        return $rawData->fill($paymentDto->toArrayForEdit())->save();
     }
 
     public function create(TypesOfPaymentDto $paymentDto): bool

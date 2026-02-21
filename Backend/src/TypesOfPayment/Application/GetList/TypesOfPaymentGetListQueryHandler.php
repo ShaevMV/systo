@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tickets\TypesOfPayment\Application\GetList;
 
 use App\Models\Festival\TypesOfPaymentModel;
-use App\Models\Ordering\OrderTicketModel;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
@@ -42,13 +41,13 @@ class TypesOfPaymentGetListQueryHandler implements QueryHandler
             ],
             // status
             [
-                'field' => OrderTicketModel::TABLE . '.active',
+                'field' => TypesOfPaymentModel::TABLE . '.active',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getActive(),
             ],
             // types_of_payment_id
             [
-                'field' => OrderTicketModel::TABLE . '.is_billing',
+                'field' => TypesOfPaymentModel::TABLE . '.is_billing',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getIsBilling(),
             ],

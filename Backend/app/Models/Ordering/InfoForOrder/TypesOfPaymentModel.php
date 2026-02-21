@@ -42,4 +42,15 @@ class TypesOfPaymentModel extends Model
     public const TABLE = 'types_of_payment';
 
     protected $table = self::TABLE;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'created_at',
+        'updated_at',
+        'sort',
+        'card',
+        'is_billing',
+        'active'
+    ];
 }
