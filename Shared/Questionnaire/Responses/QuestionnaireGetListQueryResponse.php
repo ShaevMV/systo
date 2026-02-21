@@ -10,16 +10,11 @@ use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class QuestionnaireGetListQueryResponse implements Response
 {
-    /**
-     * @var Collection
-     */
-    private Collection $collection;
 
     public function __construct(
-        array $questionnaire
+        private Collection $collection
     )
     {
-        $this->collection = new Collection($questionnaire);
     }
 
     public function toArray(): array

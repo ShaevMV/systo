@@ -35,7 +35,7 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
             [
                 'field' => QuestionnaireModel::TABLE . '.email',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getEmail(),
+                'value' => '%'.$filterQuery->getEmail().'%',
             ],
             // status
             [
@@ -46,12 +46,12 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
             [
                 'field' => QuestionnaireModel::TABLE . '.telegram',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getTelegram(),
+                'value' => '%'.$filterQuery->getTelegram().'%',
             ],
             [
                 'field' => QuestionnaireModel::TABLE . '.vk',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getVk(),
+                'value' => '%'.$filterQuery->getVk().'%',
             ],
             [
                 'field' => QuestionnaireModel::TABLE . '.is_have_in_club',

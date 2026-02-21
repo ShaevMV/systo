@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Shared\Questionnaire\Repositories;
 
+use Illuminate\Support\Collection;
 use Shared\Domain\Criteria\Filters;
 use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
@@ -24,7 +25,7 @@ interface QuestionnaireRepositoryInterface
      * @param Filters $filters
      * @return QuestionnaireTicketDto[]
      */
-    public function getList(Filters $filters): array;
+    public function getList(Filters $filters): Collection;
 
     /**
      * Проверить наличие анкеты по email пользователя

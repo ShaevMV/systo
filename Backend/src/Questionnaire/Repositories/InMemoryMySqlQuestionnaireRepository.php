@@ -7,11 +7,14 @@ namespace Tickets\Questionnaire\Repositories;
 use App\Models\Questionnaire\QuestionnaireModel;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
 use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Throwable;
+use Illuminate\Support\Collection;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
@@ -19,6 +22,19 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         private QuestionnaireModel $model
     )
     {
+    }
+
+    function getSql($query)
+    {
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+
+        foreach ($bindings as $binding) {
+            $value = is_numeric($binding) ? $binding : "'" . addslashes($binding) . "'";
+            $sql = preg_replace('/\?/', $value, $sql, 1);
+        }
+
+        return $sql;
     }
 
     /**
@@ -57,33 +73,15 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     }
 
 
-    public function getList(Filters $filters): array
+    public function getList(Filters $filters): Collection
     {
-        $builder = $this->model;
-        foreach ($filters as $filter) {
-            if (null !== $filter->value()->value()) {
-                $builder = $builder->where(
-                    $filter->field()->value(),
-                    $filter->operator()->value(),
-                    $filter->value()->value()
-                );
-            }
-        }
+        Log::info($this->getSql(FilterBuilder::build($this->model, $filters)
+            ->orderBy('created_at','DESC')));
 
-        $rawData = $builder
+        return FilterBuilder::build($this->model, $filters)
             ->orderBy('created_at','DESC')
             ->get()
-            ->toArray();
-
-        $result = [];
-
-        foreach ($rawData as $datum) {
-            $result[] = QuestionnaireTicketDto::fromState(
-                $datum,
-            );
-        }
-
-        return $result;
+            ->each(fn(QuestionnaireModel $model) =>QuestionnaireTicketDto::fromState($model->toArray()));
     }
 
     public function existByEmail(string $email): bool

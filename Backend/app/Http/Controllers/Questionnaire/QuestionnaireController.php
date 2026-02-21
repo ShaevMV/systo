@@ -22,26 +22,16 @@ class QuestionnaireController extends Controller
         QuestionnaireApplication $application,
     ): JsonResponse
     {
-        try {
-            return response()->json([
-                'success' => true,
-                'questionnaireList' => $application->getList(new QuestionnaireGetListQuery(
-                    $request->get('email'),
-                    $request->get('telegram'),
-                    $request->get('vk'),
-                    $request->get('is_have_in_club'),
-                    $request->get('status'),
-                ))->toArray()
-            ]);
-        } catch (Throwable $throwable) {
-            return response()->json([
-                'success' => false,
-                'message' => $throwable->getMessage(),
-                'line' => $throwable->getLine(),
-                'file' => $throwable->getFile(),
-                'trace' => $throwable->getTrace(),
-            ]);
-        }
+        return response()->json([
+            'success' => true,
+            'questionnaireList' => $application->getList(new QuestionnaireGetListQuery(
+                $request->get('email'),
+                $request->get('telegram'),
+                $request->get('vk'),
+                $request->get('is_have_in_club'),
+                $request->get('status'),
+            ))->toArray()
+        ]);
     }
 
     /**

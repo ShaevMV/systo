@@ -68,3 +68,7 @@ export const getUserData = state => type => {
     }
     return null;
 }
+
+export const getUserInfo = state => {
+    return state.userInfo;
+}
