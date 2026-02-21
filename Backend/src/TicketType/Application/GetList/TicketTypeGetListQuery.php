@@ -42,8 +42,8 @@ class TicketTypeGetListQuery implements Query
         return new self(
             $data['name'] ?? null,
             $data['price'] ?? null,
-            $data['active'] ?? null,
-            $data['is_live_ticket'] ?? null,
+            $data['active'] === null ? null : (bool)$data['active'],
+            $data['is_live_ticket'] === null ? null : (bool)$data['is_live_ticket'],
         );
     }
 }
