@@ -5,6 +5,7 @@ import appOrderModule from './modules/OrderModule/index';
 import appPromoCodeModule from './modules/PromoCodeModule/index';
 import appQuestionnaire from './modules/QuestionnaireModule/index';
 import appTicket from './modules/TicketModule/index';
+import appTicketType from './modules/TicketTypeModule/index';
 
 export default createStore({
     state: {
@@ -34,5 +35,6 @@ export default createStore({
         'appPromoCode': appPromoCodeModule,
         'appQuestionnaire': appQuestionnaire,
         'appTicket': appTicket,
+        'appTicketType': appTicketType,
     }
 })

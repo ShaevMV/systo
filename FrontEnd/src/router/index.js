@@ -23,6 +23,9 @@ import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.v
 import QuestionnaireRegView from "@/views/questionnaire/QuestionnaireRegView.vue";
 import LiveTicketView from "@/views/ticket/LiveTicketView.vue";
 
+import TicketTypeListView from "@/views/ticketType/TicketTypeListView.vue";
+import TicketTypeItemView from "@/views/ticketType/TicketTypeItemView.vue";
+
 const routes = [
     {
         path: '/',
@@ -230,6 +233,27 @@ const routes = [
         props: true,
     },
 
+    // Типы билтетов
+    {
+        path: '/ticketType',
+        name: 'TicketTypeListView',
+        component: TicketTypeListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/ticketType/:id',
+        name: 'TicketTypeItemView',
+        component: TicketTypeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
     {
         path: '/:pathMatch(.*)*',
         component: Error404,
