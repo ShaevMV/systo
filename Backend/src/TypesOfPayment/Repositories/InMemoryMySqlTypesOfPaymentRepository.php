@@ -1,8 +1,7 @@
 <?php
 
 namespace Tickets\TypesOfPayment\Repositories;
-
-use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Festival\TypesOfPaymentModel;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
 use Illuminate\Support\Collection;
