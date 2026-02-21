@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filter;
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
@@ -191,18 +192,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
-        /** @var Filter $filter */
-        foreach ($filters as $filter) {
-            if (null !== $filter->value()->value()) {
-                $builder = $builder->where(
-                    $filter->field()->value(),
-                    $filter->operator()->value(),
-                    $filter->value()->value()
-                );
-            }
-        }
-
-        $rawData = $builder
+        $rawData = FilterBuilder::build($builder, $filters)
             ->get()
             ->toArray();
 

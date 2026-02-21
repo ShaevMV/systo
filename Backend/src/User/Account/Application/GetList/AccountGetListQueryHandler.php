@@ -35,13 +35,13 @@ class AccountGetListQueryHandler implements QueryHandler
             [
                 'field' => User::TABLE . '.email',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getEmail(),
+                'value' => '%'.$filterQuery->getEmail().'%',
             ],
             // name
             [
                 'field' => User::TABLE . '.name',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getName(),
+                'value' => '%'.$filterQuery->getName().'%',
             ],
             // types_of_payment_id
             [
@@ -52,12 +52,12 @@ class AccountGetListQueryHandler implements QueryHandler
             [
                 'field' => User::TABLE . '.city',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getCity(),
+                'value' => '%'.$filterQuery->getCity().'%',
             ],
             [
                 'field' => User::TABLE . '.phone',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getPhone(),
+                'value' => '%'.$filterQuery->getPhone().'%',
             ],
             [
                 'field' => User::TABLE . '.ticket_type_id',

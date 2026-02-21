@@ -39,7 +39,7 @@ class TypesOfPaymentGetListQueryHandler implements QueryHandler
             [
                 'field' => TypesOfPaymentModel::TABLE . '.name',
                 'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getName(),
+                'value' => '%'.$filterQuery->getName().'%',
             ],
             // status
             [

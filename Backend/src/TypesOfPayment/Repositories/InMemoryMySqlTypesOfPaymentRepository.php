@@ -4,6 +4,7 @@ namespace Tickets\TypesOfPayment\Repositories;
 
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Filter\FilterBuilder;
 use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
 
 class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryInterface
@@ -16,22 +17,11 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
 
     public function getList(Filters $filters): array
     {
-        $builder = $this->model;
-
-        foreach ($filters as $filter) {
-            if (null !== $filter->value()->value()) {
-                $builder = $builder->where(
-                    $filter->field()->value(),
-                    $filter->operator()->value(),
-                    $filter->value()->value()
-                );
-            }
-        }
-
-        $rawData = $builder
+        $rawData = FilterBuilder::build($this->model, $filters)
             ->orderBy('created_at', 'DESC')
             ->get()
             ->toArray();
+
         $result = [];
         foreach ($rawData as $datum) {
             $result[] = TypesOfPaymentDto::fromState($datum);

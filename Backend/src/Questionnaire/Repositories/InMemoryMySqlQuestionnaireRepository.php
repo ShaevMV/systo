@@ -75,13 +75,10 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
     public function getList(Filters $filters): Collection
     {
-        Log::info($this->getSql(FilterBuilder::build($this->model, $filters)
-            ->orderBy('created_at','DESC')));
-
         return FilterBuilder::build($this->model, $filters)
             ->orderBy('created_at','DESC')
             ->get()
-            ->each(fn(QuestionnaireModel $model) =>QuestionnaireTicketDto::fromState($model->toArray()));
+            ->each(fn(QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
     }
 
     public function existByEmail(string $email): bool

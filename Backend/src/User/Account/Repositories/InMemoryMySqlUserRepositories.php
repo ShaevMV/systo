@@ -11,6 +11,7 @@ use Hash;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\User\Account\Dto\AccountDto;
@@ -77,19 +78,13 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
 
     public function getList(Filters $filters): array
     {
-        $builder = $this->model::orderBy('created_at', 'DESC');
-        foreach ($filters as $filter) {
-            if (null !== $filter->value()->value()) {
-                $builder = $builder->where(
-                    $filter->field()->value(),
-                    $filter->operator()->value(),
-                    $filter->value()->value()
-                );
-            }
-        }
+        $builder = FilterBuilder::build($this->model, $filters)
+            ->orderBy('created_at', 'DESC')
+            ->get()
+            ->toArray();
 
         $result = [];
-        foreach ($builder->get()->toArray() as $item) {
+        foreach ($builder as $item) {
             $result[] = UserInfoDto::fromState($item);
         }
 
