@@ -18,15 +18,6 @@
                        aria-describedby="inputGroupPrepend2">
               </div>
             </div>
-            <!--  статус -->
-            <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Стоимость</label>
-              <input type="text"
-                     v-model="filter.price"
-                     class="form-control"
-                     id="validationDefaultUsername"
-                     aria-describedby="inputGroupPrepend2">
-            </div>
             <!--  telegram -->
             <div class="col-md-4">
               <label for="validationDefaultUsername" class="form-label">Активность</label>
@@ -93,7 +84,6 @@ export default {
     return {
       filter: {
         name: null,
-        price: null,
         active: null,
         is_live_ticket: null,
         festival_id: null,
@@ -127,7 +117,6 @@ export default {
     clearFilter: async function () {
       this.filter = {
         name: null,
-        price: null,
         active: null,
         festival_id: null,
       };

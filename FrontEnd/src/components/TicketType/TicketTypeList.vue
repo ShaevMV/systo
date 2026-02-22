@@ -37,7 +37,7 @@
               <td>{{ item.price }}</td>
               <td>{{ item.groupLimit }}</td>
               <td>{{ item.sort }}</td>
-              <td>{{ item.festival }}</td>
+              <td>{{ item.festival_name }}</td>
               <td>{{ item.is_live_ticket ? 'ДА' : 'НЕТ' }}</td>
               <td>{{ item.active ? 'ДА' : 'НЕТ' }}</td>
               <td> <date-format :date="item.created_at"/> </td>

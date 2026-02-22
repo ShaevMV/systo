@@ -33,7 +33,7 @@ class TicketTypeDto extends AbstractionEntity implements Response
         return new self(
             empty($data['id']) ? Uuid::random() : new Uuid($data['id']),
             $data['name'],
-            (int)$data['current_price'],
+            (int)($data['current_price'] ?? $data['price']),
             (int)$data['sort'],
             (bool)$data['active'],
             (bool)$data['is_live_ticket'],

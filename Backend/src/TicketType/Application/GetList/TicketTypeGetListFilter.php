@@ -11,7 +11,6 @@ class TicketTypeGetListFilter
 {
     public function __construct(
         private ?string $name = null,
-        private ?int    $price = null,
         private ?bool   $active = null,
         private ?bool   $is_live_ticket = null,
         private ?Uuid   $festival_id = null
@@ -22,11 +21,6 @@ class TicketTypeGetListFilter
     public function getName(): ?string
     {
         return $this->name;
-    }
-
-    public function getPrice(): ?string
-    {
-        return $this->price;
     }
 
     public function getActive(): ?bool
@@ -45,9 +39,9 @@ class TicketTypeGetListFilter
         if ($data['festival_id'] ?? null) {
             $festivalId = new Uuid($data['festival_id']);
         }
+
         return new self(
             $data['name'] ?? null,
-            $data['price'] ?? null,
             ($data['active'] ?? null) === null ? null : $data['active'] === 'true',
             ($data['is_live_ticket'] ?? null) === null ? null : $data['is_live_ticket'] === 'true',
             $festivalId,

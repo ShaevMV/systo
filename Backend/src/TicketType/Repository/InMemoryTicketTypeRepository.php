@@ -41,11 +41,6 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
                 'value' => $filterQuery->getName(),
             ],
             [
-                'field' => 'current_price',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getPrice(),
-            ],
-            [
                 'field' => TicketTypesModel::TABLE . '.active',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getActive(),
@@ -58,7 +53,7 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
             [
                 'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getFestivalId()->value(),
+                'value' => $filterQuery->getFestivalId()?->value(),
             ],
         ];
     }

@@ -71,8 +71,8 @@
                             v-model="active"
                             id="validationDefault01">
                       <option value=null>Выберите</option>
-                      <option value="false">Фиксированная</option>
-                      <option value="true">Процент</option>
+                      <option value="false">Нет</option>
+                      <option value="true">Да</option>
                     </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('active') }}</small>
