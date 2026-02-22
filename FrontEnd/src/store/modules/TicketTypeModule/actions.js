@@ -76,3 +76,19 @@ export const clearError = (context) => {
     context.commit('setError', []);
 };
 
+
+export const setFilter = (context, payload) => {
+    context.commit('setFilter', payload);
+};
+
+export const setOrderBy = (context, payload) => {
+    let orderByCurrent = context.getters.getOrderBy
+
+    if (Object.keys(orderByCurrent).length == 0 || Object.keys(orderByCurrent)[0] !== payload) {
+        context.commit('setOrderBy', {[payload]: 'desc'});
+    } else {
+        let type = (orderByCurrent[payload] == 'desc' ? 'asc': 'desc');
+        context.commit('setOrderBy', {[payload]: type});
+    }
+
+};

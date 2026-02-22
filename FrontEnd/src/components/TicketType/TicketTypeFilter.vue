@@ -33,9 +33,9 @@
               <select class="form-select"
                       v-model="filter.active"
                       id="validationDefault01">
-                <option value="null">Выберите</option>
-                <option value="true">Да</option>
-                <option value="true">Нет</option>
+                <option value=null>Выберите</option>
+                <option value=true>Да</option>
+                <option value=false>Нет</option>
               </select>
             </div>
             <!--  vk -->
@@ -44,9 +44,9 @@
               <select class="form-select"
                       v-model="filter.is_live_ticket"
                       id="validationDefault01">
-                <option value="null">Выберите</option>
-                <option value="1">Да</option>
-                <option value="0">Нет</option>
+                <option value=null>Выберите</option>
+                <option value=true>Да</option>
+                <option value=false>Нет</option>
               </select>
             </div>
 
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: "TicketTypeFilter",
@@ -88,24 +88,35 @@ export default {
       }
     }
   },
+  computed: {
+    ...mapGetters('appTicketType', [
+      'getOrderBy',
+        'getFileter'
+    ]),
+  },
   methods: {
     ...mapActions('appTicketType',[
-      'loadList'
+        'loadList',
+        'setFilter',
     ]),
-    sendFilter: function () {
-      this.loadList({
-        filter: this.filter,
+     sendFilter: async function () {
+       await this.setFilter(this.filter)
+       this.loadList({
+        filter: this.getFileter,
+         orderBy: this.getOrderBy
       })
     },
-    clearFilter: function () {
+    clearFilter: async function () {
       this.filter = {
         name: null,
         price: null,
         active: null,
         is_live_ticket: null,
       };
+      await this.setFilter(this.filter)
       this.loadList({
-        'filter': this.filter,
+        filter: this.getFileter,
+        orderBy: this.getOrderBy
       });
     },
     goToItem() {

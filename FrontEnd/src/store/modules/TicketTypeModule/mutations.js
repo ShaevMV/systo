@@ -17,3 +17,11 @@ export const setMessage = (state, payload) => {
 export const removeInList = (state, payload) => {
      state.list = state.list.filter(item => item.id !== payload.id);
 };
+
+export const setFilter = (state, payload) => {
+    state.filter = payload;
+};
+
+export const setOrderBy = (state, payload) => {
+    state.orderBy = payload;
+};

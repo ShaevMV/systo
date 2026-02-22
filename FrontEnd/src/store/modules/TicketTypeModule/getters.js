@@ -16,3 +16,11 @@ export const getList = state => {
 export const getItem = state => {
     return state.item;
 };
+
+export const getFileter = state => {
+    return state.filter;
+};
+
+export const getOrderBy = state => {
+    return state.orderBy;
+};

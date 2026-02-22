@@ -9,8 +9,10 @@ use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\TicketType\Application\GetList\TicketTypeGetListFilter;
 use Tickets\TicketType\Application\GetList\TicketTypeGetListQuery;
 use Tickets\TicketType\Application\TicketTypeApplication;
 use Tickets\TicketType\Dto\TicketTypeDto;
@@ -25,7 +27,10 @@ class TicketTypeController extends Controller
         return response()->json([
             'success' => true,
             'list' => $application->getList(
-                TicketTypeGetListQuery::fromState($request->toArray()['filter'])
+                new TicketTypeGetListQuery(
+                    TicketTypeGetListFilter::fromState($request->toArray()['filter']),
+                    Order::fromState($request->toArray()['orderBy'])
+                ),
             )->getCollection()
                 ->toArray(),
         ]);

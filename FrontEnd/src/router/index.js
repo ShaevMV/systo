@@ -235,7 +235,7 @@ const routes = [
 
     // Типы билтетов
     {
-        path: '/ticketType',
+        path: '/ticketType/list',
         name: 'TicketTypeListView',
         component: TicketTypeListView,
         props: true,
