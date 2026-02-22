@@ -75,6 +75,13 @@
           :to="{name: 'TicketTypeListView'}">Все Типы билетов
       </router-link>
     </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'TypesOfPaymentListView'}">Все Типы оплат
+      </router-link>
+    </li>
     <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
       <router-link
           class="nav-link"

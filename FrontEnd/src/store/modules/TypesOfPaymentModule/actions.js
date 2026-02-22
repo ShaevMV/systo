@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API = '/api/v1/ticketType';
+const API = '/api/v1/typesOfPayment';
 
 
 export const loadList = (context, payload) => {

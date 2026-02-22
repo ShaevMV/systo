@@ -103,7 +103,7 @@
 import {mapActions, mapGetters} from "vuex";
 
 export default {
-  name: "TicketTypeItem",
+  name: "TypesOfPaymentItem",
   props: {
     id: {
       type: [String],

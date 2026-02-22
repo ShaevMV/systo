@@ -1,6 +1,6 @@
 <template>
   <div class="title-block text-center">
-    <h1 class="card-title"> Типы оргвзносов </h1>
+    <h1 class="card-title"> Типы оплат </h1>
   </div>
   <div class="row">
     <div class="col-lg-12 mx-auto" id="filter-results">
@@ -31,9 +31,8 @@
                 {{ item.name }}
               </th>
               <td>{{ item.sort }}</td>
-              <td>{{ item.groupLimit }}</td>
-              <td>{{ item.sort }}</td>
-              <td>{{ item.is_live_ticket ? 'ДА' : 'НЕТ' }}</td>
+              <td>{{ item.email_seller }}</td>
+              <td>{{ item.is_billing ? 'ДА' : 'НЕТ' }}</td>
               <td>{{ item.active ? 'ДА' : 'НЕТ' }}</td>
               <td> <date-format :date="item.created_at"/> </td>
               <td>
@@ -65,14 +64,14 @@ export default {
   name: "TypesOfPaymentList",
   components: {DateFormat},
   computed: {
-    ...mapGetters('appTicketType', [
+    ...mapGetters('appTypesOfPayment', [
         'getList',
         'getFileter',
         'getOrderBy'
     ]),
   },
   methods: {
-    ...mapActions('appTicketType', [
+    ...mapActions('appTypesOfPayment', [
         'loadList',
         'setOrderBy',
         'remove'
@@ -90,7 +89,7 @@ export default {
       });
     },
     goToItem(id) {
-      const route = this.$router.resolve({ name: 'TicketTypeItemView', params: { id: id } });
+      const route = this.$router.resolve({ name: 'TypesOfPaymentItemView', params: { id: id } });
       window.open(route.href, '_blank');
     },
   },
