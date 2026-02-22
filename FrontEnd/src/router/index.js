@@ -26,6 +26,8 @@ import LiveTicketView from "@/views/ticket/LiveTicketView.vue";
 import TicketTypeListView from "@/views/ticketType/TicketTypeListView.vue";
 import TicketTypeItemView from "@/views/ticketType/TicketTypeItemView.vue";
 
+import TypesOfPaymentListView from "@/views/typesOfPayment/TypesOfPaymentListView.vue";
+
 const routes = [
     {
         path: '/',
@@ -254,6 +256,19 @@ const routes = [
             'role': ['admin']
         }
     },
+
+    // Типы оплат
+    {
+        path: '/typesOfPayment/list',
+        name: 'TypesOfPaymentListView',
+        component: TypesOfPaymentListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
     {
         path: '/:pathMatch(.*)*',
         component: Error404,

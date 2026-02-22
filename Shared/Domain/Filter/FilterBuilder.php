@@ -10,14 +10,14 @@ use Shared\Domain\Criteria\Filters;
 
 class FilterBuilder
 {
-    public static function build(Model $builder, Filters $filters): Model|Builder|null
+    public static function build(Model|Builder $builder, Filters $filters): Model|Builder|null
     {
         foreach ($filters as $filter) {
             if (null !== $filter->value()->value()) {
                 $builder = $builder->where(
                     $filter->field()->value(),
                     $filter->operator()->value(),
-                    $filter->value()->value()
+                    $filter->operator()->value() === 'LIKE' ? '%' . $filter->value()->value() . '%' : $filter->value()->value()
                 );
             }
         }

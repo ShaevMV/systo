@@ -1,9 +1,12 @@
 <?php
 
 namespace Tickets\TypesOfPayment\Repositories;
+use App\Models\Festival\TicketTypeFestivalModel;
 use App\Models\Festival\TypesOfPaymentModel;
+use App\Models\User;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Nette\Utils\JsonException;
@@ -22,7 +25,15 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
 
     public function getList(Filters $filters): Collection
     {
-        return FilterBuilder::build($this->model, $filters)
+        $builder = $this->model::leftJoin(User::TABLE, function (JoinClause $join) {
+            $join->on(
+                User::TABLE . '.id',
+                '=',
+                $this->model::TABLE . '.user_external_id'
+            );
+        })->select([$this->model::TABLE.".*", User::TABLE.'.email as email_seller']);
+
+        return FilterBuilder::build($builder, $filters)
             ->orderBy('created_at', 'DESC')
             ->get()
             ->each(fn(TypesOfPaymentModel $model) => TypesOfPaymentDto::fromState($model->toArray()));
@@ -51,7 +62,7 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
 
     public function create(TypesOfPaymentDto $paymentDto): bool
     {
-        $data = $paymentDto->toArray();
+        $data = $paymentDto->toArrayForCreate();
         try {
             DB::beginTransaction();
             $this->model->insert(

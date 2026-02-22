@@ -51,6 +51,16 @@ abstract class AbstractionEntity implements EntityInterface
         return $array;
     }
 
+    public function toArrayForEdit(): array
+    {
+        return $this->toArray();
+    }
+
+    public function toArrayForCreate(): array
+    {
+        return $this->toArray();
+    }
+
     private function addItems(array &$array, string $key, mixed $value): void
     {
         if ($value instanceof EntityInterface) {

@@ -12,6 +12,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Application\GetList\AccountGetListQuery;
 use Tickets\User\Account\Dto\UserInfoDto;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 
 class AccountController extends Controller
@@ -20,14 +21,14 @@ class AccountController extends Controller
      * @throws JsonException
      */
     public function getList(
-        Request $request,
+        Request            $request,
         AccountApplication $accountApplication,
     ): JsonResponse
     {
-        return  response()->json([
+        return response()->json([
             'success' => true,
-            'accounts' => $accountApplication->getList(
-                AccountGetListQuery::fromState($request->toArray())
+            'list' => $accountApplication->getList(
+                AccountGetListQuery::fromState($request->toArray()['filter'])
             )->toArray(),
         ]);
     }
@@ -36,23 +37,23 @@ class AccountController extends Controller
      * @throws JsonException
      */
     public function getItem(
-        string $email,
+        string             $email,
         AccountApplication $accountApplication,
     ): JsonResponse
     {
-        return  response()->json([
+        return response()->json([
             'success' => true,
             'account' => $accountApplication->getUserByEmail($email)->toArray(),
         ]);
     }
 
     public function edit(
-        string $id,
-        Request $request,
+        string             $id,
+        Request            $request,
         AccountApplication $accountApplication,
     ): JsonResponse
     {
-        return  response()->json([
+        return response()->json([
             'success' => $accountApplication->edit(
                 new Uuid($id),
                 UserInfoDto::fromState($request->toArray())

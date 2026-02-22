@@ -10,6 +10,10 @@ interface EntityInterface
      */
     public function toArray(): ?array;
 
+    public function toArrayForEdit(): ?array;
+
+    public function toArrayForCreate(): ?array;
+
     /**
      * @param string $name
      *

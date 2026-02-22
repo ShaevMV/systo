@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Tickets\TicketType\Application\GetList;
 
 
+use Shared\Domain\ValueObject\Uuid;
+
 class TicketTypeGetListFilter
 {
     public function __construct(
-        private ?string $name,
-        private ?int    $price,
-        private ?bool   $active,
-        private ?bool   $is_live_ticket,
+        private ?string $name = null,
+        private ?int    $price = null,
+        private ?bool   $active = null,
+        private ?bool   $is_live_ticket = null,
+        private ?Uuid   $festival_id = null
     )
     {
     }
@@ -38,11 +41,21 @@ class TicketTypeGetListFilter
 
     public static function fromState(array $data): self
     {
+        $festivalId = null;
+        if ($data['festival_id'] ?? null) {
+            $festivalId = new Uuid($data['festival_id']);
+        }
         return new self(
             $data['name'] ?? null,
             $data['price'] ?? null,
             ($data['active'] ?? null) === null ? null : $data['active'] === 'true',
             ($data['is_live_ticket'] ?? null) === null ? null : $data['is_live_ticket'] === 'true',
+            $festivalId,
         );
+    }
+
+    public function getFestivalId(): ?Uuid
+    {
+        return $this->festival_id;
     }
 }

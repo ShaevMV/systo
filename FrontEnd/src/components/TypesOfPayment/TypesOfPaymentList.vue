@@ -14,13 +14,9 @@
                   @click="orderBy('name')">Имя</th>
               <th scope="col"
                   style="cursor: pointer"
-                  @click="orderBy('price')">Стоимость</th>
-              <th scope="col">Лимит на кол-во</th>
-              <th scope="col"
-                  style="cursor: pointer"
                   @click="orderBy('sort')">Сорт</th>
-              <th scope="col">Фестиваль</th>
-              <th scope="col">Для живых билетов</th>
+              <th scope="col">Реализатор</th>
+              <th scope="col">Биллинг</th>
               <th scope="col">Активность</th>
               <th scope="col"
                   style="cursor: pointer"
@@ -34,10 +30,9 @@
               <th scope="row" class="mobile" @click="goToItem(item.id)" style="cursor: pointer">
                 {{ item.name }}
               </th>
-              <td>{{ item.price }}</td>
+              <td>{{ item.sort }}</td>
               <td>{{ item.groupLimit }}</td>
               <td>{{ item.sort }}</td>
-              <td>{{ item.festival }}</td>
               <td>{{ item.is_live_ticket ? 'ДА' : 'НЕТ' }}</td>
               <td>{{ item.active ? 'ДА' : 'НЕТ' }}</td>
               <td> <date-format :date="item.created_at"/> </td>
@@ -67,7 +62,7 @@ import {mapActions, mapGetters} from "vuex";
 import DateFormat from "@/components/Utilite/DateFormat.vue";
 
 export default {
-  name: "TicketTypeList",
+  name: "TypesOfPaymentList",
   components: {DateFormat},
   computed: {
     ...mapGetters('appTicketType', [

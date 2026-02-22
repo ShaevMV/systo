@@ -18,16 +18,6 @@
                        aria-describedby="inputGroupPrepend2">
               </div>
             </div>
-            <!--  статус -->
-            <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Стоимость</label>
-              <input type="text"
-                     v-model="filter.price"
-                     class="form-control"
-                     id="validationDefaultUsername"
-                     aria-describedby="inputGroupPrepend2">
-            </div>
-            <!--  telegram -->
             <div class="col-md-4">
               <label for="validationDefaultUsername" class="form-label">Активность</label>
               <select class="form-select"
@@ -38,11 +28,10 @@
                 <option value=false>Нет</option>
               </select>
             </div>
-            <!--  vk -->
             <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Для живых билетов </label>
+              <label for="validationDefault01" class="form-label">Биллинг</label>
               <select class="form-select"
-                      v-model="filter.is_live_ticket"
+                      v-model="filter.isBilling"
                       id="validationDefault01">
                 <option value=null>Выберите</option>
                 <option value=true>Да</option>
@@ -50,14 +39,14 @@
               </select>
             </div>
             <div class="col-md-4">
-              <label for="validationDefault05" class="form-label">Выберите фестиваль</label>
+              <label for="validationDefault01" class="form-label">Продовец живых билетов</label>
               <select class="form-select"
-                      v-model="filter.festival_id"
-                      id="validationDefault05">
-                <option v-for="(festivalItem) in getFestivalList"
-                        v-bind:key="festivalItem.id"
-                        :selected="festivalItem.id == festival_id"
-                        v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
+                      v-model="filter.userExternalId"
+                      id="validationDefault01">
+                <option value=null>Выберите</option>
+                <option v-for="getlistSeller in getlistSellers"
+                        v-bind:key="getlistSeller.id"
+                        v-bind:value="getlistSeller">{{ getlistSeller.email }}
                 </option>
               </select>
             </div>
@@ -74,7 +63,7 @@
               </button>
               <button class="btn btn-primary"
                       @click="goToItem"
-                      type="submit">Добавить новый тип
+                      type="submit">Добавить новый
               </button>
             </div>
           </div>
@@ -88,40 +77,36 @@
 import {mapActions, mapGetters} from "vuex";
 
 export default {
-  name: "TicketTypeFilter",
+  name: "TypesOfPaymentFilter",
   data() {
     return {
       filter: {
         name: null,
-        price: null,
         active: null,
-        is_live_ticket: null,
-        festival_id: null,
+        isBilling: null,
+        userExternalId: null
       }
     }
   },
   computed: {
-    ...mapGetters('appTicketType', [
+    ...mapGetters('appTypesOfPayment', [
       'getOrderBy',
-        'getFileter'
+      'getFileter'
     ]),
-    ...mapGetters('appFestivalTickets', [
-      'getFestivalList',
-    ]),
+    ...mapGetters('appAccount', {
+      getlistSellers: 'getList'
+    }),
   },
   methods: {
-    ...mapActions('appTicketType',[
-        'loadList',
-        'setFilter',
+    ...mapActions('appTypesOfPayment', [
+      'loadList',
+      'setFilter',
     ]),
-    ...mapActions('appFestivalTickets', [
-      'getListFestival',
-    ]),
-     sendFilter: async function () {
-       await this.setFilter(this.filter)
-       this.loadList({
+    sendFilter: async function () {
+      await this.setFilter(this.filter)
+      this.loadList({
         filter: this.getFileter,
-         orderBy: this.getOrderBy
+        orderBy: this.getOrderBy
       })
     },
     clearFilter: async function () {
@@ -129,7 +114,7 @@ export default {
         name: null,
         price: null,
         active: null,
-        festival_id: null,
+        is_live_ticket: null,
       };
       await this.setFilter(this.filter)
       this.loadList({
@@ -138,13 +123,11 @@ export default {
       });
     },
     goToItem() {
-      const route = this.$router.resolve({ name: 'TicketTypeItemView' });
+      const route = this.$router.resolve({name: 'TicketTypeItemView'});
       window.open(route.href, '_blank');
     },
-  },
-  async created() {
-    await this.getListFestival();
-  },
+  }
+
 }
 </script>
 

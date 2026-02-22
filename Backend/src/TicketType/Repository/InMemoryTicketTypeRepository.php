@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Tickets\TicketType\Repository;
 
+use App\Models\Festival\FestivalModel;
+use App\Models\Festival\TicketTypeFestivalModel;
 use App\Models\Festival\TicketTypesModel;
+use App\Models\Festival\TicketTypesPriceModel;
 use Carbon\Carbon;
 use Doctrine\DBAL\Exception;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
@@ -30,19 +35,16 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
     private function getFilterValues(TicketTypeGetListFilter $filterQuery): array
     {
         return [
-            // email
             [
                 'field' => TicketTypesModel::TABLE . '.name',
                 'operator' => FilterOperator::LIKE,
-                'value' => '%' . $filterQuery->getName() . '%',
+                'value' => $filterQuery->getName(),
             ],
-            // status
             [
-                'field' => TicketTypesModel::TABLE . '.price',
+                'field' => 'current_price',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getPrice(),
             ],
-            // types_of_payment_id
             [
                 'field' => TicketTypesModel::TABLE . '.active',
                 'operator' => FilterOperator::EQUAL,
@@ -53,19 +55,57 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getIsLiveTicket(),
             ],
+            [
+                'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getFestivalId()->value(),
+            ],
         ];
     }
 
     public function getList(TicketTypeGetListFilter $filters, Order $orderBy): Collection
     {
-        $result = FilterBuilder::build($this->model, Filters::fromValues($this->getFilterValues($filters)));
+        $build = $this->model::leftJoin(TicketTypeFestivalModel::TABLE, function (JoinClause $join) {
+            $join->on(
+                TicketTypeFestivalModel::TABLE . '.ticket_type_id',
+                '=',
+                $this->model::TABLE . '.id'
+            );
+        })->leftJoin(FestivalModel::TABLE, function (JoinClause $join) {
+            $join->on(
+                TicketTypeFestivalModel::TABLE . '.festival_id',
+                '=',
+                FestivalModel::TABLE . '.id'
+            );
+        })->select([
+            $this->model::TABLE . '.*',
+            FestivalModel::TABLE . '.id as festival_id',
+            DB::raw("CONCAT_WS(' ', " . FestivalModel::TABLE . ".name, " . FestivalModel::TABLE . ".year) as festival_name"),
+            DB::raw('COALESCE(
+            (SELECT price
+             FROM ' . TicketTypesPriceModel::TABLE . '
+             WHERE ' . TicketTypesPriceModel::TABLE . '.ticket_type_id = ' . $this->model::TABLE . '.id
+             AND before_date >= CURDATE()
+             ORDER BY before_date ASC
+             LIMIT 1),
+            ' . $this->model::TABLE . '.price
+            ) as current_price')
+        ]);
 
-        if($orderBy->orderBy()->value()) {
+        $result = FilterBuilder::build($build, Filters::fromValues($this->getFilterValues($filters)));
+
+        if ($orderBy->orderBy()->value()) {
             $result = $result->orderBy(
                 $orderBy->orderBy()->value(),
                 $orderBy->orderType()->value()
             );
         }
+
+        Log::info('Admin users query:', [
+            'sql' => $result->toSql(),
+            'bindings' => $result->getBindings()
+        ]);
+
         return $result->get()
             ->each(fn(TicketTypesModel $model) => TicketTypeDto::fromState($model->toArray()));
     }
