@@ -53,12 +53,20 @@ abstract class AbstractionEntity implements EntityInterface
 
     public function toArrayForEdit(): array
     {
-        return $this->toArray();
+        $result = $this->toArray();
+
+        unset($result['id']);
+
+        return $result;
     }
 
     public function toArrayForCreate(): array
     {
-        return $this->toArray();
+        $result = $this->toArray();
+
+        unset($result['id']);
+
+        return $result;
     }
 
     private function addItems(array &$array, string $key, mixed $value): void
@@ -67,7 +75,7 @@ abstract class AbstractionEntity implements EntityInterface
             $array[$key] = $value->toArray();
         } elseif ($value instanceof EntityDataInterface || $value instanceof Uuid || $value instanceof Carbon) {
             //TODO: Вынести в отдельный класс, перебросить зависимость на детей
-            $array[ltrim($key)] = (string) $value;
+            $array[ltrim($key)] = (string)$value;
         } else {
             $array[ltrim($key)] = $value;
         }
@@ -79,4 +87,31 @@ abstract class AbstractionEntity implements EntityInterface
 
         return method_exists($this, $methodName) ? $this->$methodName() : null;
     }
+
+    public function isNotEmpty(): bool
+    {
+        $vars = get_object_vars($this);
+
+        $array = [];
+        foreach ($vars as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = [];
+                foreach ($value as $item) {
+                    if ($item instanceof EntityInterface) {
+                        foreach ($item->toArray() as $datum) {
+                            if ($datum) return true;
+                        }
+                    } else {
+                        if ($item) return true;
+                    }
+                }
+            } else {
+                if ($value) return true;
+            }
+
+        }
+
+        return false;
+    }
+
 }

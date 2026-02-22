@@ -25,8 +25,7 @@ class TypesOfPaymentController extends Controller
             'success' => true,
             'list' => $application->getList(
                 TypesOfPaymentGetListQuery::fromState($request->toArray()['filter'])
-            )->getTypesOfPaymentList()
-                ->toArray(),
+            )->getTypesOfPaymentListToArray(),
         ]);
     }
 

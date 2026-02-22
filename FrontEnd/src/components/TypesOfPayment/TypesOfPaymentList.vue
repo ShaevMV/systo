@@ -16,6 +16,7 @@
                   style="cursor: pointer"
                   @click="orderBy('sort')">Сорт</th>
               <th scope="col">Реализатор</th>
+              <th scope="col">Для определённого типа билета</th>
               <th scope="col">Биллинг</th>
               <th scope="col">Активность</th>
               <th scope="col"
@@ -31,7 +32,8 @@
                 {{ item.name }}
               </th>
               <td>{{ item.sort }}</td>
-              <td>{{ item.email_seller }}</td>
+              <td>{{ item.seller.email }}</td>
+              <td>{{ item.ticket_type.name }}</td>
               <td>{{ item.is_billing ? 'ДА' : 'НЕТ' }}</td>
               <td>{{ item.active ? 'ДА' : 'НЕТ' }}</td>
               <td> <date-format :date="item.created_at"/> </td>

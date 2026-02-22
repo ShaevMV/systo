@@ -34,6 +34,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @mixin Eloquent
  * @property string|null $user_external_id Связь с продавцом или реализатором
  * @method static Builder|TypesOfPaymentModel whereUserExternalId($value)
+ * @property string|null $ticket_type_id Связь с типом билета
+ * @method static Builder|TypesOfPaymentModel whereTicketTypeId($value)
  */
 class TypesOfPaymentModel extends Model
 {
@@ -42,4 +44,17 @@ class TypesOfPaymentModel extends Model
     public const TABLE = 'types_of_payment';
 
     protected $table = self::TABLE;
+
+    protected $fillable = [
+        'id',
+        'name',
+        'created_at',
+        'updated_at',
+        'active',
+        'sort',
+        'card',
+        'is_billing',
+        'user_external_id',
+        'ticket_type_id',
+    ];
 }

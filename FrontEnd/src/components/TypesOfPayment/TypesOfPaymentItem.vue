@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <div class="title-block text-center"><h1 class="card-title">Тии билета:  {{ name }}</h1></div>
+    <div class="title-block text-center"><h1 class="card-title">Тии билета: {{ name }}</h1></div>
     <div class="row">
       <div class="col-lg-12 mx-auto">
         <div class="card">
@@ -20,26 +20,15 @@
                   <small class="form-text text-muted"> {{ getError('name') }}</small>
                 </div>
                 <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Стартовая стоимсоть:</label>
+                  <label for="company" class="col-4 col-form-label">Отлено номер карты:</label>
                   <div class="col-8">
                     <input name="company"
-                           type="number"
+                           type="text"
                            class="form-control"
-                           v-model="price"
+                           v-model="card"
                            id="company">
                   </div>
-                  <small class="form-text text-muted"> {{ getError('price') }}</small>
-                </div>
-                <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Ограничение кол-во:</label>
-                  <div class="col-8">
-                    <input name="company"
-                           type="number"
-                           class="form-control"
-                           v-model="groupLimit"
-                           id="company">
-                  </div>
-                  <small class="form-text text-muted"> {{ getError('groupLimit') }}</small>
+                  <small class="form-text text-muted"> {{ getError('card') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Сорт</label>
@@ -51,18 +40,29 @@
                            id="company">
                   </div>
                 </div>
-                <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Для живых билетов:</label>
-                  <div class="col-8">
-                    <select class="form-select"
-                            v-model="isLiveTicket"
-                            id="validationDefault01">
-                      <option value=null>Выберите</option>
-                      <option value="false">Нет</option>
-                      <option value="true">Да</option>
-                    </select>
-                  </div>
-                  <small class="form-text text-muted"> {{ getError('is_live_ticket') }}</small>
+                <div class="col-md-3">
+                  <label for="validationDefault01" class="form-label">Продовец живых билетов</label>
+                  <select class="form-select"
+                          v-model="userExternalId"
+                          id="validationDefault01">
+                    <option value=null>Выберите</option>
+                    <option v-for="getlistSeller in getlistSellers"
+                            v-bind:key="getlistSeller.id"
+                            v-bind:value="getlistSeller">{{ getlistSeller.email }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-3">
+                  <label for="validationDefault01" class="form-label">Типы билетов</label>
+                  <select class="form-select"
+                          v-model="ticketTypeId"
+                          id="validationDefault01">
+                    <option value=null>Выберите</option>
+                    <option v-for="item in ticketTypeGetList"
+                            v-bind:key="item.id"
+                            v-bind:value="item">{{ item.name }}
+                    </option>
+                  </select>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Активность:</label>
@@ -71,11 +71,24 @@
                             v-model="active"
                             id="validationDefault01">
                       <option value=null>Выберите</option>
-                      <option value="false">Фиксированная</option>
-                      <option value="true">Процент</option>
+                      <option value="false">Нет</option>
+                      <option value="true">Да</option>
                     </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('active') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Биллинг:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="isBilling"
+                            id="validationDefault01">
+                      <option value=null>Выберите</option>
+                      <option value="false">Нет</option>
+                      <option value="true">Да</option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('is_billing') }}</small>
                 </div>
                 <div class="row messager">{{ message }}</div>
                 <div class="row b-row mt-2">
@@ -113,18 +126,25 @@ export default {
   data() {
     return {
       newName: null,
-      newPrice: null,
-      newGroupLimit: null,
+      newCard: null,
       newSort: null,
       newActive: null,
-      newIsLiveTicket: null,
+      newBillind: null,
+      newUserExternalId: null,
+      newTicketTypeId: null,
       message: null,
     }
   },
   computed: {
-    ...mapGetters('appTicketType', [
-      'getError',
+    ...mapGetters('appAccount', {
+      getlistSellers: 'getList'
+    }),
+    ...mapGetters('appTicketType', {
+      ticketTypeGetList: 'getList'
+    }),
+    ...mapGetters('appTypesOfPayment', [
       'getItem',
+      'getError'
     ]),
     name: {
       get: function () {
@@ -137,26 +157,26 @@ export default {
         this.newName = newValue;
       },
     },
-    price: {
+    card: {
       get: function () {
-        if (this.newPrice === null) {
-          return this.getItem.price;
+        if (this.newCard === null) {
+          return this.getItem.card;
         }
-        return this.newPrice;
+        return this.newCard;
       },
       set: function (newValue) {
-        this.newPrice = newValue;
+        this.newCard = newValue;
       },
     },
-    groupLimit: {
+    userExternalId: {
       get: function () {
-        if (this.newGroupLimit === null) {
-          return this.getItem.groupLimit;
+        if (this.newUserExternalId === null) {
+          return this.getItem.seller.user_external_id;
         }
-        return this.newGroupLimit;
+        return this.newUserExternalId;
       },
       set: function (newValue) {
-        this.newGroupLimit = newValue;
+        this.newUserExternalId = newValue.id;
       },
     },
     sortItem: {
@@ -181,35 +201,47 @@ export default {
         this.newActive = newValue;
       },
     },
-    isLiveTicket: {
+    isBilling: {
       get: function () {
-        if (this.newIsLiveTicket === null) {
-          return this.getItem.is_live_ticket;
+        if (this.newBillind === null) {
+          return this.getItem.is_billing;
         }
-        return this.newIsLiveTicket;
+        return this.newBillind;
       },
       set: function (newValue) {
-        this.newIsLiveTicket = newValue;
+        this.newBillind = newValue;
+      },
+    },
+    ticketTypeId: {
+      get: function () {
+        if (this.newTicketTypeId === null) {
+          return this.getItem.ticket_type.ticket_type_id;
+        }
+        return this.newTicketTypeId;
+      },
+      set: function (newValue) {
+        this.newTicketTypeId = newValue.id;
       },
     }
   },
   methods: {
-    ...mapActions('appTicketType', [
+    ...mapActions('appTypesOfPayment', [
       'clearError',
       'edit',
       'create'
     ]),
     back: function () {
-      this.$router.push({name: 'TicketTypeListView'});
+      this.$router.push({name: 'TypesOfPaymentListView'});
     },
     save: function () {
       let data = {
         'name': this.name,
-        'price': this.price,
-        'groupLimit': this.groupLimit,
+        'card': this.card,
+        'is_billing': this.isBilling,
         'sort': this.sortItem,
         'active': this.active,
-        'is_live_ticket': this.isLiveTicket,
+        'user_external_id': this.userExternalId,
+        'ticket_type_id': this.ticketTypeId,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {

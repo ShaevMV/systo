@@ -25,4 +25,6 @@ interface EntityInterface
      * Вывести объект в виде json
      */
     public function toJson(): string;
+
+    public function isNotEmpty(): bool;
 }

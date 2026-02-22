@@ -52,7 +52,6 @@ class TicketTypeDto extends AbstractionEntity implements Response
     {
         $result =  parent::toArrayForEdit();
         unset(
-            $result['id'],
             $result['festival'],
         );
 
@@ -63,7 +62,6 @@ class TicketTypeDto extends AbstractionEntity implements Response
     {
         $result =  parent::toArrayForCreate();
         unset(
-            $result['id'],
             $result['festival']
         );
 
