@@ -29,6 +29,9 @@ import TicketTypeItemView from "@/views/ticketType/TicketTypeItemView.vue";
 import TypesOfPaymentListView from "@/views/typesOfPayment/TypesOfPaymentListView.vue";
 import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemView.vue";
 
+import AccountListView from "@/views/account/AccountListView.vue";
+import AccountItemView from "@/views/account/AccountItemView.vue";
+
 const routes = [
     {
         path: '/',
@@ -273,6 +276,28 @@ const routes = [
         path: '/typesOfPayment/:id?',
         name: 'TypesOfPaymentItemView',
         component: TypesOfPaymentItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Акаунтды пользователей
+    {
+        path: '/account/list',
+        name: 'AccountListView',
+        component: AccountListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/account/:id?',
+        name: 'AccountItemView',
+        component: AccountItemView,
         props: true,
         meta: {
             'requiresAuth': true,

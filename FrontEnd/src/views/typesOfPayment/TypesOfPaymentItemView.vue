@@ -16,7 +16,9 @@ export default {
       orderBy: {},
     });
     window.store.dispatch('appTicketType/loadList', {
-      filter: {},
+      filter: {
+        'is_live_ticket': 'true'
+      },
       orderBy: {},
     });
     if (to.params.id) {
