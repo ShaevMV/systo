@@ -5,7 +5,9 @@ declare(strict_types = 1);
 namespace Tickets\User\Account\Repositories;
 
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\User\Account\Application\GetList\AccountGetListFilter;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
 
@@ -18,7 +20,7 @@ interface UserRepositoriesInterface
     /**
      * @return UserInfoDto[]
      */
-    public function getList(Filters $filters): array;
+    public function getList(AccountGetListFilter $filters, Order $orderBy): array;
 
     public function edit(Uuid $id, UserInfoDto $userInfoDto): bool;
 

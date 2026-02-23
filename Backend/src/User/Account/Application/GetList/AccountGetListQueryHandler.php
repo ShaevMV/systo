@@ -24,46 +24,9 @@ class AccountGetListQueryHandler implements QueryHandler
      */
     public function __invoke(AccountGetListQuery $accountGetListQuery): AccountGetListResponse
     {
-        $filter = Filters::fromValues($this->getFilterValues($accountGetListQuery));
-        return new AccountGetListResponse($this->repositories->getList($filter));
-    }
-
-    private function getFilterValues(AccountGetListQuery $filterQuery): array
-    {
-        return [
-            // email
-            [
-                'field' => User::TABLE . '.email',
-                'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getEmail(),
-            ],
-            // name
-            [
-                'field' => User::TABLE . '.name',
-                'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getName(),
-            ],
-            // types_of_payment_id
-            [
-                'field' => User::TABLE . '.types_of_payment_id',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getCity(),
-            ],
-            [
-                'field' => User::TABLE . '.city',
-                'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getCity(),
-            ],
-            [
-                'field' => User::TABLE . '.phone',
-                'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getPhone(),
-            ],
-            [
-                'field' => User::TABLE . '.role',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getRole(),
-            ],
-        ];
+        return new AccountGetListResponse($this->repositories->getList(
+            $accountGetListQuery->getAccountGetListFilter(),
+            $accountGetListQuery->getOrderBy(),
+        ));
     }
 }

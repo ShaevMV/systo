@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\User\Account\Application\AccountApplication;
+use Tickets\User\Account\Application\GetList\AccountGetListFilter;
 use Tickets\User\Account\Application\GetList\AccountGetListQuery;
 use Tickets\User\Account\Dto\UserInfoDto;
 use Tickets\User\Account\Helpers\AccountRoleHelper;
@@ -29,7 +31,10 @@ class AccountController extends Controller
         return response()->json([
             'success' => true,
             'list' => $accountApplication->getList(
-                AccountGetListQuery::fromState($request->toArray()['filter'])
+                new AccountGetListQuery(
+                    AccountGetListFilter::fromState($request->toArray()['filter']),
+                    Order::fromState($request->toArray()['orderBy'])
+                )
             )->toArray(),
         ]);
     }

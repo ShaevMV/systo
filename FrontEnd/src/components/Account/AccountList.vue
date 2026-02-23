@@ -23,7 +23,7 @@
               </th>
               <th scope="col"
                   style="cursor: pointer"
-                  @click="orderBy('cite')">город
+                  @click="orderBy('city')">город
               </th>
               <th scope="col"
                   style="cursor: pointer"

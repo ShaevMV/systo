@@ -5,52 +5,24 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Application\GetList;
 
 use Shared\Domain\Bus\Query\Query;
+use Shared\Domain\Criteria\Order;
 
 class AccountGetListQuery implements Query
 {
     public function __construct(
-        private ?string $name = null,
-        private ?string $email = null,
-        private ?string $role = null,
-        private ?string $phone = null,
-        private ?string $city = null,
+        private AccountGetListFilter $accountGetListFilter,
+        private Order $orderBy
     )
     {
     }
 
-    public function getName(): ?string
+    public function getAccountGetListFilter(): AccountGetListFilter
     {
-        return $this->name;
+        return $this->accountGetListFilter;
     }
 
-    public function getEmail(): ?string
+    public function getOrderBy(): Order
     {
-        return $this->email;
-    }
-
-    public function getRole(): ?string
-    {
-        return $this->role;
-    }
-
-    public function getPhone(): ?string
-    {
-        return $this->phone;
-    }
-
-    public function getCity(): ?string
-    {
-        return $this->city;
-    }
-
-    public static function fromState(array $data): self
-    {
-        return new self(
-            $data['name'] ?? null,
-            $data['email'] ?? null,
-            $data['role'] ?? null,
-            $data['phone'] ?? null,
-            $data['city'] ?? null,
-        );
+        return $this->orderBy;
     }
 }
