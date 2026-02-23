@@ -30,7 +30,7 @@ import TypesOfPaymentListView from "@/views/typesOfPayment/TypesOfPaymentListVie
 import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemView.vue";
 
 import AccountListView from "@/views/account/AccountListView.vue";
-import AccountItemView from "@/views/account/AccountItemView.vue";
+
 
 const routes = [
     {
@@ -288,16 +288,6 @@ const routes = [
         path: '/account/list',
         name: 'AccountListView',
         component: AccountListView,
-        props: true,
-        meta: {
-            'requiresAuth': true,
-            'role': ['admin']
-        }
-    },
-    {
-        path: '/account/:id?',
-        name: 'AccountItemView',
-        component: AccountItemView,
         props: true,
         meta: {
             'requiresAuth': true,

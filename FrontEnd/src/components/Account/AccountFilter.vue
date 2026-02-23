@@ -73,10 +73,6 @@
                       @click="clearFilter"
                       type="submit">Сбросить фильтр
               </button>
-              <button class="btn btn-primary"
-                      @click="goToItem"
-                      type="submit">Добавить новый
-              </button>
             </div>
           </div>
         </div>
@@ -132,10 +128,6 @@ export default {
         filter: this.getFileter,
         orderBy: this.getOrderBy
       });
-    },
-    goToItem() {
-      const route = this.$router.resolve({name: 'AccountItemView'});
-      window.open(route.href, '_blank');
     },
   }
 
