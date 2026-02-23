@@ -26,6 +26,6 @@ class SellerDto extends AbstractionEntity
 
     public function getUserExternalId(): ?Uuid
     {
-        return $this->user_external_id;
+        return $this->id;
     }
 }

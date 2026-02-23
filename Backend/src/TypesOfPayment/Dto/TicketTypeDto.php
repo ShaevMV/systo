@@ -26,6 +26,6 @@ class TicketTypeDto extends AbstractionEntity
 
     public function getTicketTypeId(): ?Uuid
     {
-        return $this->ticket_type_id;
+        return $this->id;
     }
 }

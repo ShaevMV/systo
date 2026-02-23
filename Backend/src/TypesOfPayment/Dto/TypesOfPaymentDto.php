@@ -19,9 +19,9 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
         protected int     $sort,
         protected bool    $is_billing,
         protected Uuid    $id,
-        protected string $card,
         protected SellerDto $seller,
         protected TicketTypeDto $ticket_type,
+        protected ?string $card = null,
         protected ?Carbon $created_at = null,
     )
     {
@@ -29,16 +29,16 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
 
     public static function fromState(array $data): self
     {
-        Log::info('toArray', $data);
+        Log::info('\Tickets\TypesOfPayment\Dto\TypesOfPaymentDto::fromState', $data);
         return new self(
             $data['name'],
-            boolval($data['active']),
+            $data['active'] === 'true',
             $data['sort'],
-            boolval($data['is_billing']),
+            $data['is_billing'] === 'true',
             empty($data['id']) ? Uuid::random() : new Uuid($data['id']),
-            $data['card'],
             SellerDto::fromState($data),
             TicketTypeDto::fromState($data),
+            $data['card'] ?? '',
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
         );
     }

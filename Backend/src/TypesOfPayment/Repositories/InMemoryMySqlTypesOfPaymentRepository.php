@@ -86,7 +86,7 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
         if(!$rawData = $this->model::whereId($id->value())->first()) {
             throw new \DomainException('TypesOfPayment not found ' . $id->value());
         }
-        Log::info('toArray', $paymentDto->toArrayForEdit());
+
         return $rawData->fill($paymentDto->toArrayForEdit())->save();
     }
 

@@ -171,7 +171,7 @@ export default {
     userExternalId: {
       get: function () {
         if (this.newUserExternalId === null) {
-          return this.getItem.seller.user_external_id;
+          return this.getItem.seller.id;
         }
         return this.newUserExternalId;
       },
@@ -215,7 +215,7 @@ export default {
     ticketTypeId: {
       get: function () {
         if (this.newTicketTypeId === null) {
-          return this.getItem.ticket_type.ticket_type_id;
+          return this.getItem.ticket_type.id;
         }
         return this.newTicketTypeId;
       },
