@@ -5,46 +5,25 @@ declare(strict_types=1);
 namespace Tickets\TypesOfPayment\Application\GetList;
 
 use Shared\Domain\Bus\Query\Query;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 
 class TypesOfPaymentGetListQuery implements Query
 {
     public function __construct(
-        private ?string $name = null,
-        private ?bool $active = null,
-        private ?bool $isBilling = null,
-        private ?Uuid $userExternalId = null,
+        private TypesOfPaymentGetListFilter $typesOfPaymentGetListFilter,
+        private Order $orderBy,
     )
     {
     }
 
-    public function getName(): ?string
+    public function getTypesOfPaymentGetListFilter(): TypesOfPaymentGetListFilter
     {
-        return $this->name;
+        return $this->typesOfPaymentGetListFilter;
     }
 
-    public function getActive(): ?bool
+    public function getOrderBy(): Order
     {
-        return $this->active;
-    }
-
-    public function getIsBilling(): ?bool
-    {
-        return $this->isBilling;
-    }
-
-    public function getUserExternal(): ?Uuid
-    {
-        return $this->userExternalId;
-    }
-
-    public static function fromState(array $data): self
-    {
-        return new self(
-            $data['name'] ?? null,
-            empty($data['active']) ? null : $data['active'],
-            empty($data['isBilling']) ? null : $data['isBilling'],
-            empty($data['userExternalId']) ? null : new Uuid($data['userExternalId']),
-        );
+        return $this->orderBy;
     }
 }

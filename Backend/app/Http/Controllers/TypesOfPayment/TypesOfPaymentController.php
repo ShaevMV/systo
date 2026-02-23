@@ -8,8 +8,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListFilter;
 use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
 use Tickets\TypesOfPayment\Application\TypesOfPaymentApplication;
 use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
@@ -24,7 +26,10 @@ class TypesOfPaymentController extends Controller
         return response()->json([
             'success' => true,
             'list' => $application->getList(
-                TypesOfPaymentGetListQuery::fromState($request->toArray()['filter'])
+                new TypesOfPaymentGetListQuery(
+                    TypesOfPaymentGetListFilter::fromState($request->toArray()['filter']),
+                    Order::fromState($request->toArray()['orderBy'])
+                ),
             )->getTypesOfPaymentListToArray(),
         ]);
     }

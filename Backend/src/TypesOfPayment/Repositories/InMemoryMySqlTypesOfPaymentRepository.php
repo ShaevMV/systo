@@ -12,9 +12,13 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListFilter;
+use Tickets\TypesOfPayment\Application\GetList\TypesOfPaymentGetListQuery;
 use Tickets\TypesOfPayment\Dto\TypesOfPaymentDto;
 
 class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryInterface
@@ -25,7 +29,7 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
     {
     }
 
-    public function getList(Filters $filters): Collection
+    public function getList(TypesOfPaymentGetListFilter $filters, Order $orderBy): Collection
     {
         $builder = $this->model::leftJoin(User::TABLE, function (JoinClause $join) {
             $join->on(
@@ -44,11 +48,41 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
             User::TABLE . '.email as email_seller',
             TicketTypesModel::TABLE . '.name as ticket_type_name',
         ]);
+        if ($orderBy->orderBy()->value()) {
+            $builder = $builder->orderBy(
+                $orderBy->orderBy()->value(),
+                $orderBy->orderType()->value()
+            );
+        }
 
-        return FilterBuilder::build($builder, $filters)
-            ->orderBy('created_at', 'DESC')
-            ->get()
+        return FilterBuilder::build($builder, Filters::fromValues(
+            $this->getFilterValues($filters)
+        ))->get()
             ->map(fn(TypesOfPaymentModel $model) => TypesOfPaymentDto::fromState($model->toArray()));
+    }
+
+    private function getFilterValues(TypesOfPaymentGetListFilter $filterQuery): array
+    {
+        return [
+            // email
+            [
+                'field' => TypesOfPaymentModel::TABLE . '.name',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getName(),
+            ],
+            // status
+            [
+                'field' => TypesOfPaymentModel::TABLE . '.active',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getActive(),
+            ],
+            // types_of_payment_id
+            [
+                'field' => TypesOfPaymentModel::TABLE . '.is_billing',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getIsBilling(),
+            ],
+        ];
     }
 
     public function getItem(Uuid $id): TypesOfPaymentDto
@@ -83,7 +117,7 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
      */
     public function editItem(Uuid $id, TypesOfPaymentDto $paymentDto): bool
     {
-        if(!$rawData = $this->model::whereId($id->value())->first()) {
+        if (!$rawData = $this->model::whereId($id->value())->first()) {
             throw new \DomainException('TypesOfPayment not found ' . $id->value());
         }
 

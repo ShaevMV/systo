@@ -23,34 +23,9 @@ class TypesOfPaymentGetListQueryHandler implements QueryHandler
     {
         return new TypesOfPaymentListResponse(
             $this->repository->getList(
-                Filters::fromValues(
-                    $this->getFilterValues($query)
-                )
+               $query->getTypesOfPaymentGetListFilter(),
+                $query->getOrderBy(),
             )
         );
-    }
-
-    private function getFilterValues(TypesOfPaymentGetListQuery $filterQuery): array
-    {
-        return [
-            // email
-            [
-                'field' => TypesOfPaymentModel::TABLE . '.name',
-                'operator' => FilterOperator::LIKE,
-                'value' => $filterQuery->getName(),
-            ],
-            // status
-            [
-                'field' => TypesOfPaymentModel::TABLE . '.active',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getActive(),
-            ],
-            // types_of_payment_id
-            [
-                'field' => TypesOfPaymentModel::TABLE . '.is_billing',
-                'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getIsBilling(),
-            ],
-        ];
     }
 }
