@@ -45,7 +45,7 @@
                     ...
                   </button>
                   <div class="dropdown-menu">
-                <span class="dropdown-item btn-link"
+                  <span class="dropdown-item btn-link"
                       role="button"
                       v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
                       @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>

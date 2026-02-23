@@ -33,21 +33,37 @@
                   style="cursor: pointer"
                   @click="orderBy('created_at')">Дата создание
               </th>
+              <th scope="col">Сменить роль</th>
               <th scope="col" class="mobile"></th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(item,index) in getList"
                 v-bind:key="index">
-              <th scope="row" class="mobile" @click="goToItem(item.id)" style="cursor: pointer">
+              <th scope="row" class="mobile">
                 {{ item.name }}
               </th>
               <td>{{ item.email }}</td>
               <td>{{ item.phone }}</td>
               <td>{{ item.city }}</td>
-              <td>{{ item.role }}</td>
+              <td>{{ listRole[item.role] }}</td>
               <td>
                 <date-format :date="item.created_at"/>
+              </td>
+              <td class="mobile">
+                <div class="btn-group">
+                  <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false">
+                    ...
+                  </button>
+                  <div class="dropdown-menu">
+                  <span class="dropdown-item btn-link"
+                        role="button"
+                        v-for="(role, key) in listRole" v-bind:key="key"
+                        @click="chance(item.id,key)">{{ role }}</span>
+                  </div>
+                </div>
               </td>
               <td>
                 <span
@@ -81,11 +97,20 @@ export default {
       'getFileter',
       'getOrderBy'
     ]),
+    listRole() {
+      return {
+        admin: 'Админ',
+        seller: 'Продовец живых билетов',
+        pusher: 'Френдли Продовец ',
+        guest: 'Гость',
+      };
+    },
   },
   methods: {
     ...mapActions('appAccount', [
       'loadList',
       'setOrderBy',
+      'chanceRole',
       'remove'
     ]),
     localRemove(id) {
@@ -100,9 +125,18 @@ export default {
         orderBy: this.getOrderBy,
       });
     },
-    goToItem(id) {
-      const route = this.$router.resolve({name: 'AccountItemView', params: {id: id}});
-      window.open(route.href, '_blank');
+    async chance(id, role) {
+      let self = this;
+      await this.chanceRole({
+        id: id,
+        role: role,
+        calback: function () {
+          self.loadList({
+            filter: self.getFileter,
+            orderBy: self.getOrderBy,
+          });
+        }
+      });
     },
   },
   async created() {

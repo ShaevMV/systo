@@ -102,4 +102,14 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
 
         return $model->update($userInfoDto->toArray()) > 0;
     }
+
+    public function chanceRole(Uuid $id, string $role): bool
+    {
+        if(!$model = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('User not found for edit ' . $id->value());
+        }
+
+        $model->role = $role;
+        return $model->save();
+    }
 }

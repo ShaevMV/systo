@@ -21,4 +21,6 @@ interface UserRepositoriesInterface
     public function getList(Filters $filters): array;
 
     public function edit(Uuid $id, UserInfoDto $userInfoDto): bool;
+
+    public function chanceRole(Uuid $id, string $role): bool;
 }

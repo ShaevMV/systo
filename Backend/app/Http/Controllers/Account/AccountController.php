@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Application\GetList\AccountGetListQuery;
 use Tickets\User\Account\Dto\UserInfoDto;
@@ -57,6 +58,23 @@ class AccountController extends Controller
             'success' => $accountApplication->edit(
                 new Uuid($id),
                 UserInfoDto::fromState($request->toArray())
+            ),
+        ]);
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function chanceRole(
+        string             $id,
+        Request            $request,
+        AccountApplication $accountApplication,
+    ): JsonResponse
+    {
+        return response()->json([
+            'success' => $accountApplication->chanceRole(
+                new Uuid($id),
+                $request->get('role'),
             ),
         ]);
     }

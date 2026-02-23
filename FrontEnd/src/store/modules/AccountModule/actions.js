@@ -57,6 +57,23 @@ export const edit = (context, payload) => {
     });
 };
 
+export const chanceRole = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post(API + '/chanceRole/' + payload.id, {
+            'role': payload.role
+        });
+        return promise.then(function (response) {
+            if(payload.calback !== undefined) {
+                payload.calback()
+            }
+            context.commit('setMessage', response.data.message)
+        }).catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
+    });
+};
+
 export const remove = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.delete(API + '/delete/' + payload.id, {
