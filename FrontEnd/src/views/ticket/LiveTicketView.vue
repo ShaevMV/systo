@@ -1,5 +1,8 @@
 <template>
-  <h1> номер вашего билета {{getLiveTicketNumber}} </h1>
+  <div class="ticket">
+    <h1> Номер вашего оргвзноса {{ getLiveTicketNumber }} </h1>
+    <img src="/assets/img/medved.png" alt="Номер Вашего Оргвзноса">
+  </div>
 </template>
 
 <script>

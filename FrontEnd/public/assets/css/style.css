@@ -1937,6 +1937,19 @@ input[readonly] {
     margin-bottom: 0;
 }
 
+
+.ticket{
+    text-align: center;
+    padding-top: 3vw;
+}
+
+.ticket img{
+    display: block;
+    width: 30%;
+    margin: 3vw auto;
+}
+
+
 #total-numberz span {
     font-weight: bold;
     color: var(--c-red);
@@ -2280,7 +2293,6 @@ input[readonly] {
 .faq-question h2 {
     font-size: 1.1rem;
     font-weight: bold;
-    /*color: var(--c-purple);*/
     margin: 0;
     flex: 1;
     padding-right: 20px;
@@ -2655,6 +2667,10 @@ input[readonly] {
 @media (max-width: 605px) {
     #main h1 {
         font-size: 22px;
+    }
+
+    .ticket{
+        padding-top: 8vw;
     }
 
     .line-2 {
@@ -3151,11 +3167,21 @@ input[readonly] {
     .ticket-choice label .form-check-input {
         left: 0;
     }
+
+    .ticket img{
+        width: 50%;
+        margin-top: 5vw;
+    }
 }
 
 
 @media (max-width: 405px) {
     .ticket-choice label .form-check-input {
         display: none;
+    }
+
+    .ticket img{
+        width: 70%;
+        margin-top: 7vw;
     }
 }
