@@ -25,7 +25,7 @@ final class UserInfoDto extends AbstractionEntity implements Response
         return new self(
             new Uuid($data['id']),
             $data['email'],
-            $data['city'],
+            $data['city'] ?? '',
             $data['role'],
             $data['phone'] ?? null,
             $data['name'] ?? null
