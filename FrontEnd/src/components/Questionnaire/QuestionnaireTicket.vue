@@ -58,8 +58,7 @@
       </div>
 
       <div class="quest-item">
-        <label for="questionnaire_tellegram" class="line-2">«Добавьте ваш ник в Телеграм строго в формате @никнейм»
-          (номера телефонов не принимаются):
+        <label for="questionnaire_tellegram" class="line-2">Добавьте ваш ник в Телеграм строго в формате «цифры и ник без @» (номера телефонов не принимаются):
           <span v-show="!isNewUser">(для доступа в новый закрытый чат Систо)</span></label>
 
         <div class="input-group" id="promo-input">
@@ -67,8 +66,8 @@
               type="text"
               id="questionnaire_tellegram"
               class="form-control"
-              placeholder="Telegram-аккаунт"
-              aria-label="Telegram-аккаунт"
+              placeholder="@telegram_nickname"
+              aria-label="@telegram_nickname"
               :value="questionnaire.telegram"
               @input="updateParent('telegram', $event.target.value)"
               aria-describedby="basic-addon1"
