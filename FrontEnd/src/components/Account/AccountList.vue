@@ -11,10 +11,6 @@
             <tr>
               <th scope="col"
                   style="cursor: pointer"
-                  @click="orderBy('name')">Имя
-              </th>
-              <th scope="col"
-                  style="cursor: pointer"
                   @click="orderBy('email')">email
               </th>
               <th scope="col"
@@ -40,9 +36,6 @@
             <tbody>
             <tr v-for="(item,index) in getList"
                 v-bind:key="index">
-              <th scope="row" class="mobile">
-                {{ item.name }}
-              </th>
               <td>{{ item.email }}</td>
               <td>{{ item.phone }}</td>
               <td>{{ item.city }}</td>
