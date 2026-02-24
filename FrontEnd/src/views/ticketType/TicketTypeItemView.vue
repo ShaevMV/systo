@@ -14,7 +14,7 @@ export default {
         id: to.params.id,
       });
     }
-
+    window.store.dispatch('appFestivalTickets/getListFestival');
     next();
   },
 }

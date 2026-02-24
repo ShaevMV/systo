@@ -71,7 +71,8 @@ class TicketTypeController extends Controller
                     new Uuid($id),
                     TicketTypeDto::fromState($request->toArray()['data'])
                 ),
-                'item' => $application->getItem(new Uuid($id))->toArray()
+                'item' => $application->getItem(new Uuid($id))->toArray(),
+                'message' => 'Тип билета отредактирован'
             ]);
         } catch (DomainException $exception) {
             return response()->json([
@@ -94,7 +95,8 @@ class TicketTypeController extends Controller
 
         return response()->json([
             'success' => $application->create($data),
-            'item' => $application->getItem($data->getId())->toArray()
+            'item' => $application->getItem($data->getId())->toArray(),
+            'message' => 'Тип билета создан'
         ]);
     }
 

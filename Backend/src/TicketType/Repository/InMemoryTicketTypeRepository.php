@@ -26,7 +26,8 @@ use Tickets\TicketType\Dto\TicketTypeDto;
 class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
 {
     public function __construct(
-        private TicketTypesModel $model,
+        private TicketTypesModel        $model,
+        private TicketTypeFestivalModel $ticketTypeFestivalModel,
     )
     {
     }
@@ -96,20 +97,26 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
             );
         }
 
-        Log::info('Admin users query:', [
-            'sql' => $result->toSql(),
-            'bindings' => $result->getBindings()
-        ]);
-
         return $result->get()
             ->each(fn(TicketTypesModel $model) => TicketTypeDto::fromState($model->toArray()));
     }
 
     public function getItem(Uuid $id): TicketTypeDto
     {
-        if (!$rawData = $this->model::whereId($id->value())->first()) {
+        if (!$this->model::whereId($id->value())->exists()) {
             throw new \DomainException('TypesOfPayment not found ' . $id->value());
         }
+        $rawData = $this->model::leftJoin(TicketTypeFestivalModel::TABLE, function (JoinClause $join) {
+            $join->on(
+                TicketTypeFestivalModel::TABLE . '.ticket_type_id',
+                '=',
+                $this->model::TABLE . '.id'
+            );
+        })->select([
+            $this->model::TABLE . '.*',
+            TicketTypeFestivalModel::TABLE . '.festival_id'
+        ])->where($this->model::TABLE . '.id', '=', $id->value())
+            ->first();
 
         return TicketTypeDto::fromState($rawData->toArray());
     }
@@ -122,8 +129,22 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
         if (!$rawData = $this->model::whereId($id->value())->first()) {
             throw new \DomainException('TypesOfPayment not found ' . $id->value());
         }
+        if ($data->getFestivalId()) {
+            $this->sendFestival($id, $data->getFestivalId());
+        }
 
         return $rawData->fill($data->toArrayForEdit())->save();
+    }
+
+    private function sendFestival(Uuid $ticketTypeId, Uuid $festivalId): void
+    {
+        if(!$rawData = $this->ticketTypeFestivalModel::whereTicketTypeId($ticketTypeId->value())->first()){
+            $rawData = new TicketTypeFestivalModel();
+            $rawData->ticket_type_id = $ticketTypeId->value();
+        };
+
+        $rawData->festival_id = $festivalId->value();
+        $rawData->save();
     }
 
     /**
@@ -133,16 +154,22 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
      */
     public function create(TicketTypeDto $data): bool
     {
-        $data = $data->toArray();
+        $dataAr = $data->toArrayForCreate();
         try {
             DB::beginTransaction();
             $this->model->insert(
-                array_merge($data,
+                array_merge($dataAr,
                     [
                         'created_at' => (string)(new Carbon()),
                         'updated_at' => (string)(new Carbon()),
                     ]
                 ));
+            if ($data->getFestivalId()) {
+                $this->sendFestival(
+                    $data->getId(),
+                    $data->getFestivalId()
+                );
+            }
             DB::commit();
             return true;
         } catch (Exception $exception) {

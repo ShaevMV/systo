@@ -24,3 +24,7 @@ export const getFileter = state => {
 export const getOrderBy = state => {
     return state.orderBy;
 };
+
+export const getMessage = state => {
+    return state.message;
+};

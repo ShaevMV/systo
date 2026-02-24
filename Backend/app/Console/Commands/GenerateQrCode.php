@@ -36,7 +36,7 @@ class GenerateQrCode extends Command
             echo $i . '
 ';
             $qrCode = $service->createQrCode(
-                'https://org.spaceofjoy.ru/ticket/live/.'.$number, '');
+                'https://org.spaceofjoy.ru/braslet/.'.$number, '');
             $qrCode->saveToFile(__DIR__ . '/QR/' . TicketLiveService::addZero($i) . ".png");
         }
 

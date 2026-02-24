@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\Log;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Festival\Response\TicketTypeDto;
 
@@ -31,7 +32,10 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $data = $this->joinFestival($festivalId, $afterDate)
             ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
             ->where('active', '=', 1);
-
+        Log::info('getList:', [
+            'sql' => $data->toSql(),
+            'bindings' => $data->getBindings()
+        ]);
         $data = $data->get()
             ->toArray();
 

@@ -55,7 +55,7 @@ abstract class AbstractionEntity implements EntityInterface
     {
         $result = $this->toArray();
 
-        unset($result['id']);
+        unset($result['id'], $result['created_at']);
 
         return $result;
     }
@@ -64,7 +64,7 @@ abstract class AbstractionEntity implements EntityInterface
     {
         $result = $this->toArray();
 
-        unset($result['id']);
+       // unset($result['id']);
 
         return $result;
     }

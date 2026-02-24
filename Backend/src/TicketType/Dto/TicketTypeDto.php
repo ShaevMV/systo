@@ -52,7 +52,7 @@ class TicketTypeDto extends AbstractionEntity implements Response
     {
         $result =  parent::toArrayForEdit();
         unset(
-            $result['festival'],
+            $result['festival']
         );
 
         return  $result;
@@ -62,7 +62,7 @@ class TicketTypeDto extends AbstractionEntity implements Response
     {
         $result =  parent::toArrayForCreate();
         unset(
-            $result['festival']
+            $result['festival'], $result['festival_id'],
         );
 
         return  $result;
@@ -71,5 +71,10 @@ class TicketTypeDto extends AbstractionEntity implements Response
     public function getId(): Uuid
     {
         return $this->id;
+    }
+
+    public function getFestivalId(): ?Uuid
+    {
+        return $this->festival_id;
     }
 }

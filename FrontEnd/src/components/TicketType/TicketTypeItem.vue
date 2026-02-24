@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <div class="title-block text-center"><h1 class="card-title">Тии билета:  {{ name }}</h1></div>
+    <div class="title-block text-center"><h1 class="card-title">Тии билета: {{ name }}</h1></div>
     <div class="row">
       <div class="col-lg-12 mx-auto">
         <div class="card">
@@ -77,7 +77,23 @@
                   </div>
                   <small class="form-text text-muted"> {{ getError('active') }}</small>
                 </div>
-                <div class="row messager">{{ message }}</div>
+                <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Фестиваль:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="festival_id"
+                            id="validationDefault01">
+                      <option v-for="(festivalItem) in getFestivalList"
+                              v-bind:key="festivalItem.id"
+                              :selected="festivalItem.id == festival_id"
+                              v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('festival_id') }}</small>
+                </div>
+
+                <div class="row messager">{{ getMessage }}</div>
                 <div class="row b-row mt-2">
                   <button type="submit"
                           @click="save"
@@ -118,14 +134,29 @@ export default {
       newSort: null,
       newActive: null,
       newIsLiveTicket: null,
-      message: null,
+      newFestivalId: null,
     }
   },
   computed: {
     ...mapGetters('appTicketType', [
       'getError',
       'getItem',
+      'getMessage'
     ]),
+    ...mapGetters('appFestivalTickets', [
+      'getFestivalList',
+    ]),
+    festival_id: {
+      get: function () {
+        if (this.newFestivalId === null) {
+          return this.getItem.festival_id;
+        }
+        return this.newFestivalId;
+      },
+      set: function (newValue) {
+        this.newFestivalId = newValue;
+      },
+    },
     name: {
       get: function () {
         if (this.newName === null) {
@@ -210,6 +241,7 @@ export default {
         'sort': this.sortItem,
         'active': this.active,
         'is_live_ticket': this.isLiveTicket,
+        'festival_id': this.festival_id,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {
