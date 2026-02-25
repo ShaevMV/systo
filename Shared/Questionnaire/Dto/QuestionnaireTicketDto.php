@@ -16,7 +16,7 @@ class QuestionnaireTicketDto implements Response
         protected string              $questionForSysto,
         protected string              $phone,
         protected ?string              $howManyTimes = null,
-        protected QuestionnaireStatus $status = QuestionnaireStatus::NEW,
+        protected string              $status = QuestionnaireStatus::NEW,
         protected bool                $is_have_in_club = false,
         protected ?string             $email = null,
         protected ?string             $telegram = null,
@@ -48,7 +48,7 @@ class QuestionnaireTicketDto implements Response
             $data['questionForSysto'],
             $data['phone'],
             (string)$data['howManyTimes'] ?? null,
-            QuestionnaireStatus::from($data['status']),
+            $data['status'],
             (bool)($data['is_have_in_club'] ?? false),
             $data['email'] ?? null,
             $data['telegram'] ?? null,
@@ -145,7 +145,7 @@ class QuestionnaireTicketDto implements Response
         $this->userId = $userId;
     }
 
-    public function getStatus(): QuestionnaireStatus
+    public function getStatus(): string
     {
         return $this->status;
     }
