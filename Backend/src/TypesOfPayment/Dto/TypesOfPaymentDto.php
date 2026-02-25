@@ -29,7 +29,7 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
 
     public static function fromState(array $data): self
     {
-
+        Log::info('\Tickets\TypesOfPayment\Dto\TypesOfPaymentDto::fromState', $data);
         $active = $data['active'] === "true";
         $is_billing = $data['is_billing'] === "true";
 
