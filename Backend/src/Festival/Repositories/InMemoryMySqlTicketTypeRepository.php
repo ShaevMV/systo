@@ -32,10 +32,7 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $data = $this->joinFestival($festivalId, $afterDate)
             ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
             ->where('active', '=', 1);
-        Log::info('getList:', [
-            'sql' => $data->toSql(),
-            'bindings' => $data->getBindings()
-        ]);
+
         $data = $data->get()
             ->toArray();
 

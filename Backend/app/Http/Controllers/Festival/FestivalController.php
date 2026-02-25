@@ -48,6 +48,9 @@ class FestivalController extends Controller
             ->toArray();
     }
 
+    /**
+     * @throws JsonException
+     */
     public function loadByTicketType(
         string $ticketTypeId,
     ): array
