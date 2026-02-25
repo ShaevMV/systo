@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Shared\Questionnaire\Domain\ValueObject;
 
-enum QuestionnaireStatus: string
+class QuestionnaireStatus
 {
-    case NEW = 'NEW';
-    case APPROVE = 'APPROVE';
+    public const NEW = 'NEW';
+    public const APPROVE = 'APPROVE';
 }

@@ -40,5 +40,5 @@ interface QuestionnaireRepositoryInterface
      */
     public function get(int $id): QuestionnaireTicketDto;
 
-    public function cacheStatus(int $id, QuestionnaireStatus $questionnaireStatus): bool;
+    public function cacheStatus(int $id, string $questionnaireStatus): bool;
 }

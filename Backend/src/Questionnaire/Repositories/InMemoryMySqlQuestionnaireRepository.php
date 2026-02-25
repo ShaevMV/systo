@@ -95,7 +95,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         return QuestionnaireTicketDto::fromState($rawData);
     }
 
-    public function cacheStatus(int $id, QuestionnaireStatus $questionnaireStatus): bool
+    public function cacheStatus(int $id, string $questionnaireStatus): bool
     {
         $rawData = $this->model::find($id);
         if (!$rawData) {
