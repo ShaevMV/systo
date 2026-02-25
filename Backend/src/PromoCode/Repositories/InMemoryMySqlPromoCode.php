@@ -119,9 +119,9 @@ class InMemoryMySqlPromoCode implements PromoCodeInterface
      */
     public function createOrUpdate(PromoCodeDto $promoCodeDto): bool
     {
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $rawModel = $this->model::whereId($promoCodeDto->getId()->value());
             if (!$rawModel->exists()) {
                 $data = $promoCodeDto->toArrayForTable();

@@ -42,10 +42,10 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function create(OrderTicketDto $orderTicketDto): bool
     {
-
+        DB::beginTransaction();
         $data = $orderTicketDto->toArray();
         try {
-            DB::beginTransaction();
+
             $this->model->insert(
                 array_merge($data,
                     [
@@ -223,9 +223,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 'email' => $guest->getEmail(),
             ];
         }
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $order = $this->model::find($orderId->value());
             $order->status = (string)$newStatus;
             $order->guests = $arrGuests;

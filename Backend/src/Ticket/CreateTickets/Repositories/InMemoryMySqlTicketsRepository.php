@@ -40,9 +40,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         if ($this->model::whereId($ticketDto->getId())->exists()) {
             return true;
         }
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $this->model::insert($ticketDto->toArray());
             DB::commit();
             return true;
@@ -57,9 +57,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
      */
     public function deleteTicketsByOrderId(Uuid $orderId): bool
     {
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $this->model::whereOrderTicketId($orderId->value())->delete();
             DB::commit();
             return true;

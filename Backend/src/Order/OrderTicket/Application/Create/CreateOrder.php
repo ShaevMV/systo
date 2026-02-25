@@ -47,9 +47,9 @@ final class CreateOrder
         OrderTicketDto $orderTicketDto,
     ): bool
     {
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
 
             /** @var OrderTicketItemResponse $orderTicketItem */

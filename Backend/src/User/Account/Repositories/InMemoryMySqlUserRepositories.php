@@ -36,9 +36,8 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
         string     $password
     ): bool
     {
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $this->model::insert(
                 array_merge(
                     $accountDto->toArray(),

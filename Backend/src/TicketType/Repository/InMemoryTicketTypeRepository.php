@@ -155,8 +155,9 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
     public function create(TicketTypeDto $data): bool
     {
         $dataAr = $data->toArrayForCreate();
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $this->model->insert(
                 array_merge($dataAr,
                     [

@@ -127,8 +127,9 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
     public function create(TypesOfPaymentDto $paymentDto): bool
     {
         $data = $paymentDto->toArrayForCreate();
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $this->model->insert(
                 array_merge($data,
                     [

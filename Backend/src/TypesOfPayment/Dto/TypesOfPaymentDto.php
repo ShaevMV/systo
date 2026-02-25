@@ -29,11 +29,15 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
 
     public static function fromState(array $data): self
     {
+
+        $active = $data['active'] === "true";
+        $is_billing = $data['is_billing'] === "true";
+
         return new self(
             $data['name'],
-            (bool)$data['active'],
+            $active,
             $data['sort'],
-            (bool)$data['is_billing'],
+            $is_billing,
             empty($data['id']) ? Uuid::random() : new Uuid($data['id']),
             SellerDto::fromState($data),
             TicketTypeDto::fromState($data),
