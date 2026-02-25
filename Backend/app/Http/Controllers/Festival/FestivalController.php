@@ -48,6 +48,15 @@ class FestivalController extends Controller
             ->toArray();
     }
 
+    public function loadByTicketType(
+        string $ticketTypeId,
+    ): array
+    {
+        return $this->allInfoForOrderingTicketsSearcher
+            ->getListTypesOfPaymentDto(new Uuid($ticketTypeId))
+            ->toArray();
+    }
+
 
     /**
      * @throws JsonException

@@ -730,6 +730,7 @@ export default {
       'setSelectTicketType',
       'checkPromoCode',
       'clearPromoCode',
+      'loadTypesOfPayment',
     ]),
     ...mapActions('appOrder', ['goToCreateOrderTicket', 'clearError']),
     ...mapActions('appUser', ['loadUserData']),
@@ -740,6 +741,12 @@ export default {
       area.select();
       document.execCommand('copy');
       document.body.removeChild(area);
+    },
+    sendTicketType: function () {
+        let select = this.selectTypeTicket;
+        this.loadTypesOfPayment({
+          ticket_type_id: select
+        })
     },
     /**
      * Отправить промо код

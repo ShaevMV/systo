@@ -39,6 +39,14 @@ final class GetInfoForOrder
         );
     }
 
+    public function getListTypesOfPaymentDto(Uuid $ticketTypeId): ListTypesOfPaymentDto
+    {
+        /** @var ListTypesOfPaymentDto $listTypesOfPaymentDto */
+        $listTypesOfPaymentDto = $this->queryBus->ask(new TypesOfPaymentQuery(ticketTypeId:$ticketTypeId));
+
+        return $listTypesOfPaymentDto;
+    }
+
     public function getListTicketTypeDto(Uuid $festivalId): ListTicketTypeDto
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */

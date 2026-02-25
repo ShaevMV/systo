@@ -19,7 +19,10 @@ class TypesOfPaymentQueryHandler implements QueryHandler
     public function __invoke(TypesOfPaymentQuery $query): ListTypesOfPaymentDto
     {
         return new ListTypesOfPaymentDto(
-            $this->typesOfPayment->getList($query->isForAdmin())
+            $this->typesOfPayment->getList(
+                $query->isForAdmin(),
+                $query->getTicketTypeId(),
+            )
         );
     }
 }
