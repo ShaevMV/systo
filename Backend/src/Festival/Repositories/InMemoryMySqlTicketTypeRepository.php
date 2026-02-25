@@ -31,7 +31,7 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $result = [];
         $data = $this->joinFestival($festivalId, $afterDate)
             ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
-            ->where('active', '=', 1);
+            ->where($this->model::TABLE . '.active', '=', 1);
 
         $data = $data->get()
             ->toArray();
