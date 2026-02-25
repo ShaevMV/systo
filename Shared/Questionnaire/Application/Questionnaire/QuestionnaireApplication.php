@@ -54,9 +54,9 @@ class QuestionnaireApplication
         $this->commandBus->dispatch(new QuestionnaireCreateCommand($questionnaireTicketDto));
     }
 
-    public function getItemId(int $id): ?QuestionnaireGetListQueryResponse
+    public function getItemId(int $id): ?QuestionnaireTicketDto
     {
-        /** @var  QuestionnaireGetListQueryResponse|null $result */
+        /** @var  QuestionnaireTicketDto|null $result */
         $result = $this->queryBus->ask(new QuestionnaireGetItemQuery($id));
 
         return $result;

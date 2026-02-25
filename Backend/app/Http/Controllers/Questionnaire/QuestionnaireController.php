@@ -197,7 +197,7 @@ class QuestionnaireController extends Controller
     {
         return response()->json([
             'success' => true,
-            'questionnaire' => $questionnaireApplication->getItemId($id)->first()->toArray(),
+            'questionnaire' => $questionnaireApplication->getItemId($id)->toArray(),
         ]);
     }
 }

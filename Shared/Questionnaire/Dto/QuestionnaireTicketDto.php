@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Shared\Questionnaire\Dto;
 
+use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 
-class QuestionnaireTicketDto
+class QuestionnaireTicketDto implements Response
 {
     protected ?string $link;
     public function __construct(
