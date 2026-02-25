@@ -250,6 +250,7 @@
                                 v-model="selectTypeTicket"
                                 v-bind:value="typeTickets.id"
                                 v-bind:id="typeTickets.id"
+                                @change="sendTicketType()"
                             />
                             <span class="intckt">
                             <p>
@@ -304,7 +305,7 @@
 
 
 
-                <div class="row itog-row mb-4" v-show="totalPrice !== null">
+                <div class="row itog-row mb-4" v-show="totalPrice !== null && !Number.isNaN(totalPrice)">
                   <div class="col-12">
                     <h4 class="my-lg-2 font-weight-normal">
                       Итого к внесению:
@@ -624,8 +625,8 @@ export default {
     selectTypesOfPaymentIsBilling: function () {
       let typesOfPaymentList = this.getTypesOfPayment;
       if(this.selectTypesOfPayment !== null ) {
-        let select = typesOfPaymentList.find(user => user.id == this.selectTypesOfPayment);
-        return select.is_billing ?? false;
+        let select = typesOfPaymentList?.find(user => user.id == this.selectTypesOfPayment);
+        return select?.is_billing ?? false;
       }
       return false;
     },

@@ -27,8 +27,8 @@ export const loadTypesOfPayment = (context, payload) => {
     let promise = axios.get(API_FESTIVAL + '/loadByTicketType/' + payload.ticket_type_id);
 
     promise.then(function (response) {
-        context.commit('setTypesOfPayment', response.data.typesOfPayment);
-        context.commit('setSelectTypesOfPayment', response.data.typesOfPayment[0]);
+        context.commit('setTypesOfPayment', response.data.typesOfPaymentDto);
+        context.commit('setSelectTypesOfPayment', response.data.typesOfPaymentDto[0]);
     })
 };
 
