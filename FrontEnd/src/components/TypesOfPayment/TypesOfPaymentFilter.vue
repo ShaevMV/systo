@@ -123,7 +123,7 @@ export default {
       });
     },
     goToItem() {
-      const route = this.$router.resolve({name: 'TicketTypeItemView'});
+      const route = this.$router.resolve({name: 'TypesOfPaymentItemView'});
       window.open(route.href, '_blank');
     },
   }

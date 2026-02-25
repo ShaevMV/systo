@@ -28,6 +28,8 @@ class InMemoryMySqlTypesOfPayment implements TypesOfPaymentInterface
         }
         if ($ticketTypeId && $this->model::where('ticket_type_id', '=', $ticketTypeId->value())->exists()) {
             $typesOfPayments->where('ticket_type_id', '=', $ticketTypeId->value());
+        } else {
+            $typesOfPayments->whereNull('ticket_type_id');
         }
 
         $typesOfPayments = $typesOfPayments->orderBy('sort')
