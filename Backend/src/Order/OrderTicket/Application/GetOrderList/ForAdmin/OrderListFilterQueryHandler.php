@@ -54,7 +54,7 @@ class OrderListFilterQueryHandler implements QueryHandler
             [
                 'field' => User::TABLE . '.email',
                 'operator' => FilterOperator::LIKE,
-                'value' => '%'. $filterQuery->getEmail().'%',
+                'value' => $filterQuery->getEmail(),
             ],
             // status
             [
@@ -71,12 +71,12 @@ class OrderListFilterQueryHandler implements QueryHandler
             [
                 'field' => User::TABLE . '.city',
                 'operator' => FilterOperator::LIKE,
-                'value' => '%'. $filterQuery->getCity().'%',
+                'value' => $filterQuery->getCity(),
             ],
             [
                 'field' => OrderTicketModel::TABLE . '.promo_code',
                 'operator' => FilterOperator::LIKE,
-                'value' => '%'.$filterQuery->getPromoCode().'%',
+                'value' => $filterQuery->getPromoCode(),
             ],
             [
                 'field' => OrderTicketModel::TABLE . '.ticket_type_id',
