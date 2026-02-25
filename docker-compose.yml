@@ -117,6 +117,7 @@ services:
       MYSQL_ALLOW_EMPTY_PASSWORD: 1
     volumes:
       - ./Docker/mysql/db:/var/lib/mysql
+      - ./Docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - backend
 
