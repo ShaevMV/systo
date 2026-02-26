@@ -109,6 +109,19 @@ services:
       retries: 5
       start_period: 30s
 
+  database:
+    image: mysql:5.7
+    environment:
+      - "MYSQL_ROOT_PASSWORD=common404"
+      - "MYSQL_DATABASE=friendly"
+    volumes:
+      - ./Docker/mysqlFriendly/db:/var/lib/mysql
+      - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
+    ports:
+      - "33065:3306"
+    networks:
+      - backend
+
   phpBaza:
     hostname: ${ENV_VHOD_BACKEND_HOST}
     build:
