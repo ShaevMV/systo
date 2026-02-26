@@ -82,6 +82,11 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getIsBilling(),
             ],
+            [
+                'field' => TypesOfPaymentModel::TABLE . '.ticket_type_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getIsBilling(),
+            ],
         ];
     }
 
