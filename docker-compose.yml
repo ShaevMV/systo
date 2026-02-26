@@ -36,7 +36,6 @@ services:
     links:
       - mysql
       - node
-      - phpFriendly
       - php
 
   php:
