@@ -19,8 +19,7 @@ class TicketTypeDto extends AbstractionEntity implements Response
         protected int $sort,
         protected bool $active,
         protected bool $is_live_ticket,
-        protected ?string $festival = null,
-        protected ?Uuid $festival_id = null,
+        protected FestivalDto $festival,
         protected ?int $groupLimit = null,
         protected ?Carbon $created_at = null,
         protected ?Carbon $updated_at = null,
@@ -37,8 +36,7 @@ class TicketTypeDto extends AbstractionEntity implements Response
             (int)$data['sort'],
             (bool)$data['active'],
             (bool)$data['is_live_ticket'],
-            $data['festival_name'] ?? null,
-            !empty($data['festival_id']) ? new Uuid($data['festival_id']) : null,
+            FestivalDto::fromState($data),
             $data['groupLimit'] ?? null,
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
@@ -73,8 +71,9 @@ class TicketTypeDto extends AbstractionEntity implements Response
         return $this->id;
     }
 
-    public function getFestivalId(): ?Uuid
+
+    public function getFestival(): FestivalDto
     {
-        return $this->festival_id;
+        return $this->festival;
     }
 }

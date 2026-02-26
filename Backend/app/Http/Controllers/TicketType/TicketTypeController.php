@@ -36,6 +36,9 @@ class TicketTypeController extends Controller
         ]);
     }
 
+    /**
+     * @throws JsonException
+     */
     public function getItem(
         string $id,
         TicketTypeApplication $application,

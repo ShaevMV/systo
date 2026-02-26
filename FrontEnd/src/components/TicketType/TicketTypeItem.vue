@@ -42,6 +42,41 @@
                   <small class="form-text text-muted"> {{ getError('groupLimit') }}</small>
                 </div>
                 <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Имя файла для шаблона билета (Backend/resources/views):</label>
+                  <div class="col-8">
+                    <input name="company"
+                           type="text"
+                           class="form-control"
+                           v-model="festival_pdf"
+                           id="company">
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('festival_pdf') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Шаблон письма (Backend/resources/views/email):</label>
+                  <div class="col-8">
+                    <input name="company"
+                           type="text"
+                           class="form-control"
+                           v-model="festival_email"
+                           id="company">
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('festival_email') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="questionnaire_howManyTimes">
+                    Описание
+                  </label>
+                  <div class="input-group" id="promo-input">
+                    <textarea
+                        id="questionnaire_howManyTimes"
+                        class="form-control"
+                        v-model="festival_description"
+                       ></textarea>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('festival_description') }}</small>
+                </div>
+                <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Сорт</label>
                   <div class="col-8">
                     <input name="company"
@@ -135,6 +170,9 @@ export default {
       newActive: null,
       newIsLiveTicket: null,
       newFestivalId: null,
+      newDescription: null,
+      newEmail: null,
+      newPdf: null,
     }
   },
   computed: {
@@ -146,10 +184,43 @@ export default {
     ...mapGetters('appFestivalTickets', [
       'getFestivalList',
     ]),
+    festival_description: {
+      get: function () {
+        if (this.newDescription === null) {
+          return this.getItem.festival.description
+        }
+        return this.newDescription;
+      },
+      set: function (newValue) {
+        this.newDescription = newValue;
+      },
+    },
+    festival_email: {
+      get: function () {
+        if (this.newEmail === null) {
+          return this.getItem.festival.email
+        }
+        return this.newEmail;
+      },
+      set: function (newValue) {
+        this.newEmail = newValue;
+      },
+    },
+    festival_pdf: {
+      get: function () {
+        if (this.newPdf === null) {
+          return this.getItem.festival.pdf;
+        }
+        return this.newPdf;
+      },
+      set: function (newValue) {
+        this.newPdf = newValue;
+      },
+    },
     festival_id: {
       get: function () {
         if (this.newFestivalId === null) {
-          return this.getItem.festival_id;
+          return this.getItem.festival.id;
         }
         return this.newFestivalId;
       },
@@ -242,6 +313,9 @@ export default {
         'active': this.active,
         'is_live_ticket': this.isLiveTicket,
         'festival_id': this.festival_id,
+        'festival_pdf': this.festival_pdf,
+        'festival_email': this.festival_email,
+        'festival_description': this.festival_description,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {
