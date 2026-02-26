@@ -120,6 +120,12 @@ services:
       - ./Docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     networks:
       - backend
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   database:
     image: mysql:5.7
@@ -169,6 +175,10 @@ services:
     command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
     networks:
       - backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
 networks:
   backend:
