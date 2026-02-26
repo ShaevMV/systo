@@ -75,27 +75,6 @@ services:
     networks:
       - backend
 
-  phpFriendly:
-    hostname: ${ENV_DRUG_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=true
-    container_name: php-friendly
-    image: 'friendly_laravel'
-    env_file:
-      - ./Friendly/.env
-    volumes:
-      - ./Friendly:${ENV_DRUG_PATCH}
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_DRUG_PATCH}
-    environment:
-      - WITH_XDEBUG=true
-      - WORKING_DIR=${ENV_DRUG_PATCH}
-    user: user
-    networks:
-      - backend
-
   redis:
     build: ./Docker/redis
     container_name: redis-solarSysto
@@ -107,6 +86,9 @@ services:
 
   mysql:
     image: mysql:8
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1g
     ports:
       - "33069:3306"
     environment:
