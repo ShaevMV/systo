@@ -31,16 +31,8 @@ class InMemoryMySqlTicketTypeRepository implements TicketTypeInterfaceRepository
         $result = [];
         $data = $this->joinFestival($festivalId, $afterDate)
             ->addSelect([TicketTypeFestivalModel::TABLE . '.description'])
-<<<<<<< HEAD
             ->where($this->model::TABLE . '.active', '=', 1);
 
-=======
-            ->where('active', '=', 1);
-        Log::info('getList:', [
-            'sql' => $data->toSql(),
-            'bindings' => $data->getBindings()
-        ]);
->>>>>>> c01019fa ([org, front] Поправил создание типа билета)
         $data = $data->get()
             ->toArray();
 

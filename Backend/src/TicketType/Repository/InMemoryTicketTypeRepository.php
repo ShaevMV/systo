@@ -155,10 +155,7 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
     public function create(TicketTypeDto $data): bool
     {
         $dataAr = $data->toArrayForCreate();
-<<<<<<< HEAD
         DB::beginTransaction();
-=======
->>>>>>> c01019fa ([org, front] Поправил создание типа билета)
         try {
 
             $this->model->insert(
