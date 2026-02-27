@@ -15,6 +15,7 @@ export default {
       });
     }
     window.store.dispatch('appFestivalTickets/getListFestival');
+    window.store.dispatch('appTicketType/loadTemplate');
     next();
   },
 }

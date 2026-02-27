@@ -42,24 +42,36 @@
                   <small class="form-text text-muted"> {{ getError('groupLimit') }}</small>
                 </div>
                 <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Имя файла для шаблона билета (Backend/resources/views):</label>
+                  <label for="company" class="col-4 col-form-label">Имя файла для шаблона билета
+                    (Backend/resources/views):</label>
                   <div class="col-8">
-                    <input name="company"
-                           type="text"
-                           class="form-control"
-                           v-model="festival_pdf"
-                           id="company">
+                    <select class="form-select"
+                            v-model="festival_pdf"
+                            id="validationDefault01">
+                      <option value=null>Выберите</option>
+                      <option v-for="item in getTemplatePdf"
+                              v-bind:key="item"
+                              :selected="item == festival_pdf"
+                              v-bind:value="item">{{ item }}
+                      </option>
+                    </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('festival_pdf') }}</small>
                 </div>
                 <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Шаблон письма (Backend/resources/views/email):</label>
+                  <label for="company" class="col-4 col-form-label">Шаблон письма
+                    (Backend/resources/views/email):</label>
                   <div class="col-8">
-                    <input name="company"
-                           type="text"
-                           class="form-control"
-                           v-model="festival_email"
-                           id="company">
+                    <select class="form-select"
+                            v-model="festival_email"
+                            id="validationDefault01">
+                      <option value=null>Выберите</option>
+                      <option v-for="item in getTemplateEmail"
+                              v-bind:key="item"
+                              :selected="item == festival_email"
+                              v-bind:value="item">{{ item }}
+                      </option>
+                    </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('festival_email') }}</small>
                 </div>
@@ -72,7 +84,7 @@
                         id="questionnaire_howManyTimes"
                         class="form-control"
                         v-model="festival_description"
-                       ></textarea>
+                    ></textarea>
                   </div>
                   <small class="form-text text-muted"> {{ getError('festival_description') }}</small>
                 </div>
@@ -179,7 +191,9 @@ export default {
     ...mapGetters('appTicketType', [
       'getError',
       'getItem',
-      'getMessage'
+      'getMessage',
+      'getTemplateEmail',
+      'getTemplatePdf',
     ]),
     ...mapGetters('appFestivalTickets', [
       'getFestivalList',
@@ -299,7 +313,8 @@ export default {
     ...mapActions('appTicketType', [
       'clearError',
       'edit',
-      'create'
+      'create',
+      'loadTemplate'
     ]),
     back: function () {
       this.$router.push({name: 'TicketTypeListView'});

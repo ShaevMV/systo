@@ -16,6 +16,7 @@ use Tickets\TicketType\Application\GetList\TicketTypeGetListFilter;
 use Tickets\TicketType\Application\GetList\TicketTypeGetListQuery;
 use Tickets\TicketType\Application\TicketTypeApplication;
 use Tickets\TicketType\Dto\TicketTypeDto;
+use Tickets\TicketType\Service\TemplateService;
 
 class TicketTypeController extends Controller
 {
@@ -55,7 +56,26 @@ class TicketTypeController extends Controller
                 'massage' => $exception->getMessage(),
             ]);
         }
+    }
 
+    public function getBlade(
+        TemplateService $templateService,
+    ): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'templateList' => [
+                    'email' => $templateService->getList('views/email')->toArray(),
+                    'pdf' => $templateService->getList('views')->toArray(),
+                ],
+            ]);
+        } catch (DomainException $exception) {
+            return response()->json([
+                'success' => false,
+                'massage' => $exception->getMessage(),
+            ]);
+        }
     }
 
     /**

@@ -15,4 +15,6 @@ Route::prefix('v1/ticketType')->group(static function (): void {
     Route::post('/create',[TicketTypeController::class, 'create']);
 
     Route::delete('/delete/{id}',[TicketTypeController::class, 'delete']);
+
+    Route::get('/getBlade',[TicketTypeController::class, 'getBlade']);
 });
