@@ -15,9 +15,6 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Billing\Application\Billing;
-use Tickets\Billing\DTO\PaymentRequestDTO;
-use Tickets\Billing\ValueObject\DeviceValueObject;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
@@ -44,7 +41,7 @@ class OrderTickets extends Controller
         private ChanceStatus       $chanceStatus,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
-        private Billing            $billing,
+       // private Billing            $billing,
     )
     {
     }

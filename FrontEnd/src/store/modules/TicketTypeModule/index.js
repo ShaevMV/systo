@@ -9,6 +9,7 @@ export default {
         item: {},
         filter: {},
         orderBy: {},
+        templateList: {},
         isLoading: false,
         dataError: [],
         message: null,

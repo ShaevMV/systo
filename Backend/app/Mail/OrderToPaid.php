@@ -41,6 +41,7 @@ class OrderToPaid extends Mailable
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
 
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
+        \Log::info('Шаблон  '. $this->tickets[0]->getEmailView());
         $mail = $this->view('email.'. ($this->tickets[0]->getEmailView() ?? 'orderToPaid'),[
             'festivalName' => $festivalName,
             'comment' => $this->comment,

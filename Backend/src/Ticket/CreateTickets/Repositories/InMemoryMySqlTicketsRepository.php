@@ -8,6 +8,7 @@ use App\Models\Festival\FestivalModel;
 use App\Models\Festival\TicketTypeFestivalModel;
 use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
+use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
@@ -42,7 +43,6 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         }
         DB::beginTransaction();
         try {
-
             $this->model::insert($ticketDto->toArray());
             DB::commit();
             return true;
@@ -125,12 +125,14 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $join->on($this->model::TABLE . '.festival_id', '=', TicketTypeFestivalModel::TABLE . '.festival_id');
                 $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
             })
+            ->leftJoin(TypesOfPaymentModel::TABLE, OrderTicketModel::TABLE . '.types_of_payment_id', '=', TypesOfPaymentModel::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
                 TicketTypeFestivalModel::TABLE . '.pdf',
                 TicketTypeFestivalModel::TABLE . '.email as emailView',
+                TypesOfPaymentModel::TABLE . '.email as emailPayView',
                 OrderTicketModel::TABLE . '.phone',
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
@@ -158,7 +160,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['last_comment'],
             Carbon::parse($result['created_at']),
             empty($result['pdf']) ? null : $result['pdf'],
-            $result['emailView'],
+            $result['emailPayView'] ?? $result['emailView'],
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             new Uuid($result['ticket_type_id']),

@@ -28,3 +28,11 @@ export const getOrderBy = state => {
 export const getMessage = state => {
     return state.message;
 };
+
+export const getTemplateEmail = state => {
+    return state.templateList?.email
+}
+
+export const getTemplatePdf = state => {
+    return state.templateList?.pdf
+}

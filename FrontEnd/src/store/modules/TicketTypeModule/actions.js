@@ -15,6 +15,18 @@ export const loadList = (context, payload) => {
     });
 };
 
+export const loadTemplate = (context) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.get(API + '/getBlade');
+        return promise.then(function (response) {
+            context.commit('setTemplateList', response.data.list)
+        }).catch(function (error) {
+            context.commit('setError', error);
+            reject(error);
+        });
+    });
+};
+
 
 export const loadItem = (context, payload) => {
     return new Promise((resolve, reject) => {

@@ -25,3 +25,7 @@ export const setFilter = (state, payload) => {
 export const setOrderBy = (state, payload) => {
     state.orderBy = payload;
 };
+
+export const setTemplateList = (state, payload) => {
+    state.templateList = payload;
+};
