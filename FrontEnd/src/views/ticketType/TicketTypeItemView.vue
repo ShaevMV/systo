@@ -8,14 +8,16 @@ import TicketTypeItem from "@/components/TicketType/TicketTypeItem.vue";
 export default {
   name: "TicketTypeItemView",
   components: {TicketTypeItem},
-  beforeRouteEnter: (to, from, next) => {
+  beforeRouteEnter: async (to, from, next) => {
+    await window.store.dispatch('appFestivalTickets/getListFestival');
+    await window.store.dispatch('appTicketType/loadTemplate');
+
     if (to.params.id) {
-      window.store.dispatch('appTicketType/loadItem', {
+      await window.store.dispatch('appTicketType/loadItem', {
         id: to.params.id,
       });
     }
-    window.store.dispatch('appFestivalTickets/getListFestival');
-    window.store.dispatch('appTicketType/loadTemplate');
+
     next();
   },
 }

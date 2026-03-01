@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Utility;
+namespace Tickets\Template\Service;
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 
@@ -19,9 +20,8 @@ class TemplateService
         // Получаем только имена файлов
         $fileNames = [];
         foreach ($files as $file) {
-            $fileNames[] = $file->getFilename(); // только имя с расширением
-            // или $file->getBasename() - тоже имя файла
-            // или $file->getPathname() - полный путь
+            $fileNames[] = preg_replace('/\..*$/', '', $file->getFilename()); // Удаляем всё, начиная с первой точки (т.е. все расширения целиком)
+            // Для 'my.file.name.blade.php' вернёт 'my.file.name'
         }
 
         return new Collection($fileNames);

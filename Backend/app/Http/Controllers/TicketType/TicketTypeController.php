@@ -16,7 +16,7 @@ use Tickets\TicketType\Application\GetList\TicketTypeGetListFilter;
 use Tickets\TicketType\Application\GetList\TicketTypeGetListQuery;
 use Tickets\TicketType\Application\TicketTypeApplication;
 use Tickets\TicketType\Dto\TicketTypeDto;
-use Tickets\Utility\TemplateService;
+use Tickets\Template\Service\TemplateService;
 
 class TicketTypeController extends Controller
 {
@@ -65,7 +65,7 @@ class TicketTypeController extends Controller
         try {
             return response()->json([
                 'success' => true,
-                'templateList' => [
+                'list' => [
                     'email' => $templateService->getList('views/email')->toArray(),
                     'pdf' => $templateService->getList('views')->toArray(),
                 ],
