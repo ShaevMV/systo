@@ -18,7 +18,7 @@ class OrderFilterQuery implements Query
         private ?string $promoCode = null,
         private ?float $price = null,
         private ?Uuid $typeOrder = null,
-        private bool $isManager = false,
+        private ?Uuid $userId = null,
         private ?string $city = null,
         private ?string $questionnaire = null,
     ) {
@@ -31,7 +31,7 @@ class OrderFilterQuery implements Query
 
     public function getEmail(): ?string
     {
-        return null !== $this->email ? '%'.$this->email.'%' : null;
+        return null !== $this->email ? $this->email : null;
     }
 
     public function getStatus(): ?string
@@ -41,10 +41,10 @@ class OrderFilterQuery implements Query
 
     public function getPromoCode(): ?string
     {
-        return null !== $this->promoCode ? '%'.$this->promoCode.'%' : null;
+        return null !== $this->promoCode ? $this->promoCode : null;
     }
 
-    public static function fromState(array $data, bool $isManager): self
+    public static function fromState(array $data, ?Uuid $userId = null): self
     {
         if(!isset($data['festivalId'])) {
             throw new InvalidArgumentException('festivalId обязательное поле!');
@@ -60,7 +60,7 @@ class OrderFilterQuery implements Query
             $data['promoCode'] ?? null,
             $data['price'] ?? null,
             (null !== $typePrice) ? new Uuid($data['typePrice']) : null,
-            $isManager,
+            $userId,
             $data['city'] ?? null,
             $data['questionnaire'] ?? null,
         );
@@ -86,18 +86,18 @@ class OrderFilterQuery implements Query
         return $this->festivalId;
     }
 
-    public function isManager(): bool
-    {
-        return $this->isManager;
-    }
-
     public function getCity(): ?string
     {
-        return null !== $this->city ? '%'.$this->city.'%' : null;
+        return null !== $this->city ? $this->city : null;
     }
 
     public function getQuestionnaire(): ?string
     {
         return $this->questionnaire;
+    }
+
+    public function getUserId(): ?Uuid
+    {
+        return $this->userId;
     }
 }

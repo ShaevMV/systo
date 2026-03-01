@@ -69,14 +69,11 @@ final class CreateOrder
                 ));
             }
             Log::info('Создал заказ ' . $orderTicketDto->getEmail());
-            $orderTicket = OrderTicket::create(
-                $orderTicketDto,
-                $orderTicketItem->getKilter(),
-                $orderTicketDto->isIsLiveTicket() && $orderTicketDto->getTicketTypeId()
-                    ->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
-                    $this->externalPromocode->getPromocodeByOrderId($orderTicketDto->getId()) :
-                    null,
-            );
+            if (!$orderTicketDto->isIsLiveTicket()) {
+                $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
+            } else {
+                $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto);
+            }
 
             $this->bus::chain($orderTicket->pullDomainEvents())
                 ->dispatch();

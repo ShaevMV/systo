@@ -12,6 +12,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommand;
 use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommandHandler;
+use Tickets\Ticket\CreateTickets\Application\PushTicketLive\PushTicketsLiveCommand;
+use Tickets\Ticket\CreateTickets\Application\PushTicketLive\PushTicketsLiveCommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicket
@@ -20,10 +22,13 @@ class PushTicket
 
     public function __construct(
         PushTicketsCommandHandler $handler,
+        PushTicketsLiveCommandHandler $handlerLive,
         private TicketsRepositoryInterface $ticketsRepository,
+
     ){
         $this->commandBus = new InMemorySymfonyCommandBus([
-            PushTicketsCommand::class => $handler
+            PushTicketsCommand::class => $handler,
+            PushTicketsLiveCommand::class => $handlerLive,
         ]);
     }
 
@@ -39,10 +44,28 @@ class PushTicket
     }
 
     /**
+     * @throws JsonException
+     * @throws DomainException
+     * @throws Throwable
+     */
+    public function pushTicketLive(Uuid $id, int $number): void
+    {
+        $this->commandBus->dispatch(new PushTicketsLiveCommand($id, $number));
+    }
+
+    /**
      * @throws Throwable
      * @throws JsonException
      */
     public function pushByOrderId(Uuid $orderId): void
+    {
+        $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId, true);
+        foreach ($idTickets as $id) {
+            $this->pushTicket($id);
+        }
+    }
+
+    public function pushByOrderIdLive(Uuid $orderId, array $liveNumber): void
     {
         $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId, true);
         foreach ($idTickets as $id) {

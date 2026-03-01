@@ -16,6 +16,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\PromoCode\Response\ExternalPromoCodeDto;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
+use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
 
 final class OrderTicket extends AggregateRoot
 {
@@ -52,46 +53,17 @@ final class OrderTicket extends AggregateRoot
 
     public static function create(
         OrderTicketDto $orderTicketDto,
-        int            $kilter,
-        ?ExternalPromoCodeDto $externalPromoCodeDto = null
+        int            $kilter
     ): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
-        if($orderTicketDto->isIsLiveTicket()) {
-            $result->record(new ProcessCreateTicket(
-                $result->id,
-                $result->getTicket(),
-            ));
-            $result->record(new ProcessUserNotificationOrderPaid(
-                    $orderTicketDto->getEmail(),
-                    $result->getTicket(),
-                    $orderTicketDto->getTicketTypeId(),
-                    null,
-                    $externalPromoCodeDto?->getPromocode(),
-                )
-            );
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail() ?? $orderTicketDto->getEmail(),
-                            $orderTicketDto->getId()->value(),
-                        $item->getId()->value(),
-                    )
-                );
-                $result->record(new ProcessTelegramByQuestionnaireSend(
-                        $item->getEmail() ?? $orderTicketDto->getEmail()
-                    )
-                );
-            }
-        } else {
-            $result->record(new ProcessUserNotificationNewOrderTicket(
-                    $orderTicketDto->getEmail(),
-                    $kilter,
-                    $orderTicketDto->getTicketTypeId(),
-                    $result->festival_id,
-                )
-            );
-        }
-
+        $result->record(new ProcessUserNotificationNewOrderTicket(
+                $orderTicketDto->getEmail(),
+                $kilter,
+                $orderTicketDto->getTicketTypeId(),
+                $result->festival_id,
+            )
+        );
 
         return $result;
     }
@@ -100,19 +72,35 @@ final class OrderTicket extends AggregateRoot
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
+
+
         $result->record(new ProcessUserNotificationOrderPaidLiveTicket(
                 $orderTicketDto->getEmail(),
                 $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->getTypesOfPaymentId()
             )
         );
+
+        foreach ($orderTicketDto->getTicket() as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $item->getEmail() ?? $orderTicketDto->getEmail(),
+                    $orderTicketDto->getId()->value(),
+                    $item->getId()->value(),
+                )
+            );
+        }
 
         return $result;
     }
 
 
     public static function toPaid(
-        OrderTicketDto $orderTicketDto,
-        ?string $comment = null,
+        OrderTicketDto        $orderTicketDto,
+        ?string               $comment = null,
         ?ExternalPromoCodeDto $externalPromoCodeDto = null
     ): self
     {
@@ -167,19 +155,22 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    public static function toLiveIssued(OrderTicketDto $orderTicketDto): self
+    public static function toLiveIssued(
+        OrderTicketDto $orderTicketDto,
+        array          $liveNumber = [],
+    ): self
     {
-        $result = self::fromOrderTicketDto($orderTicketDto);
-        $result->updateIdTicket();
-        $result->record(new ProcessCancelTicket(
-            $result->id,
-        ));
+        if (count($liveNumber) === 0) {
+            throw new DomainException('Забыли ввести номера билетов');
+        }
 
-        $result->record(new ProcessUserNotificationOrderLiveTicketIssued(
-                $orderTicketDto->getEmail(),
-                $orderTicketDto->getTicketTypeId(),
-            )
-        );
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        foreach ($liveNumber as $key => $item) {
+            $result->record(new ProcessPushLiveTicket(
+                new Uuid($key),
+                (int)$item
+            ));
+        }
 
         return $result;
     }

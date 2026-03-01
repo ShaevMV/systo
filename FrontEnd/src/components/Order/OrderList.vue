@@ -46,9 +46,9 @@
                   </button>
                   <div class="dropdown-menu">
                   <span class="dropdown-item btn-link"
-                      role="button"
-                      v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
-                      @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+                        role="button"
+                        v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
+                        @click="chanceStatus(key,itemOrder)">{{ statusItem }}</span>
                   </div>
                 </div>
               </td>
@@ -93,18 +93,24 @@
       Launch demo modal
     </button>
 
+    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtnLive"
+            data-target="#exampleModalLive">
+      Launch demo modal
+    </button>
+
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
          aria-hidden="true">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Номер живого билета или комментарий для пользователя</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Комментарий для пользователя</h5>
             <button type="button" class="close"
                     data-dismiss="modal"
                     id="closeModal"
                     aria-label="Close">
               <span aria-hidden="true">
+                Х
               </span>
             </button>
           </div>
@@ -116,6 +122,51 @@
             <button type="button"
                     @click="sendDifficultiesArose"
                     class="btn btn-secondary">Сменить статус
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="exampleModalLive" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelLive"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Введите номера билетов для каждого гостя</h5>
+            <button type="button" class="close"
+                    data-dismiss="modal"
+                    id="closeModalLive"
+                    aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Номер билета</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="guest in getListGuest" :key="guest.id">
+                <td>{{ guest.value }}</td>
+                <td>
+                  <input type="text"
+                         v-model="liveNumber[guest.id]"
+                         class="form-control"
+                         placeholder="Введите номер билета">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <small class="form-text text-muted">{{ getError('liveNumber') }}</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" @click="sendLive" class="btn btn-secondary">
+              Сменить статус
             </button>
           </div>
         </div>
@@ -134,6 +185,8 @@ export default {
       comment: null,
       selectId: null,
       selectStatus: null,
+      selectItem: {},
+      liveNumber: {},
     }
   },
   props: {
@@ -147,6 +200,10 @@ export default {
       'getOrderList',
       'getError'
     ]),
+    getListGuest: function () {
+      return this.selectItem?.guests ?? [];
+    },
+
   },
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
@@ -210,15 +267,29 @@ export default {
      * @param status
      * @param id
      */
-    chanceStatus(status, id) {
-      this.selectId = id;
+    chanceStatus(status, itemOrder) {
+      this.selectId = itemOrder.id;
       this.selectStatus = status;
 
-      if (['difficulties_arose', 'live_ticket_issued'].includes(status)) {
+      if (['difficulties_arose'].includes(status)) {
         document.getElementById('modalOpenBtn').click();
+      } else if (['live_ticket_issued'].includes(status)) {
+        this.selectItem = itemOrder;
+
+        // Инициализируем объект liveNumber для всех гостей
+        const guests = itemOrder.guests || [];
+        this.liveNumber = {};
+        guests.forEach(guest => {
+          this.liveNumber[guest.id] = '';
+        });
+
+        // Ждем, пока Vue обновит DOM, и только потом открываем модалку
+        this.$nextTick(() => {
+          document.getElementById('modalOpenBtnLive').click();
+        });
       } else {
         this.sendToChanceStatus({
-          'id': id,
+          'id': itemOrder.id,
           'status': status,
           'comment': null
         });
@@ -240,7 +311,25 @@ export default {
           self.comment = null;
         }
       });
+    },
+    /**
+     * Сменить статус на возникли трудности и отправить сообщение для пользователя
+     */
+    sendLive() {
+      let self = this;
+      this.sendToChanceStatus({
+        'id': this.selectId,
+        'status': this.selectStatus,
+        'liveList': this.liveNumber,
+        'callback': function () {
+          document.getElementById('closeModalLive').click();
+          self.selectId = null;
+          self.selectStatus = null;
+          self.comment = null;
+        }
+      });
     }
+
   }
 }
 </script>

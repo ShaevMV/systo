@@ -17,6 +17,7 @@ use DomainException;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
@@ -143,7 +144,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 TicketTypesModel::TABLE . '.name as name_type',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
-        \Log::info('Билет '. $ticketId->value() .' : '. $result->toSql());
+        \Log::info('Билет ' . $ticketId->value() . ' : ' . $result->toSql());
         $result = $result->first()?->toArray();
         if (is_null($result)) {
             throw new DomainException("Билет {$ticketId->value()} не найден");
@@ -188,13 +189,13 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 DB::connection('mysqlBaza')->table('el_tickets')
                     ->where('uuid', '=', $ticketsDto->getId()->value())
                     ->update([
-                            'status' => $data['status'],
-                            'festival_id' => $data['festival_id'],
-                            'is_need_seedling' => $data['is_need_seedling'],
-                            'type_ticket_id' => $data['type_ticket_id'],
-                            'type_ticket' => $data['type_ticket'],
-                            'name' => $data['name']
-                        ]);
+                        'status' => $data['status'],
+                        'festival_id' => $data['festival_id'],
+                        'is_need_seedling' => $data['is_need_seedling'],
+                        'type_ticket_id' => $data['type_ticket_id'],
+                        'type_ticket' => $data['type_ticket'],
+                        'name' => $data['name']
+                    ]);
             }
         } catch (\Exception $e) {
             return false;
@@ -203,6 +204,33 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         }
     }
 
+    /**
+     * @throws \Nette\Utils\JsonException
+     */
+    public function setInBazaLive(int $number, Uuid $ticketId): bool
+    {
+        DB::connection('mysqlBaza')->getPdo();
+        if (!DB::connection('mysqlBaza')->table('live_tickets')
+            ->where('kilter', '=', $number)->exists()
+        ) {
+            throw new DomainException('Не найден билет в Базе входа');
+        } else {
+            $res = (array)DB::connection('mysqlBaza')->table('live_tickets')
+                ->where('kilter', '=', $number)->first();
+
+            Log::info('То что нашли', $res);
+
+            if (!empty($res['el_ticket_id'])) {
+                throw new DomainException('Билет уже выдан ' . $res['el_ticket_id']);
+            }
+            Log::info('Тут мы меняем запись');
+            return DB::connection('mysqlBaza')->table('live_tickets')
+                ->where('kilter', '=', $number)
+                ->update([
+                    'el_ticket_id' => $ticketId->value()
+                ]) > 0;
+        }
+    }
 
     /**
      * @return Uuid[]

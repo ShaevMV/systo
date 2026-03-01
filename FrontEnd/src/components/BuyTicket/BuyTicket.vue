@@ -808,7 +808,7 @@ export default {
             self.clearData();
           }
           if (link !== null) {
-            window.location.href = link;
+          //  window.location.href = link;
           } else {
             self.message = message;
             document.getElementById('modalOpenBtn').click();

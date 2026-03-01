@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 
+use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
 use Shared\Domain\Bus\Query\QueryHandler;
@@ -88,15 +89,13 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),
             ],
+            [
+                'field' => TypesOfPaymentModel::TABLE . '.user_external_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getUserId()?->value(),
+            ],
         ];
 
-        if ($filterQuery->isManager()) {
-            $result[] = [
-                'field' => OrderTicketModel::TABLE . '.status',
-                'operator' => FilterOperator::NOT_EQUAL,
-                'value' => Status::NEW,
-            ];
-        }
 
         return $result;
     }

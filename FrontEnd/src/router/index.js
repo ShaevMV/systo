@@ -132,7 +132,7 @@ const routes = [
         component: OrderListForAdmin,
         meta: {
             'requiresAuth': true,
-            'role': ['admin'],
+            'role': ['admin', 'seller'],
         }
     },
 
