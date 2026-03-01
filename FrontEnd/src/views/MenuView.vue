@@ -40,7 +40,7 @@
           :to="{ name: 'Conditions' }">Правила участия
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAuth">
+    <li class="nav-item" v-if="isAuth && !isSeller">
       <router-link
           class="nav-link"
           active-class="active"

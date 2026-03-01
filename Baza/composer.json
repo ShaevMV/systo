@@ -15,8 +15,7 @@
         "laravel/tinker": "^2.7",
         "sentry/sentry-laravel": "^3.2",
         "symfony/messenger": "^6.0",
-        "ext-openssl": "*",
-
+        "ext-openssl": "*"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.13",

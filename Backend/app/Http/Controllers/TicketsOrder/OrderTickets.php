@@ -190,7 +190,6 @@ class OrderTickets extends Controller
     {
         if (in_array($request->get('status'), [
             Status::DIFFICULTIES_AROSE,
-            Status::LIVE_TICKET_ISSUED
         ])) {
             $request->validate([
                 'comment' => 'required|string'
@@ -198,13 +197,24 @@ class OrderTickets extends Controller
                 '*.required' => 'Поле обязательно для ввода',
             ]);
         }
+        if (in_array($request->get('status'), [
+            Status::LIVE_TICKET_ISSUED,
+        ])) {
+            $request->validate([
+                'liveList' => 'required|array'
+            ], [
+                '*.required' => 'Поле обязательно для ввода',
+            ]);
+        }
+
 
         $status = new Status($request->get('status'));
         $this->chanceStatus->chance(
             new Uuid($id),
             $status,
             new Uuid(Auth::id()),
-            $request->get('comment', null)
+            $request->get('comment', null),
+            liveList:$request->get('liveList')
         );
 
         return response()->json([

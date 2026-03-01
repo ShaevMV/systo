@@ -31,6 +31,7 @@ class ChanceStatus
         ?string $comment = null,
         bool $now = false,
         int $delay = 0,
+        array $liveList = [],
     ): void
     {
         $this->commandBus->dispatch(new ChanceStatusCommand(
@@ -40,6 +41,7 @@ class ChanceStatus
             $comment,
             $now,
             $delay,
+            $liveList
         ));
     }
 }

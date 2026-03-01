@@ -79,7 +79,8 @@ export const loadOrderItem = (context, payload) => {
 export const sendToChanceStatus = (context, payload) => {
     let promise = axios.post(API_ORDER + '/toChanceStatus/' + payload.id, {
         'status': payload.status,
-        'comment': payload.comment
+        'comment': payload.comment,
+        'liveList': payload?.liveList,
     });
     promise.then(function (response) {
         if(payload.callback !== undefined) {

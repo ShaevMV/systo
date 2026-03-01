@@ -15,6 +15,7 @@ class ChanceStatusCommand implements Command
         public ?string $comment = null,
         public bool $now = false,
         public int $delayMinute = 0,
+        public array $liveNumber = [],
     ){
     }
 
@@ -46,5 +47,10 @@ class ChanceStatusCommand implements Command
     public function getDelayMinute(): int
     {
         return $this->delayMinute;
+    }
+
+    public function getLiveNumber(): array
+    {
+        return $this->liveNumber;
     }
 }
