@@ -22,6 +22,7 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
         protected SellerDto $seller,
         protected TicketTypeDto $ticket_type,
         protected ?string $card = null,
+        protected ?string $email = null,
         protected ?Carbon $created_at = null,
     )
     {
@@ -46,6 +47,7 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
             SellerDto::fromState($data),
             TicketTypeDto::fromState($data),
             $data['card'] ?? '',
+            $data['email'] ?? '',
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
         );
     }
@@ -85,5 +87,10 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
     public function getId(): Uuid
     {
         return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
     }
 }

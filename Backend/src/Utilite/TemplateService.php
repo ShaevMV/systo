@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\TicketType\Service;
+namespace Tickets\Utility;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;

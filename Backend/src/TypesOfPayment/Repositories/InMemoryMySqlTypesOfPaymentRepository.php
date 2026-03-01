@@ -64,19 +64,16 @@ class InMemoryMySqlTypesOfPaymentRepository implements TypesOfPaymentRepositoryI
     private function getFilterValues(TypesOfPaymentGetListFilter $filterQuery): array
     {
         return [
-            // email
             [
                 'field' => TypesOfPaymentModel::TABLE . '.name',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getName(),
             ],
-            // status
             [
                 'field' => TypesOfPaymentModel::TABLE . '.active',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getActive(),
             ],
-            // types_of_payment_id
             [
                 'field' => TypesOfPaymentModel::TABLE . '.is_billing',
                 'operator' => FilterOperator::EQUAL,

@@ -48,7 +48,7 @@
                     <option value=null>Выберите</option>
                     <option v-for="getlistSeller in getlistSellers"
                             v-bind:key="getlistSeller.id"
-                            v-bind:value="getlistSeller">{{ getlistSeller.email }}
+                            v-bind:value="getlistSeller.id">{{ getlistSeller.email }}
                     </option>
                   </select>
                 </div>
@@ -60,7 +60,7 @@
                     <option value=null>Выберите</option>
                     <option v-for="item in ticketTypeGetList"
                             v-bind:key="item.id"
-                            v-bind:value="item">{{ item.name }}
+                            v-bind:value="item.id">{{ item.name }}
                     </option>
                   </select>
                 </div>
@@ -176,7 +176,7 @@ export default {
         return this.newUserExternalId;
       },
       set: function (newValue) {
-        this.newUserExternalId = newValue.id;
+        this.newUserExternalId = newValue;
       },
     },
     sortItem: {
@@ -220,7 +220,7 @@ export default {
         return this.newTicketTypeId;
       },
       set: function (newValue) {
-        this.newTicketTypeId = newValue.id;
+        this.newTicketTypeId = newValue;
       },
     }
   },

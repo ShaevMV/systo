@@ -16,7 +16,7 @@ use Tickets\TicketType\Application\GetList\TicketTypeGetListFilter;
 use Tickets\TicketType\Application\GetList\TicketTypeGetListQuery;
 use Tickets\TicketType\Application\TicketTypeApplication;
 use Tickets\TicketType\Dto\TicketTypeDto;
-use Tickets\TicketType\Service\TemplateService;
+use Tickets\Utility\TemplateService;
 
 class TicketTypeController extends Controller
 {
