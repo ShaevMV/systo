@@ -68,6 +68,14 @@ class ChanceStatusCommandHandler implements CommandHandler
             );
         }
 
+        if ($command->getNextStatus()->isLiveIssued()) {
+            $this->addComment->send(
+                $command->getOrderId(),
+                $command->getUserId(),
+                implode(' ', $command->getLiveNumber()),
+            );
+        }
+
         $list = $orderTicket->pullDomainEvents();
 
         $this->orderTicketRepository->chanceStatus(
