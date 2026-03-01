@@ -61,7 +61,7 @@ class OrderTicketDto
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
-        $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::PAID);
+        $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::PAID_FOR_LIVE);
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
         foreach ($guests as $guest) {

@@ -21,6 +21,7 @@ class ProcessUserNotificationOrderPaidLiveTicket implements ShouldQueue, DomainE
     public function __construct(
         private string $email,
         private Uuid $ticketTypeId,
+        private Uuid $typeOrPaymentId,
     )
     {
     }
@@ -28,7 +29,8 @@ class ProcessUserNotificationOrderPaidLiveTicket implements ShouldQueue, DomainE
     public function handle(): void
     {
         Mail::to($this->email)->send(new OrderToPaidLiveTicket(
-            $this->ticketTypeId
+            $this->ticketTypeId,
+            $this->typeOrPaymentId,
         ));
     }
 }

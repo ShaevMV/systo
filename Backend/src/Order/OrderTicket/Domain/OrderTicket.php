@@ -52,46 +52,17 @@ final class OrderTicket extends AggregateRoot
 
     public static function create(
         OrderTicketDto $orderTicketDto,
-        int            $kilter,
-        ?ExternalPromoCodeDto $externalPromoCodeDto = null
+        int            $kilter
     ): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
-        if($orderTicketDto->isIsLiveTicket()) {
-            $result->record(new ProcessCreateTicket(
-                $result->id,
-                $result->getTicket(),
-            ));
-            $result->record(new ProcessUserNotificationOrderPaid(
-                    $orderTicketDto->getEmail(),
-                    $result->getTicket(),
-                    $orderTicketDto->getTicketTypeId(),
-                    null,
-                    $externalPromoCodeDto?->getPromocode(),
-                )
-            );
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail() ?? $orderTicketDto->getEmail(),
-                            $orderTicketDto->getId()->value(),
-                        $item->getId()->value(),
-                    )
-                );
-                $result->record(new ProcessTelegramByQuestionnaireSend(
-                        $item->getEmail() ?? $orderTicketDto->getEmail()
-                    )
-                );
-            }
-        } else {
-            $result->record(new ProcessUserNotificationNewOrderTicket(
-                    $orderTicketDto->getEmail(),
-                    $kilter,
-                    $orderTicketDto->getTicketTypeId(),
-                    $result->festival_id,
-                )
-            );
-        }
-
+        $result->record(new ProcessUserNotificationNewOrderTicket(
+                $orderTicketDto->getEmail(),
+                $kilter,
+                $orderTicketDto->getTicketTypeId(),
+                $result->festival_id,
+            )
+        );
 
         return $result;
     }
@@ -103,6 +74,7 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessUserNotificationOrderPaidLiveTicket(
                 $orderTicketDto->getEmail(),
                 $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->getTypesOfPaymentId()
             )
         );
 
