@@ -73,7 +73,6 @@
                           placeholder="Email: *"
                           required="required"
                           v-model="email"
-                          v-bind:readonly="isAuth"
                           data-error="Valid email is required."
                       />
                       <small class="form-text text-muted">
