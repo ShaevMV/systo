@@ -48,7 +48,7 @@
                     <select class="form-select"
                             v-model="festival_pdf"
                             id="validationDefault01">
-                      <option value="">Выберите</option>
+                      <option value=null>Выберите</option>
                       <option v-for="item in (getTemplatePdf)"
                               v-bind:key="item"
                               :selected="item == festival_pdf"
@@ -65,7 +65,7 @@
                     <select class="form-select"
                             v-model="festival_email"
                             id="validationDefault01">
-                      <option value="">Выберите</option>
+                      <option value=null>Выберите</option>
                       <option v-for="item in (getTemplateEmail)"
                               v-bind:key="item"
                               :selected="item == festival_email"
@@ -201,7 +201,7 @@ export default {
     festival_description: {
       get: function () {
         if (this.newDescription === null) {
-          return this.getItem.festival.description
+          return this.getItem.festival?.description
         }
         return this.newDescription;
       },
@@ -212,7 +212,7 @@ export default {
     festival_email: {
       get: function () {
         if (this.newEmail === null) {
-          return this.getItem.festival.email
+          return this.getItem.festival?.email
         }
         return this.newEmail;
       },
@@ -223,7 +223,7 @@ export default {
     festival_pdf: {
       get: function () {
         if (this.newPdf === null) {
-          return this.getItem.festival.pdf;
+          return this.getItem.festival?.pdf;
         }
         return this.newPdf;
       },
@@ -234,7 +234,7 @@ export default {
     festival_id: {
       get: function () {
         if (this.newFestivalId === null) {
-          return this.getItem.festival.id;
+          return this.getItem.festival?.id;
         }
         return this.newFestivalId;
       },
@@ -346,6 +346,10 @@ export default {
 
     }
   },
+  async created() {
+    await window.store.dispatch('appFestivalTickets/getListFestival');
+    await window.store.dispatch('appTicketType/loadTemplate');
+  }
 }
 </script>
 
