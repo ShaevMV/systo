@@ -14,23 +14,23 @@ use Shared\Domain\ValueObject\Uuid;
 class TypesOfPaymentDto extends AbstractionEntity implements Response
 {
     public function __construct(
-        protected string  $name,
-        protected bool    $active,
-        protected int     $sort,
-        protected bool    $is_billing,
-        protected Uuid    $id,
-        protected SellerDto $seller,
+        protected string        $name,
+        protected bool          $active,
+        protected int           $sort,
+        protected bool          $is_billing,
+        protected Uuid          $id,
+        protected SellerDto     $seller,
         protected TicketTypeDto $ticket_type,
-        protected ?string $card = null,
-        protected ?string $email = null,
-        protected ?Carbon $created_at = null,
+        protected ?string       $card = null,
+        protected ?string       $email = null,
+        protected ?Carbon       $created_at = null,
     )
     {
     }
 
     public static function fromState(array $data): self
     {
-        if(is_string($data['active'])) {
+        if (is_string($data['active'])) {
             $active = $data['active'] == "true";
             $is_billing = $data['is_billing'] == "true";
         } else {
@@ -58,6 +58,7 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
     public function toArrayForEdit(): array
     {
         $result = parent::toArrayForEdit();
+        $result['email'] = empty($result['email']) ? null : $result['email'];
 
         unset(
             $result['seller'],
@@ -73,8 +74,11 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
     public function toArrayForCreate(): array
     {
         $result = parent::toArrayForCreate();
-
-        unset($result['seller'], $result['ticket_type']);
+        $result['email'] = empty($result['email']) ? null : $result['email'];
+        unset(
+            $result['seller'],
+            $result['ticket_type']
+        );
         $result['user_external_id'] = $this->seller->getUserExternalId()?->value();
         $result['ticket_type_id'] = $this->ticket_type->getTicketTypeId()?->value();
 

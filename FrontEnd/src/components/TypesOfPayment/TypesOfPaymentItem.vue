@@ -20,7 +20,7 @@
                   <small class="form-text text-muted"> {{ getError('name') }}</small>
                 </div>
                 <div class="row mb-3">
-                  <label for="company" class="col-4 col-form-label">Отлено номер карты:</label>
+                  <label for="company" class="col-4 col-form-label">Отдельно номер карты:</label>
                   <div class="col-8">
                     <input name="company"
                            type="text"
@@ -63,6 +63,23 @@
                             v-bind:value="item.id">{{ item.name }}
                     </option>
                   </select>
+                </div>
+                <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Шаблон письма
+                    (Backend/resources/views/email):</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="email"
+                            id="validationDefault01">
+                      <option value="">Выберите</option>
+                      <option v-for="item in (getTemplateEmail)"
+                              v-bind:key="item"
+                              :selected="item == email"
+                              v-bind:value="item">{{ item }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('email') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Активность:</label>
@@ -132,6 +149,7 @@ export default {
       newBillind: null,
       newUserExternalId: null,
       newTicketTypeId: null,
+      newEmail: null,
       message: null,
     }
   },
@@ -145,6 +163,9 @@ export default {
     ...mapGetters('appTypesOfPayment', [
       'getItem',
       'getError'
+    ]),
+    ...mapGetters('appTicketType', [
+      'getTemplateEmail',
     ]),
     name: {
       get: function () {
@@ -168,10 +189,21 @@ export default {
         this.newCard = newValue;
       },
     },
+    email: {
+      get: function () {
+        if (this.newEmail === null) {
+          return this.getItem?.email;
+        }
+        return this.newEmail;
+      },
+      set: function (newValue) {
+        this.newEmail = newValue;
+      },
+    },
     userExternalId: {
       get: function () {
         if (this.newUserExternalId === null) {
-          return this.getItem.seller.id;
+          return this.getItem.seller?.id;
         }
         return this.newUserExternalId;
       },
@@ -242,6 +274,7 @@ export default {
         'active': this.active,
         'user_external_id': this.userExternalId,
         'ticket_type_id': this.ticketTypeId,
+        'email': this.email,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {

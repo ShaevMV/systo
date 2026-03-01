@@ -48,7 +48,7 @@
                     <select class="form-select"
                             v-model="festival_pdf"
                             id="validationDefault01">
-                      <option value=null>Выберите</option>
+                      <option value="">Выберите</option>
                       <option v-for="item in (getTemplatePdf)"
                               v-bind:key="item"
                               :selected="item == festival_pdf"
@@ -65,7 +65,7 @@
                     <select class="form-select"
                             v-model="festival_email"
                             id="validationDefault01">
-                      <option value=null>Выберите</option>
+                      <option value="">Выберите</option>
                       <option v-for="item in (getTemplateEmail)"
                               v-bind:key="item"
                               :selected="item == festival_email"

@@ -9,6 +9,7 @@ export default {
   name: "TypesOfPaymentItemView",
   components: {TypesOfPaymentItem},
   beforeRouteEnter: (to, from, next) => {
+    window.store.dispatch('appTicketType/loadTemplate');
     window.store.dispatch('appAccount/loadList', {
       filter: {
         'role': 'seller'
@@ -22,6 +23,7 @@ export default {
       orderBy: {},
     });
     if (to.params.id) {
+      console.log(to.params.id)
       window.store.dispatch('appTypesOfPayment/loadItem', {
         id: to.params.id,
       });
