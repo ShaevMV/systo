@@ -70,6 +70,18 @@ final class OrderTicket extends AggregateRoot
                     $externalPromoCodeDto?->getPromocode(),
                 )
             );
+            foreach ($orderTicketDto->getTicket() as $item) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail() ?? $orderTicketDto->getEmail(),
+                            $orderTicketDto->getId()->value(),
+                        $item->getId()->value(),
+                    )
+                );
+                $result->record(new ProcessTelegramByQuestionnaireSend(
+                        $item->getEmail() ?? $orderTicketDto->getEmail()
+                    )
+                );
+            }
         } else {
             $result->record(new ProcessUserNotificationNewOrderTicket(
                     $orderTicketDto->getEmail(),
