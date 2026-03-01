@@ -53,17 +53,33 @@ final class OrderTicket extends AggregateRoot
     public static function create(
         OrderTicketDto $orderTicketDto,
         int            $kilter,
+        ?ExternalPromoCodeDto $externalPromoCodeDto = null
     ): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
+        if($orderTicketDto->isIsLiveTicket()) {
+            $result->record(new ProcessCreateTicket(
+                $result->id,
+                $result->getTicket(),
+            ));
+            $result->record(new ProcessUserNotificationOrderPaid(
+                    $orderTicketDto->getEmail(),
+                    $result->getTicket(),
+                    $orderTicketDto->getTicketTypeId(),
+                    null,
+                    $externalPromoCodeDto?->getPromocode(),
+                )
+            );
+        } else {
+            $result->record(new ProcessUserNotificationNewOrderTicket(
+                    $orderTicketDto->getEmail(),
+                    $kilter,
+                    $orderTicketDto->getTicketTypeId(),
+                    $result->festival_id,
+                )
+            );
+        }
 
-        $result->record(new ProcessUserNotificationNewOrderTicket(
-                $orderTicketDto->getEmail(),
-                $kilter,
-                $orderTicketDto->getTicketTypeId(),
-                $result->festival_id,
-            )
-        );
 
         return $result;
     }

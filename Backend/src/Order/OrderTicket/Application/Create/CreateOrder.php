@@ -7,6 +7,8 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 use Bus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
@@ -17,6 +19,7 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHan
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
+use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 
 final class CreateOrder
 {
@@ -28,6 +31,7 @@ final class CreateOrder
         OrderItemQueryHandler          $itemQueryHandler,
         AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
         private Bus                    $bus,
+        private ExternalPromocode      $externalPromocode,
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -58,14 +62,21 @@ final class CreateOrder
                 throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
             }
 
-            if(null !== $orderTicketDto->getInviteLink()) {
+            if (null !== $orderTicketDto->getInviteLink()) {
                 $this->commandBus->dispatch(new AddOrderInInviteCommand(
                     $orderTicketDto->getInviteLink(),
                     $orderTicketDto->getId(),
                 ));
             }
-
-            $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
+            Log::info('Создал заказ ' . $orderTicketDto->getEmail());
+            $orderTicket = OrderTicket::create(
+                $orderTicketDto,
+                $orderTicketItem->getKilter(),
+                $orderTicketDto->isIsLiveTicket() && $orderTicketDto->getTicketTypeId()
+                    ->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
+                    $this->externalPromocode->getPromocodeByOrderId($orderTicketDto->getId()) :
+                    null,
+            );
 
             $this->bus::chain($orderTicket->pullDomainEvents())
                 ->dispatch();
