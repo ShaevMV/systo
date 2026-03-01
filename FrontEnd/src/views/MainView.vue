@@ -3,7 +3,7 @@
     <a :href="getLinkHome" class="logo d-flex"><span>Система регистрации оргвзносов на систо</span><img
         src="/assets/img/systo-nota.png" alt="systo-nota"></a>
 
-    <button type="button" aria-label="Меню" id="menu-btn" @click.stop="toggleMenu"></button>
+    <span class="menu-span">Меню</span><button type="button" aria-label="Меню" id="menu-btn" @click.stop="toggleMenu"></button>
   </header>
 
   <aside v-bind:class="classObject" @click.stop>

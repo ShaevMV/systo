@@ -1674,6 +1674,14 @@ select.form-select::after {
     margin-top: 0;
 }
 
+.menu-span{
+    position: absolute;
+    right: 89px;
+    text-transform: uppercase;
+    top: 20px;
+    display: none;
+}
+
 .in-choice > div.payment-choice:first-of-type label > span {
     background-image: url('../img/icon-sber.png');
     background-size: 25px;
@@ -2400,6 +2408,58 @@ input[readonly] {
     font-weight: 500;
 }
 
+#org-type .in-choice .ticket-choice:first-of-type .intckt p:first-child::before{
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/pdf-icon.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 3px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(4) .intckt p:first-child::before{
+    content: '';
+    width: 52px;
+    height: 21px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/envelop-plus-elka.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 5px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(3) .intckt p:first-child::before{
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/envelope-icon.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 4px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(2) .intckt p:first-child::before{
+    content: '';
+    width: 50px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/pdf-plus-elka.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 4px;
+}
+
 @media (max-width: 768px) {
     /*body {*/
     /*    padding: 10px;*/
@@ -2449,7 +2509,7 @@ input[readonly] {
         left: 0 !important;
     }
 
-    #header button {
+    #header button, .menu-span {
         display: block;
     }
 
@@ -2847,6 +2907,11 @@ input[readonly] {
 @media (max-width: 505px) {
     #main h1 {
         font-size: 21px;
+    }
+
+    .menu-span{
+        top: 15px;
+        right: 58px;
     }
 
     #stub .blue-btn {

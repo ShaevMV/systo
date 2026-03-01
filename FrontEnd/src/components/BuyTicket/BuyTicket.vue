@@ -227,7 +227,7 @@
                   каждого гостя, за которого будешь вносить средства:
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" id="org-type">
                   <div class="col-3">
                     <label for="form_need">Тип оргвзноса: *</label>
                   </div>

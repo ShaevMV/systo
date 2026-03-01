@@ -17,6 +17,9 @@ export default {
 
     next();
   },
+  created() {
+    document.title = "Создать тип билета"
+  }
 }
 </script>
 

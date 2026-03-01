@@ -31,6 +31,9 @@ export default {
 
     next();
   },
+  created() {
+    document.title = "Создать тип оплаты"
+  }
 }
 </script>
 

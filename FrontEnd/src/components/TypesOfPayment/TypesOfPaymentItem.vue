@@ -1,6 +1,6 @@
 <template>
   <div class="container-fluid">
-    <div class="title-block text-center"><h1 class="card-title">Тии оплаты: {{ name }}</h1></div>
+    <div class="title-block text-center"><h1 class="card-title">Тип оплаты: {{ name }}</h1></div>
     <div class="row">
       <div class="col-lg-12 mx-auto">
         <div class="card">
