@@ -28,6 +28,7 @@ use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 class OrderTickets extends Controller
 {
@@ -138,10 +139,13 @@ class OrderTickets extends Controller
      */
     public function getList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
+        /** @var User $user */
+        $user = Auth::user();
+
         $listResponse = $this->getOrder->listByFilter(
             OrderFilterQuery::fromState(
                 $filterForTicketOrder->toArray(),
-                Auth::user()->isManager() ?? false
+                $user->role === AccountRoleHelper::admin ? null : new Uuid(Auth::id())
             )
         ) ?? new ListResponse();
 
@@ -165,7 +169,7 @@ class OrderTickets extends Controller
         $user = Auth::user();
         if (is_null($orderItem) ||
             (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
-                && !$user->is_admin)
+                && !($user->role === AccountRoleHelper::admin))
         ) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']

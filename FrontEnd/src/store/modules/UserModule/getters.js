@@ -28,6 +28,10 @@ export const isAdmin = state => {
     return state.userInfo.admin;
 };
 
+export const isSeller = state => {
+    return state.userInfo.seller;
+};
+
 /**
  * Проверить авторизацию
  *

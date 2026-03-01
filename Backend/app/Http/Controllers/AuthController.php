@@ -138,10 +138,10 @@ class AuthController extends Controller
             throw new DomainException('Пользователь не найден');
         }
 
-        $isCorrect = true;
+        $isCorrect = false;
         foreach ($roles as $role) {
-            if (!$userInfoDto->isRole($role)) {
-                $isCorrect = false;
+            if ($userInfoDto->isRole($role)) {
+                $isCorrect = true;
                 break;
             }
         }

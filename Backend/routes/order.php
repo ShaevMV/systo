@@ -15,25 +15,24 @@ Route::prefix('v1/order')->group(static function (): void {
     // список всех заказов для АДМИНА
     Route::post('/getList',[OrderTickets::class, 'getList'])
         ->middleware('auth:api')
-        ->middleware('admin');
+        ->middleware('role:seller,admin');
+
     // сменить статус заказа АДМИН
     Route::post('/toChanceStatus/{id}', [OrderTickets::class, 'toChanceStatus'])
         ->middleware('auth:api')
-        ->middleware('admin');
+        ->middleware('role:seller,admin');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])
         ->middleware('auth:api');
+
     // получить определённые заказ
     Route::get('/getItem/{id}', [OrderTickets::class, 'getOrderItem'])
         ->middleware('auth:api');
 
-
-
     Route::get('/getTicketPdf/{id}',[
         OrderTickets::class, 'getUrlListForPdf'
     ])->middleware('auth:api');
-
 });
 
 

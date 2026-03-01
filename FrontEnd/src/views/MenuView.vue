@@ -54,7 +54,7 @@
           :to="{ name: 'Profile' }">Мой аккаунт
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
+    <li class="nav-item" v-if="(isAdmin || isSeller) && isAuth ">
       <router-link
           class="nav-link"
           active-class="active"
@@ -136,6 +136,7 @@ export default {
     ...mapGetters('appUser', [
       'isAuth',
       'isAdmin',
+      'isSeller',
       'isManager'
     ]),
     getLinkHome: function () {
