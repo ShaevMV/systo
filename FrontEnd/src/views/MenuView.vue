@@ -61,7 +61,7 @@
           :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
+    <li class="nav-item" v-if="(isAdmin || isManager) && isAuth">
       <router-link
           class="nav-link"
           active-class="active"
@@ -89,7 +89,7 @@
           :to="{name: 'AccountListView'}">Все пользователи
       </router-link>
     </li>
-    <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
+    <li class="nav-item" v-if="(isAdmin && isAuth)">
       <router-link
           class="nav-link"
           active-class="active"

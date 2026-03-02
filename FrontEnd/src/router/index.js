@@ -180,7 +180,7 @@ const routes = [
         component: QuestionnaireListView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin']
+            'role': ['admin', 'manager']
         }
     },
     // статические ссылки

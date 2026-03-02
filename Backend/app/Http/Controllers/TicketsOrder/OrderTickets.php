@@ -249,6 +249,4 @@ class OrderTickets extends Controller
             ], 422);
         }
     }
-
-
 }
