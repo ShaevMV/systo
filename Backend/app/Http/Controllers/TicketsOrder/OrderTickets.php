@@ -214,7 +214,7 @@ class OrderTickets extends Controller
             $status,
             new Uuid(Auth::id()),
             $request->get('comment', null),
-            liveList:$request->get('liveList')
+            liveList:$request->get('liveList' , [])
         );
 
         return response()->json([
