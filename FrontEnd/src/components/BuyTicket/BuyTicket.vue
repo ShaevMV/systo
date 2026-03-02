@@ -91,7 +91,6 @@
                           class="form-control"
                           placeholder="Телефон:*"
                           required="required"
-                          v-bind:readonly="getUserData('phone') !== null"
                           v-model="phone"
                           data-error="Valid phone is required."
                       />
@@ -110,7 +109,6 @@
                           class="form-control"
                           placeholder="Город:*"
                           required="required"
-                          v-bind:readonly="getUserData('city') !== null"
                           v-model="city"
                           data-error="Valid phone is required."
                       />
