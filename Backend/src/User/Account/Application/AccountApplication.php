@@ -21,6 +21,7 @@ use Tickets\User\Account\Application\GetList\AccountGetListQueryHandler;
 use Tickets\User\Account\Domain\Account;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 use Tickets\User\Account\Response\AccountGetListResponse;
 
 final class AccountApplication

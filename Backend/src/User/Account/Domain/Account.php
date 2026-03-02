@@ -24,7 +24,7 @@ class Account extends AggregateRoot
     public static function creatingNewAccount(
         Uuid $uuid,
         AccountDto $accountDto,
-        string $password,
+        string $password
     ): self {
         $self = new self(
             $uuid,
@@ -32,6 +32,7 @@ class Account extends AggregateRoot
             $accountDto->getPhone(),
             $accountDto->getCity(),
             $accountDto->getName(),
+            $accountDto->getRole(),
         );
 
 

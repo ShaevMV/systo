@@ -7,6 +7,7 @@ namespace Tickets\User\Account\Dto;
 use Illuminate\Support\Facades\Hash;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 final class AccountDto extends AbstractionEntity
 {
@@ -17,6 +18,7 @@ final class AccountDto extends AbstractionEntity
         protected string $city,
         protected ?string $name = null,
         protected bool $is_admin = false,
+        protected string $role = AccountRoleHelper::guest,
     ) {
     }
 
@@ -62,5 +64,17 @@ final class AccountDto extends AbstractionEntity
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->role = $role;
+
+        return $this;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
     }
 }

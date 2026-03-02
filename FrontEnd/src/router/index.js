@@ -31,6 +31,7 @@ import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemVie
 
 import AccountListView from "@/views/account/AccountListView.vue";
 
+import RegView from "@/views/auth/RegView.vue";
 
 const routes = [
     {
@@ -62,6 +63,14 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/regGydhf',
+        name: 'registration',
+        component: RegView,
         meta: {
             'guest': true
         }

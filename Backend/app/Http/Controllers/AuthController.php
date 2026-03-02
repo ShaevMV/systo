@@ -18,6 +18,7 @@ use Nette\Utils\JsonException;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Domain\ProcessPasswordResets;
 use Tickets\User\Account\Dto\AccountDto;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 class AuthController extends Controller
 {
@@ -75,9 +76,9 @@ class AuthController extends Controller
             '*.confirmed' => 'Пароль не совпадает',
             '*.min' => 'Минимальное количество символов 6-ть',
         ]);
-
+        $accountDto = AccountDto::fromState($request->toArray());
         $this->accountApplication->createNewAccount(
-            AccountDto::fromState($request->toArray()),
+            $accountDto->setRole(AccountRoleHelper::pusher),
             $request->password
         );
         $credentials = $request->only('email', 'password');
@@ -85,6 +86,7 @@ class AuthController extends Controller
         if (!$token = auth()->attempt($credentials, true)) {
             return response()->json(['message' => 'Логин и пароль указан не верно'], 401);
         }
+
         return $this->respondWithToken($token);
     }
 
