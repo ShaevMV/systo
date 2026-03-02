@@ -45,6 +45,7 @@ class OrderTicketDto
         protected bool     $is_live_ticket = false,
         ?Uuid              $id = null,
         protected ?Uuid    $inviteLink = null,
+        protected ?Uuid    $friendly_id = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -58,6 +59,7 @@ class OrderTicketDto
         Uuid     $userId,
         PriceDto $priceDto,
         bool     $isLiveTicket = false,
+        ?Uuid    $pusherId = null,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
@@ -83,6 +85,7 @@ class OrderTicketDto
             $data['promo_code'],
             $isLiveTicket,
             $id,
+            friendly_id: $pusherId
         );
     }
 
@@ -115,6 +118,7 @@ class OrderTicketDto
             'date' => (string)$this->datePay,
             'promo_code' => $this->promo_code,
             'id_buy' => $this->id_buy,
+            'friendly_id' => $this->friendly_id?->value(),
         ];
     }
 

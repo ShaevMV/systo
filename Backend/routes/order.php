@@ -12,6 +12,11 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::post('/create',
         [OrderTickets::class, 'create']);
 
+    Route::post('/createFriendly',[OrderTickets::class, 'createFriendly'])
+        ->middleware('auth:api')
+        ->middleware('role:pusher');
+
+
     // список всех заказов для АДМИНА
     Route::post('/getList',[OrderTickets::class, 'getList'])
         ->middleware('auth:api')

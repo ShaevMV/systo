@@ -42,6 +42,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static \Illuminate\Database\Query\Builder|TicketModel withTrashed()
  * @method static \Illuminate\Database\Query\Builder|TicketModel withoutTrashed()
  * @mixin Eloquent
+ * @property string|null $email
+ * @method static Builder|TicketModel whereEmail($value)
  */
 class TicketModel extends Model
 {

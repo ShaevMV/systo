@@ -23,6 +23,7 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
@@ -118,6 +119,72 @@ class OrderTickets extends Controller
             ]);
         }
     }
+
+
+    /**
+     * Создать заказ
+     *
+     * @throws Throwable
+     */
+    public function createFriendly(CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
+    {
+        try {
+            // Создание или получение пользователя по email
+            $userId = new Uuid(Auth::id());
+            $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
+            $guests = $createOrderTicketsRequest->guests;
+            if ($createOrderTicketsRequest->name) {
+                array_unshift($guests, [
+                    'value' => $createOrderTicketsRequest->name,
+                    'email' => $createOrderTicketsRequest->email,
+                ]);
+            }
+            $priceDto = new PriceDto(
+                (int)$createOrderTicketsRequest->price,
+                count($guests),
+                0
+            );
+
+            $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
+
+            $data = $createOrderTicketsRequest->toArray();
+            $data['guests'] = $guests;
+
+            $orderTicketDto = OrderTicketDto::fromState(
+                $data,
+                $userId,
+                $priceDto,
+                $ticketType->isLiveTicket(),
+                $userId
+            );
+
+            $this->createOrder->createAndSave($orderTicketDto);
+
+            // Добавления комментария
+            if ($createOrderTicketsRequest->comment) {
+                $this->addComment->send(
+                    $orderTicketDto->getId(),
+                    $userId,
+                    $createOrderTicketsRequest->comment
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
+              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
+            ]);
+
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'link' => $exception->getLine(),
+                'file' => $exception->getFile(),
+            ]);
+        }
+    }
+
 
     /**
      * Получить список заказов от пользователя

@@ -37,6 +37,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TypesOfPaymentModel whereUserExternalId($value)
  * @property string|null $ticket_type_id Связь с типом билета
  * @method static Builder|TypesOfPaymentModel whereTicketTypeId($value)
+ * @method static Builder|TypesOfPaymentModel whereEmail($value)
  */
 class TypesOfPaymentModel extends Model
 {

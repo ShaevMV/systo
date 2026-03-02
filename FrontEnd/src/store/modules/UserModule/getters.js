@@ -43,6 +43,16 @@ export const isManager = state => {
 };
 
 /**
+ * Проверить авторизацию
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const isPusher = state => {
+    return state.userInfo.pusher;
+};
+
+/**
  * Вывести email
  *
  * @param state

@@ -20,6 +20,18 @@ export const goToCreateOrderTicket = (context, payload) => {
 }
 
 
+export const goToCreateFrendlyOrderTicket = (context, payload) => {
+    let promise = axios.post(API_ORDER + '/createFriendly', payload);
+    promise.then(function (response) {
+        console.log(response.data.success);
+        payload.callback(response.data.success, response.data.message);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}
+
+
 /**
  * Получить список заказов пользователя
  *

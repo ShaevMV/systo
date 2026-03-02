@@ -65,6 +65,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel whereUpdatedAt($value)
  * @method static Builder|OrderTicketModel whereUserId($value)
  * @mixin Eloquent
+ * @property string $type
+ * @method static Builder|OrderTicketModel whereType($value)
+ * @property string|null $friendly_id
+ * @method static Builder|OrderTicketModel whereFriendlyId($value)
  */
 final class OrderTicketModel extends Model
 {

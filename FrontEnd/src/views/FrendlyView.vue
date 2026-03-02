@@ -1,19 +1,18 @@
 <template>
-    <BuyTicket
-        :userId="userId"
-    />
+  <BuyTicketFrendly
+    :user-id="userId"/>
 </template>
 <script>
-import BuyTicket from "@/components/BuyTicket/BuyTicket";
 import axios from 'axios';
+import BuyTicketFrendly from "@/components/BuyTicket/BuyTicketFrendly.vue";
 
 export default {
-  name: 'HomeView',
+  name: 'FrendlyView',
   props: {
     'userId': String
   },
   components: {
-    BuyTicket,
+    BuyTicketFrendly
   },
   created() {
     document.title = "Система регистрации оргвзносов на систо"

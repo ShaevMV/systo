@@ -1,7 +1,7 @@
 <template>
   <div id="left-logo">
     <a :href="getLinkHome">
-    <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
+      <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
@@ -21,9 +21,16 @@
     </li>
     <li class="nav-item">
       <router-link
-          class="nav-link" v-if="isAuth"
+          class="nav-link" v-if="isAuth && !isPusher"
           active-class="active"
           :to="getLinkHome">Регистрация оргвзноса
+      </router-link>
+    </li>
+    <li class="nav-item">
+      <router-link
+          class="nav-link" v-if="isAuth && isPusher"
+          active-class="active"
+          :to="{ name: 'frendlyOrder' }">Регистрация дружеского оргвзноса
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
@@ -111,13 +118,14 @@
   <div id="left-sub">
     <p>Если у вас возникли трудности <br>с внесением оргвзноса напишите нам:</p>
     <ul>
-      <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank" >FAQ (Вопрос-Ответ)</a></li>
+      <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank">FAQ (Вопрос-Ответ)</a></li>
       <li><a href="tg://resolve?domain=systo_club" class="telegram" target="_blank">@systo_club</a></li>
     </ul>
 
   </div>
 
-  <div id="prana"><span>Система разработана веб-студией</span> <a href="https://pranaweb.ru" target="_blank">PRANA</a></div>
+  <div id="prana"><span>Система разработана веб-студией</span> <a href="https://pranaweb.ru" target="_blank">PRANA</a>
+  </div>
 
 </template>
 
@@ -137,7 +145,8 @@ export default {
       'isAuth',
       'isAdmin',
       'isSeller',
-      'isManager'
+      'isManager',
+      'isPusher',
     ]),
     getLinkHome: function () {
       return this.isAuth ? '/hfjlsd65t4732' : '/';
@@ -145,8 +154,8 @@ export default {
   },
   methods: {
     ...mapActions('appUser', [
-          'logOut'
-        ]),
+      'logOut'
+    ]),
   },
 }
 </script>

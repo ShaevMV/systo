@@ -1,5 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import FrendlyView from '../views/FrendlyView.vue'
 import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
@@ -39,7 +40,16 @@ const routes = [
         name: 'stub',
         component: StubView
     },
-
+    // инвайт при старте покупка билета
+    {
+        path: '/frendlyOrder',
+        name: 'frendlyOrder',
+        component: FrendlyView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'pusher'],
+        }
+    },
     // инвайт при старте покупка билета
     {
         path: '/hfjlsd65t4732',
