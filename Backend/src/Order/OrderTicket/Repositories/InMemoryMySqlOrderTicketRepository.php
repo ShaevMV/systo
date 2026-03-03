@@ -26,6 +26,7 @@ use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
@@ -162,7 +163,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      * @return OrderTicketItemForListResponse[]
      * @throws JsonException
      */
-    public function getList(Filters $filters, bool $isFriendly = false): array
+    public function getList(Filters $filters): array
     {
         $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE . '.user_id',
@@ -189,13 +190,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 TypesOfPaymentModel::TABLE . '.name as payment_name'
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
+            ->whereNull($this->model::TABLE . '.friendly_id')
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
-        if(!$isFriendly) {
-            $builder->whereNull($this->model::TABLE . '.friendly_id');
-        } else {
-            $builder->whereNotNull($this->model::TABLE . '.friendly_id');
-        }
 
         $rawData = FilterBuilder::build($builder, $filters)
             ->get()
@@ -256,5 +253,41 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ?->toArray();
 
         return is_null($rawData) ? null : OrderTicketItemResponse::fromState($rawData);
+    }
+
+    public function getFriendlyList(Filters $filters): array
+    {
+        $builder = $this->model
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE . '.id')
+            ->leftJoin(TicketTypeFestivalModel::TABLE, TicketTypesModel::TABLE . '.id',
+                '=',
+                TicketTypeFestivalModel::TABLE . '.ticket_type_id')
+            ->leftJoin(FestivalModel::TABLE, TicketTypeFestivalModel::TABLE . '.festival_id',
+                '=',
+                FestivalModel::TABLE . '.id')
+            ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE . '.types_of_payment_id',
+                '=',
+                TypesOfPaymentModel::TABLE . '.id')
+            ->select([
+                $this->model::TABLE . '.*',
+                TicketTypesModel::TABLE . '.name',
+            ])
+            ->whereNotNull($this->model::TABLE . '.friendly_id')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
+            ->orderBy($this->model::TABLE . '.kilter', 'DESC');
+
+        $rawData = FilterBuilder::build($builder, $filters)
+            ->get()
+            ->toArray();
+
+        $result = [];
+
+        foreach ($rawData as $datum) {
+            $result[] = OrderTicketItemForFriendlyListResponse::fromState($datum);
+        }
+
+        return $result;
     }
 }

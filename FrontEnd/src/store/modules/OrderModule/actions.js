@@ -32,6 +32,20 @@ export const goToCreateFrendlyOrderTicket = (context, payload) => {
 }
 
 
+export const getOrderListForFrendly = (context, payload) => {
+    console.log(payload);
+    let promise = axios.post(API_ORDER + '/getListForFriendly', payload);
+    promise.then(function (response) {
+        context.commit('setOrderUserList', response.data.list);
+        context.commit('setTotalNumber', response.data.totalNumber);
+        context.commit('setLoaging', false);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}
+
+
 /**
  * Получить список заказов пользователя
  *

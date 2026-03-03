@@ -68,6 +68,13 @@
           :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
+    <li class="nav-item" v-if="(isAdmin || isPusher) && isAuth ">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'AllOrdersFriendly'}">Все френдли оргвзносы
+      </router-link>
+    </li>
     <li class="nav-item" v-if="(isAdmin || isManager) && isAuth">
       <router-link
           class="nav-link"

@@ -22,6 +22,10 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:seller,admin');
 
+    Route::post('/getListForFriendly',[OrderTickets::class, 'getFriendlyList'])
+        ->middleware('auth:api')
+        ->middleware('role:pusher,admin');
+
     // сменить статус заказа АДМИН
     Route::post('/toChanceStatus/{id}', [OrderTickets::class, 'toChanceStatus'])
         ->middleware('auth:api')

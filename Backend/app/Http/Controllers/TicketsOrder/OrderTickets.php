@@ -20,6 +20,7 @@ use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
@@ -221,6 +222,26 @@ class OrderTickets extends Controller
                 'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray()
             ]);
     }
+
+    public function getFriendlyList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $listResponse = $this->getOrder->listByFilterForFriendly(
+            OrderFilterQueryForFriendly::fromState(
+                $filterForTicketOrder->toArray(),
+                $user->role === AccountRoleHelper::admin ? null : new Uuid(Auth::id()),
+            )
+        ) ?? new ListResponse();
+
+        return response()->json(
+            [
+                'list' => $listResponse->toArray(),
+                'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray()
+            ]);
+    }
+
 
     /**
      * Получить определённый заказ
