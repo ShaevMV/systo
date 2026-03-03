@@ -52,20 +52,20 @@
         <div class="card">
           <div class="card-body pt-3">
             <a class="nav-item"
-                 v-if="isAdmin"
+                 v-if="isAdmin || isManager"
                  @click="goList"
             >
               Все анкеты
             </a>
 
             <questionnaire-ticket
-                :questionnaire="isAdmin ? getQuestionnaireItem : questionnaire"
-                :is-disabled="isAdmin"
+                :questionnaire="(isAdmin || isManager)? getQuestionnaireItem : questionnaire"
+                :is-disabled="isAdmin || isManager"
                 @update-questionnaire="updateQuestionnaire"
             />
             <div class="form-check"
                  id="check-check"
-                 v-show="!isAdmin"
+                 v-show="!isAdmin || !isManager"
             >
               <input
                   class="form-check-input"
@@ -80,7 +80,7 @@
                 и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
               </label>
             </div>
-            <div class="col-12" v-show="!isAdmin">
+            <div class="col-12" v-show="!isAdmin || !isManager">
               <button
                   type="button"
                   @click="send"
@@ -136,7 +136,8 @@ export default {
   },
   computed: {
     ...mapGetters('appUser', [
-      'isAdmin'
+      'isAdmin',
+      'isManager'
     ]),
     ...mapGetters('appQuestionnaire', [
       'getQuestionnaireItem'
