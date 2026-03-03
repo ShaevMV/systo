@@ -162,7 +162,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      * @return OrderTicketItemForListResponse[]
      * @throws JsonException
      */
-    public function getList(Filters $filters): array
+    public function getList(Filters $filters, bool $isFriendly = false): array
     {
         $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE . '.user_id',
@@ -191,6 +191,11 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
+        if(!$isFriendly) {
+            $builder->whereNull($this->model::TABLE . '.friendly_id');
+        } else {
+            $builder->whereNotNull($this->model::TABLE . '.friendly_id');
+        }
 
         $rawData = FilterBuilder::build($builder, $filters)
             ->get()

@@ -51,7 +51,7 @@ interface OrderTicketRepositoryInterface
      * @param  Filters  $filters
      * @return OrderTicketItemForListResponse[]
      */
-    public function getList(Filters $filters): array;
+    public function getList(Filters $filters, bool $isFriendly = false): array;
 
     /**
      * Сменить статус заказа
