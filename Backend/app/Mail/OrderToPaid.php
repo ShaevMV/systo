@@ -42,7 +42,7 @@ class OrderToPaid extends Mailable
 
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
         \Log::info('Шаблон  '. $this->tickets[0]->getEmailView());
-        $mail = $this->view('email.'. ($this->tickets[0]->getEmailView() ?? 'orderToPaid'),[
+        $mail = $this->view('email.'. (empty($this->tickets[0]->getEmailView()) ? 'orderToPaid' : $this->tickets[0]->getEmailView()),[
             'festivalName' => $festivalName,
             'comment' => $this->comment,
             'promocode' => $this->promocode,

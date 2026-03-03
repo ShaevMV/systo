@@ -158,7 +158,7 @@ class OrderTickets extends Controller
                 $userId
             );
 
-            $this->createOrder->createAndSave($orderTicketDto);
+            $this->createOrder->createAndSaveForFriendly($orderTicketDto);
 
             // Добавления комментария
             if ($createOrderTicketsRequest->comment) {
@@ -171,8 +171,7 @@ class OrderTickets extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты! <br/>
-              Так же мы создали нового пользователя и отправили вам на почту данные для авторизации',
+                'message' => 'Мы удачно зарегистрировали ваш заказ скоро мы его проверим и вы получите свои билеты!',
             ]);
 
         } catch (Throwable $exception) {

@@ -203,4 +203,11 @@ class OrderTicketDto
     {
         $this->inviteLink = $inviteLink;
     }
+
+    public function setStatus(?Status $status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
 }

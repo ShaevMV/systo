@@ -7,8 +7,7 @@ namespace Tickets\Order\OrderTicket\Application\Create;
 use Bus;
 use DomainException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Status;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
@@ -19,7 +18,6 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHan
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 
 final class CreateOrder
 {
@@ -31,7 +29,6 @@ final class CreateOrder
         OrderItemQueryHandler          $itemQueryHandler,
         AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
         private Bus                    $bus,
-        private ExternalPromocode      $externalPromocode,
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -68,9 +65,45 @@ final class CreateOrder
                     $orderTicketDto->getId(),
                 ));
             }
-            Log::info('Создал заказ ' . $orderTicketDto->getEmail());
+
             if (!$orderTicketDto->isIsLiveTicket()) {
                 $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
+            } else {
+                $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto);
+            }
+
+            $this->bus::chain($orderTicket->pullDomainEvents())
+                ->dispatch();
+
+            DB::commit();
+        } catch (Throwable $throwable) {
+            DB::rollBack();
+            throw $throwable;
+        }
+
+        return true;
+    }
+
+
+    public function createAndSaveForFriendly(
+        OrderTicketDto $orderTicketDto,
+    ): bool
+    {
+        $orderTicketDto->setStatus(new Status(Status::PAID));
+        DB::beginTransaction();
+        try {
+
+            $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
+
+            /** @var OrderTicketItemResponse $orderTicketItem */
+            $orderTicketItem = $this->queryBus->ask(new OrderIdQuery($orderTicketDto->getId()));
+            if (is_null($orderTicketItem)) {
+                throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
+            }
+
+
+            if (!$orderTicketDto->isIsLiveTicket()) {
+                $orderTicket = OrderTicket::toPaid($orderTicketDto);
             } else {
                 $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto);
             }
