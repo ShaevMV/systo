@@ -69,7 +69,7 @@ final class CreateOrder
             if (!$orderTicketDto->isIsLiveTicket()) {
                 $orderTicket = OrderTicket::create($orderTicketDto, $orderTicketItem->getKilter());
             } else {
-                $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto);
+                $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto, $orderTicketItem->getKilter());
             }
 
             $this->bus::chain($orderTicket->pullDomainEvents())

@@ -68,7 +68,7 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-    public static function toPaidInLiveTicket(OrderTicketDto $orderTicketDto): self
+    public static function toPaidInLiveTicket(OrderTicketDto $orderTicketDto, int $kilter): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
@@ -81,7 +81,8 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessUserNotificationOrderPaidLiveTicket(
                 $orderTicketDto->getEmail(),
                 $orderTicketDto->getTicketTypeId(),
-                $orderTicketDto->getTypesOfPaymentId()
+                $orderTicketDto->getTypesOfPaymentId(),
+                $kilter,
             )
         );
 

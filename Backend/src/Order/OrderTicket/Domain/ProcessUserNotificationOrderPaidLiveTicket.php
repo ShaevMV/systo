@@ -22,6 +22,7 @@ class ProcessUserNotificationOrderPaidLiveTicket implements ShouldQueue, DomainE
         private string $email,
         private Uuid $ticketTypeId,
         private Uuid $typeOrPaymentId,
+        private int $kilter,
     )
     {
     }
@@ -31,6 +32,7 @@ class ProcessUserNotificationOrderPaidLiveTicket implements ShouldQueue, DomainE
         Mail::to($this->email)->send(new OrderToPaidLiveTicket(
             $this->ticketTypeId,
             $this->typeOrPaymentId,
+            $this->kilter
         ));
     }
 }

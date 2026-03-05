@@ -39,7 +39,7 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на {{$festivalName}} потдверждён</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} подтверждён.  </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создании общего праздника!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ты можете получить свой конверт с аналоговой картой и стикером в эко-баре "Холистик" в Москве по адресу: м.Цветной Бульвар, Цветной бульвар 15с1, универмаг «Цветной» 5 этаж.<br>
                         Эко-бар открыт с 10.00 до 22.00 (в воскресенье с 11.00). <b>Чашка авторского чая в подарок</b></p>

@@ -14,8 +14,9 @@ class OrderToPaidLiveTicket extends Mailable
     use Queueable, SerializesModels;
 
     public function __construct(
-        private Uuid    $ticketTypeId,
-        private Uuid    $typesOfPaymentId,
+        private Uuid $ticketTypeId,
+        private Uuid $typesOfPaymentId,
+        private int  $kilter,
     )
     {
 
@@ -27,7 +28,7 @@ class OrderToPaidLiveTicket extends Mailable
      * @return $this
      */
     public function build(
-        FestivalService $festivalService,
+        FestivalService                   $festivalService,
         TypesOfPaymentRepositoryInterface $typesOfPaymentRepository,
     ): static
     {
@@ -37,7 +38,8 @@ class OrderToPaidLiveTicket extends Mailable
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
 
         $mail = $this->view('email.' . $typesOfPaymentDto->getEmail() ?? 'orderToPaidLiveTicket', [
-            'festivalName' => $festivalName
+            'festivalName' => $festivalName,
+            'kilter' => $this->kilter,
         ]);
 
         return $mail;
