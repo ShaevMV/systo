@@ -5,6 +5,10 @@ services:
   nginx:
     build:
       context: ./Docker/nginx
+    pull_policy: never
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     ports:
       - "${NGINX_PORT:-50080}:8083"
     volumes:
@@ -44,6 +48,10 @@ services:
       context: ./Docker/php
       args:
         - WITH_XDEBUG=false
+    pull_policy: never
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     image: 'ogr_laravel'
     env_file:
       - ./Backend/.env
@@ -63,13 +71,17 @@ services:
     hostname: ${ENV_ORG_FRONTEND_HOST}
     build:
       context: ./Docker/node
+    pull_policy: never
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     working_dir: ${ENV_ORG_FRONT_PATCH}
     ports:
       - "8082:8080"
     container_name: node-solarSysto
     volumes:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
-    command: tail -f /dev/null
+    command: bash -c "npm install && npm run serve -- --host 0.0.0.0 --disable-host-check"
     user: node
     environment:
       - VUE_APP_API_URL=${VUE_APP_API_URL:-http://api.tickets.loc/}
@@ -78,6 +90,10 @@ services:
 
   redis:
     build: ./Docker/redis
+    pull_policy: never
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     container_name: redis-solarSysto
     command: redis-server --appendonly yes
     ports:
@@ -129,6 +145,10 @@ services:
       context: ./Docker/php
       args:
         - WITH_XDEBUG=false
+    pull_policy: never
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     container_name: php-baza
     image: 'baza_laravel'
     env_file:
@@ -147,7 +167,11 @@ services:
   worker:
     build:
       context: ./Docker/worker
+    pull_policy: never
     image: 'laravelworker'
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     volumes:
       - ./Backend:${ENV_ORG_BACKEND_PATCH}
       - ./Friendly:${ENV_DRUG_PATCH}
