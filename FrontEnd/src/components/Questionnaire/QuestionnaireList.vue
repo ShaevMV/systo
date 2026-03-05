@@ -13,12 +13,12 @@
               <th scope="col" class="mobile">№</th>
               <th scope="col" class="mobile"></th>
               <th scope="col">Email</th>
-              <th scope="col">Имя</th>
+              <th scope="col" class="mobile">Имя</th>
               <th scope="col">Телефон</th>
               <th scope="col">Возраст</th>
-              <th scope="col">Telegram-аккаунт:</th>
+              <th scope="col" class="mobile">Telegram-аккаунт:</th>
               <th scope="col">Профайл Вконтакте</th>
-              <th scope="col">Сколько раз на Систо?</th>
+              <th scope="col" class="mobile">Сколько раз на Систо?</th>
               <th scope="col">Откуда</th>
               <th scope="col">Отправить повторно</th>
             </tr>
@@ -49,12 +49,12 @@
                 </div>
               </td>
               <td>{{ item.email }}</td>
-              <td>{{ item.name }}</td>
+              <td class="mobile">{{ item.name }}</td>
               <td>{{ item.phone }}</td>
               <td>{{ item.agy }}</td>
-              <td>{{ item.telegram }}</td>
+              <td class="mobile">{{ item.telegram }}</td>
               <td>{{ item.vk }}</td>
-              <td>{{ item.howManyTimes }}</td>
+              <td class="mobile">{{ item.howManyTimes }}</td>
               <td>{{ item.whereSysto }}</td>
               <td>
                 <span

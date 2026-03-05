@@ -14,16 +14,16 @@
             <tr>
               <th scope="col" class="mobile">№ заказа</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
-              <th scope="col" v-if="isAdmin">Email</th>
-              <th scope="col" v-if="isAdmin">Гости</th>
+              <th scope="col" v-if="isAdmin" class="mobile">Email</th>
+              <th scope="col" v-if="isAdmin" class="mobile">Гости</th>
               <th scope="col">Тип оргвзноса</th>
-              <th scope="col">Стоимость</th>
-              <th scope="col">Кол-во</th>
+              <th scope="col" class="mobile">Стоимость</th>
+              <th scope="col" class="mobile">Кол-во</th>
               <th scope="col">Дата <span>внесения средств</span></th>
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col" class="mobile">Телефон</th>
+              <th scope="col">Телефон</th>
               <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
@@ -52,19 +52,19 @@
                   </div>
                 </div>
               </td>
-              <td v-if="isAdmin">{{ itemOrder.email }}</td>
-              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) ">
+              <td v-if="isAdmin" class="mobile">{{ itemOrder.email }}</td>
+              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) " class="mobile">
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td>{{ itemOrder.price }} рублей</td>
-              <td>{{ itemOrder.count }}</td>
+              <td class="mobile">{{ itemOrder.price }} рублей</td>
+              <td class="mobile">{{ itemOrder.count }}</td>
               <td>{{ itemOrder.dateBuy }}</td>
               <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
+              <td :style="styleObject(itemOrder.status)" style="text-align: left;">
                 {{ itemOrder.phone }}
               </td>
               <td v-if="isAdmin">
