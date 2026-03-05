@@ -99,6 +99,7 @@ class OrderTicketDto
             $tickets[] = [
                 'value' => $item->getValue(),
                 'email' => $item->getEmail(),
+                'number' => $item->getNumber(),
                 'id' => $item->getId()->value(),
                 'festival_id' => $item->getFestivalId()->value(),
             ];
