@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.2-fpm-bookworm
 
 
 ENV HOME ${WORKING_DIR}
@@ -26,7 +26,8 @@ RUN apt-get update && apt-get install -y \
         && docker-php-ext-install zip \
         && docker-php-ext-install soap \
         && docker-php-ext-install sockets \
-        && docker-php-source delete
+        && docker-php-source delete \
+        && rm -rf /var/lib/apt/lists/*
 
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf
 COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
@@ -43,7 +44,7 @@ RUN if [ ${WITH_XDEBUG} = "true" ]; then \
 ;fi
 
 #
-RUN adduser --disabled-password --gecos "" user
+RUN useradd -m user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 RUN if [ ${WITH_XDEBUG} = "true" ]; then \
