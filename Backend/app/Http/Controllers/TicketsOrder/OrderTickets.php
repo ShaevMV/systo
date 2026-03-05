@@ -28,6 +28,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
+use Tickets\Ticket\Live\Service\CheckLiveTicketService;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Helpers\AccountRoleHelper;
@@ -273,35 +274,69 @@ class OrderTickets extends Controller
      *
      * @throws Throwable
      */
-    public function toChanceStatus(string $id, Request $request): JsonResponse
+    public function toChanceStatus(
+        string $id,
+        Request $request,
+        CheckLiveTicketService $checkLiveTicketService,
+    ): JsonResponse
     {
+        // Базовые правила валидации
+        $rules = [];
+        $messages = [
+            '*.required' => 'Поле обязательно для ввода',
+        ];
+
+        // Добавляем правила в зависимости от статуса
         if (in_array($request->get('status'), [
             Status::DIFFICULTIES_AROSE,
         ])) {
-            $request->validate([
-                'comment' => 'required|string'
-            ], [
-                '*.required' => 'Поле обязательно для ввода',
-            ]);
+            $rules['comment'] = 'required|string';
         }
+
         if (in_array($request->get('status'), [
             Status::LIVE_TICKET_ISSUED,
         ])) {
-            $request->validate([
-                'liveList' => 'required|array'
-            ], [
-                '*.required' => 'Поле обязательно для ввода',
-            ]);
+            $rules['liveList'] = 'required|array';
         }
 
+        // Создаем валидатор
+        $validator = \Validator::make($request->all(), $rules, $messages);
 
+        // Добавляем кастомную проверку для liveList
+        $validator->after(function ($validator) use ($request, $checkLiveTicketService) {
+            // Проверяем только если статус LIVE_TICKET_ISSUED и liveList передан
+            if (in_array($request->get('status'), [Status::LIVE_TICKET_ISSUED]) &&
+                $request->has('liveList')) {
+
+                foreach ($request->get('liveList', []) as $item) {
+                    if ($checkLiveTicketService->checkLiveNumber((int)$item)) {
+                        $validator->errors()->add(
+                            'liveList',
+                            "Номер $item выдан ранее"
+                        );
+                        break; // Можно остановиться на первой ошибке
+                    }
+                }
+            }
+        });
+
+        // Проверяем результат валидации
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422); // 422 Unprocessable Entity - стандартный код для ошибок валидации
+        }
+
+        // Если валидация прошла успешно, выполняем основной код
         $status = new Status($request->get('status'));
+
         $this->chanceStatus->chance(
             new Uuid($id),
             $status,
             new Uuid(Auth::id()),
             $request->get('comment', null),
-            liveList:$request->get('liveList' , [])
+            liveList: $request->get('liveList', [])
         );
 
         return response()->json([

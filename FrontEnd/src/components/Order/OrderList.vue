@@ -162,7 +162,7 @@
               </tr>
               </tbody>
             </table>
-            <small class="form-text text-muted">{{ getError('liveNumber') }}</small>
+            <small class="form-text text-muted">{{ getError('liveList') }}</small>
           </div>
           <div class="modal-footer">
             <button type="button" @click="sendLive" class="btn btn-secondary">

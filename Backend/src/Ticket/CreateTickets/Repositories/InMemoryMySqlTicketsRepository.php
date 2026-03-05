@@ -215,14 +215,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         ) {
             throw new DomainException('Не найден билет в Базе входа');
         } else {
-            $res = (array)DB::connection('mysqlBaza')->table('live_tickets')
-                ->where('kilter', '=', $number)->first();
 
-            Log::info('То что нашли', $res);
-
-            if (!empty($res['el_ticket_id'])) {
-                throw new DomainException('Билет уже выдан ' . $res['el_ticket_id']);
-            }
             Log::info('Тут мы меняем запись');
             return DB::connection('mysqlBaza')->table('live_tickets')
                 ->where('kilter', '=', $number)
@@ -251,5 +244,13 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         }
 
         return $result;
+    }
+
+    public function checkLiveNumber(int $number): bool
+    {
+        $res = (array)DB::connection('mysqlBaza')->table('live_tickets')
+            ->where('kilter', '=', $number)->first();
+
+        return !empty($res['el_ticket_id']);
     }
 }

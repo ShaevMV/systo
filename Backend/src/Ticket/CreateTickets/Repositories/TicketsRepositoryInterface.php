@@ -28,4 +28,6 @@ interface TicketsRepositoryInterface
      * @return Uuid[]
      */
     public function getAllTicketsId(Uuid $festivalId): array;
+
+    public function checkLiveNumber(int $number): bool;
 }
