@@ -13,6 +13,7 @@ export default {
             id: null,
             groupLimit: null,
             description: null,
+            isLiveTicket: false,
         },
         promoCode: {
             discount: null,

@@ -90,13 +90,15 @@ export default {
       this.toLogin({
         'email': this.email,
         'password': this.password,
-        'callback': function (isAdmin) {
+        'callback': function (role) {
           let url = self.$route.query.nextUrl || null;
           if (url !== null) {
             location.href = url;
           } else {
-            if (isAdmin === true) {
+            if (role === 'admin') {
               location.href = '/orders';
+            } else if(role === 'pusher') {
+              location.href = '/frendlyOrder';
             } else {
               location.href = '/hfjlsd65t4732';
             }

@@ -64,7 +64,7 @@
                 <div class="row y-row">
                   <div class="col-md-4">
                     <div class="form-group">
-                      <label for="form_email" class="hidder">Email *</label>
+                      <label for="form_email" class="hidder">Email куда прийдёт билет *</label>
                       <input
                           id="form_email"
                           type="email"
@@ -119,24 +119,8 @@
                   </div>
 
                 </div>
-                <div class="pp2 row">Введи свои Имя и Фамилию, если вносишь оргвзнос за себя</div>
-                <div class="quest-item row" id="first-item-row">
-                  <label for="name" style="display: none">Твои Имя и Фамилия: *</label>
-
-                  <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
-                    <input
-                        type="text"
-                        id="name"
-                        class="form-control"
-                        placeholder="Твои Имя и Фамилия"
-                        aria-label="Твои Имя и Фамилия"
-                        v-model="masterName"
-                        aria-describedby="basic-addon1"
-                    />
-                  </div>
-                </div>
                 <div class="row mt-3 mb-3" id="enter-guests">
-                  <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
+                  <div class="pp2">Введи данные дополнительных друзей:</div>
                   <div class="not-first-guest input-group mb-3">
 
                     <input
@@ -159,13 +143,24 @@
                         aria-describedby="basic-addon1"
                         @blur="addGuest"
                     />
+                    <input
+                        type="number"
+                        id="newEmailGuest"
+                        class="form-control"
+                        placeholder="Номер живого билета(без нулей в начале)"
+                        aria-label="Номер живого билета(без нулей в начале)"
+                        v-model="newGuestNumber"
+                        aria-describedby="basic-addon1"
+                        @blur="addGuest"
+                        v-show="getSelectTicketType?.isLiveTicket"
+                    />
+
                     <div class="input-group-prepend">
                       <span
                           class="input-group-text btn"
                           @click="addGuest()"
                           id="basic-addon1"
-                      >Добавить</span
-                      >
+                      >Добавить</span>
                     </div>
                   </div>
                 </div>
@@ -191,6 +186,13 @@
                             v-bind:value="itemGuest.email"
                             aria-describedby="basic-addon2"
                         />
+                        <input
+                            type="number"
+                            class="form-control"
+                            readonly
+                            v-bind:value="itemGuest.number"
+                            aria-describedby="basic-addon2"
+                        />
                         <div class="input-group-prepend">
                           <span
                               class="input-group-text btn"
@@ -214,7 +216,7 @@
                   </h4>
                 </div>
 
-                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на твою почту и почты твоих друзей придёт ссылка на анкету, которую необходимо заполнить, чтобы
+                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на почту и почты друзей придёт ссылка на анкету, которую необходимо заполнить, чтобы
                   активировать ваши QR-коды, а также получить доступ к новому закрытому чату гостей Solar Systo Togathering 2026.
 
                 </div>
@@ -396,6 +398,7 @@ export default {
       masterName: '',
       newGuest: '',
       newGuestEmail: '',
+      newGuestNumber: '',
       isFirstGuestAdded: false,
       email: null,
       date: null,
@@ -556,6 +559,7 @@ export default {
       document.body.removeChild(area);
     },
     sendTicketType: function () {
+        this.guests = [];
         let select = this.selectTypeTicket;
         this.loadTypesOfPayment({
           ticket_type_id: select
@@ -578,10 +582,14 @@ export default {
      * Добавить нового гостя
      */
     addGuest: function () {
-      if (this.newGuest.length > 0 && this.newGuestEmail.length > 0) {
+      if (
+          (this.newGuest.length > 0 && this.newGuestEmail.length > 0) &&
+          (!this.getSelectTicketType?.isLiveTicket || this.newGuestNumber.length > 0)
+      ) {
         this.guests.push({
           value: this.newGuest,
           email: this.newGuestEmail,
+          number: this.newGuestNumber,
         });
         this.newGuest = '';
         this.newGuestEmail = '';
@@ -661,16 +669,6 @@ export default {
       festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
     });
     await this.clearError();
-    if (this.isAuth) {
-      let self = this;
-      await this.loadUserData({
-        callback: function (data) {
-          self.phone = data.phone;
-          self.city = data.city;
-        },
-      });
-      this.email = this.getEmail;
-    }
   },
 };
 </script>
