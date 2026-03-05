@@ -622,7 +622,9 @@ export default {
       this.preload = false;
       this.newGuest = '';
       this.newGuestEmail = '';
-      this.email = this.getEmail;
+      this.email = '';
+      this.city = '';
+      this.phone = '';
       this.promoCode = null;
       this.day = null;
       this.mount = null;
