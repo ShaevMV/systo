@@ -166,6 +166,10 @@ final class OrderTicket extends AggregateRoot
         }
 
         $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
         foreach ($liveNumber as $key => $item) {
             $result->record(new ProcessPushLiveTicket(
                 new Uuid($key),

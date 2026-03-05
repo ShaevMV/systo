@@ -234,7 +234,7 @@ export default {
       let max = isAll ? quests.length : 3;
       quests.forEach(function (item, i) {
         if (i < max) {
-          result = result + item.value + " | ";
+          result = result + item.value + '(' + item.number + ')' + " | ";
         }
       });
 

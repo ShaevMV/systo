@@ -128,19 +128,16 @@ class OrderTickets extends Controller
      *
      * @throws Throwable
      */
-    public function createFriendly(CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
+    public function createFriendly(
+        CreateOrderTicketsRequest $createOrderTicketsRequest,
+        CheckLiveTicketService    $checkLiveTicketService
+    ): JsonResponse
     {
         try {
             // Создание или получение пользователя по email
             $userId = new Uuid(Auth::id());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             $guests = $createOrderTicketsRequest->guests;
-            if ($createOrderTicketsRequest->name) {
-                array_unshift($guests, [
-                    'value' => $createOrderTicketsRequest->name,
-                    'email' => $createOrderTicketsRequest->email,
-                ]);
-            }
             $priceDto = new PriceDto(
                 (int)$createOrderTicketsRequest->price,
                 count($guests),
@@ -151,6 +148,14 @@ class OrderTickets extends Controller
 
             $data = $createOrderTicketsRequest->toArray();
             $data['guests'] = $guests;
+            if ($ticketType->isLiveTicket()) {
+                foreach ($guests as $guest) {
+                    if ($checkLiveTicketService->checkLiveNumber($guest['number'])) {
+                        throw new \DomainException("Номер билета " . $guest['number'] . " уже выдан ");
+                    }
+                }
+            }
+            $data['status'] = $ticketType->isLiveTicket() ? Status::PAID_FOR_LIVE : Status::PAID;
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
@@ -275,8 +280,8 @@ class OrderTickets extends Controller
      * @throws Throwable
      */
     public function toChanceStatus(
-        string $id,
-        Request $request,
+        string                 $id,
+        Request                $request,
         CheckLiveTicketService $checkLiveTicketService,
     ): JsonResponse
     {

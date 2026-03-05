@@ -131,7 +131,7 @@
                         aria-label="Имя и фамилия твоего друга"
                         v-model="newGuest"
                         aria-describedby="basic-addon1"
-                        @blur="addGuest"
+
                     />
                     <input
                         type="email"
@@ -141,8 +141,9 @@
                         aria-label="E-mail этого друга"
                         v-model="newGuestEmail"
                         aria-describedby="basic-addon1"
-                        @blur="addGuest"
+
                     />
+                    <!--small v-show="getSelectTicketType?.isLiveTicket">Номер живого билета(без нулей в начале)</small-->
                     <input
                         type="number"
                         id="newEmailGuest"
@@ -151,7 +152,6 @@
                         aria-label="Номер живого билета(без нулей в начале)"
                         v-model="newGuestNumber"
                         aria-describedby="basic-addon1"
-                        @blur="addGuest"
                         v-show="getSelectTicketType?.isLiveTicket"
                     />
 
@@ -398,7 +398,7 @@ export default {
       masterName: '',
       newGuest: '',
       newGuestEmail: '',
-      newGuestNumber: '',
+      newGuestNumber: 0,
       isFirstGuestAdded: false,
       email: null,
       date: null,
@@ -451,34 +451,16 @@ export default {
      * @returns {false|*|null}
      */
     isNotCorrect: function () {
-      let group = true;
-
-      if (this.getSelectTicketType !== null) {
-        if (!this.isAllowedGuestMin(this.guests.length)) {
-          group = false;
-        }
-      }
 
       let result = (
           this.selectTypeTicket !== null &&
           this.selectTypesOfPayment !== null &&
           this.phone !== null &&
           this.confirm === true &&
-          group &&
-          (this.isAuth || this.email)
+          (this.email)
       )
+      result = result && this.guests.length > 0;
 
-      if(!this.isNotNeedQuestionnaire) {
-        result = result && this.masterName.length > 0;
-      } else {
-        result = result && this.guests.length > 0;
-      }
-
-      if(!this.selectTypesOfPaymentIsBilling) {
-        result = result &&
-            (this.date !== null && this.date.length > 0) &&
-            (this.idBuy !== null && this.idBuy.length > 0);
-      }
 
       return result;
     },
@@ -503,21 +485,6 @@ export default {
           }
         }
       },
-    },
-    /**
-     * Стоимость билета
-     */
-    totalPrice: function () {
-      let price = null;
-      let countTicket = this.guests.length + ((!this.isNotNeedQuestionnaire && this.masterName.length > 0) ? 1 : 0);
-      if (this.getSelectTicketType !== null) {
-        price = this.getSelectTicketType.price;
-        let count =
-            this.getSelectTicketTypeLimit !== null ? 1 : countTicket;
-        return price * count - this.getDiscountByPromoCode * count;
-      }
-
-      return null;
     },
     /**
      * Кол-во гостей
@@ -583,15 +550,19 @@ export default {
      */
     addGuest: function () {
       if (
-          (this.newGuest.length > 0 && this.newGuestEmail.length > 0) &&
-          (!this.getSelectTicketType?.isLiveTicket || this.newGuestNumber.length > 0)
+          // Два поля всегда обязательны
+          this.newGuest.length > 0 &&
+          this.newGuestEmail.length > 0 &&
+          // Третье поле обязательно только если флаг true
+          (!this.getSelectTicketType?.isLiveTicket || this.newGuestNumber > 0)
       ) {
         this.guests.push({
           value: this.newGuest,
           email: this.newGuestEmail,
-          number: this.newGuestNumber,
+          number: this.newGuestNumber > 0 ? this.newGuestNumber : null,
         });
         this.newGuest = '';
+        this.newGuestNumber = 0;
         this.newGuestEmail = '';
       }
     },
@@ -625,6 +596,8 @@ export default {
         types_of_payment_id: this.selectTypesOfPayment,
         festival_id: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
         callback: function (result, message, link) {
+          document.getElementById('modalOpenBtn').click();
+          self.message = message;
           if (result) {
             self.clearData();
           }
