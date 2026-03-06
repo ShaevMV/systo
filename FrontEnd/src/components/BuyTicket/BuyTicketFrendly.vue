@@ -149,11 +149,8 @@
                                 @change="sendTicketType()"
                             />
                             <span class="intckt">
-                            <p>
-                              {{ typeTickets.name }} /
-                            </p>
-                            <p v-html="typeTickets.description"></p>
-                              </span>
+                            <p>{{ typeTickets.name }}</p>
+                           </span>
                           </label>
                           <small class="form-text text-muted">
                             {{ getError('ticket_type_id') }}
@@ -166,7 +163,6 @@
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные всех гостей, включая основного гостя!:</div>
                   <div class="not-first-guest input-group mb-3">
-
                     <input
                         type="text"
                         id="newGuest"
@@ -305,16 +301,10 @@
                   <div class="col-12">
                     <button
                         type="button"
-                        :disabled="preload || !isNotCorrect"
+                        :disabled="!isNotCorrect"
                         @click="orderTicket"
                         class="btn btn-lg btn-block btn-outline-primary reg-btn"
                     >
-                      <span
-                          class="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                          v-show="preload"
-                      ></span>
                       Зарегистрировать оргвзнос
                     </button>
                   </div>

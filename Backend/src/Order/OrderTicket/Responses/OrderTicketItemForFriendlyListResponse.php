@@ -45,7 +45,8 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         protected Status  $status,
         protected array   $listCorrectNextStatus,
         protected ?string $phone = null,
-
+        protected ?string $pusher_name = null,
+        protected ?string $pusher_email = null,
     )
     {
         $this->count = self::getGuestsCount($guests);
@@ -78,7 +79,9 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
             $guests,
             $status,
             $status->getListNextStatus(),
-            $data['phone'],
+            $data['phone'] ?? null,
+            $data['pusher_name'] ?? null,
+            $data['pusher_email'] ?? null,
         );
     }
 

@@ -1,7 +1,6 @@
 <template>
   <div class="title-block text-center">
-    <h1 class="card-title" v-if="!isAdmin">Мои Оргвзносы</h1>
-    <h1 class="card-title" v-else> Заказы пользователей </h1>
+    <h1 class="card-title"> Заказы "пушеров" </h1>
   </div>
   <div class="row">
     <div class="col-lg-12 mx-auto" id="filter-results">
@@ -13,15 +12,15 @@
             <thead>
             <tr>
               <th scope="col" class="mobile">№ заказа</th>
-              <th scope="col" class="mobile" v-if="isAdmin"></th>
+              <th scope="col" class="mobile"></th>
+              <th scope="col">Продовец</th>
               <th scope="col">Email</th>
               <th scope="col">Гости</th>
               <th scope="col">Тип оргвзноса</th>
               <th scope="col">Стоимость</th>
               <th scope="col">Кол-во</th>
               <th scope="col" class="mobile">Телефон</th>
-              <th scope="col">Город</th>
-              <th scope="col" v-if="isAdmin" class="mobile"></th>
+              <th scope="col" class="mobile"></th>
             </tr>
             </thead>
             <tbody>
@@ -31,8 +30,8 @@
               <th scope="row" class="mobile">
                 {{ itemOrder.kilter }}
               </th>
-              <td class="mobile"  v-if="isAdmin">
-                <div class="btn-group" v-show="isAdmin && Object.keys(itemOrder.listCorrectNextStatus).length > 0">
+              <td class="mobile">
+                <div class="btn-group" v-show="Object.keys(itemOrder.listCorrectNextStatus).length > 0">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
                           :style="{'background-color': activeColor(itemOrder.status)}"
@@ -47,6 +46,7 @@
                   </div>
                 </div>
               </td>
+              <td>{{ itemOrder.pusher_name }} <br/> {{ itemOrder.pusher_email }}</td>
               <td>{{ itemOrder.email }}</td>
               <td :title="getListQuests(itemOrder.guests, true) ">
                 {{ getListQuests(itemOrder.guests, false) }}
@@ -57,10 +57,7 @@
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
                 {{ itemOrder.phone }}
               </td>
-              <td>
-                {{ itemOrder.city }}
-              </td>
-              <td v-if="isAdmin" class="mobile" style="text-align: left;">
+              <td class="mobile" style="text-align: left;">
                 <router-link
                     :to="{
                     name: 'orderItems',

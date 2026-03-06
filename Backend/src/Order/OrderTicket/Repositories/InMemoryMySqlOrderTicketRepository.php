@@ -255,6 +255,9 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         return is_null($rawData) ? null : OrderTicketItemResponse::fromState($rawData);
     }
 
+    /**
+     * @throws JsonException
+     */
     public function getFriendlyList(Filters $filters): array
     {
         $builder = $this->model
@@ -270,9 +273,14 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->leftJoin(TypesOfPaymentModel::TABLE, $this->model::TABLE . '.types_of_payment_id',
                 '=',
                 TypesOfPaymentModel::TABLE . '.id')
+            ->leftJoin(User::TABLE, $this->model::TABLE . '.friendly_id',
+                '=',
+                User::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.*',
                 TicketTypesModel::TABLE . '.name',
+                User::TABLE . '.name as pusher_name',
+                User::TABLE . '.email as pusher_email',
             ])
             ->whereNotNull($this->model::TABLE . '.friendly_id')
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
