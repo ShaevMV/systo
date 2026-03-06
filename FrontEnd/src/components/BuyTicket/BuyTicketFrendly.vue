@@ -118,6 +118,51 @@
                   </div>
 
                 </div>
+
+                <div class="pp1 row">
+                  <span>ШАГ 2.</span> Выбери тип оргвзноса:
+                </div>
+
+                <div class="mb-3" id="org-type">
+                  <div class="col-3">
+                    <label for="form_need">Тип оргвзноса: *</label>
+                  </div>
+
+                  <div class="mt-1 col-9">
+                    <div class="in-choice">
+                      <div
+                          class="ticket-choice"
+                          v-for="typeTickets in getTicketType"
+                          v-bind:key="typeTickets.id"
+                      >
+                        <div class="form-check">
+                          <label
+                              class="form-check-label"
+                              v-bind:for="typeTickets.id"
+                          >
+                            <input
+                                type="radio"
+                                class="form-check-input"
+                                v-model="selectTypeTicket"
+                                v-bind:value="typeTickets.id"
+                                v-bind:id="typeTickets.id"
+                                @change="sendTicketType()"
+                            />
+                            <span class="intckt">
+                            <p>
+                              {{ typeTickets.name }} /
+                            </p>
+                            <p v-html="typeTickets.description"></p>
+                              </span>
+                          </label>
+                          <small class="form-text text-muted">
+                            {{ getError('ticket_type_id') }}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные всех гостей, включая основного гостя!:</div>
                   <div class="not-first-guest input-group mb-3">
@@ -126,8 +171,8 @@
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        placeholder="Имя и фамилия дополнительного гостя"
-                        aria-label="Имя и фамилия дополнительного гостя"
+                        placeholder="Имя и фамилия гостя"
+                        aria-label="Имя и фамилия гостя"
                         v-model="newGuest"
                         aria-describedby="basic-addon1"
 
@@ -220,51 +265,6 @@
 
                 </div>
 
-                <div class="pp1 row">
-                  <span>ШАГ 2.</span> Выбери тип оргвзноса:
-                </div>
-
-                <div class="mb-3" id="org-type">
-                  <div class="col-3">
-                    <label for="form_need">Тип оргвзноса: *</label>
-                  </div>
-
-                  <div class="mt-1 col-9">
-                    <div class="in-choice">
-                      <div
-                          class="ticket-choice"
-                          v-for="typeTickets in getTicketType"
-                          v-bind:key="typeTickets.id"
-                      >
-                        <div class="form-check">
-                          <label
-                              class="form-check-label"
-                              v-bind:for="typeTickets.id"
-                          >
-                            <input
-                                type="radio"
-                                class="form-check-input"
-                                v-model="selectTypeTicket"
-                                v-bind:value="typeTickets.id"
-                                v-bind:id="typeTickets.id"
-                                @change="sendTicketType()"
-                            />
-                            <span class="intckt">
-                            <p>
-                              {{ typeTickets.name }} /
-                            </p>
-                            <p v-html="typeTickets.description"></p>
-                              </span>
-                          </label>
-                          <small class="form-text text-muted">
-                            {{ getError('ticket_type_id') }}
-                          </small>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
 
 
                 <div class="row itog-row mb-4">
@@ -277,7 +277,7 @@
                           id="newEmailGuest"
                           class="form-control"
                           placeholder="Внесите стоимость одного билета <b>(за вычетом вашей комиссии)</b>"
-                          aria-label="E-mail этого друга"
+                          aria-label="Внесите стоимость одного билета <b>(за вычетом вашей комиссии)</b>"
                           v-model="price"
                           aria-describedby="basic-addon1"
                       />
@@ -285,21 +285,23 @@
                   </div>
 
                 </div>
+
+
                 <div class="row" style="justify-content: center">
-                    <div class="form-check" id="check-check">
-                      <input
-                          class="form-check-input"
-                          type="checkbox"
-                          value=""
-                          v-model="confirm"
-                          id="defaultCheck1"
-                      />
-                      <label class="form-check-label" for="defaultCheck1">
-                        Регистрируя добровольный оргвзнос, ты соглашаешься с
-                        &nbsp;<a href="/conditions" target="_blank"><b>Правилами и условиями участия в туристическом слёте</b></a>
-                        и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
-                      </label>
-                    </div>
+                  <div class="form-check" id="check-check">
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        value=""
+                        v-model="confirm"
+                        id="defaultCheck1"
+                    />
+                    <label class="form-check-label" for="defaultCheck1">
+                      Регистрируя добровольный оргвзнос, ты соглашаешься с
+                      &nbsp;<a href="/conditions" target="_blank"><b>Правилами и условиями участия в туристическом слёте</b></a>
+                      и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
+                    </label>
+                  </div>
                   <div class="col-12">
                     <button
                         type="button"
@@ -317,6 +319,9 @@
                     </button>
                   </div>
                 </div>
+
+
+
                 <div
                     class="row justify-content-center"
                     v-if="!isNotCorrect"
@@ -523,11 +528,11 @@ export default {
       document.body.removeChild(area);
     },
     sendTicketType: function () {
-        this.guests = [];
-        let select = this.selectTypeTicket;
-        this.loadTypesOfPayment({
-          ticket_type_id: select
-        })
+      this.guests = [];
+      let select = this.selectTypeTicket;
+      this.loadTypesOfPayment({
+        ticket_type_id: select
+      })
     },
     /**
      * Отправить промо код
@@ -599,7 +604,7 @@ export default {
             self.clearData();
           }
           if (link !== null) {
-          //  window.location.href = link;
+            //  window.location.href = link;
           } else {
             self.message = message;
             document.getElementById('modalOpenBtn').click();
