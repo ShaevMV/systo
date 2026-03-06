@@ -28,6 +28,8 @@ class OrderTicketDto
      * @param string|null $promo_code
      * @param bool $is_live_ticket
      * @param Uuid|null $id
+     * @param Uuid|null $inviteLink
+     * @param Uuid|null $friendly_id
      */
     private function __construct(
         protected Uuid     $festival_id,
@@ -63,6 +65,7 @@ class OrderTicketDto
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
+
         $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::PAID_FOR_LIVE);
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];

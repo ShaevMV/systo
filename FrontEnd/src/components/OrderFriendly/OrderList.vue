@@ -26,8 +26,10 @@
             <tbody>
             <tr v-for="(itemOrder,index) in getOrderList"
                 v-bind:key="index"
-                @click="goItemOrderForUser(itemOrder.id, itemOrder.status)">
-              <th scope="row" class="mobile">
+                >
+              <th scope="row" class="mobile"
+                  @click="goItemOrderForUser(itemOrder.id, itemOrder.status)"
+              >
                 {{ itemOrder.kilter }}
               </th>
               <td class="mobile">
@@ -231,7 +233,11 @@ export default {
       let max = isAll ? quests.length : 3;
       quests.forEach(function (item, i) {
         if (i < max) {
-          result = result + item.value + '(' + item.number + ')' + " | ";
+          result = result + item.value
+          if(item.number) {
+            result = result + '(' + item.number + ')'
+          }
+          result = result + " ";
         }
       });
 

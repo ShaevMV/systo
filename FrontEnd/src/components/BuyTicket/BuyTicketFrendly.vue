@@ -609,7 +609,6 @@ export default {
      * Очистить данные
      */
     clearData: async function () {
-      this.selectTypesOfPayment = null;
       this.guests = [];
       this.preload = false;
       this.newGuest = '';
@@ -617,13 +616,7 @@ export default {
       this.email = '';
       this.city = '';
       this.phone = '';
-      this.promoCode = null;
-      this.day = null;
-      this.mount = null;
-      this.date = null;
-      this.minute = null;
       this.messageForPromoCode = null;
-      this.idBuy = null;
       this.comment = null;
       this.confirm = false;
       this.price = 0;

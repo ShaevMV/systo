@@ -29,7 +29,7 @@ Route::prefix('v1/order')->group(static function (): void {
     // сменить статус заказа АДМИН
     Route::post('/toChanceStatus/{id}', [OrderTickets::class, 'toChanceStatus'])
         ->middleware('auth:api')
-        ->middleware('role:seller,admin');
+        ->middleware('role:seller,admin,pusher');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])

@@ -82,4 +82,15 @@ final class GuestsDto implements EntityDataInterface
     {
         return $this->number;
     }
+
+    public function toArray():array
+    {
+        return [
+            'value' => $this->value,
+            'id' => $this->id->value(),
+            'number' => $this->number ?? null,
+            'email' => $this->email ?? null,
+            'festival_id' => $this->festivalId->value(),
+        ];
+    }
 }

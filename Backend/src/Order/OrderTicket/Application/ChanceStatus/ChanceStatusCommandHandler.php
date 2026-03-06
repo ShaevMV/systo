@@ -55,6 +55,7 @@ class ChanceStatusCommandHandler implements CommandHandler
             ),
             Status::PAID_FOR_LIVE => OrderTicket::toPaidInLiveTicket($orderTicketDto),
             Status::CANCEL => OrderTicket::toCancel($orderTicketDto),
+            Status::CANCEL_FOR_LIVE => OrderTicket::toCancel($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto, $command->getLiveNumber()),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),
             default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),

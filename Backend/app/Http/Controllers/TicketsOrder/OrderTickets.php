@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
@@ -155,8 +156,8 @@ class OrderTickets extends Controller
                     }
                 }
             }
-            $data['status'] = $ticketType->isLiveTicket() ? Status::PAID_FOR_LIVE : Status::PAID;
-
+            $data['status'] = $ticketType->isLiveTicket() ? Status::LIVE_TICKET_ISSUED : Status::PAID;
+            Log::info('Создание заказа ', $data);
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
                 $userId,

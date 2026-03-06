@@ -8,13 +8,13 @@ use Shared\Domain\ValueObject\Uuid;
 class PushTicketsLiveCommand implements Command
 {
     public function __construct(
-        private Uuid $id,
         private int  $number,
+        private ?Uuid $id = null,
     )
     {
     }
 
-    public function getId(): Uuid
+    public function getId(): ?Uuid
     {
         return $this->id;
     }

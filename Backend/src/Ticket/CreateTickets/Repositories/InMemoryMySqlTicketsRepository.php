@@ -207,7 +207,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     /**
      * @throws \Nette\Utils\JsonException
      */
-    public function setInBazaLive(int $number, Uuid $ticketId): bool
+    public function setInBazaLive(int $number, ?Uuid $ticketId = null): bool
     {
         DB::connection('mysqlBaza')->getPdo();
         if (!DB::connection('mysqlBaza')->table('live_tickets')
@@ -215,12 +215,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         ) {
             throw new DomainException('Не найден билет в Базе входа');
         } else {
-
-            Log::info('Тут мы меняем запись');
             return DB::connection('mysqlBaza')->table('live_tickets')
                 ->where('kilter', '=', $number)
                 ->update([
-                    'el_ticket_id' => $ticketId->value()
+                    'el_ticket_id' => $ticketId?->value()
                 ]) > 0;
         }
     }

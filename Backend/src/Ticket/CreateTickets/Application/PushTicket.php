@@ -48,9 +48,9 @@ class PushTicket
      * @throws DomainException
      * @throws Throwable
      */
-    public function pushTicketLive(Uuid $id, int $number): void
+    public function pushTicketLive(int $number, ?Uuid $id = null): void
     {
-        $this->commandBus->dispatch(new PushTicketsLiveCommand($id, $number));
+        $this->commandBus->dispatch(new PushTicketsLiveCommand($number, $id));
     }
 
     /**
@@ -58,14 +58,6 @@ class PushTicket
      * @throws JsonException
      */
     public function pushByOrderId(Uuid $orderId): void
-    {
-        $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId, true);
-        foreach ($idTickets as $id) {
-            $this->pushTicket($id);
-        }
-    }
-
-    public function pushByOrderIdLive(Uuid $orderId, array $liveNumber): void
     {
         $idTickets = $this->ticketsRepository->getListIdByOrderId($orderId, true);
         foreach ($idTickets as $id) {

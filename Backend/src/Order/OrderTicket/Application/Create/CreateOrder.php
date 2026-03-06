@@ -90,7 +90,6 @@ final class CreateOrder
         OrderTicketDto $orderTicketDto,
     ): bool
     {
-        $orderTicketDto->setStatus(new Status(Status::PAID));
         DB::beginTransaction();
         try {
 

@@ -14,6 +14,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\PromoCode\Response\ExternalPromoCodeDto;
+use Tickets\Ticket\CreateTickets\Domain\ProcessCancelLiveTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
@@ -88,7 +89,7 @@ final class OrderTicket extends AggregateRoot
 
         foreach ($orderTicketDto->getTicket() as $item) {
             $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail() ?? $orderTicketDto->getEmail(),
+                    $item->getEmail(),
                     $orderTicketDto->getId()->value(),
                     $item->getId()->value(),
                 )
@@ -156,6 +157,19 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    public static function toCancelLive(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->record(new ProcessCancelLiveTicket(
+            $result->id,
+            $orderTicketDto->getTicket()
+        ));
+
+        $result->updateIdTicket();
+
+        return $result;
+    }
+
     public static function toLiveIssued(
         OrderTicketDto $orderTicketDto,
         array          $liveNumber = [],
@@ -172,8 +186,8 @@ final class OrderTicket extends AggregateRoot
         ));
         foreach ($liveNumber as $key => $item) {
             $result->record(new ProcessPushLiveTicket(
+                (int)$item,
                 new Uuid($key),
-                (int)$item
             ));
         }
 

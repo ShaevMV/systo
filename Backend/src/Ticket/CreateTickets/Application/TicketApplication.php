@@ -87,6 +87,14 @@ class TicketApplication
         $this->commandBus->dispatch(new CancelTicketCommand($orderId));
     }
 
+    /**
+     * @throws Throwable
+     */
+    public function cancelTicketLive(Uuid $orderId): void
+    {
+        $this->commandBus->dispatch(new CancelTicketCommand($orderId));
+    }
+
     public function getPdfList(Uuid $orderId): UrlsTicketPdfResponse
     {
         /** @var UrlsTicketPdfResponse $result */
