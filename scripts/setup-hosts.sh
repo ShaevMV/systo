@@ -26,7 +26,7 @@ echo "Добавление доменов в $HOSTS_FILE..."
 echo ""
 
 for domain in "${DOMAINS[@]}"; do
-    if ! grep -q "$domain" "$HOSTS_FILE"; then
+    if ! grep -qF "$domain" "$HOSTS_FILE"; then
         echo "$domain" >> "$HOSTS_FILE"
         echo "✓ Добавлено: $domain"
     else

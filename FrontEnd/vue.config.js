@@ -4,11 +4,11 @@ module.exports = defineConfig({
     transpileDependencies: true,
     devServer: {
         port: 8080,
-        host: '0.0.0.0',
-        allowedHosts: 'all',
+        host: '127.0.0.1',
+        allowedHosts: ['org.tickets.loc', 'localhost'],
         client: {
             webSocketURL: {
-                hostname: '0.0.0.0',
+                hostname: 'org.tickets.loc',
                 port: 8080,
             },
         },
