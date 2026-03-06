@@ -7,6 +7,10 @@ env:
 	cp FrontEnd/.env.example FrontEnd/.env
 	cp Friendly/.env.example Friendly/.env
 	cp Baza/.env.example Baza/.env
+	@if ! grep -q "^JWT_SECRET=" Backend/.env 2>/dev/null; then \
+		echo "JWT_SECRET=$(openssl rand -base64 32)" >> Backend/.env; \
+		echo "✓ JWT_SECRET сгенерирован"; \
+	fi
 
 up-prod: ## Полная конфигурация, старт + миграции
 	$(DOCKER_COMPOSE) -f docker-compose.prod.yml up --build -d
@@ -167,7 +171,9 @@ setup: ## Полная настройка и запуск проекта на н
 	@echo ""
 	$(MAKE) install
 	$(DOCKER_COMPOSE) exec -it php php artisan key:generate
-	$(DOCKER_COMPOSE) exec -it php test -L /var/www/org/public/storage || $(DOCKER_COMPOSE) exec -it php php artisan storage:link
+	$(DOCKER_COMPOSE) exec -it php php artisan jwt:secret
+	$(DOCKER_COMPOSE) exec -it php php artisan config:clear
+	$(DOCKER_COMPOSE) exec -it php php artisan storage:link
 	$(DOCKER_COMPOSE) exec -it -u0 php chmod -R 777 /var/www/org/storage
 	$(MAKE) migrate
 	$(MAKE) db-seed
