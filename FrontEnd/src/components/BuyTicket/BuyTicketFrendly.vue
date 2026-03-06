@@ -46,7 +46,7 @@
       </div>
     </div>
     <div class="text-center title-block">
-      <h1>Форма подтверждения добровольного оргвзноса</h1>
+      <h1>Форма подтверждения дружеского оргвзноса</h1>
       <small class="form-text text-muted"
       >на создание туристического слёта Solar Systo Togathering 2026</small
       >
@@ -58,8 +58,7 @@
             <div id="contact-form" role="form">
               <div class="controls">
                 <div class="pp1 row">
-                  <span>ШАГ 1.</span> Введи свои контактные данные, после чего
-                  система автоматически создаст тебе аккаунт:
+                  <span>ШАГ 1.</span> Введи данные основного гостя, который тебе вносит средства:
                 </div>
                 <div class="row y-row">
                   <div class="col-md-4">
@@ -120,15 +119,15 @@
 
                 </div>
                 <div class="row mt-3 mb-3" id="enter-guests">
-                  <div class="pp2">Введи данные дополнительных друзей:</div>
+                  <div class="pp2">Введи данные всех гостей, включая основного гостя!:</div>
                   <div class="not-first-guest input-group mb-3">
 
                     <input
                         type="text"
                         id="newGuest"
                         class="form-control"
-                        placeholder="Имя и фамилия твоего друга"
-                        aria-label="Имя и фамилия твоего друга"
+                        placeholder="Имя и фамилия дополнительного гостя"
+                        aria-label="Имя и фамилия дополнительного гостя"
                         v-model="newGuest"
                         aria-describedby="basic-addon1"
 
@@ -137,8 +136,8 @@
                         type="email"
                         id="newEmailGuest"
                         class="form-control"
-                        placeholder="Email твоего друга"
-                        aria-label="E-mail этого друга"
+                        placeholder="Email этого гостя"
+                        aria-label="E-mail этого гостя"
                         v-model="newGuestEmail"
                         aria-describedby="basic-addon1"
 
@@ -216,14 +215,13 @@
                   </h4>
                 </div>
 
-                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на почту и почты друзей придёт ссылка на анкету, которую необходимо заполнить, чтобы
-                  активировать ваши QR-коды, а также получить доступ к новому закрытому чату гостей Solar Systo Togathering 2026.
+                <div class="row sub-warn"><b>ВНИМАНИЕ!</b> После оформления заказа на почты гостей придёт ссылка на анкету, которую необходимо заполнить, чтобы
+                  активировать QR-коды, а также получить доступ к новому закрытому чату Solar Systo Togathering 2026.
 
                 </div>
 
                 <div class="pp1 row">
-                  <span>ШАГ 2.</span> Выбери тип оргвзноса и введи данные
-                  каждого гостя, за которого будешь вносить средства:
+                  <span>ШАГ 2.</span> Выбери тип оргвзноса:
                 </div>
 
                 <div class="mb-3" id="org-type">
@@ -254,7 +252,6 @@
                             <span class="intckt">
                             <p>
                               {{ typeTickets.name }} /
-                              {{ typeTickets.price }} руб.
                             </p>
                             <p v-html="typeTickets.description"></p>
                               </span>
@@ -273,13 +270,13 @@
                 <div class="row itog-row mb-4">
                   <div class="col-12">
                     <h4 class="my-lg-2 font-weight-normal">
-                      Итого:
+                      Внесите стоимость одного билета <b>(за вычетом вашей комиссии)</b>:
 
                       <input
                           type="number"
                           id="newEmailGuest"
                           class="form-control"
-                          placeholder="Внесите стоимсоть заказа"
+                          placeholder="Внесите стоимость одного билета <b>(за вычетом вашей комиссии)</b>"
                           aria-label="E-mail этого друга"
                           v-model="price"
                           aria-describedby="basic-addon1"
@@ -330,7 +327,7 @@
                 <div class="row mt-4" id="sub-order">
                   <div class="after-order">
                     <p>
-                      После подтверждения перевода на твой e-mail придет <strong>электронный билет с QR-кодом</strong><br> для входа на Solar Systo Togathering 2026! А также ссылка на анкету для добавления в новый закрытый чат
+                      После подтверждения перевода на e-mail придет <strong>электронный файл с QR-кодом</strong><br> для входа на Solar Systo Togathering 2026! А также ссылка на анкету для добавления в новый закрытый чат
                     </p>
                   </div>
                 </div>
