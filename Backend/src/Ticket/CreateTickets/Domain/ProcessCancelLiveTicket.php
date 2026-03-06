@@ -43,9 +43,8 @@ class ProcessCancelLiveTicket implements ShouldQueue, DomainEvent
         $pushTicket->pushByOrderId($this->orderId);
 
         foreach ($this->guest as $item) {
-            if($item->getNumber()) {
-                Log::info('Отмена живого билета заказ ' . $this->orderId->value(), $item->toArray());
-                $pushTicket->pushTicketLive($item['number']);
+            if($item->getNumber() > 0) {
+                $pushTicket->pushTicketLive($item->getNumber());
             }
         }
     }
