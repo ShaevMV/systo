@@ -41,7 +41,7 @@ class TypesOfPaymentGetListFilter
     {
         return new self(
             $data['name'] ?? null,
-            empty($data['active']) ? null : $data['active'],
+            empty($data['active']) ? null : $data['active'] === "true",
             empty($data['isBilling']) ? null : $data['isBilling'],
             empty($data['userExternalId']) ? null : new Uuid($data['userExternalId']['id']),
         );
