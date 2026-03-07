@@ -155,7 +155,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 count($guests),
                 $rawData['discount']
             ),
-            (bool)$rawData['ticketType']['is_live_ticket'],
+            (bool)$rawData['ticketType']['is_live_ticket'] ?? false,
         ) : null;
     }
 
