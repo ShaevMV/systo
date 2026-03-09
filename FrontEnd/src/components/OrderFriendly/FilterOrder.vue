@@ -73,6 +73,18 @@
                 </option>
               </select>
             </div>
+            <div class="col-md-4" v-show="isAdmin">
+              <label for="validationDefault06" class="form-label">Продовец</label>
+              <select class="form-select"
+                      v-model="friendlyId"
+                      id="validationDefault06">
+                <option :value="null">Выберите пользователя</option>
+                <option v-for="pusher in getPusherList"
+                        :key="pusher.id"
+                        :value="pusher.id">{{ pusher.name }} ({{ pusher.email }})
+                </option>
+              </select>
+            </div>
           </div>
 
           <div class="row b-row mt-2">
@@ -107,6 +119,7 @@ export default {
       city: null,
       selectFestivalId: null,
       questionnaire: '',
+      friendlyId: null,
     }
   },
   computed: {
@@ -117,6 +130,13 @@ export default {
     ...mapGetters('appOrder', [
       'getIsLoading'
     ]),
+    ...mapGetters('appUser', [
+      'isAdmin'
+    ]),
+    ...mapGetters('appAccount', ['getList']),
+    getPusherList: function () {
+      return this.getList.filter(item => item.role === 'pusher');
+    },
     festival_id: {
       get: function () {
         if (this.selectFestivalId === null) {
@@ -137,6 +157,7 @@ export default {
       'getOrderListForFrendly',
       'loading'
     ]),
+    ...mapActions('appAccount', ['loadList']),
     /**
      * Отправить данные для фильтра
      */
@@ -151,6 +172,7 @@ export default {
           'status': self.status,
           'festivalId': self.festival_id,
           'city': self.city,
+          'friendlyId': self.friendlyId,
         });
       },
     clearFilter: function () {
@@ -159,6 +181,7 @@ export default {
       this.status = '';
       this.typeOrder = null;
       this.city = null;
+      this.friendlyId = null;
       let festivalId = this.festival_id;
       this.getOrderListForFrendly({
         'festivalId': festivalId,
@@ -167,6 +190,12 @@ export default {
   },
   async created() {
     await this.getListFestival();
+    await this.loadList({
+      filter: {
+        'role': 'pusher'
+      },
+      orderBy: {},
+    });
   },
 }
 </script>

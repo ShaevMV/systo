@@ -184,24 +184,29 @@
 
                     />
                     <!--small v-show="getSelectTicketType?.isLiveTicket">Номер живого билета(без нулей в начале)</small-->
-                    <input
-                        type="number"
-                        id="newEmailGuest"
-                        class="form-control"
-                        placeholder="Номер живого билета(без нулей в начале)"
-                        aria-label="Номер живого билета(без нулей в начале)"
-                        v-model="newGuestNumber"
-                        aria-describedby="basic-addon1"
-                        v-show="getSelectTicketType?.isLiveTicket"
-                    />
+                    <div class="input-group mb-2">
+                      <input
+                          type="number"
+                          id="newGuestNumber"
+                          class="form-control"
+                          placeholder="Номер живого билета(без нулей в начале)"
+                          aria-label="Номер живого билета(без нулей в начале)"
+                          v-model="newGuestNumber"
+                          aria-describedby="basic-addon1"
+                          v-show="getSelectTicketType?.isLiveTicket"
+                      />
 
-                    <div class="input-group-prepend">
-                      <span
-                          class="input-group-text btn"
-                          @click="addGuest()"
-                          id="basic-addon1"
-                      >Добавить</span>
+                      <div class="input-group-prepend">
+                        <span
+                            class="input-group-text btn"
+                            @click="addGuest()"
+                            id="basic-addon1"
+                        >Добавить</span>
+                      </div>
                     </div>
+                    <small class="form-text text-muted" v-show="getSelectTicketType?.isLiveTicket">
+                      Номер конверта (без нулей в начале)
+                    </small>
                   </div>
                 </div>
                 <div class="row x-row" v-show="guests.length > 0" id="adding-guests">

@@ -65,9 +65,17 @@ class OrderListFilterQueryHandler implements QueryHandler
             [
                 'field' => OrderTicketModel::TABLE . '.friendly_id',
                 'operator' => FilterOperator::EQUAL,
-                'value' => $filterQuery->getUserId()?->value(),
+                'value' => $filterQuery->getFriendlyId()?->value(),
             ],
         ];
+
+        if ($filterQuery->getUserId() !== null) {
+            $result[] = [
+                'field' => OrderTicketModel::TABLE . '.friendly_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getUserId()?->value(),
+            ];
+        }
 
 
         return $result;

@@ -15,6 +15,7 @@ class OrderFilterQuery implements Query
         private ?string $email = null,
         private ?Uuid $userId = null,
         private ?string $name = null,
+        private ?Uuid $friendlyId = null,
     ) {
     }
 
@@ -29,6 +30,7 @@ class OrderFilterQuery implements Query
             $data['email'] ?? null,
             $userId,
             $data['name'] ?? null,
+            isset($data['friendlyId']) ? new Uuid($data['friendlyId']) : null,
         );
     }
 
@@ -50,5 +52,10 @@ class OrderFilterQuery implements Query
     public function getName(): ?string
     {
         return $this->name;
+    }
+
+    public function getFriendlyId(): ?Uuid
+    {
+        return $this->friendlyId;
     }
 }
