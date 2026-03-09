@@ -78,7 +78,7 @@
       </div>
 
       <div class="quest-item phone-item">
-        <label for="questionnaire_phone">Номер телефона:</label>
+        <label for="questionnaire_phone">Номер телефона: *</label>
 
         <div class="input-group" id="promo-input">
           <input
