@@ -157,6 +157,7 @@ class OrderTickets extends Controller
                 }
             }
             $data['status'] = $ticketType->isLiveTicket() ? Status::LIVE_TICKET_ISSUED : Status::PAID;
+            $data['types_of_payment_id'] = '613d6bb9-a3a0-480e-ade8-05625fc19544';
             Log::info('Создание заказа ', $data);
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,

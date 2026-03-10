@@ -1,6 +1,7 @@
 /Docker/redis/data
 .idea/*
 .env
+.env.production
 /Backend/phpunit.xml.dist
 /List/*
 /Docker/mysqlFriendly/db/

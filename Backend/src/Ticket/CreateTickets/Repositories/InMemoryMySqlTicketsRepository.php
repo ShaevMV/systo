@@ -139,7 +139,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
                 $this->model::TABLE . '.festival_id',
-                User::TABLE . '.email',
+                $this->model::TABLE . '.email',
+                User::TABLE . '.email as email_user',
                 User::TABLE . '.city',
                 TicketTypesModel::TABLE . '.name as name_type',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment');
@@ -155,7 +156,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['kilter'],
             new Uuid($result['id']),
             $result['status'],
-            $result['email'],
+            empty($result['email']) ? $result['email_user'] : $result['email'],
             $result['phone'],
             $result['city'],
             $result['last_comment'],
