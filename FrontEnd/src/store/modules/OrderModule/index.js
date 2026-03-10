@@ -29,6 +29,7 @@ export default {
             lastComment: null,
             listCorrectNextStatus: [],
             phone: null,
+            friendly_id: null,
         },
         isLoading: false,
     },

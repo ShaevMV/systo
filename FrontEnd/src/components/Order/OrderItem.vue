@@ -10,7 +10,7 @@
                 <tr>
                   <th scope="col">Название</th>
                   <th scope="col">Гости</th>
-                  <th scope="col">Тип оплаты</th>
+                  <th scope="col" v-if="!getFriendlyId">Тип оплаты</th>
                   <th scope="col">Дата оплаты</th>
                   <th scope="col">Скидка</th>
                   <th scope="col">Стоимость</th>
@@ -21,7 +21,7 @@
                 <tr>
                   <td>{{ getName }}</td>
                   <td v-html="getGuests"></td>
-                  <td>{{ getTypeOfPayment }}</td>
+                  <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
                   <td>{{ getDateBuy }}</td>
                   <td class="text-right">{{ getDiscount }}</td>
                   <td class="text-right">{{ getTotalPrice }}</td>
@@ -112,6 +112,9 @@ export default {
     },
     getId: function () {
       return this.getOrderItem.id;
+    },
+    getFriendlyId: function () {
+      return this.getOrderItem.friendly_id;
     }
   },
   methods: {
