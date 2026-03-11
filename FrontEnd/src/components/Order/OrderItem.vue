@@ -11,8 +11,8 @@
                   <th scope="col">Название</th>
                   <th scope="col">Гости</th>
                   <th scope="col" v-if="!getFriendlyId">Тип оплаты</th>
-                  <th scope="col">Дата оплаты</th>
-                  <th scope="col">Скидка</th>
+                  <th scope="col" v-if="!getFriendlyId">Дата оплаты</th>
+                  <th scope="col" v-if="!getFriendlyId">Скидка</th>
                   <th scope="col">Стоимость</th>
                   <th scope="col">Статус</th>
                 </tr>
@@ -22,8 +22,8 @@
                   <td>{{ getName }}</td>
                   <td v-html="getGuests"></td>
                   <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
-                  <td>{{ getDateBuy }}</td>
-                  <td class="text-right">{{ getDiscount }}</td>
+                  <td v-if="!getFriendlyId">{{ getDateBuy }}</td>
+                  <td class="text-right" v-if="!getFriendlyId">{{ getDiscount }}</td>
                   <td class="text-right">{{ getTotalPrice }}</td>
                   <td>{{ getHumanStatus }}</td>
                 </tr>
