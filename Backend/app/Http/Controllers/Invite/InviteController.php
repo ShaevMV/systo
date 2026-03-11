@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Service\InviteLinkService;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 class InviteController extends Controller
 {
@@ -38,9 +39,9 @@ class InviteController extends Controller
 
     public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
     {
-        $user = User::find($userId)->first()?->toArray();
+        $user = User::find($userId)->first();
 
-        if(empty($user['email'])) {
+        if(empty($user->email)) {
             return response()->json([
                 'success' => false
             ]);
@@ -48,7 +49,8 @@ class InviteController extends Controller
         return response()->json([
             'success' => $inviteLinkService->isPaidOrderByUserId(
                 new Uuid($userId),
-                $user['email'],
+                $user->email,
+                $user->role,
             ),
         ]);
     }

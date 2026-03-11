@@ -31,8 +31,12 @@ class InviteLinkService
 
     }
 
-    public function isPaidOrderByUserId(Uuid $userId, string $email): bool
+    public function isPaidOrderByUserId(Uuid $userId, string $email, string $role): bool
     {
+        if (AccountRoleHelper::guest !== $role) {
+            return true;
+        }
+
         return $this->repository->isPaidOrderByUserId($userId) ||
             $this->questionnaireRepository->findByEmail($email)?->getStatus() === QuestionnaireStatus::APPROVE;
     }
