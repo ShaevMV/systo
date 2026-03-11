@@ -104,4 +104,9 @@ final class TicketTypeDto extends AbstractionEntity implements Response
     {
         return $this->isLiveTicket;
     }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
 }

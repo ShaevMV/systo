@@ -71,6 +71,8 @@ services:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
     command: tail -f /dev/null
     user: node
+    environment:
+      - VUE_APP_API_URL=${VUE_APP_API_URL:-http://api.tickets.loc/}
     networks:
       - backend
 

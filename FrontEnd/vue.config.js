@@ -4,7 +4,7 @@ module.exports = {
   },
   chainWebpack: config => {
     config.plugin('define').tap(definitions => {
-      definitions[0]['__APP_ENV__'] = JSON.stringify(process.env.VUE_APP_API_URL || 'http://api.tickets.loc/');
+      definitions[0]['process.env'].VUE_APP_API_URL = JSON.stringify(process.env.VUE_APP_API_URL || 'http://api.tickets.loc/');
       return definitions;
     });
   },
