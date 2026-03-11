@@ -23,7 +23,7 @@ class InviteController extends Controller
             ]);
         }
 
-        if($link = $inviteLinkService->getLink(new Uuid($userId))) {
+        if($link = $inviteLinkService->getLink(new Uuid($userId), $request->user()->role)) {
             return response()->json([
                 'message' => 'Вам доступна ссылка для приглашение друга',
                 'link' => $link
