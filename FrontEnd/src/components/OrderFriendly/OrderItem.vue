@@ -73,7 +73,7 @@ export default {
       let result = '';
       let sign = '';
       this.getOrderItem.guests.forEach(function (elm) {
-        result = result + sign + elm.value + ' ' + (elm.email ?? '');
+        result = result + sign + elm.value + (elm.number ? ' (' + elm.number + ')' : '') + ' ' + (elm.email ?? '');
         sign = '<br/> '
       })
 
