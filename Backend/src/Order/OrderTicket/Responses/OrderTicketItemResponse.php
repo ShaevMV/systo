@@ -49,6 +49,7 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         protected string $email,
         protected array $tickets,
         protected ?string $promoCode = null,
+        protected ?string $friendly_id = null,
     ) {
         $this->totalPrice = $price - $discount;
         $this->count = count($this->guests);
@@ -77,7 +78,8 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
             $data['type_of_payment']['name'],
             $data['users']['email'],
             $tickets,
-            $data['promo_code']
+            $data['promo_code'],
+            $data['friendly_id'] ?? null
         );
     }
 
