@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Questionnaire\Application\Questionnaire\ExistsByEmail\QuestionnaireExistsByEmailQuery;
 use Shared\Questionnaire\Application\Questionnaire\ExistsByEmail\QuestionnaireExistsByEmailQueryHandler;
@@ -35,7 +36,9 @@ class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
         $mail = new TicketQuestionnaire(
             'https://org.spaceofjoy.ru/questionnaire/guest/'. $this->orderId . '/' . $this->ticketId
         );
-
+        Log::info('От правил письмо для анкетирования '  . $this->email,[
+            $this->orderId, $this->ticketId
+        ]);
         \Mail::to($this->email)
             ->send($mail);
     }
