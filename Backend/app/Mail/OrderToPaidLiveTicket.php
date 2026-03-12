@@ -37,7 +37,7 @@ class OrderToPaidLiveTicket extends Mailable
         $typesOfPaymentDto = $typesOfPaymentRepository->getItem($this->typesOfPaymentId);
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
 
-        $mail = $this->view('email.' . empty($typesOfPaymentDto->getEmail()) ? 'orderToPaidLiveTicket' : $typesOfPaymentDto->getEmail(), [
+        $mail = $this->view('email.' . empty(trim($typesOfPaymentDto->getEmail() ?? '')) ? 'orderToPaidLiveTicket' : $typesOfPaymentDto->getEmail(), [
             'festivalName' => $festivalName,
             'kilter' => $this->kilter,
         ]);
