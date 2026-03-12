@@ -112,7 +112,7 @@ final class OrderTicket extends AggregateRoot
             $result->id,
             $result->getTicket(),
         ));
-
+        \Log::info('ProcessCreateTicket Ticket', $result->getTicket());
         $result->record(new ProcessUserNotificationOrderPaid(
                 $orderTicketDto->getEmail(),
                 $result->getTicket(),
@@ -160,6 +160,10 @@ final class OrderTicket extends AggregateRoot
     public static function toCancelLive(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+        $result->record(new ProcessCancelTicket(
+            $result->id,
+        ));
         $result->record(new ProcessCancelLiveTicket(
             $result->id,
             $orderTicketDto->getTicket()
