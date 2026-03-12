@@ -188,6 +188,16 @@ final class OrderTicket extends AggregateRoot
             $result->id,
             $result->getTicket(),
         ));
+
+        foreach ($orderTicketDto->getTicket() as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $item->getEmail(),
+                    $orderTicketDto->getId()->value(),
+                    $item->getId()->value(),
+                )
+            );
+        }
+
         foreach ($liveNumber as $key => $item) {
             $result->record(new ProcessPushLiveTicket(
                 (int)$item,
