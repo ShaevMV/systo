@@ -134,4 +134,9 @@ final class Status implements EntityDataInterface
     {
         return $this->name === self::PAID_FOR_LIVE;
     }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
 }

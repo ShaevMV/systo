@@ -49,6 +49,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected array   $listCorrectNextStatus,
         protected string  $idBuy,
         protected float   $priceWithoutDiscount,
+        protected Uuid    $userId,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
         protected int     $discount = 0,
@@ -92,6 +93,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $status->getListNextStatus(),
             $data['id_buy'],
             (int)$data['price'],
+            new Uuid($data['user_id']),
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
             (int)$data['discount'],
@@ -172,5 +174,25 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getFriendlyId(): ?Uuid
     {
         return $this->friendly_id;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function getUserId(): Uuid
+    {
+        return $this->userId;
     }
 }

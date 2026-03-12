@@ -99,6 +99,22 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    public static function toProcessGuestNotificationQuestionnaire(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        foreach ($orderTicketDto->getTicket() as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $item->getEmail(),
+                    $orderTicketDto->getId()->value(),
+                    $item->getId()->value(),
+                )
+            );
+        }
+
+        return $result;
+    }
+
 
     public static function toPaid(
         OrderTicketDto        $orderTicketDto,
