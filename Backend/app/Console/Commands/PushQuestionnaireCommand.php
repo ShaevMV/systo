@@ -56,7 +56,7 @@ class PushQuestionnaireCommand extends Command
                 ],
             ]);
 
-            foreach ($orderTicketRepository->getList($filter) as $item) {
+            foreach ($orderTicketRepository->getFriendlyList($filter) as $item) {
                 $this->info('Нашел заказ '.$item->getKilter());
                 $guests = [];
                 foreach ($item->getGuests() as $guest) {
