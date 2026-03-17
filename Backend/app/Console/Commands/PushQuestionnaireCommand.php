@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\OrderTicketModel;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
@@ -21,7 +22,7 @@ class PushQuestionnaireCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'questionnaire:push_friendly_live {status}';
+    protected $signature = 'questionnaire:push_friendly_live';
 
     /**
      * The console command description.
@@ -44,9 +45,9 @@ class PushQuestionnaireCommand extends Command
         try {
             $filter = Filters::fromValues([
                 [
-                    'field' => OrderTicketModel::TABLE . '.status',
+                    'field' => TicketTypesModel::TABLE . '.is_live_ticket',
                     'operator' => FilterOperator::EQUAL,
-                    'value' => $status,
+                    'value' => true,
                 ],
                 [
                     'field' => OrderTicketModel::TABLE . '.festival_id',
