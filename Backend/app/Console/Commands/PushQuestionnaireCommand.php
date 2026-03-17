@@ -41,7 +41,7 @@ class PushQuestionnaireCommand extends Command
         Bus                            $bus,
     ): int
     {
-        $status = $this->argument('status');
+
         try {
             $filter = Filters::fromValues([
                 [
