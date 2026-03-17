@@ -47,6 +47,7 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         protected ?string $phone = null,
         protected ?string $pusher_name = null,
         protected ?string $pusher_email = null,
+        protected ?Uuid $userId = null,
     )
     {
         $this->count = self::getGuestsCount($guests);
@@ -69,7 +70,7 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
             $guests[] = GuestsDto::fromState($guest, $data['festival_id']);
         }
         $status = new Status($data['status']);
-
+        $userId = empty($data['user_id']) ? null : new Uuid($data['user_id']);
         return new self(
             new Uuid($data['id']),
             $data['kilter'],
@@ -82,6 +83,7 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
             $data['phone'] ?? null,
             $data['pusher_name'] ?? null,
             $data['pusher_email'] ?? null,
+            $userId
         );
     }
 
@@ -140,5 +142,10 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         $this->guests = $guests;
         $this->count = count($guests);
         return $this;
+    }
+
+    public function getUserId(): ?Uuid
+    {
+        return $this->userId;
     }
 }

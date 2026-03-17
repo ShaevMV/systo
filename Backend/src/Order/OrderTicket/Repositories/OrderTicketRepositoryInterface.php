@@ -8,6 +8,7 @@ use Shared\Domain\Criteria\Filters;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
@@ -57,7 +58,7 @@ interface OrderTicketRepositoryInterface
      * Получить список заказов по фильтру для френдли продовца
      *
      * @param  Filters  $filters
-     * @return OrderTicketItemForListResponse[]
+     * @return OrderTicketItemForFriendlyListResponse[]
      */
     public function getFriendlyList(Filters $filters): array;
 
