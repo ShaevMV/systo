@@ -54,6 +54,11 @@ class PushQuestionnaireCommand extends Command
                     'operator' => FilterOperator::EQUAL,
                     'value' => '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
                 ],
+                [
+                    'field' => OrderTicketModel::TABLE . '.created_at',
+                    'operator' => FilterOperator::LT,
+                    'value' => '2026-03-13 00:00:00',
+                ],
             ]);
 
             foreach ($orderTicketRepository->getFriendlyList($filter) as $item) {
