@@ -109,6 +109,8 @@ class ReportExportController extends Controller
     {
         $validated = $request->validate([
             'config_id' => 'required|uuid|exists:report_configs,id',
+            'festival_id' => 'nullable|uuid',
+            'limit' => 'nullable|integer|min:1',
         ]);
 
         $config = ReportConfig::findOrFail($validated['config_id']);
@@ -120,28 +122,67 @@ class ReportExportController extends Controller
             ], 400);
         }
 
-        $filters = $config->filters ?? [];
-        $data = $handler->getData($filters);
-
-        $rows = [$handler->getHeaders()];
-        foreach ($data as $index => $row) {
-            $rows[] = $handler->formatRow($row, $index);
-        }
-
-        $range = "{$config->sheet_name}!A{$config->start_row}";
-        $this->googleClient->appendRows(
-            $config->spreadsheet_id,
-            $range,
-            $rows
+        $filters = array_merge(
+            $config->filters ?? [],
+            array_filter([
+                'festival_id' => $validated['festival_id'] ?? null,
+                'limit' => $validated['limit'] ?? null,
+            ])
         );
 
-        $rowCount = count($rows) - 1;
-        $config->updateLastRun('success', $rowCount, "Выгружено {$rowCount} строк");
+        try {
+            $data = $handler->getData($filters);
 
-        return response()->json([
-            'success' => true,
-            'exportedRows' => $rowCount,
-            'googleSheetUrl' => "https://docs.google.com/spreadsheets/d/{$config->spreadsheet_id}",
-        ]);
+            if (empty($data)) {
+                return response()->json([
+                    'error' => 'Нет данных для экспорта',
+                ], 400);
+            }
+
+            $rows = [$handler->getHeaders()];
+            foreach ($data as $index => $row) {
+                $rows[] = $handler->formatRow($row, $index);
+            }
+
+            $range = "{$config->sheet_name}!A{$config->start_row}";
+            $this->googleClient->appendRows(
+                $config->spreadsheet_id,
+                $range,
+                $rows
+            );
+
+            $rowCount = count($rows) - 1;
+            $config->updateLastRun('success', $rowCount, "Выгружено {$rowCount} строк");
+
+            return response()->json([
+                'success' => true,
+                'exportedRows' => $rowCount,
+                'googleSheetUrl' => "https://docs.google.com/spreadsheets/d/{$config->spreadsheet_id}",
+            ]);
+
+        } catch (\Google_Exception $e) {
+            \Log::error('Google Sheets export failed', [
+                'config_id' => $config->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $config->updateLastRun('failed', 0, $e->getMessage());
+
+            return response()->json([
+                'error' => 'Не удалось экспортировать в Google Sheets',
+            ], 500);
+
+        } catch (\Throwable $e) {
+            \Log::error('Report export failed', [
+                'config_id' => $config->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $config->updateLastRun('failed', 0, $e->getMessage());
+
+            return response()->json([
+                'error' => 'Ошибка при экспорте отчёта',
+            ], 500);
+        }
     }
 }

@@ -56,16 +56,26 @@ class FriendlySummaryHandler implements ReportHandlerInterface
             $query->where('ot.festival_id', $festivalId);
         }
 
-        $data = $query->get();
-
-        foreach ($data as &$row) {
-            $row->live_sum = $this->getLiveSum($row->id, $festivalId);
-            $row->live_count = $this->getLiveCount($row->id, $festivalId);
-            $row->list_count = $this->getListCount($row->name, $festivalId);
+        if ($limit) {
+            $query->limit($limit);
         }
 
-        if ($limit) {
-            $data = $data->take($limit);
+        $data = $query->get();
+
+        if ($data->isEmpty()) {
+            return [];
+        }
+
+        $userIdList = $data->pluck('id')->toArray();
+        $userNameList = $data->pluck('name')->toArray();
+
+        $liveStats = $this->getLiveStats($userIdList, $festivalId);
+        $listStats = $this->getListStats($userNameList, $festivalId);
+
+        foreach ($data as &$row) {
+            $row->live_sum = $liveStats[$row->id]['sum'] ?? 0;
+            $row->live_count = $liveStats[$row->id]['count'] ?? 0;
+            $row->list_count = $listStats[$row->name] ?? 0;
         }
 
         return $data->toArray();
@@ -86,46 +96,51 @@ class FriendlySummaryHandler implements ReportHandlerInterface
         ];
     }
 
-    private function getLiveSum(string $userId, ?string $festivalId): float
+    private function getLiveStats(array $userIds, ?string $festivalId): array
     {
+        if (empty($userIds)) {
+            return [];
+        }
+
         $query = DB::connection('mysql')
             ->table('order_tickets as ot')
             ->join('ticket_types as tt', 'ot.ticket_type_id', '=', 'tt.id')
-            ->where('ot.friendly_id', $userId)
-            ->where('tt.is_live_ticket', true);
+            ->whereIn('ot.friendly_id', $userIds)
+            ->where('tt.is_live_ticket', true)
+            ->selectRaw('ot.friendly_id, SUM(ot.price) as live_sum, COUNT(*) as live_count')
+            ->groupBy('ot.friendly_id');
 
         if ($festivalId) {
             $query->where('ot.festival_id', $festivalId);
         }
 
-        return (float) $query->sum('ot.price');
-    }
-
-    private function getLiveCount(string $userId, ?string $festivalId): int
-    {
-        $query = DB::connection('mysql')
-            ->table('order_tickets as ot')
-            ->join('ticket_types as tt', 'ot.ticket_type_id', '=', 'tt.id')
-            ->where('ot.friendly_id', $userId)
-            ->where('tt.is_live_ticket', true);
-
-        if ($festivalId) {
-            $query->where('ot.festival_id', $festivalId);
+        $result = [];
+        foreach ($query->get() as $row) {
+            $result[$row->friendly_id] = [
+                'sum' => (float) $row->live_sum,
+                'count' => (int) $row->live_count,
+            ];
         }
 
-        return (int) $query->count('ot.id');
+        return $result;
     }
 
-    private function getListCount(string $userName, ?string $festivalId): int
+    private function getListStats(array $userNames, ?string $festivalId): array
     {
+        if (empty($userNames)) {
+            return [];
+        }
+
         $query = DB::connection('baza')
             ->table('spisok_tickets')
-            ->where('curator', $userName);
+            ->whereIn('curator', $userNames)
+            ->selectRaw('curator, COUNT(*) as list_count')
+            ->groupBy('curator');
 
         if ($festivalId) {
             $query->where('festival_id', $festivalId);
         }
 
-        return (int) $query->count();
+        return $query->get()->pluck('list_count', 'curator')->toArray();
     }
 }

@@ -10,12 +10,17 @@ class GoogleSheetsClient
 {
     public function __construct(
         private string $credentials,
-    ) {}
+    ) {
+        if (empty($credentials)) {
+            throw new \RuntimeException('Google Sheets credentials not configured');
+        }
+    }
 
     public function appendRows(string $spreadsheetId, string $range, array $rows): void
     {
         $client = new Google_Client();
-        $client->setAccessToken($this->credentials);
+        $client->setAuthConfig(json_decode($this->credentials, true));
+        $client->useApplicationDefaultCredentials();
 
         $service = new Google_Service_Sheets($client);
 
