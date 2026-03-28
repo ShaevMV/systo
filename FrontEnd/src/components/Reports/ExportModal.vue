@@ -1,10 +1,10 @@
 <template>
-  <div class="modal fade" id="exportModal" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal fade" :class="{ show: modelValue }" :style="displayStyle" tabindex="-1" role="dialog">
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Настройка выгрузки отчёта по френдли</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close" @click="close">
+          <button type="button" class="close" @click="close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -29,12 +29,12 @@
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label>Sheet Name</label>
-                <input v-model="config.sheet_name" class="form-control" value="Sheet1" />
+                <input v-model="config.sheet_name" class="form-control" />
               </div>
               
               <div class="form-group col-md-6">
                 <label>Start Row</label>
-                <input type="number" v-model.number="config.start_row" class="form-control" value="1" min="1" />
+                <input type="number" v-model.number="config.start_row" class="form-control" min="1" />
               </div>
             </div>
             
@@ -99,6 +99,7 @@
       </div>
     </div>
   </div>
+  <div class="modal-backdrop fade show" v-if="modelValue"></div>
 </template>
 
 <script>
@@ -106,6 +107,13 @@ import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'ExportModal',
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: ['update:modelValue'],
   data() {
     return {
       config: {
@@ -128,6 +136,9 @@ export default {
     ...mapGetters('appFestival', ['getFestivals']),
     festivals() {
       return this.getFestivals;
+    },
+    displayStyle() {
+      return this.modelValue ? { display: 'block' } : { display: 'none' };
     }
   },
   methods: {
@@ -149,12 +160,8 @@ export default {
     },
     
     close() {
-      $('#exportModal').modal('hide');
+      this.$emit('update:modelValue', false);
       this.resetConfig();
-    },
-    
-    open() {
-      $('#exportModal').modal('show');
     },
     
     resetConfig() {

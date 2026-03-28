@@ -4,11 +4,11 @@
       <div class="row mb-3">
         <div class="col-12">
           <export-button />
-          <button class="btn btn-info ml-2" @click="openExportModal">⚙️ Настройки выгрузки</button>
+          <button class="btn btn-info ml-2" @click="showModal = true">⚙️ Настройки выгрузки</button>
         </div>
       </div>
       <order-list :is-admin="true"/>
-      <export-modal ref="exportModal" />
+      <export-modal v-model="showModal" />
 </template>
 
 <script>
@@ -21,13 +21,13 @@ import ExportModal from "@/components/Reports/ExportModal.vue";
 export default {
   name: "OrderListForFriendly",
   components: {ExportModal, ExportButton, TotalNumber, FilterOrder, OrderList},
+  data() {
+    return {
+      showModal: false,
+    };
+  },
   created() {
     document.title = "Все заказы"
-  },
-  methods: {
-    openExportModal() {
-      this.$refs.exportModal.open();
-    }
   },
 }
 </script>
