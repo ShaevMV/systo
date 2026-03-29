@@ -9,7 +9,7 @@ module.exports = defineConfig({
         client: {
             webSocketURL: {
                 hostname: 'org.tickets.loc',
-                port: 8080,
+                port: process.env.VUE_APP_WS_PORT || 50080,
             },
         },
     },
