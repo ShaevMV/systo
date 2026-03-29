@@ -85,6 +85,7 @@ services:
     user: node
     environment:
       - VUE_APP_API_URL=${VUE_APP_API_URL:-http://api.tickets.loc/}
+      - VUE_APP_WS_PORT=${VUE_APP_WS_PORT:-50080}
     networks:
       - backend
     restart: unless-stopped
