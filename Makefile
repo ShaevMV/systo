@@ -20,19 +20,53 @@ COLOR_BLUE := \033[34m
 # Main Targets
 # =============================================================================
 
-.PHONY: help env setup setup-hosts up down ps restart rebuild clean
+.PHONY: help check-env env up down ps restart rebuild clean setup setup-hosts logs logs-php logs-nginx logs-mysql composer install update dump-autoload artisan migrate migrate-fresh migrate-rollback db-seed cache-clear route-list tinker test test-coverage npm npm-install npm-build npm-dev db-import db-dump shell shell-root shell-node _get-mysql-password _get-mysql-friendly-password _generate-jwt-secret _wait-for-mysql _wait-for-php _setup-app
 
 help: ## Показать список всех команд
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "$(COLOR_BLUE)%-20s$(COLOR_RESET) %s\n", $$1, $$2}'
 
+check-env: ## Проверка наличия необходимых .env файлов
+	@echo "$(COLOR_BLUE)=== Проверка окружения ===$(COLOR_RESET)"
+	@if [ ! -f .env ]; then \
+		echo "$(COLOR_YELLOW)⚠ .env не найден. Копирую .env.example.dev$(COLOR_RESET)"; \
+		cp .env.example.dev .env; \
+	else \
+		echo "$(COLOR_GREEN)✓ .env найден$(COLOR_RESET)"; \
+	fi
+	@if [ ! -f Backend/.env ]; then \
+		cp Backend/.env.example.dev Backend/.env; \
+		echo "$(COLOR_YELLOW)⚠ Backend/.env не найден. Копирую из .env.example.dev$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_GREEN)✓ Backend/.env найден$(COLOR_RESET)"; \
+	fi
+	@if [ ! -f FrontEnd/.env ]; then \
+		cp FrontEnd/.env.example.dev FrontEnd/.env; \
+		echo "$(COLOR_YELLOW)⚠ FrontEnd/.env не найден. Копирую из .env.example.dev$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_GREEN)✓ FrontEnd/.env найден$(COLOR_RESET)"; \
+	fi
+	@if [ ! -f Baza/.env ]; then \
+		cp Baza/.env.example.dev Baza/.env; \
+		echo "$(COLOR_YELLOW)⚠ Baza/.env не найден. Копирую из .env.example.dev$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_GREEN)✓ Baza/.env найден$(COLOR_RESET)"; \
+	fi
+	@if [ ! -f Friendly/.env ]; then \
+		cp Friendly/.env.example.dev Friendly/.env; \
+		echo "$(COLOR_YELLOW)⚠ Friendly/.env не найден. Копирую из .env.example.dev$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_GREEN)✓ Friendly/.env найден$(COLOR_RESET)"; \
+	fi
+	@echo "$(COLOR_GREEN)✓ Проверка завершена$(COLOR_RESET)"
+
 env: ## Скопировать .env.example файлы
 	@echo "$(COLOR_BLUE)=== Копирование .env файлов ===$(COLOR_RESET)"
-	@if [ ! -f .env ]; then cp .env.example .env; else echo "$(COLOR_YELLOW)✓ .env уже существует$(COLOR_RESET)"; fi
-	@cp -n Backend/.env.example Backend/.env 2>/dev/null || true
-	@cp -n FrontEnd/.env.example FrontEnd/.env 2>/dev/null || true
-	@cp -n Friendly/.env.example Friendly/.env 2>/dev/null || true
-	@cp -n Baza/.env.example Baza/.env 2>/dev/null || true
+	@if [ ! -f .env ]; then cp .env.example.dev .env; else echo "$(COLOR_YELLOW)✓ .env уже существует$(COLOR_RESET)"; fi
+	@cp -n Backend/.env.example.dev Backend/.env 2>/dev/null || true
+	@cp -n FrontEnd/.env.example.dev FrontEnd/.env 2>/dev/null || true
+	@cp -n Baza/.env.example.dev Baza/.env 2>/dev/null || true
+	@cp -n Friendly/.env.example.dev Friendly/.env 2>/dev/null || true
 	@$(MAKE) _generate-jwt-secret
 
 up: ## Запуск всех контейнеров
@@ -52,15 +86,20 @@ rebuild: ## Пересборка и запуск контейнеров
 
 clean: ## Остановка и удаление контейнеров, томов и данных
 	@echo "$(COLOR_YELLOW)=== Очистка проекта ===$(COLOR_RESET)"
-	$(DC) down -v --remove-orphans
-	sudo rm -rf ./Docker/mysql/db/* ./Docker/mysqlFriendly/db/*
-	sudo rm -f Backend/public/storage
-	@echo "$(COLOR_GREEN)✓ Очистка завершена$(COLOR_RESET)"
+	@echo "$(COLOR_YELLOW)⚠ Внимание: Это удалит все данные баз данных!$(COLOR_RESET)"
+	@read -p "Продолжить? (y/N): " confirm; \
+	if [ "$$confirm" = "y" ] || [ "$$confirm" = "Y" ]; then \
+		$(DC) down -v --remove-orphans; \
+		sudo rm -rf ./Docker/mysql/db/* ./Docker/mysqlFriendly/db/*; \
+		sudo rm -f Backend/public/storage; \
+		echo "$(COLOR_GREEN)✓ Очистка завершена$(COLOR_RESET)"; \
+	else \
+		echo "$(COLOR_YELLOW)✗ Очистка отменена$(COLOR_RESET)"; \
+	fi
 
 setup: ## Полная настройка и запуск проекта (fresh install)
 	@echo "$(COLOR_BLUE)=== Настройка проекта systo ===$(COLOR_RESET)"
-	@$(MAKE) clean
-	@$(MAKE) env
+	@$(MAKE) check-env
 	@$(MAKE) setup-hosts
 	@$(MAKE) up
 	@$(MAKE) _wait-for-mysql
@@ -177,7 +216,7 @@ npm-build: ## npm run build
 	$(DC_RUN) node npm run build
 
 npm-dev: ## Запустить npm run serve (dev режим)
-	$(DC_RUN) -d node npm run serve
+	$(DC) exec -d node npm run serve
 
 # =============================================================================
 # Database Commands
@@ -186,10 +225,14 @@ npm-dev: ## Запустить npm run serve (dev режим)
 .PHONY: db-import db-dump
 
 db-import: ## Импорт дампа базы данных
-	$(DC_RUN_T) mysql mysql -uroot -psecret systo < systo_dump.sql
+	@MYSQL_ROOT_PASSWORD=$$(grep '^MYSQL_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
+	if [ -z "$$MYSQL_ROOT_PASSWORD" ]; then MYSQL_ROOT_PASSWORD="secret"; fi; \
+	$(DC_RUN_T) mysql mysql -uroot -p"$$MYSQL_ROOT_PASSWORD" systo < systo_dump.sql
 
 db-dump: ## Дамп базы данных
-	$(DC_RUN) mysql mysqldump -uroot -psecret systo > systo_dump.sql
+	@MYSQL_ROOT_PASSWORD=$$(grep '^MYSQL_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
+	if [ -z "$$MYSQL_ROOT_PASSWORD" ]; then MYSQL_ROOT_PASSWORD="secret"; fi; \
+	$(DC_RUN) mysql mysqldump -uroot -p"$$MYSQL_ROOT_PASSWORD" systo > systo_dump.sql
 
 # =============================================================================
 # Shell Access
@@ -207,29 +250,31 @@ shell-node: ## Войти в Node контейнер
 	$(DC_RUN) node bash
 
 # =============================================================================
-# Production
-# =============================================================================
-
-.PHONY: up-prod down-prod
-
-up-prod: ## Запуск production контейнеров
-	$(DC) --project-directory . -f docker-compose.yml -f docker-compose.prod.yml up --build -d
-
-down-prod: ## Остановка production контейнеров
-	$(DC) -f docker-compose.prod.yml down
-
-# =============================================================================
 # Internal Helpers
 # =============================================================================
 
-.PHONY: _generate-jwt-secret _wait-for-mysql _setup-app _wait-for-php
+.PHONY: _generate-jwt-secret _wait-for-mysql _setup-app _wait-for-php _get-mysql-password _get-mysql-friendly-password
+
+_get-mysql-password: ## Получить пароль MySQL из .env
+	@MYSQL_ROOT_PASSWORD=$$(grep '^MYSQL_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
+	if [ -z "$$MYSQL_ROOT_PASSWORD" ]; then \
+		MYSQL_ROOT_PASSWORD="secret"; \
+	fi; \
+	echo "$$MYSQL_ROOT_PASSWORD"
+
+_get-mysql-friendly-password: ## Получить пароль MySQL Friendly из .env
+	@MYSQL_FRIENDLY_ROOT_PASSWORD=$$(grep '^MYSQL_FRIENDLY_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
+	if [ -z "$$MYSQL_FRIENDLY_ROOT_PASSWORD" ]; then \
+		MYSQL_FRIENDLY_ROOT_PASSWORD="common404"; \
+	fi; \
+	echo "$$MYSQL_FRIENDLY_ROOT_PASSWORD"
 
 _generate-jwt-secret: ## Сгенерировать JWT_SECRET если отсутствует или пуст
 	@if ! grep -q "^JWT_SECRET=" Backend/.env 2>/dev/null || \
-	    [ -z "$$(grep "^JWT_SECRET=" Backend/.env 2>/dev/null | cut -d'=' -f2)" ]; then \
-		JWT_SECRET=$$(openssl rand -base64 32); \
+	    ! grep -q "^JWT_SECRET=." Backend/.env 2>/dev/null; then \
+		JWT_SECRET=$$(openssl rand -base64 32 | tr -d '\n'); \
 		if grep -q "^JWT_SECRET=" Backend/.env 2>/dev/null; then \
-			sed -i "s|^JWT_SECRET=.*|JWT_SECRET=$$JWT_SECRET|" Backend/.env; \
+			sed -i.bak "s|^JWT_SECRET=.*|JWT_SECRET=$$JWT_SECRET|" Backend/.env && rm -f Backend/.env.bak; \
 		else \
 			echo "JWT_SECRET=$$JWT_SECRET" >> Backend/.env; \
 		fi; \
@@ -240,7 +285,9 @@ _generate-jwt-secret: ## Сгенерировать JWT_SECRET если отсу
 
 _wait-for-mysql: ## Ожидание готовности MySQL
 	@echo "$(COLOR_BLUE)Ожидание готовности MySQL...$(COLOR_RESET)"
-	@while ! $(DC_RUN_T) mysql mysqladmin ping -uroot -psecret --silent 2>/dev/null; do \
+	@MYSQL_ROOT_PASSWORD=$$(grep '^MYSQL_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
+	if [ -z "$$MYSQL_ROOT_PASSWORD" ]; then MYSQL_ROOT_PASSWORD="secret"; fi; \
+	while ! $(DC_RUN_T) mysql mysqladmin ping -uroot -p"$$MYSQL_ROOT_PASSWORD" --silent 2>/dev/null; do \
 		echo "  Ждём MySQL..."; \
 		sleep 2; \
 	done
