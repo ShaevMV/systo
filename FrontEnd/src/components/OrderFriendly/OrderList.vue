@@ -15,10 +15,10 @@
               <th scope="col" class="mobile"></th>
               <th scope="col">Продовец</th>
               <th scope="col">Email</th>
-              <th scope="col">Гости</th>
+              <th scope="col" class="mobile">Гости</th>
               <th scope="col">Тип оргвзноса</th>
-              <th scope="col">Стоимость</th>
-              <th scope="col">Кол-во</th>
+              <th scope="col" class="mobile">Стоимость</th>
+              <th scope="col" class="mobile">Кол-во</th>
               <th scope="col" class="mobile">Телефон</th>
               <th scope="col" class="mobile"></th>
             </tr>
@@ -50,12 +50,12 @@
               </td>
               <td>{{ itemOrder.pusher_name }} <br/> {{ itemOrder.pusher_email }}</td>
               <td>{{ itemOrder.email }}</td>
-              <td :title="getListQuests(itemOrder.guests, true) ">
+              <td :title="getListQuests(itemOrder.guests, true) " class="mobile">
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td>{{ itemOrder.price }} рублей</td>
-              <td>{{ itemOrder.count }}</td>
+              <td class="mobile">{{ itemOrder.price }} рублей</td>
+              <td class="mobile">{{ itemOrder.count }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
                 {{ itemOrder.phone }}
               </td>
