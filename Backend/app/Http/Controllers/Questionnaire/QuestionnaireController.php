@@ -7,11 +7,11 @@ namespace App\Http\Controllers\Questionnaire;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Shared\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
-use Shared\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
-use Shared\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
-use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
-use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
+use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
+use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Throwable;
 
 class QuestionnaireController extends Controller

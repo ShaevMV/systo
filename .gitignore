@@ -10,3 +10,4 @@
 /Friendly/bootstrap/cache/
 /Backend/bootstrap/cache/
 /Baza/bootstrap/cache/
+*.sql

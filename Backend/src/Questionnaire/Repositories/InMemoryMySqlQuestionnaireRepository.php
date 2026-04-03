@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Filter\FilterBuilder;
-use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
-use Shared\Questionnaire\Dto\QuestionnaireTicketDto;
-use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Throwable;
 use Illuminate\Support\Collection;
 

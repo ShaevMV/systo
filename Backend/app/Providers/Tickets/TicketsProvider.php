@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace App\Providers\Tickets;
 
 use Illuminate\Support\ServiceProvider;
-use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Festival\Repositories\InMemoryMySqlTicketTypeRepository;
 use Tickets\Festival\Repositories\InMemoryMySqlTypesOfPayment;
 use Tickets\Festival\Repositories\TicketTypeInterfaceRepository;

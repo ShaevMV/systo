@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Service;
 
 use Shared\Domain\ValueObject\Uuid;
-use Shared\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
-use Shared\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Order\OrderTicket\Repositories\InviteLinkRepositoryInterface;
 use Tickets\User\Account\Helpers\AccountRoleHelper;
 
