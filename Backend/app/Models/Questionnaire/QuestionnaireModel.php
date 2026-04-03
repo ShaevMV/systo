@@ -77,5 +77,10 @@ class QuestionnaireModel extends Model
         'status',
         'is_have_in_club',
         'festival',
+        'data',
+    ];
+
+    protected $casts = [
+        'data' => 'array',
     ];
 }
