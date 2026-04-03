@@ -52,7 +52,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
                     ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
             }
             if ($questionnaireTicketDto->getEmail()) {
-                $rawModel = $this->model::whereEmail($questionnaireTicketDto->getEmail());
+                $rawModel = $this->model::where('data->email', $questionnaireTicketDto->getEmail());
             }
             if ($rawModel->exists()) {
                 $rawModel->update($data);
@@ -84,7 +84,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
     public function existByEmail(string $email): bool
     {
-        return $this->model::whereEmail($email)->exists();
+        return $this->model::where('data->email', $email)->exists();
     }
 
     public function get(int $id): QuestionnaireTicketDto
@@ -108,7 +108,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
     public function findByEmail(string $email): ?QuestionnaireTicketDto
     {
-        if (!$data = $this->model::whereEmail($email)->first()?->toArray()) {
+        if (!$data = $this->model::where('data->email', $email)->first()?->toArray()) {
             return null;
         }
 

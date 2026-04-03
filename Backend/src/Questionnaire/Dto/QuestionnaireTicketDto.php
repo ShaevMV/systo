@@ -43,21 +43,27 @@ class QuestionnaireTicketDto implements Response
         $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
         $ticketId = (empty($data['ticket_id'] ?? null)) ? null : new Uuid($data['ticket_id']);
         $orderId = (empty($data['order_id'] ?? null)) ? null : new Uuid($data['order_id']);
+
+        $jsonData = $data['data'] ?? [];
+        if (is_string($jsonData)) {
+            $jsonData = json_decode($jsonData, true) ?? [];
+        }
+
         return new self(
-            (int)$data['agy'],
-            $data['questionForSysto'],
-            $data['phone'],
-            (string)$data['howManyTimes'] ?? null,
-            $data['status'],
-            (bool)($data['is_have_in_club'] ?? false),
-            $data['email'] ?? null,
-            $data['telegram'] ?? null,
-            $data['vk'] ?? null,
-            $data['musicStyles'] ?? null,
-            $data['name'] ?? null,
-            $data['whereSysto'] ?? null,
-            $data['creationOfSisto'] ?? null,
-            $data['activeOfEvent'] ?? null,
+            (int)($jsonData['agy'] ?? $data['agy'] ?? 0),
+            $jsonData['questionForSysto'] ?? $data['questionForSysto'] ?? '',
+            $jsonData['phone'] ?? $data['phone'] ?? '',
+            (string)($jsonData['howManyTimes'] ?? $data['howManyTimes'] ?? null),
+            $data['status'] ?? QuestionnaireStatus::NEW,
+            (bool)($jsonData['is_have_in_club'] ?? $data['is_have_in_club'] ?? false),
+            $jsonData['email'] ?? $data['email'] ?? null,
+            $jsonData['telegram'] ?? $data['telegram'] ?? null,
+            $jsonData['vk'] ?? $data['vk'] ?? null,
+            $jsonData['musicStyles'] ?? $data['musicStyles'] ?? null,
+            $jsonData['name'] ?? $data['name'] ?? null,
+            $jsonData['whereSysto'] ?? $data['whereSysto'] ?? null,
+            $jsonData['creationOfSisto'] ?? $data['creationOfSisto'] ?? null,
+            $jsonData['activeOfEvent'] ?? $data['activeOfEvent'] ?? null,
             $userId,
             $orderId,
             $ticketId,
@@ -93,12 +99,11 @@ class QuestionnaireTicketDto implements Response
 
     public function toArrayForMySql(): array
     {
-        return [
+        $dataFields = [
             'agy' => $this->agy,
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
             'phone' => $this->phone,
-            'status' => $this->status ?? QuestionnaireStatus::APPROVE,
             'is_have_in_club' => $this->is_have_in_club,
             'email' => $this->email,
             'telegram' => $this->telegram,
@@ -108,9 +113,14 @@ class QuestionnaireTicketDto implements Response
             'whereSysto' => $this->whereSysto,
             'creationOfSisto' => $this->creationOfSisto,
             'activeOfEvent' => $this->activeOfEvent,
+        ];
+
+        return [
+            'data' => json_encode($dataFields),
             'order_id' => $this->orderId?->value(),
             'ticket_id' => $this->ticketId?->value(),
             'user_id' => $this->userId?->value(),
+            'status' => $this->status ?? QuestionnaireStatus::APPROVE,
         ];
     }
 
