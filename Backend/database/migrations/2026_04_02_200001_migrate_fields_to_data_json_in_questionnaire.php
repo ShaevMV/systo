@@ -12,20 +12,22 @@ return new class extends Migration
      */
     public function up()
     {
+        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data'];
+
         $questionnaires = DB::table('questionnaire')->get();
 
         foreach ($questionnaires as $questionnaire) {
-            $data = json_encode([
-                'order_id' => $questionnaire->order_id,
-                'ticket_id' => $questionnaire->ticket_id,
-                'user_id' => $questionnaire->user_id,
-                'festival_id' => $questionnaire->festival_id,
-                'status' => $questionnaire->status,
-            ]);
+            $data = [];
+
+            foreach ($questionnaire as $field => $value) {
+                if (!in_array($field, $excludedFields)) {
+                    $data[$field] = $value;
+                }
+            }
 
             DB::table('questionnaire')
                 ->where('id', $questionnaire->id)
-                ->update(['data' => $data]);
+                ->update(['data' => json_encode($data)]);
         }
     }
 
@@ -36,21 +38,25 @@ return new class extends Migration
      */
     public function down()
     {
+        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data'];
+
         $questionnaires = DB::table('questionnaire')->whereNotNull('data')->get();
 
         foreach ($questionnaires as $questionnaire) {
             $data = json_decode($questionnaire->data, true);
 
             if ($data) {
+                $updateData = [];
+
+                foreach ($data as $field => $value) {
+                    if (!in_array($field, $excludedFields)) {
+                        $updateData[$field] = $value;
+                    }
+                }
+
                 DB::table('questionnaire')
                     ->where('id', $questionnaire->id)
-                    ->update([
-                        'order_id' => $data['order_id'] ?? null,
-                        'ticket_id' => $data['ticket_id'] ?? null,
-                        'user_id' => $data['user_id'] ?? null,
-                        'festival_id' => $data['festival_id'] ?? null,
-                        'status' => $data['status'] ?? null,
-                    ]);
+                    ->update($updateData);
             }
         }
     }
