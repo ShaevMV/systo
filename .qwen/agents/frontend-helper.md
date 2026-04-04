@@ -10,7 +10,7 @@
 FrontEnd/src/
 ├── components/         # Переиспользуемые компоненты
 │   ├── Auth/           # LoginAuth, RegAuth, ForgotPassword
-│   ├── BuyTicket/      # BuyTicket, BuyTicketFrendly
+│   ├── BuyTicket/      # BuyTicket, BuyTicketFriendly
 │   ├── Order/          # OrderList, OrderItem, FilterOrder
 │   ├── PromoCode/      # PromoCodeList, PromoCodeItem
 │   ├── Questionnaire/  # QuestionnaireList, QuestionnaireTicket
