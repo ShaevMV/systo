@@ -16,6 +16,8 @@ interface QuestionnaireTypeRepositoryInterface
 
     public function getItem(Uuid $id): QuestionnaireTypeDto;
 
+    public function getByCode(string $code): QuestionnaireTypeDto;
+
     public function create(QuestionnaireTypeDto $data): bool;
 
     public function editItem(Uuid $id, QuestionnaireTypeDto $data): bool;

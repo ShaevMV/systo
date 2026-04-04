@@ -17,6 +17,8 @@ use Tickets\QuestionnaireType\Application\Edit\QuestionnaireTypeEditCommand;
 use Tickets\QuestionnaireType\Application\Edit\QuestionnaireTypeEditCommandHandler;
 use Tickets\QuestionnaireType\Application\GetItem\QuestionnaireTypeGetItemQuery;
 use Tickets\QuestionnaireType\Application\GetItem\QuestionnaireTypeGetItemQueryHandler;
+use Tickets\QuestionnaireType\Application\GetByCode\QuestionnaireTypeGetByCodeQuery;
+use Tickets\QuestionnaireType\Application\GetByCode\QuestionnaireTypeGetByCodeQueryHandler;
 use Tickets\QuestionnaireType\Application\GetList\QuestionnaireTypeGetListQuery;
 use Tickets\QuestionnaireType\Application\GetList\QuestionnaireTypeGetListQueryHandler;
 use Tickets\QuestionnaireType\Dto\QuestionnaireTypeDto;
@@ -30,6 +32,7 @@ class QuestionnaireTypeApplication
     public function __construct(
         QuestionnaireTypeGetListQueryHandler $questionnaireTypeGetListQueryHandler,
         QuestionnaireTypeGetItemQueryHandler $questionnaireTypeGetItemQueryHandler,
+        QuestionnaireTypeGetByCodeQueryHandler $questionnaireTypeGetByCodeQueryHandler,
         QuestionnaireTypeCreateCommandHandler $questionnaireTypeCreateCommandHandler,
         QuestionnaireTypeEditCommandHandler $questionnaireTypeEditCommandHandler,
         QuestionnaireTypeDeleteCommandHandler $questionnaireTypeDeleteCommandHandler,
@@ -44,6 +47,7 @@ class QuestionnaireTypeApplication
         $this->queryBus = new InMemorySymfonyQueryBus([
             QuestionnaireTypeGetListQuery::class => $questionnaireTypeGetListQueryHandler,
             QuestionnaireTypeGetItemQuery::class => $questionnaireTypeGetItemQueryHandler,
+            QuestionnaireTypeGetByCodeQuery::class => $questionnaireTypeGetByCodeQueryHandler,
         ]);
     }
 
@@ -59,6 +63,14 @@ class QuestionnaireTypeApplication
     {
         /** @var QuestionnaireTypeDto $result */
         $result = $this->queryBus->ask(new QuestionnaireTypeGetItemQuery($uuid));
+
+        return $result;
+    }
+
+    public function getByCode(string $code): QuestionnaireTypeDto
+    {
+        /** @var QuestionnaireTypeDto $result */
+        $result = $this->queryBus->ask(new QuestionnaireTypeGetByCodeQuery($code));
 
         return $result;
     }

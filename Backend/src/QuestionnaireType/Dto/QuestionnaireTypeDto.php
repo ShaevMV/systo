@@ -14,6 +14,7 @@ class QuestionnaireTypeDto extends AbstractionEntity implements Response
     public function __construct(
         protected Uuid $id,
         protected string $name,
+        protected ?string $code,
         protected array $questions,
         protected bool $active,
         protected int $sort,
@@ -28,6 +29,7 @@ class QuestionnaireTypeDto extends AbstractionEntity implements Response
         return new self(
             empty($data['id']) ? Uuid::random() : new Uuid($data['id']),
             $data['name'],
+            $data['code'] ?? null,
             $data['questions'] ?? [],
             (bool)($data['active'] ?? true),
             (int)($data['sort'] ?? 0),
@@ -44,6 +46,11 @@ class QuestionnaireTypeDto extends AbstractionEntity implements Response
     public function getName(): string
     {
         return $this->name;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
     }
 
     public function getQuestions(): array

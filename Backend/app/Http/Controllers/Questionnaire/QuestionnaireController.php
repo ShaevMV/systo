@@ -113,31 +113,34 @@ class QuestionnaireController extends Controller
     public function setNewUserQuestionnaire(
         Request                  $request,
         QuestionnaireApplication $questionnaireApplication,
+        QuestionnaireValidationService   $validationService,
     ): JsonResponse
     {
-        $request->validate([
-            'questionnaire.telegram' => [
-                'string',
-                'min:5',
-                'max:32',
-                'regex:/^[a-zA-Z0-9_]+$/',
-                'unique:questionnaire,telegram',
-            ],
-            'questionnaire.agy' => [
-                'integer',
-            ],
-        ],[
-            'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
-            'questionnaire.telegram.max' => 'не может превышать 32 символа.',
-            'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
-            'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
-            'questionnaire.agy' => 'Возраст только цифрами',
-        ]);
-
         $data = $request->toArray();
+        $questionnaireData = $data['questionnaire'] ?? [];
+
+        // Получаем тип анкеты "Анкета нового пользователя" по коду
+        $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('code', 'new_user')
+            ->where('active', true)
+            ->first();
+
+        $questionnaireTypeId = $questionnaireType?->id;
+
+        // Валидация через сервис
+        $errors = $validationService->validate($questionnaireTypeId, $questionnaireData);
+
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors,
+                'message' => 'Ошибка валидации'
+            ], 422);
+        }
+
         try {
             if (isset($data['questionnaire'])) {
                 $data['questionnaire']['status'] = 'NEW';
+                $data['questionnaire']['questionnaire_type_id'] = $questionnaireTypeId;
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire']
@@ -225,11 +228,11 @@ class QuestionnaireController extends Controller
             $orderTicket = $orderTicketRepository->findOrder(new \Shared\Domain\ValueObject\Uuid($orderId));
             
             if (!$orderTicket || !$orderTicket->getQuestionnaireTypeId()) {
-                // Возвращаем первый активный тип анкеты (гостевая)
-                $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('active', true)
-                    ->orderBy('sort')
+                // Возвращаем тип анкеты "Гостевая анкета" по коду
+                $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('code', 'guest')
+                    ->where('active', true)
                     ->first();
-                
+
                 if (!$questionnaireType) {
                     return response()->json([
                         'success' => false,

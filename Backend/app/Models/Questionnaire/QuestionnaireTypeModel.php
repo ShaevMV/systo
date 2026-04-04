@@ -44,6 +44,7 @@ class QuestionnaireTypeModel extends Model
     protected $fillable = [
         'id',
         'name',
+        'code',
         'questions',
         'active',
         'sort',

@@ -49,6 +49,17 @@ class InMemoryMySqlQuestionnaireTypeRepository implements QuestionnaireTypeRepos
         return QuestionnaireTypeDto::fromState($rawData->toArray());
     }
 
+    public function getByCode(string $code): QuestionnaireTypeDto
+    {
+        if (!$rawData = $this->model::where('code', $code)
+            ->where('active', true)
+            ->first()) {
+            throw new \DomainException('Тип анкеты не найден по коду: ' . $code);
+        }
+
+        return QuestionnaireTypeDto::fromState($rawData->toArray());
+    }
+
     public function create(QuestionnaireTypeDto $data): bool
     {
         DB::beginTransaction();

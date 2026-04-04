@@ -18,7 +18,7 @@
             :placeholder="question.title"
             :value="getFieldValue(question.name)"
             @input="updateField(question.name, $event.target.value)"
-            :disabled="isDisabled ? '' : disabled"
+            :disabled="isDisabled"
         ></textarea>
 
         <!-- Число -->
@@ -30,7 +30,7 @@
               :placeholder="question.title"
               :value="getFieldValue(question.name)"
               @input="updateField(question.name, $event.target.value)"
-              :disabled="isDisabled ? '' : disabled"
+              :disabled="isDisabled"
           />
         </div>
 
@@ -44,7 +44,7 @@
               :placeholder="question.title"
               :value="getFieldValue(question.name)"
               @input="updateField(question.name, $event.target.value)"
-              :disabled="isDisabled ? '' : disabled"
+              :disabled="isDisabled"
           />
         </div>
 
@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: "QuestionnaireTicket",
@@ -83,6 +83,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters('appQuestionnaire', ['getError']),
     canApprove() {
       return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
     },
@@ -90,7 +91,7 @@ export default {
       if (!this.questionnaireType || !this.questionnaireType.questions) {
         return [];
       }
-      
+
       let questions = this.questionnaireType.questions;
       if (typeof questions === 'string') {
         try {

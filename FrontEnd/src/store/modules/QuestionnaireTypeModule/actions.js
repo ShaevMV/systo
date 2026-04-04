@@ -48,6 +48,26 @@ export const loadQuestionnaireTypeByOrderTicket = (context, payload) => {
     });
 };
 
+export const loadQuestionnaireTypeByCode = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.get(API + '/getByCode/' + payload.code);
+        return promise.then(function (response) {
+            const questionnaireType = response.data.item;
+            if (questionnaireType) {
+                context.commit('setItem', questionnaireType);
+                resolve(questionnaireType);
+            } else {
+                resolve(null);
+            }
+        }).catch(function (error) {
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            }
+            reject(error);
+        });
+    });
+};
+
 export const create = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.post(API + '/create', {

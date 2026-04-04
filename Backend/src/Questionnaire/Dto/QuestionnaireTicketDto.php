@@ -30,6 +30,7 @@ class QuestionnaireTicketDto implements Response
         protected ?Uuid $orderId = null,
         protected ?Uuid $ticketId = null,
         protected ?int $id = null,
+        protected ?Uuid $questionnaireTypeId = null,
     )
     {
         $this->link = $this->getLink();
@@ -43,6 +44,7 @@ class QuestionnaireTicketDto implements Response
         $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
         $ticketId = (empty($data['ticket_id'] ?? null)) ? null : new Uuid($data['ticket_id']);
         $orderId = (empty($data['order_id'] ?? null)) ? null : new Uuid($data['order_id']);
+        $questionnaireTypeId = (empty($data['questionnaire_type_id'])) ? null : new Uuid($data['questionnaire_type_id']);
 
         $jsonData = $data['data'] ?? [];
         if (is_string($jsonData)) {
@@ -68,6 +70,7 @@ class QuestionnaireTicketDto implements Response
             $orderId,
             $ticketId,
             $id,
+            $questionnaireTypeId,
         );
     }
 
@@ -121,6 +124,7 @@ class QuestionnaireTicketDto implements Response
             'ticket_id' => $this->ticketId?->value(),
             'user_id' => $this->userId?->value(),
             'status' => $this->status ?? QuestionnaireStatus::APPROVE,
+            'questionnaire_type_id' => $this->questionnaireTypeId?->value(),
         ];
     }
 

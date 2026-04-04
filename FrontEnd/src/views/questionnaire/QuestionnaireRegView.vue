@@ -53,6 +53,7 @@
           <div class="card-body pt-3">
             <questionnaire-ticket
                 :questionnaire="questionnaire"
+                :questionnaire-type="questionnaireType"
                 :is-newUser="true"
                 @update-questionnaire="updateQuestionnaire"
             />
@@ -94,7 +95,7 @@
 <script>
 
 import QuestionnaireTicket from "@/components/Questionnaire/QuestionnaireTicket.vue";
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: 'QuestionnaireRegView',
@@ -104,7 +105,7 @@ export default {
   data() {
     return {
       questionnaire: {
-        name: null,    // Добавил дату для имени и фамилии
+        name: null,
         agy: null,
         telegram: null,
         vk: null,
@@ -115,35 +116,47 @@ export default {
         creationOfSisto: null,
         activeOfEvent: null,
         email: null,
-        whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
+        whereSysto: null
       },
       confirm: false,
     }
   },
   computed: {
+    ...mapGetters('appQuestionnaireType', [
+      'getItem'
+    ]),
+    questionnaireType() {
+      return this.getItem || null;
+    },
     isCorrect() {
-      return this.questionnaire.agy !== null &&
-          this.questionnaire.email !== null &&
-          this.questionnaire.phone !== null &&
-          this.confirm;
+      if (!this.questionnaireType || !this.questionnaireType.questions) return false;
+
+      let questions = this.questionnaireType.questions;
+      if (typeof questions === 'string') {
+        questions = JSON.parse(questions);
+      }
+
+      for (let q of questions) {
+        if (q.required && (this.questionnaire[q.name] === null || this.questionnaire[q.name] === '')) {
+          return false;
+        }
+      }
+
+      return this.confirm;
     }
   },
   methods: {
     ...mapActions('appQuestionnaire', [
       'sendNewUserQuestionnaire',
-      'editQuestionnaire'
     ]),
-    goList() {
-      this.$router.push({name: 'QuestionnaireList'});
-    },
     send() {
       let self = this;
       this.sendNewUserQuestionnaire({
         questionnaire: this.questionnaire,
-        newUser: true,
         callback: function () {
           document.getElementById('modalOpenBtn').click();
           self.questionnaire = {
+            name: null,
             agy: null,
             telegram: null,
             vk: null,
@@ -153,6 +166,8 @@ export default {
             questionForSysto: null,
             creationOfSisto: null,
             activeOfEvent: null,
+            email: null,
+            whereSysto: null
           };
         },
       })
@@ -165,13 +180,14 @@ export default {
     document.title = "Анкета участника Solar Systo Togathering"
   },
   beforeRouteEnter: (to, from, next) => {
-    if (to.params.id) {
-      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-        id: to.params.id,
-      });
-    }
-
-    next();
+    // Загружаем тип анкеты "Анкета нового пользователя" по коду
+    window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByCode', {
+      code: 'new_user'
+    }).catch(() => {
+      // Игнорируем ошибку, страница всё равно загрузится
+    }).finally(() => {
+      next();
+    });
   },
 }
 </script>

@@ -101,6 +101,27 @@ class QuestionnaireTypeController extends Controller
     }
 
     /**
+     * Получить тип анкеты по коду (slug)
+     */
+    public function getByCode(
+        string $code,
+        QuestionnaireTypeApplication $application,
+    ): JsonResponse
+    {
+        try {
+            return response()->json([
+                'success' => true,
+                'item' => $application->getByCode($code)->toArray(),
+            ]);
+        } catch (DomainException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 404);
+        }
+    }
+
+    /**
      * @throws Throwable
      */
     public function delete(
