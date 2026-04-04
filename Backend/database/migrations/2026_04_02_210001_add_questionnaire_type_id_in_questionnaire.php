@@ -118,13 +118,6 @@ return new class extends Migration
                     'validate' => null,
                     'required' => false,
                 ],
-                [
-                    'title' => 'Хочет участвовать в клубе',
-                    'name' => 'is_have_in_club',
-                    'type' => 'number',
-                    'validate' => null,
-                    'required' => false,
-                ],
             ]),
             'created_at' => now(),
             'updated_at' => now(),

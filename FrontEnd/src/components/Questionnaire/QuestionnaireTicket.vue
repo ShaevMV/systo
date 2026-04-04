@@ -49,24 +49,6 @@
           {{ getError('questionnaire.' + question.name) }}
         </div>
       </div>
-
-      <!-- Чекбокс "Хочу вступить в клуб" -->
-      <div class="quest-item form-check"
-           id="check-check"
-           v-show="!isAdmin"
-      >
-        <input
-            class="form-check-input"
-            type="checkbox"
-            :checked="questionnaire.is_have_in_club"
-            id="defaultCheck1"
-            @change="updateField('is_have_in_club', $event.target.checked)"
-            :disabled="isDisabled ? '' : disabled"
-        />
-        <label class="form-check-label" for="defaultCheck1">
-          Хочу вступить в приватный клуб (18+)
-        </label>
-      </div>
     </div>
     <div class="col-12" v-if="canApprove">
       <button class="btn btn-success" @click="handleApprove">Подтвердить анкету</button>
