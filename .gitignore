@@ -11,7 +11,5 @@
 /Backend/bootstrap/cache/
 /Baza/bootstrap/cache/
 *.sql
-.qwen/docs/*
-!.qwen/docs/.gitkeep
-.qwen/QWEN.md
-.qwen/RULES.md
+.qwen/*
+!.qwen/agents/
