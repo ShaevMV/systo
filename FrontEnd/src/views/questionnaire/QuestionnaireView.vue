@@ -60,6 +60,7 @@
 
             <questionnaire-ticket
                 :questionnaire="(isAdmin || isManager)? getQuestionnaireItem : questionnaire"
+                :questionnaire-type="questionnaireType"
                 :is-disabled="isAdmin || isManager"
                 @update-questionnaire="updateQuestionnaire"
             />
@@ -142,13 +143,30 @@ export default {
     ...mapGetters('appQuestionnaire', [
       'getQuestionnaireItem'
     ]),
+    ...mapGetters('appQuestionnaireType', [
+      'getList'
+    ]),
+    questionnaireType() {
+      if (this.getList && this.getList.length > 0) {
+        return this.getList[0];
+      }
+      return null;
+    },
     isCorrect() {
-      return this.questionnaire.agy !== null &&
-          this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto !== null &&
-          this.questionnaire.email !== null &&
-          this.questionnaire.phone !== null &&
-          this.confirm;
+      if (!this.questionnaireType || !this.questionnaireType.questions) return false;
+      
+      let questions = this.questionnaireType.questions;
+      if (typeof questions === 'string') {
+        questions = JSON.parse(questions);
+      }
+      
+      for (let q of questions) {
+        if (q.required && (this.questionnaire[q.name] === null || this.questionnaire[q.name] === '')) {
+          return false;
+        }
+      }
+      
+      return this.confirm;
     }
   },
   methods: {
@@ -202,13 +220,19 @@ export default {
     document.title = "Анкета участника Solar Systo Togathering"
   },
   beforeRouteEnter: (to, from, next) => {
-    if (to.params.id) {
-      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-        id: to.params.id,
-      });
-    }
-
-    next();
+    // Загружаем тип анкеты
+    window.store.dispatch('appQuestionnaireType/loadList', {
+      filter: { active: '1' },
+      orderBy: { sort: 'asc' }
+    }).then(() => {
+      // Загружаем анкету если есть id
+      if (to.params.id) {
+        window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+          id: to.params.id,
+        });
+      }
+      next();
+    });
   },
 }
 </script>
