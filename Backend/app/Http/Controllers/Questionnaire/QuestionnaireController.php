@@ -216,9 +216,9 @@ class QuestionnaireController extends Controller
             
             if (!$orderTicket) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Заказ не найден'
-                ], 404);
+                    'success' => true,
+                    'questionnaire_type_id' => null,
+                ]);
             }
 
             return response()->json([
@@ -227,9 +227,9 @@ class QuestionnaireController extends Controller
             ]);
         } catch (\Throwable $throwable) {
             return response()->json([
-                'success' => false,
-                'message' => $throwable->getMessage()
-            ], 422);
+                'success' => true,
+                'questionnaire_type_id' => null,
+            ]);
         }
     }
 }

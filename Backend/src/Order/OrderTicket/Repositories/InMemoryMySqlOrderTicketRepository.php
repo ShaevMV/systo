@@ -144,11 +144,15 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ])
             ->first();
 
+        if (!$rawData) {
+            return null;
+        }
+
         $rawDataArr = $rawData->toArray();
-        $rawDataArr['email'] = $rawDataArr['users']['email'];
+        $rawDataArr['email'] = $rawDataArr['users']['email'] ?? '';
         $rawDataArr['questionnaire_type_id'] = $rawDataArr['ticketType']['questionnaire_type_id'] ?? null;
         $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
-        return $rawDataArr !== null ? OrderTicketDto::fromState(
+        return OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
             new PriceDto(
@@ -157,7 +161,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $rawData['discount']
             ),
             (bool)$rawData['ticketType']['is_live_ticket'] ?? false,
-        ) : null;
+        );
     }
 
     /**
