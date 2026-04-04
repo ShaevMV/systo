@@ -33,44 +33,17 @@ export const loadItem = (context, payload) => {
 export const loadQuestionnaireTypeByOrderTicket = (context, payload) => {
     const questionnaireAPI = '/api/v1/questionnaire';
     return new Promise((resolve, reject) => {
-        let promise = axios.get(questionnaireAPI + '/getQuestionnaireType/' + payload.orderId + '/' + payload.ticketId);
+        let promise = axios.get(questionnaireAPI + '/getQuestionnaireTypeByOrderTicket/' + payload.orderId + '/' + payload.ticketId);
         return promise.then(function (response) {
-            const questionnaireTypeId = response.data.questionnaire_type_id;
-            if (questionnaireTypeId) {
-                return axios.get(API + '/getItem/' + questionnaireTypeId).then(function (itemResponse) {
-                    context.commit('setItem', itemResponse.data.item);
-                    resolve(itemResponse.data.item);
-                });
+            const questionnaireType = response.data.questionnaire_type;
+            if (questionnaireType) {
+                context.commit('setItem', questionnaireType);
+                resolve(questionnaireType);
+            } else {
+                resolve(null);
             }
-            // Если questionnaire_type_id не найден, загружаем первый активный тип (гостевая анкета)
-            return axios.post(API + '/getList', {
-                filter: { active: '1' },
-                orderBy: { sort: 'asc' }
-            }).then(function (listResponse) {
-                if (listResponse.data.list && listResponse.data.list.length > 0) {
-                    const firstType = listResponse.data.list[0];
-                    context.commit('setItem', firstType);
-                    resolve(firstType);
-                } else {
-                    resolve(null);
-                }
-            });
         }).catch(function (error) {
-            // При ошибке загружаем первый активный тип как фоллбэк
-            return axios.post(API + '/getList', {
-                filter: { active: '1' },
-                orderBy: { sort: 'asc' }
-            }).then(function (listResponse) {
-                if (listResponse.data.list && listResponse.data.list.length > 0) {
-                    const firstType = listResponse.data.list[0];
-                    context.commit('setItem', firstType);
-                    resolve(firstType);
-                } else {
-                    resolve(null);
-                }
-            }).catch(function () {
-                reject(error);
-            });
+            reject(error);
         });
     });
 };

@@ -213,9 +213,9 @@ class QuestionnaireController extends Controller
     }
 
     /**
-     * Получить questionnaire_type_id по order_id и ticket_id
+     * Получить тип анкеты по order_id и ticket_id (с вопросами)
      */
-    public function getQuestionnaireType(
+    public function getQuestionnaireTypeByOrderTicket(
         string $orderId,
         string $ticketId,
         OrderTicketRepositoryInterface $orderTicketRepository,
@@ -224,22 +224,45 @@ class QuestionnaireController extends Controller
         try {
             $orderTicket = $orderTicketRepository->findOrder(new \Shared\Domain\ValueObject\Uuid($orderId));
             
-            if (!$orderTicket) {
+            if (!$orderTicket || !$orderTicket->getQuestionnaireTypeId()) {
+                // Возвращаем первый активный тип анкеты (гостевая)
+                $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('active', true)
+                    ->orderBy('sort')
+                    ->first();
+                
+                if (!$questionnaireType) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Тип анкеты не найден'
+                    ], 404);
+                }
+
                 return response()->json([
                     'success' => true,
-                    'questionnaire_type_id' => null,
+                    'questionnaire_type' => $questionnaireType->toArray(),
                 ]);
+            }
+
+            $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::find(
+                $orderTicket->getQuestionnaireTypeId()->value()
+            );
+
+            if (!$questionnaireType) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Тип анкеты не найден'
+                ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'questionnaire_type_id' => $orderTicket->getQuestionnaireTypeId()?->value(),
+                'questionnaire_type' => $questionnaireType->toArray(),
             ]);
         } catch (\Throwable $throwable) {
             return response()->json([
-                'success' => true,
-                'questionnaire_type_id' => null,
-            ]);
+                'success' => false,
+                'message' => $throwable->getMessage()
+            ], 422);
         }
     }
 }

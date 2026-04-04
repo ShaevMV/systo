@@ -144,19 +144,10 @@ export default {
       'getQuestionnaireItem'
     ]),
     ...mapGetters('appQuestionnaireType', [
-      'getList',
       'getItem'
     ]),
     questionnaireType() {
-      // Сначала пробуем getItem (загруженный по order_id/ticket_id)
-      if (this.getItem && this.getItem.id) {
-        return this.getItem;
-      }
-      // Фоллбэк: первый активный тип из списка (гостевая анкета)
-      if (this.getList && this.getList.length > 0) {
-        return this.getList[0];
-      }
-      return null;
+      return this.getItem || null;
     },
     isCorrect() {
       if (!this.questionnaireType || !this.questionnaireType.questions) return false;

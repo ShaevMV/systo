@@ -1,6 +1,9 @@
 <template>
   <div class="row">
     <div class="mb-12" id="quest">
+      <div v-if="questionsList.length === 0" class="text-center">
+        <p>Загрузка вопросов...</p>
+      </div>
       <div v-for="(question, index) in questionsList" :key="index" class="quest-item">
         <label :for="'questionnaire_' + question.name">
           {{ question.title }}
@@ -57,7 +60,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   name: "QuestionnaireTicket",
@@ -80,34 +83,12 @@ export default {
     },
   },
   computed: {
-    getError() {
-      return (fieldName) => {
-        const errors = this.$store.state.appQuestionnaire.dataError || {};
-        // Remove 'questionnaire.' prefix if present
-        const cleanFieldName = fieldName.replace('questionnaire.', '');
-        return errors[cleanFieldName] ? errors[cleanFieldName][0] : null;
-      };
-    },
     canApprove() {
       return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
     },
     questionsList() {
       if (!this.questionnaireType || !this.questionnaireType.questions) {
-        // Фоллбэк на стандартные поля если тип анкеты не загружен
-        return [
-          { title: 'Твои Имя и Фамилия', name: 'name', type: 'string', required: true },
-          { title: 'Email', name: 'email', type: 'string', required: true },
-          { title: 'Возраст', name: 'agy', type: 'number', required: true },
-          { title: 'Telegram', name: 'telegram', type: 'string', required: false },
-          { title: 'Номер телефона', name: 'phone', type: 'string', required: true },
-          { title: 'Профайл Вконтакте', name: 'vk', type: 'string', required: false },
-          { title: 'Бывал ли ты ранее на Систо', name: 'howManyTimes', type: 'text', required: true },
-          { title: 'Стили музыки, которые предпочитаешь в лесу', name: 'musicStyles', type: 'text', required: false },
-          { title: 'Зачем ты едешь на Систо?', name: 'questionForSysto', type: 'text', required: true },
-          { title: 'Откуда ты узнал о Систо?', name: 'whereSysto', type: 'text', required: false },
-          { title: 'Считаете ли вы себя участвующим в сотворении Систо?', name: 'creationOfSisto', type: 'text', required: false },
-          { title: 'Готовы принимать более активное или творческое участие?', name: 'activeOfEvent', type: 'text', required: false },
-        ];
+        return [];
       }
       
       let questions = this.questionnaireType.questions;
