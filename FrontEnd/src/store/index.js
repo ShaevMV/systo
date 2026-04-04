@@ -8,6 +8,7 @@ import appTicket from './modules/TicketModule/index';
 import appTicketType from './modules/TicketTypeModule/index';
 import appAccount from './modules/AccountModule/index';
 import appTypesOfPayment from './modules/TypesOfPaymentModule/index';
+import appQuestionnaireType from './modules/QuestionnaireTypeModule/index';
 
 export default createStore({
     state: {
@@ -40,5 +41,6 @@ export default createStore({
         'appTicketType': appTicketType,
         'appAccount': appAccount,
         'appTypesOfPayment': appTypesOfPayment,
+        'appQuestionnaireType': appQuestionnaireType,
     }
 })
