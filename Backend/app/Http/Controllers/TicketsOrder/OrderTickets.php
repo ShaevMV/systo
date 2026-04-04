@@ -18,7 +18,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
-use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
+use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
@@ -43,7 +43,7 @@ class OrderTickets extends Controller
         private PriceService       $priceService,
         private GetOrder           $getOrder,
         private TotalNumber        $totalNumber,
-        private ChanceStatus       $chanceStatus,
+        private ChangeStatus       $chanceStatus,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
        // private Billing            $billing,
@@ -281,7 +281,7 @@ class OrderTickets extends Controller
      *
      * @throws Throwable
      */
-    public function toChanceStatus(
+    public function toChangeStatus(
         string                 $id,
         Request                $request,
         CheckLiveTicketService $checkLiveTicketService,
@@ -338,7 +338,7 @@ class OrderTickets extends Controller
         // Если валидация прошла успешно, выполняем основной код
         $status = new Status($request->get('status'));
 
-        $this->chanceStatus->chance(
+        $this->chanceStatus->change(
             new Uuid($id),
             $status,
             new Uuid(Auth::id()),

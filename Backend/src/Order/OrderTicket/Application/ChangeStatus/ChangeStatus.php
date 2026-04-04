@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChangeStatus;
 
 use DomainException;
 use Throwable;
@@ -10,21 +10,21 @@ use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 
-class ChanceStatus
+class ChangeStatus
 {
     private InMemorySymfonyCommandBus $commandBus;
 
-    public function __construct(ChanceStatusCommandHandler $commandHandler)
+    public function __construct(ChangeStatusCommandHandler $commandHandler)
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            ChanceStatusCommand::class => $commandHandler
+            ChangeStatusCommand::class => $commandHandler
         ]);
     }
 
     /**
      * @throws Throwable
      */
-    public function chance(
+    public function change(
         Uuid $orderId,
         Status $status,
         Uuid $userId,
@@ -34,7 +34,7 @@ class ChanceStatus
         array $liveList = [],
     ): void
     {
-        $this->commandBus->dispatch(new ChanceStatusCommand(
+        $this->commandBus->dispatch(new ChangeStatusCommand(
             $orderId,
             $status,
             $userId,

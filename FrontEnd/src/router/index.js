@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import FrendlyView from '../views/FrendlyView.vue'
+import FriendlyView from '../views/FriendlyView.vue'
 import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
@@ -48,7 +48,7 @@ const routes = [
     {
         path: '/frendlyOrder',
         name: 'frendlyOrder',
-        component: FrendlyView,
+        component: FriendlyView,
         meta: {
             'requiresAuth': true,
             'role': ['admin', 'pusher'],

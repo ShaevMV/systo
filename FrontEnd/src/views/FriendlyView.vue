@@ -1,18 +1,18 @@
 <template>
-  <BuyTicketFrendly
+  <BuyTicketFriendly
     :user-id="userId"/>
 </template>
 <script>
 import axios from 'axios';
-import BuyTicketFrendly from "@/components/BuyTicket/BuyTicketFrendly.vue";
+import BuyTicketFriendly from "@/components/BuyTicket/BuyTicketFriendly.vue";
 
 export default {
-  name: 'FrendlyView',
+  name: 'FriendlyView',
   props: {
     'userId': String
   },
   components: {
-    BuyTicketFrendly
+    BuyTicketFriendly
   },
   created() {
     document.title = "Система регистрации оргвзносов на систо"

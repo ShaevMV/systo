@@ -1,10 +1,10 @@
 <?php
 
-namespace Tickets\User\Account\Application\ChanceRole;
+namespace Tickets\User\Account\Application\ChangeRole;
 
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
-class ChanceRoleCommandHandler implements \Shared\Domain\Bus\Command\CommandHandler
+class ChangeRoleCommandHandler implements \Shared\Domain\Bus\Command\CommandHandler
 {
     public function __construct(
         private UserRepositoriesInterface $repositories
@@ -12,7 +12,7 @@ class ChanceRoleCommandHandler implements \Shared\Domain\Bus\Command\CommandHand
     {
     }
 
-    public function __invoke(ChanceRoleCommand $command): void
+    public function __invoke(ChangeRoleCommand $command): void
     {
         $this->repositories->chanceRole($command->getId(), $command->getRole());
     }

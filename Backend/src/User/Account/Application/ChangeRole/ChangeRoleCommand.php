@@ -1,11 +1,11 @@
 <?php
 
-namespace Tickets\User\Account\Application\ChanceRole;
+namespace Tickets\User\Account\Application\ChangeRole;
 
 use Shared\Domain\Bus\Command\Command;
 use Shared\Domain\ValueObject\Uuid;
 
-class ChanceRoleCommand implements Command
+class ChangeRoleCommand implements Command
 {
     public function __construct(
         private Uuid $id,

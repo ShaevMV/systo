@@ -1,12 +1,12 @@
 <?php
 
-namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChangeStatus;
 
 use Shared\Domain\Bus\Command\Command;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 
-class ChanceStatusCommand implements Command
+class ChangeStatusCommand implements Command
 {
     public function __construct(
         public Uuid $orderId,

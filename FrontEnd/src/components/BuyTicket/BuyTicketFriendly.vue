@@ -378,7 +378,7 @@
 import { mapActions, mapGetters } from 'vuex';
 
 export default {
-  name: 'BuyTicketFrendly',
+  name: 'BuyTicketFriendly',
   props: {
     'userId': String
   },

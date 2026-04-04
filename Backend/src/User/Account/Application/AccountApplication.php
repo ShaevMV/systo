@@ -10,8 +10,8 @@ use Throwable;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
-use Tickets\User\Account\Application\ChanceRole\ChanceRoleCommand;
-use Tickets\User\Account\Application\ChanceRole\ChanceRoleCommandHandler;
+use Tickets\User\Account\Application\ChangeRole\ChangeRoleCommand;
+use Tickets\User\Account\Application\ChangeRole\ChangeRoleCommandHandler;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommand;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommandHandler;
 use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQuery;
@@ -31,7 +31,7 @@ final class AccountApplication
 
     public function __construct(
         CreatingNewAccountCommandHandler $accountCommandHandler,
-        ChanceRoleCommandHandler         $chanceRoleCommandHandler,
+        ChangeRoleCommandHandler         $changeRoleCommandHandler,
 
         AccountFindByEmailQueryHandler   $accountFindQueryHandler,
         AccountGetListQueryHandler       $accountGetListQueryHandler,
@@ -41,7 +41,7 @@ final class AccountApplication
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
             CreatingNewAccountCommand::class => $accountCommandHandler,
-            ChanceRoleCommand::class => $chanceRoleCommandHandler,
+            ChangeRoleCommand::class => $changeRoleCommandHandler,
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
@@ -132,9 +132,9 @@ final class AccountApplication
     /**
      * @throws Throwable
      */
-    public function chanceRole(Uuid $id, string $role): bool
+    public function changeRole(Uuid $id, string $role): bool
     {
-        $this->commandBus->dispatch(new ChanceRoleCommand($id, $role));
+        $this->commandBus->dispatch(new ChangeRoleCommand($id, $role));
         return true;
     }
 }

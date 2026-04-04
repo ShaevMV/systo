@@ -21,7 +21,7 @@ Route::prefix('v1/account')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('admin');
 
-    Route::post('/chanceRole/{id}',[AccountController::class, 'chanceRole'])
+    Route::post('/changeRole/{id}',[AccountController::class, 'changeRole'])
         ->middleware('auth:api')
         ->middleware('admin');
 });

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Order\OrderTicket\Application\ChanceStatus;
+namespace Tickets\Order\OrderTicket\Application\ChangeStatus;
 
 use Bus;
 use DomainException;
@@ -17,7 +17,7 @@ use Shared\Domain\ValueObject\Status;
 use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
-class ChanceStatusCommandHandler implements CommandHandler
+class ChangeStatusCommandHandler implements CommandHandler
 {
     public function __construct(
         private OrderTicketRepositoryInterface $orderTicketRepository,
