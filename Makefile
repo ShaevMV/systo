@@ -108,8 +108,8 @@ setup: ## Полная настройка и запуск проекта (fresh 
 	@$(MAKE) up
 	@$(MAKE) _wait-for-mysql
 	@$(MAKE) _setup-app
-	@$(MAKE) migrate
-	@$(MAKE) db-seed
+	@$(MAKE) _setup-frontend
+	@$(MAKE) migrate-fresh
 	@echo ""; \
 	echo "$(COLOR_GREEN)=== Настройка завершена! ===$(COLOR_RESET)"; \
 	echo ""; \
@@ -262,7 +262,7 @@ shell-node: ## Войти в Node контейнер
 # Internal Helpers
 # =============================================================================
 
-.PHONY: _generate-jwt-secret _wait-for-mysql _setup-app _wait-for-php _get-mysql-password _get-mysql-friendly-password
+.PHONY: _generate-jwt-secret _wait-for-mysql _setup-app _setup-frontend _wait-for-php _get-mysql-password _get-mysql-friendly-password
 
 _get-mysql-password: ## Получить пароль MySQL из .env
 	@MYSQL_ROOT_PASSWORD=$$(grep '^MYSQL_ROOT_PASSWORD=' .env 2>/dev/null | cut -d'=' -f2 | tr -d '\r'); \
@@ -335,6 +335,12 @@ _setup-app: ## Настройка Laravel приложения
 	$(DC_RUN) php php artisan storage:link
 	$(DC_RUN) -u0 php chmod -R 777 /var/www/org/storage
 	@echo "$(COLOR_GREEN)✓ Laravel настроен$(COLOR_RESET)"
+
+_setup-frontend: ## Настройка frontend (npm install + build)
+	@echo "$(COLOR_BLUE)Настройка Frontend...$(COLOR_RESET)"
+	@$(DC_RUN) node npm install --no-interaction
+	@$(DC_RUN) node npm run build
+	@echo "$(COLOR_GREEN)✓ Frontend настроен$(COLOR_RESET)"
 
 # Catch-all target to prevent errors for unknown targets
 %:
