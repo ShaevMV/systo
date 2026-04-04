@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up()
     {
-        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data'];
+        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data', 'email', 'telegram'];
 
         $questionnaires = DB::table('questionnaire')->get();
 
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down()
     {
-        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data'];
+        $excludedFields = ['id', 'order_id', 'ticket_id', 'user_id', 'festival_id', 'status', 'created_at', 'updated_at', 'data', 'email', 'telegram'];
 
         $questionnaires = DB::table('questionnaire')->whereNotNull('data')->get();
 

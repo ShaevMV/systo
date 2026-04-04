@@ -105,8 +105,6 @@ class QuestionnaireTicketDto implements Response
             'questionForSysto' => $this->questionForSysto,
             'phone' => $this->phone,
             'is_have_in_club' => $this->is_have_in_club,
-            'email' => $this->email,
-            'telegram' => $this->telegram,
             'vk' => $this->vk,
             'name' => $this->name,
             'musicStyles' => $this->musicStyles,
@@ -117,6 +115,8 @@ class QuestionnaireTicketDto implements Response
 
         return [
             'data' => json_encode($dataFields),
+            'email' => $this->email,
+            'telegram' => $this->telegram,
             'order_id' => $this->orderId?->value(),
             'ticket_id' => $this->ticketId?->value(),
             'user_id' => $this->userId?->value(),

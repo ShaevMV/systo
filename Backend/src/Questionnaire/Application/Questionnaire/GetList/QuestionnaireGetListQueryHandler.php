@@ -33,7 +33,7 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
         return [
             // email
             [
-                'field' => 'data->email',
+                'field' => QuestionnaireModel::TABLE . '.email',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getEmail(),
             ],
@@ -44,7 +44,7 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
                 'value' => $filterQuery->getStatus(),
             ],
             [
-                'field' => 'data->telegram',
+                'field' => QuestionnaireModel::TABLE . '.telegram',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getTelegram(),
             ],
