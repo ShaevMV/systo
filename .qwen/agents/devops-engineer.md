@@ -242,19 +242,36 @@ docker logs systo-worker-1 --tail=50
 
 ---
 
-## CI/CD рекомендации
+## CI/CD (обязательная зона ответственности)
 
-### GitHub Actions (если будет настраиваться)
+### GitHub Actions — настройка и поддержка
 
+**Обязанности:**
+- ✅ Настройка CI/CD пайплайна (GitHub Actions или аналог)
+- ✅ Автоматический запуск тестов при каждом push
+- ✅ Проверка синтаксиса PHP/JS перед коммитом
+- ✅ Проверка уязвимостей зависимостей
+- ✅ Автоматический деплой на staging/prod
+
+**Что проверять в пайплайне:**
 ```yaml
-# Что проверять:
 # 1. PHP syntax check
 # 2. Composer install --no-dev
 # 3. npm ci && npm run build
-# 4. php artisan test
+# 4. php artisan test (запуск Auto-Tester тестов)
 # 5. docker compose config (валидация)
 # 6. trivy scan (уязвимости образов)
 ```
+
+### Архитектура CI/CD
+
+| Этап | Что делает | Кто отвечает |
+|------|-----------|--------------|
+| **Push** | Запускает пайплайн | DevOps |
+| **Тесты** | Запуск PHPUnit + ESLint | Auto-Tester (тесты), DevOps (пайплайн) |
+| **Code Review** | Проверка качества кода | Code Reviewer |
+| **Build** | Сборка Docker образов | DevOps |
+| **Deploy** | Деплой на staging/prod | DevOps |
 
 ### Deploy checklist
 
