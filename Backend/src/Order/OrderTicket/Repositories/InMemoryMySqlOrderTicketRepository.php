@@ -29,6 +29,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
+use Illuminate\Database\Eloquent\Builder
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
 {
@@ -170,6 +171,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getList(Filters $filters): array
     {
+        /** @var Builder $builder */
         $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE . '.user_id',
             '=',
@@ -265,6 +267,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getFriendlyList(Filters $filters): array
     {
+        /** @var Builder $builder */
         $builder = $this->model
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
                 '=',
