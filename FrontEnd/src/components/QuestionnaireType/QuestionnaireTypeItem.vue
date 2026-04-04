@@ -48,7 +48,7 @@
                   </div>
                 </div>
                 <div class="row mt-2">
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="form-group">
                       <label>Тип данных</label>
                       <select class="form-control" v-model="question.type">
@@ -58,17 +58,23 @@
                       </select>
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
                     <div class="form-group">
-                      <label>Регулярное выражение (validate)</label>
+                      <label>Регулярное выражение</label>
                       <input type="text" class="form-control" v-model="question.validate" placeholder="/^[0-9]+$/">
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-3">
+                    <div class="form-group">
+                      <label>Сообщение об ошибке</label>
+                      <input type="text" class="form-control" v-model="question.validate_message" placeholder="Неверный формат">
+                    </div>
+                  </div>
+                  <div class="col-md-3">
                     <div class="form-group">
                       <div class="form-check mt-4">
                         <input type="checkbox" class="form-check-input" v-model="question.required" :id="'req' + index">
-                        <label class="form-check-label" :for="'req' + index">Обязательное поле</label>
+                        <label class="form-check-label" :for="'req' + index">Обязательное</label>
                       </div>
                     </div>
                   </div>
@@ -184,6 +190,7 @@ export default {
         name: '',
         type: 'string',
         validate: null,
+        validate_message: null,
         required: false,
       });
       this.newQuestions = [...questions];

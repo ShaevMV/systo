@@ -66,7 +66,8 @@ return new class extends Migration
                     'title' => 'Telegram',
                     'name' => 'telegram',
                     'type' => 'string',
-                    'validate' => null,
+                    'validate' => '/^[a-zA-Z0-9_]+$/',
+                    'validate_message' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
                     'required' => false,
                 ],
                 [

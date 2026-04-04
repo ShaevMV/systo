@@ -37,6 +37,7 @@
               :type="question.name === 'email' ? 'email' : 'text'"
               :id="'questionnaire_' + question.name"
               class="form-control"
+              :class="{'is-invalid': getError('questionnaire.' + question.name)}"
               :placeholder="question.title"
               :value="getFieldValue(question.name)"
               @input="updateField(question.name, $event.target.value)"
@@ -44,7 +45,7 @@
           />
         </div>
 
-        <div class="messager" v-show="getError('questionnaire.' + question.name)">
+        <div class="messager text-danger" v-show="getError('questionnaire.' + question.name)">
           {{ getError('questionnaire.' + question.name) }}
         </div>
       </div>
