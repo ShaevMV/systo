@@ -45,6 +45,7 @@ class OrderTicketDto
         protected ?Status  $status,
         protected ?string  $promo_code = null,
         protected bool     $is_live_ticket = false,
+        protected ?Uuid    $questionnaire_type_id = null,
         ?Uuid              $id = null,
         protected ?Uuid    $inviteLink = null,
         protected ?Uuid    $friendly_id = null,
@@ -186,6 +187,11 @@ class OrderTicketDto
     public function getTicketTypeId(): Uuid
     {
         return $this->ticket_type_id;
+    }
+
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaire_type_id;
     }
 
     public function isIsLiveTicket(): bool

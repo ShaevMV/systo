@@ -12,6 +12,7 @@ use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Throwable;
 
 class QuestionnaireController extends Controller
@@ -199,5 +200,36 @@ class QuestionnaireController extends Controller
             'success' => true,
             'questionnaire' => $questionnaireApplication->getItemId($id)->toArray(),
         ]);
+    }
+
+    /**
+     * Получить questionnaire_type_id по order_id и ticket_id
+     */
+    public function getQuestionnaireType(
+        string $orderId,
+        string $ticketId,
+        OrderTicketRepositoryInterface $orderTicketRepository,
+    ): JsonResponse
+    {
+        try {
+            $orderTicket = $orderTicketRepository->findOrder(new \Shared\Domain\ValueObject\Uuid($orderId));
+            
+            if (!$orderTicket) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Заказ не найден'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'questionnaire_type_id' => $orderTicket->getQuestionnaireTypeId()?->value(),
+            ]);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'message' => $throwable->getMessage()
+            ], 422);
+        }
     }
 }

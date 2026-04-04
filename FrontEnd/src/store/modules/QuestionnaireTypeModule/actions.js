@@ -7,7 +7,8 @@ export const loadList = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.post(API + '/getList', payload);
         return promise.then(function (response) {
-            context.commit('setList', response.data.list)
+            context.commit('setList', response.data.list);
+            resolve(response.data.list);
         }).catch(function (error) {
             context.commit('setError', error);
             reject(error);

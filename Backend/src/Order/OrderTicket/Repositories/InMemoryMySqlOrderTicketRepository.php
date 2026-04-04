@@ -146,6 +146,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $rawDataArr = $rawData->toArray();
         $rawDataArr['email'] = $rawDataArr['users']['email'];
+        $rawDataArr['questionnaire_type_id'] = $rawDataArr['ticketType']['questionnaire_type_id'] ?? null;
         $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
         return $rawDataArr !== null ? OrderTicketDto::fromState(
             $rawDataArr,

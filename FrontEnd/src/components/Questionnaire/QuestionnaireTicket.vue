@@ -102,7 +102,23 @@ export default {
       return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
     },
     questionsList() {
-      if (!this.questionnaireType || !this.questionnaireType.questions) return [];
+      if (!this.questionnaireType || !this.questionnaireType.questions) {
+        // Фоллбэк на стандартные поля если тип анкеты не загружен
+        return [
+          { title: 'Твои Имя и Фамилия', name: 'name', type: 'string', required: true },
+          { title: 'Email', name: 'email', type: 'string', required: true },
+          { title: 'Возраст', name: 'agy', type: 'number', required: true },
+          { title: 'Telegram', name: 'telegram', type: 'string', required: false },
+          { title: 'Номер телефона', name: 'phone', type: 'string', required: true },
+          { title: 'Профайл Вконтакте', name: 'vk', type: 'string', required: false },
+          { title: 'Бывал ли ты ранее на Систо', name: 'howManyTimes', type: 'text', required: true },
+          { title: 'Стили музыки, которые предпочитаешь в лесу', name: 'musicStyles', type: 'text', required: false },
+          { title: 'Зачем ты едешь на Систо?', name: 'questionForSysto', type: 'text', required: true },
+          { title: 'Откуда ты узнал о Систо?', name: 'whereSysto', type: 'text', required: false },
+          { title: 'Считаете ли вы себя участвующим в сотворении Систо?', name: 'creationOfSisto', type: 'text', required: false },
+          { title: 'Готовы принимать более активное или творческое участие?', name: 'activeOfEvent', type: 'text', required: false },
+        ];
+      }
       
       let questions = this.questionnaireType.questions;
       if (typeof questions === 'string') {

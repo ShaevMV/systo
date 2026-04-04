@@ -14,3 +14,8 @@ Route::prefix('v1/questionnaire')->group(static function (): void {
     Route::get('/get/{id}', [QuestionnaireController::class, 'getQuestionnaire']);
 })->middleware('auth:api')
     ->middleware('admin');
+
+// Публичный endpoint для получения questionnaire_type_id
+Route::prefix('v1/questionnaire')->group(static function (): void {
+    Route::get('/getQuestionnaireType/{orderId}/{ticketId}', [QuestionnaireController::class, 'getQuestionnaireType']);
+});

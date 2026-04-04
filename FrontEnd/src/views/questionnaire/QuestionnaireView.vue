@@ -224,7 +224,9 @@ export default {
     window.store.dispatch('appQuestionnaireType/loadList', {
       filter: { active: '1' },
       orderBy: { sort: 'asc' }
-    }).then(() => {
+    }).catch(() => {
+      // Игнорируем ошибку, страница всё равно загрузится
+    }).finally(() => {
       // Загружаем анкету если есть id
       if (to.params.id) {
         window.store.dispatch('appQuestionnaire/getQuestionnaire', {
