@@ -30,7 +30,11 @@ services:
       - ENV_DRUG_PATCH=${ENV_DRUG_PATCH}
 
     networks:
-      - backend
+      frontend:
+        aliases:
+          - api.tickets.loc
+          - api.spaceofjoy.ru
+      backend:
     depends_on:
       mysql:
         condition: service_healthy
@@ -62,7 +66,10 @@ services:
       - WITH_XDEBUG=false
       - WORKING_DIR=${ENV_ORG_BACKEND_PATCH}
     networks:
-      - backend
+      backend:
+        aliases:
+          - ${ENV_ORG_BACKEND_HOST}
+      database:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "php", "-v"]
@@ -76,8 +83,8 @@ services:
     build:
       context: ./Docker/node
     working_dir: ${ENV_ORG_FRONT_PATCH}
-    ports:
-      - "127.0.0.1:8082:8080"
+    expose:
+      - "8080"
     container_name: node-solarSysto
     volumes:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
@@ -100,10 +107,10 @@ services:
     build: ./Docker/redis
     container_name: redis-solarSysto
     command: redis-server --appendonly yes
-    ports:
-      - "8002:6379"
+    expose:
+      - "6379"
     networks:
-      - backend
+      - database
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -117,8 +124,8 @@ services:
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1g
-    ports:
-      - "33069:3306"
+    expose:
+      - "3306"
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-systo}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -134,7 +141,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - backend
+      - database
 
   database:
     image: mysql:5.7
@@ -147,8 +154,8 @@ services:
     volumes:
       - ./Docker/mysqlFriendly/db:/var/lib/mysql
       - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
-    ports:
-      - "33065:3306"
+    expose:
+      - "3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -156,7 +163,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - backend
+      - database
 
   phpBaza:
     hostname: ${ENV_VHOD_BACKEND_HOST}
@@ -177,7 +184,10 @@ services:
       - WITH_XDEBUG=false
       - WORKING_DIR=${ENV_VHOD_PATCH}
     networks:
-      - backend
+      backend:
+        aliases:
+          - ${ENV_VHOD_BACKEND_HOST}
+      database:
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "php", "-v"]
@@ -200,6 +210,7 @@ services:
     command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
     networks:
       - backend
+      - database
     depends_on:
       mysql:
         condition: service_healthy
@@ -208,5 +219,10 @@ services:
     restart: unless-stopped
 
 networks:
+  frontend:
+    driver: bridge
   backend:
     driver: bridge
+  database:
+    driver: bridge
+    internal: true
