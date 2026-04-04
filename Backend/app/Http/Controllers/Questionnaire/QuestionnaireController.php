@@ -12,6 +12,7 @@ use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Service\QuestionnaireValidationService;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Throwable;
 
@@ -44,6 +45,8 @@ class QuestionnaireController extends Controller
         Request                          $request,
         QuestionnaireApplication         $questionnaireApplication,
         QuestionnaireRepositoryInterface $questionnaireRepository,
+        QuestionnaireValidationService   $validationService,
+        OrderTicketRepositoryInterface   $orderTicketRepository,
         string                           $orderId,
         string                           $ticketId,
     ): JsonResponse
@@ -54,7 +57,7 @@ class QuestionnaireController extends Controller
         // Получаем тип анкеты по заказу
         $questionnaireTypeId = null;
         try {
-            $orderTicket = app(OrderTicketRepositoryInterface::class)->findOrder(
+            $orderTicket = $orderTicketRepository->findOrder(
                 new \Shared\Domain\ValueObject\Uuid($orderId)
             );
             if ($orderTicket) {
@@ -64,79 +67,16 @@ class QuestionnaireController extends Controller
             // Игнорируем ошибку
         }
 
-        // Формируем правила валидации на основе типа анкеты
-        $validationRules = [];
-        $validationMessages = [];
+        // Валидация через сервис
+        $errors = $validationService->validate($questionnaireTypeId, $questionnaireData);
 
-        if ($questionnaireTypeId) {
-            $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::find($questionnaireTypeId);
-            if ($questionnaireType && $questionnaireType->questions) {
-                $questions = is_string($questionnaireType->questions)
-                    ? json_decode($questionnaireType->questions, true)
-                    : $questionnaireType->questions;
-
-                foreach ($questions as $question) {
-                    $fieldName = 'questionnaire.' . $question['name'];
-                    $rules = [];
-
-                    // Required
-                    if (!empty($question['required'])) {
-                        $rules[] = 'required';
-                    } else {
-                        $rules[] = 'nullable';
-                    }
-
-                    // Type validation
-                    if ($question['type'] === 'number') {
-                        $rules[] = 'integer';
-                        $validationMessages[$fieldName . '.integer'] = $question['title'] . ' должно быть числом';
-                    } else {
-                        $rules[] = 'string';
-                    }
-
-                    // Regex validation
-                    if (!empty($question['validate'])) {
-                        $rules[] = 'regex:' . $question['validate'];
-                        if (!empty($question['validate_message'])) {
-                            $validationMessages[$fieldName . '.regex'] = $question['validate_message'];
-                        }
-                    }
-
-                    // Unique validation for telegram
-                    if ($question['name'] === 'telegram' && !empty($questionnaireData['telegram'])) {
-                        $rules[] = 'unique:questionnaire,telegram';
-                        $validationMessages[$fieldName . '.unique'] = 'Этот telegram уже занят.';
-                    }
-
-                    $validationRules[$fieldName] = $rules;
-                }
-            }
-        } else {
-            // Фоллбэк на стандартную валидацию для гостевой анкеты
-            $validationRules = [
-                'questionnaire.telegram' => [
-                    'nullable',
-                    'string',
-                    'min:5',
-                    'max:32',
-                    'regex:/^[a-zA-Z0-9_]+$/',
-                    'unique:questionnaire,telegram',
-                ],
-                'questionnaire.agy' => [
-                    'nullable',
-                    'integer',
-                ],
-            ];
-            $validationMessages = [
-                'questionnaire.telegram.min' => 'должен содержать минимум 5 символов.',
-                'questionnaire.telegram.max' => 'не может превышать 32 символа.',
-                'questionnaire.telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
-                'questionnaire.telegram.unique' => 'Этот telegram уже занят.',
-                'questionnaire.agy' => 'Возраст только цифрами',
-            ];
+        if (!empty($errors)) {
+            return response()->json([
+                'success' => false,
+                'errors' => $errors,
+                'message' => 'Ошибка валидации'
+            ], 422);
         }
-
-        $request->validate($validationRules, $validationMessages);
 
         try {
             if (isset($data['questionnaire'])) {

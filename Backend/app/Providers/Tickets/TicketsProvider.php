@@ -8,6 +8,7 @@ use Illuminate\Support\ServiceProvider;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\QuestionnaireType\Repositories\InMemoryMySqlQuestionnaireTypeRepository;
 use Tickets\QuestionnaireType\Repositories\QuestionnaireTypeRepositoryInterface;
+use Tickets\Questionnaire\Service\QuestionnaireValidationService;
 use Tickets\Festival\Repositories\InMemoryMySqlTicketTypeRepository;
 use Tickets\Festival\Repositories\InMemoryMySqlTypesOfPayment;
 use Tickets\Festival\Repositories\TicketTypeInterfaceRepository;
@@ -57,5 +58,6 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(TypesOfPaymentRepositoryInterface::class, InMemoryMySqlTypesOfPaymentRepository::class);
         $this->app->bind(TicketTypeRepositoryInterface::class, InMemoryTicketTypeRepository::class);
         $this->app->bind(QuestionnaireTypeRepositoryInterface::class, InMemoryMySqlQuestionnaireTypeRepository::class);
+        $this->app->singleton(QuestionnaireValidationService::class, QuestionnaireValidationService::class);
     }
 }

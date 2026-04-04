@@ -117,10 +117,16 @@ export const sendQuestionnaire = (context, payload) => {
             'questionnaire': payload.questionnaire
         });
         return promise.then(function (response) {
-            context.commit('setMessage', response.data.message)
+            context.commit('setMessage', response.data.message);
+            context.commit('setError', {});
             payload.callback();
+            resolve(response);
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            } else {
+                context.commit('setError', {});
+            }
             reject(error);
         });
     });

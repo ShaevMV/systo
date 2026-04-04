@@ -98,7 +98,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('appQuestionnaire', ['getError']),
+    getError() {
+      return (fieldName) => {
+        const errors = this.$store.state.appQuestionnaire.dataError || {};
+        // Remove 'questionnaire.' prefix if present
+        const cleanFieldName = fieldName.replace('questionnaire.', '');
+        return errors[cleanFieldName] ? errors[cleanFieldName][0] : null;
+      };
+    },
     canApprove() {
       return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
     },

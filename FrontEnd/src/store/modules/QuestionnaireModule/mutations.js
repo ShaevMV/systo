@@ -1,5 +1,5 @@
 export const setError = (state, payload) => {
-    state.dataError = payload;
+    state.dataError = payload || {};
 };
 
 /**
