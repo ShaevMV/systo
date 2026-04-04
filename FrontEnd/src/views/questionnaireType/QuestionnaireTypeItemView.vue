@@ -13,6 +13,18 @@ export default {
       type: String,
       default: null
     }
+  },
+  beforeRouteEnter: (to, from, next) => {
+    if (to.params.id) {
+      window.store.dispatch('appQuestionnaireType/loadItem', {
+        id: to.params.id,
+      });
+    }
+
+    next();
+  },
+  created() {
+    document.title = this.id ? "Редактирование типа анкеты" : "Создать тип анкеты"
   }
 }
 </script>
