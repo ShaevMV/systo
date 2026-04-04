@@ -58,16 +58,11 @@
                       </select>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <div class="form-group">
-                      <label>Регулярное выражение</label>
-                      <input type="text" class="form-control" v-model="question.validate" placeholder="/^[0-9]+$/">
-                    </div>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="form-group">
-                      <label>Сообщение об ошибке</label>
-                      <input type="text" class="form-control" v-model="question.validate_message" placeholder="Неверный формат">
+                      <label>Правила валидации (JSON Laravel)</label>
+                      <textarea class="form-control" v-model="question.validate" rows="3" placeholder='{"rules": ["string", "min:5"], "messages": {"min": "Минимум 5 символов"}}'></textarea>
+                      <small class="form-text text-muted">Формат: {"rules": ["string", "min:5"], "messages": {"min": "Сообщение"}}</small>
                     </div>
                   </div>
                   <div class="col-md-3">
@@ -190,7 +185,6 @@ export default {
         name: '',
         type: 'string',
         validate: null,
-        validate_message: null,
         required: false,
       });
       this.newQuestions = [...questions];

@@ -66,8 +66,14 @@ return new class extends Migration
                     'title' => 'Telegram',
                     'name' => 'telegram',
                     'type' => 'string',
-                    'validate' => '/^[a-zA-Z0-9_]+$/',
-                    'validate_message' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
+                    'validate' => json_encode([
+                        'rules' => ['string', 'min:5', 'max:32', 'regex:/^[a-zA-Z0-9_]+$/'],
+                        'messages' => [
+                            'min' => 'должен содержать минимум 5 символов.',
+                            'max' => 'не может превышать 32 символа.',
+                            'regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
+                        ],
+                    ]),
                     'required' => false,
                 ],
                 [

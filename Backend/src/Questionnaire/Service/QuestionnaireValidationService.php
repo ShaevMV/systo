@@ -6,7 +6,6 @@ namespace Tickets\Questionnaire\Service;
 
 use App\Models\Questionnaire\QuestionnaireTypeModel;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class QuestionnaireValidationService
 {
@@ -23,7 +22,7 @@ class QuestionnaireValidationService
         $messages = [];
 
         if ($questionnaireTypeId) {
-            $rules = $this->buildValidationRules($questionnaireTypeId, $answers, $messages);
+            $rules = $this->buildValidationRules($questionnaireTypeId, $messages);
         } else {
             // Фоллбэк на стандартную валидацию для гостевой анкеты
             $rules = $this->getDefaultValidationRules();
@@ -47,11 +46,10 @@ class QuestionnaireValidationService
      * Построить правила валидации на основе типа анкеты
      *
      * @param string $questionnaireTypeId
-     * @param array $answers
      * @param array $messages
      * @return array
      */
-    private function buildValidationRules(string $questionnaireTypeId, array $answers, array &$messages): array
+    private function buildValidationRules(string $questionnaireTypeId, array &$messages): array
     {
         $questionnaireType = QuestionnaireTypeModel::find($questionnaireTypeId);
         
@@ -85,38 +83,29 @@ class QuestionnaireValidationService
                 $fieldRules[] = 'nullable';
             }
 
-            // Type validation
-            $type = $question['type'] ?? 'string';
-            switch ($type) {
-                case 'number':
-                    $fieldRules[] = 'integer';
-                    $messages[$fieldName . '.integer'] = $question['title'] . ' должно быть числом';
-                    break;
-                case 'text':
-                case 'string':
-                default:
-                    $fieldRules[] = 'string';
-                    break;
-            }
-
-            // Regex validation
-            if (!empty($question['validate'])) {
-                $fieldRules[] = 'regex:' . $question['validate'];
-                if (!empty($question['validate_message'])) {
-                    $messages[$fieldName . '.regex'] = $question['validate_message'];
+            // Laravel validation rules from JSON
+            if (!empty($question['validate']) && is_string($question['validate'])) {
+                $validateConfig = json_decode($question['validate'], true);
+                
+                if (is_array($validateConfig)) {
+                    // Формат: {"rules": ["string", "min:5"], "messages": {"min": "Минимум 5 символов"}}
+                    if (isset($validateConfig['rules']) && is_array($validateConfig['rules'])) {
+                        $fieldRules = array_merge($fieldRules, $validateConfig['rules']);
+                    }
+                    
+                    // Custom messages
+                    if (isset($validateConfig['messages']) && is_array($validateConfig['messages'])) {
+                        foreach ($validateConfig['messages'] as $rule => $message) {
+                            $messages[$fieldName . '.' . $rule] = $message;
+                        }
+                    }
                 }
             }
 
             // Unique validation for telegram
-            if ($fieldName === 'telegram' && !empty($answers['telegram'])) {
+            if ($fieldName === 'telegram') {
                 $fieldRules[] = 'unique:questionnaire,telegram';
                 $messages[$fieldName . '.unique'] = 'Этот telegram уже занят.';
-            }
-
-            // Email validation
-            if ($fieldName === 'email' && !empty($answers['email'])) {
-                $fieldRules[] = 'email';
-                $messages[$fieldName . '.email'] = 'Некорректный формат email';
             }
 
             $rules[$fieldName] = $fieldRules;
