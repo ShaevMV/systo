@@ -144,9 +144,15 @@ export default {
       'getQuestionnaireItem'
     ]),
     ...mapGetters('appQuestionnaireType', [
-      'getList'
+      'getList',
+      'getItem'
     ]),
     questionnaireType() {
+      // Сначала пробуем getItem (загруженный по order_id/ticket_id)
+      if (this.getItem && this.getItem.id) {
+        return this.getItem;
+      }
+      // Фоллбэк: первый активный тип из списка (гостевая анкета)
       if (this.getList && this.getList.length > 0) {
         return this.getList[0];
       }
@@ -220,21 +226,39 @@ export default {
     document.title = "Анкета участника Solar Systo Togathering"
   },
   beforeRouteEnter: (to, from, next) => {
-    // Загружаем тип анкеты
-    window.store.dispatch('appQuestionnaireType/loadList', {
-      filter: { active: '1' },
-      orderBy: { sort: 'asc' }
-    }).catch(() => {
-      // Игнорируем ошибку, страница всё равно загрузится
-    }).finally(() => {
-      // Загружаем анкету если есть id
-      if (to.params.id) {
-        window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-          id: to.params.id,
-        });
-      }
-      next();
-    });
+    // Если есть order_id и ticket_id, загружаем тип анкеты по заказу/билету
+    if (to.params.order_id && to.params.ticket_id) {
+      window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByOrderTicket', {
+        orderId: to.params.order_id,
+        ticketId: to.params.ticket_id,
+      }).catch(() => {
+        // Игнорируем ошибку, страница всё равно загрузится
+      }).finally(() => {
+        // Загружаем анкету если есть id
+        if (to.params.id) {
+          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+            id: to.params.id,
+          });
+        }
+        next();
+      });
+    } else {
+      // Фоллбэк: загружаем первый активный тип анкеты (гостевая анкета)
+      window.store.dispatch('appQuestionnaireType/loadList', {
+        filter: { active: '1' },
+        orderBy: { sort: 'asc' }
+      }).catch(() => {
+        // Игнорируем ошибку
+      }).finally(() => {
+        // Загружаем анкету если есть id
+        if (to.params.id) {
+          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+            id: to.params.id,
+          });
+        }
+        next();
+      });
+    }
   },
 }
 </script>

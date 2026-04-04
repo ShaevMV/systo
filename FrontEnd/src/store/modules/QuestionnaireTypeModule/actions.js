@@ -21,10 +21,56 @@ export const loadItem = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.get(API + '/getItem/' + payload.id);
         return promise.then(function (response) {
-            context.commit('setItem', response.data.item)
+            context.commit('setItem', response.data.item);
+            resolve(response.data.item);
         }).catch(function (error) {
             context.commit('setError', error.response.data.errors);
             reject(error);
+        });
+    });
+};
+
+export const loadQuestionnaireTypeByOrderTicket = (context, payload) => {
+    const questionnaireAPI = '/api/v1/questionnaire';
+    return new Promise((resolve, reject) => {
+        let promise = axios.get(questionnaireAPI + '/getQuestionnaireType/' + payload.orderId + '/' + payload.ticketId);
+        return promise.then(function (response) {
+            const questionnaireTypeId = response.data.questionnaire_type_id;
+            if (questionnaireTypeId) {
+                return axios.get(API + '/getItem/' + questionnaireTypeId).then(function (itemResponse) {
+                    context.commit('setItem', itemResponse.data.item);
+                    resolve(itemResponse.data.item);
+                });
+            }
+            // Если questionnaire_type_id не найден, загружаем первый активный тип (гостевая анкета)
+            return axios.post(API + '/getList', {
+                filter: { active: '1' },
+                orderBy: { sort: 'asc' }
+            }).then(function (listResponse) {
+                if (listResponse.data.list && listResponse.data.list.length > 0) {
+                    const firstType = listResponse.data.list[0];
+                    context.commit('setItem', firstType);
+                    resolve(firstType);
+                } else {
+                    resolve(null);
+                }
+            });
+        }).catch(function (error) {
+            // При ошибке загружаем первый активный тип как фоллбэк
+            return axios.post(API + '/getList', {
+                filter: { active: '1' },
+                orderBy: { sort: 'asc' }
+            }).then(function (listResponse) {
+                if (listResponse.data.list && listResponse.data.list.length > 0) {
+                    const firstType = listResponse.data.list[0];
+                    context.commit('setItem', firstType);
+                    resolve(firstType);
+                } else {
+                    resolve(null);
+                }
+            }).catch(function () {
+                reject(error);
+            });
         });
     });
 };
