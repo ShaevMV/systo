@@ -1,0 +1,521 @@
+# API спецификация Systo Backend
+
+Базовый URL: `http://api.tickets.loc/` (dev) / `https://api.spaceofjoy.ru/` (prod)
+Все маршруты имеют префикс `/api` (настраивается в `RouteServiceProvider`).
+
+---
+
+## 1. Аутентификация
+
+### POST `/api/login`
+**Middleware:** публичный
+
+**Request:**
+```json
+{
+  "email": "string (required, email)",
+  "password": "string (required)"
+}
+```
+
+**Response 200:**
+```json
+{
+  "status": "success",
+  "user": { "id": "...", "email": "...", "name": "...", "role": "...", "is_admin": true },
+  "authorisation": { "token": "Bearer ...", "type": "bearer", "lifetime": 1234567890 }
+}
+```
+
+**Response 401:**
+```json
+{ "message": "Твой пароль неверный, попробуй еще раз!" }
+```
+
+---
+
+### POST `/api/register`
+**Middleware:** публичный
+
+**Request:**
+```json
+{
+  "name": "string (required, max:255)",
+  "email": "string (required, email, max:255, unique)",
+  "phone": "string (required, max:255)",
+  "city": "string (required, max:255)",
+  "password": "string (required, confirmed, min:6)"
+}
+```
+
+**Response 200:** аналогично `/login`
+**Response 401:** `{ "message": "Логин и пароль указан не верно" }`
+**Response 422:** `{ "errors": { "email": ["..."] } }`
+
+---
+
+### POST `/api/logout`
+**Middleware:** `auth:api`
+
+**Response:** `{ "message": "Successfully logged out" }`
+
+---
+
+### POST `/api/refresh`
+**Middleware:** `auth:api`
+
+**Response:** аналогично `/login` (новый токен)
+**Response 401:** вызывает `logOut` на фронтенде
+
+---
+
+### POST `/api/forgot-password`
+**Middleware:** публичный
+
+**Request:** `{ "email": "string (required, email)" }`
+
+**Response 200:** `{ "message": "На указанный е-мейл отправлена ссылка для восстановления пароля" }`
+**Response 422:** `{ "errors": { "email": "Такой e-mail не зарегистрирован в системе!" } }`
+
+---
+
+### POST `/api/resetPassword`
+**Middleware:** публичный
+
+**Request:**
+```json
+{
+  "password": "string (required, confirmed, min:6)",
+  "token": "string (required)"
+}
+```
+
+**Response 200:** аналогично `/login`
+**Response 422:** `{ "errors": { "email": ["Не верная ссылка"] } }`
+
+---
+
+### GET `/api/user`
+**Middleware:** `auth:api`
+
+**Response:** объект `User` (Eloquent модель)
+
+---
+
+### POST `/api/isCorrectRole`
+**Middleware:** `auth:api`
+
+**Request:** `{ "role": ["admin", "seller"] }` — массив ролей
+
+**Response 200:** `{ "status": "success" }`
+**Response 403:** `{ "error": "Forbidden" }`
+
+---
+
+### POST `/api/editProfile`
+**Middleware:** `auth:api`
+
+**Request:** `{ "name": "string?", "phone": "string?", "city": "string?" }` — любые опциональны
+
+**Response:** `{ "message": "Данные пользователя изменены" }`
+
+---
+
+### POST `/api/editPassword`
+**Middleware:** `auth:api`
+
+**Request:** `{ "password": "string (required, confirmed, min:6)" }`
+
+**Response:** `{ "message": "Пароль сменён" }`
+
+---
+
+### GET `/api/findUserByEmail/{email}`
+**Middleware:** публичный
+
+**Response:** `{ "success": true/false }`
+
+---
+
+## 2. Фестивали
+
+Префикс: **`/api/v1/festival`**
+
+### GET `/api/v1/festival/load`
+**Middleware:** публичный
+
+**Query params:** `festival_id` (UUID, required), `is_admin` (bool, optional)
+
+**Response:** массив типов билетов, цен, способов оплаты для оформления заказа
+
+---
+
+### GET `/api/v1/festival/loadByTicketType/{ticketTypeId}`
+**Middleware:** публичный
+
+**Response:** массив способов оплаты для данного типа билета
+
+---
+
+### GET `/api/v1/festival/getListPrice`
+**Middleware:** публичный
+
+**Query params:** `festival_id` (UUID, required)
+
+**Response:** массив цен (все волны)
+
+---
+
+### GET `/api/v1/festival/getTicketTypeList`
+**Middleware:** `auth:api` + `admin`
+
+**Response:** список всех типов билетов
+
+---
+
+### GET `/api/v1/festival/getFestivalList`
+**Middleware:** публичный
+
+**Response:** список всех фестивалей
+
+---
+
+## 3. Заказы
+
+Префикс: **`/api/v1/order`**
+
+### POST `/api/v1/order/create`
+**Middleware:** публичный
+
+**Request:**
+```json
+{
+  "email": "string (required, email)",
+  "phone": "string (required)",
+  "city": "string (required)",
+  "ticket_type_id": "UUID (required, exists)",
+  "types_of_payment_id": "UUID (required, exists)",
+  "guests": [{ "value": "string", "email": "string?" }],
+  "name": "string?",
+  "invite": "UUID?",
+  "promo_code": "string?",
+  "comment": "string?",
+  "festival_id": "UUID",
+  "price": "float"
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "message": "Мы удачно зарегистрировали ваш заказ..."
+}
+```
+
+**Response (error):**
+```json
+{
+  "success": false,
+  "message": "...",
+  "link": "...",
+  "file": "..."
+}
+```
+
+---
+
+### POST `/api/v1/order/createFriendly`
+**Middleware:** `auth:api` + `role:pusher`
+
+**Request:** аналогично `create`, но `price` — required, `guests` — обязателен с полем `number`
+
+---
+
+### POST `/api/v1/order/getList`
+**Middleware:** `auth:api` + `role:seller,admin`
+
+**Request (body — фильтр):**
+```json
+{
+  "email": "string?", "price": "float?", "typesOfPayment": "UUID?",
+  "status": "string?", "promoCode": "string?", "typePrice": "UUID?",
+  "festivalId": "UUID?", "city": "string?", "questionnaire": "string?",
+  "friendlyId": "UUID?", "filter": [...], "orderBy": {...}
+}
+```
+
+**Response:** `{ "list": {...}, "totalNumber": {...} }`
+
+---
+
+### POST `/api/v1/order/getListForFriendly`
+**Middleware:** `auth:api` + `role:pusher,admin`
+
+**Response:** аналогично `getList`
+
+---
+
+### POST `/api/v1/order/toChanceStatus/{id}`
+**Middleware:** `auth:api` + `role:seller,admin,pusher`
+
+**Request:**
+```json
+{
+  "status": "string (required)",
+  "comment": "string? (required если DIFFICULTIES_AROSE)",
+  "liveList": ["int"]? (required если LIVE_TICKET_ISSUED)
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "status": { "name": "...", "humanStatus": "...", "listCorrectNextStatus": [...] }
+}
+```
+
+**Response 422:** `{ "success": false, "errors": {...} }`
+
+---
+
+### GET `/api/v1/order/getUserList`
+**Middleware:** `auth:api`
+
+**Response:** `{ "list": [...] }`
+
+---
+
+### GET `/api/v1/order/getItem/{id}`
+**Middleware:** `auth:api`
+
+**Response 200:** `{ "order": {...} }`
+**Response 404:** `{ "errors": { "error": "Заказ не найден" } }`
+
+---
+
+### GET `/api/v1/order/getTicketPdf/{id}`
+**Middleware:** `auth:api`
+
+**Response 200:** `{ "success": true, "listUrl": ["..."] }`
+**Response 422:** `{ "success": false, "message": "..." }`
+
+---
+
+### ANY `/api/v1/order/succes`
+**Middleware:** публичный (webhook платёжной системы)
+
+**Request:**
+```json
+{
+  "data": {
+    "metadata": { "order_id": "UUID" },
+    "receipts": [{ "link_to_receipt": "..." }]
+  },
+  "type": "payment.completed | payment.refund"
+}
+```
+
+**Response:** `{ "status": 0 }`
+
+---
+
+## 4. Билеты
+
+Префикс: **`/api/v1/ticket`**
+
+### GET `/api/v1/ticket/live/{cash?}`
+**Middleware:** публичный
+
+**Response:** `{ "success": true, "number": 1234 }` — расшифрованный номер живого билета
+
+---
+
+## 5. Анкеты
+
+Префикс: **`/api/v1/questionnaire`**
+
+### POST `/api/v1/questionnaire/load`
+**Middleware:** `auth:api` + `admin`
+
+**Request (фильтр):** `{ "email": "...", "telegram": "...", "vk": "...", "is_have_in_club": "...", "status": "..." }`
+
+**Response:** `{ "success": true, "questionnaireList": [...] }`
+
+---
+
+### POST `/api/v1/questionnaire/send/{orderId}/{ticketId}`
+**Middleware:** `auth:api` + `admin`
+
+**Request:** `{ "questionnaire": { "email": "...", "telegram": "...", ...все поля анкеты... } }`
+(`ticket_id` и `order_id` проставляются автоматически, `status` = `APPROVE`)
+
+**Response 200:** `{ "success": true, "message": "Спасибо большие, ваши анкетные данные зарегистрированы..." }`
+**Response 422:** `{ "success": false, "errors": [...], "message": "Ошибка валидации" }`
+
+---
+
+### POST `/api/v1/questionnaire/sendNewUser`
+**Middleware:** `auth:api` + `admin`
+
+**Request:** `{ "questionnaire": { "telegram": "string (5-32, regex ^[a-zA-Z0-9_]+$)", "agy": "int?" } }`
+
+---
+
+### POST `/api/v1/questionnaire/notification/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Request:** `{ "email": "string (required, email)" }`
+
+**Response:** `{ "success": true, "message": "Ссылка на анкету отправлена" }`
+
+---
+
+### POST `/api/v1/questionnaire/approve/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response:** `{ "success": true, "message": "Анкета одобрена" }`
+
+---
+
+### GET `/api/v1/questionnaire/get/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response:** `{ "success": true, "questionnaire": {...} }`
+
+---
+
+### GET `/api/v1/questionnaire/getQuestionnaireTypeByOrderTicket/{orderId}/{ticketId}`
+**Middleware:** публичный
+
+**Response 200:** `{ "success": true, "questionnaire_type": {...} }`
+**Response 404:** `{ "success": false, "message": "Тип анкеты не найден" }`
+
+---
+
+## 6. Типы анкет
+
+Префикс: **`/api/v1/questionnaireType`**
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список с фильтрацией |
+| GET | `/getItem/{id}` | публичный | Один тип анкеты |
+| POST | `/create` | публичный | Создать (UUID в `data.id`) |
+| POST | `/edit/{id}` | публичный | Редактировать |
+| DELETE | `/delete/{id}` | публичный | Удалить |
+
+---
+
+## 7. Промокоды
+
+Префикс: **`/api/v1/promoCode`** | **Middleware:** `auth:api` + `admin`
+
+| Метод | Маршрут | Описание |
+|-------|---------|----------|
+| GET | `/getListPromoCode` | Список всех |
+| GET | `/getItemPromoCode/{idPromoCode?}` | Один промокод |
+| POST | `/savePromoCode/{idPromoCode?}` | Создать/обновить |
+| POST | `/find/{promoCode?}` | Применить промокод (расчёт скидки) |
+| POST | `/savePromoCodeForBot/{idPromoCode?}` | Создать для бота (UPPERCASE + random) |
+
+**savePromoCode Request:**
+```json
+{
+  "name": "string (required, unique)",
+  "discount": "float (required, numeric, > 0, <= 100 если is_percent)",
+  "is_percent": "bool (required)",
+  "active": "bool (required)",
+  "limit": "int? (nullable)",
+  "type_ticket_id": "UUID?"
+}
+```
+
+---
+
+## 8. Типы билетов
+
+Префикс: **`/api/v1/ticketType`**
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список с фильтрацией |
+| GET | `/getItem/{id}` | публичный | Один тип билета |
+| POST | `/create` | публичный | Создать (UUID в `data.id`) |
+| POST | `/edit/{id}` | публичный | Редактировать |
+| DELETE | `/delete/{id}` | публичный | Удалить |
+| GET | `/getBlade` | публичный | Список доступных шаблонов email/pdf |
+
+---
+
+## 9. Способы оплаты
+
+Префикс: **`/api/v1/typesOfPayment`**
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список с фильтрацией |
+| GET | `/getItem/{id}` | публичный | Один способ оплаты |
+| POST | `/create` | публичный | Создать |
+| POST | `/edit/{id}` | публичный | Редактировать |
+| DELETE | `/delete/{id}` | публичный | Удалить |
+
+---
+
+## 10. Пользователи (админка)
+
+Префикс: **`/api/v1/account`** | **Middleware:** `auth:api` + `admin`
+
+| Метод | Маршрут | Описание |
+|-------|---------|----------|
+| POST | `/getList` | Список с фильтрацией |
+| GET | `/getItem/{email}` | Один пользователь |
+| POST | `/edit/{id}` | Редактировать |
+| POST | `/chanceRole/{id}` | Сменить роль |
+
+**chanceRole Request:** `{ "role": "string (admin/seller/pusher/manager)" }`
+
+---
+
+## 11. Приглашения
+
+Префикс: **`/api/v1/invite`**
+
+### GET `/api/v1/invite/getInviteLink`
+**Middleware:** `auth:api`
+
+**Response (есть):** `{ "message": "...", "link": "https://..." }`
+**Response (нет):** `{ "message": "Формирование ссылки-приглашения будет доступно после одобрения...", "link": null }`
+
+---
+
+### GET `/api/v1/invite/isCorrectInviteLink/{userId}`
+**Middleware:** публичный
+
+**Response:** `{ "success": true/false }`
+
+---
+
+## Middleware — описание
+
+| Middleware | Alias | Описание |
+|------------|-------|----------|
+| **CORS** | global | Проверяет Origin против белого списка |
+| **Authenticate** | `auth:api` | JWT через `php-open-source-saver/jwt-auth` |
+| **IsAdmin** | `admin` | Проверка `is_admin = true` или `role = 'admin'` |
+| **CheckRole** | `role:role1,role2` | Проверка роли пользователя |
+| **Bot** | `bot` | Заголовок `auth-token` == `PCf4yeeM8prVGee3zbArQGQP2eGpPHsV` |
+| **Throttle:api** | global | 60 запросов/мин на IP/user |
+
+## Сводная таблица доступа
+
+| Категория | Маршруты |
+|-----------|----------|
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink |
+| **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/* (кроме getQuestionnaireTypeByOrderTicket) |
+| **role: seller,admin** | order/getList |
+| **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
+| **role: seller,admin,pusher** | order/toChanceStatus |
+| **bot** | promoCode/savePromoCodeForBot |
