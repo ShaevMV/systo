@@ -124,6 +124,15 @@ export const CLEAR_ERROR = (state) => { state.dataError = []; };
 
 ---
 
+## Мандат: Vue 3 Composition API
+
+**Правило:** Все новые компоненты **обязаны** использовать **`<script setup>` и Composition API**.
+- **Запрещено:** Использовать `export default { data() {...}, methods: {...} }` в новых файлах.
+- **Рефакторинг:** Если вносишь значимые изменения в старый компонент на Options API — переведи его на Composition API заодно.
+- **Стиль:** `const`, `ref`, `reactive`, `computed` из 'vue'.
+
+---
+
 ## Унификация сущностей Backend ↔ Frontend
 
 ### Цель

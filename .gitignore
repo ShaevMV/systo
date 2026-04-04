@@ -13,3 +13,5 @@
 *.sql
 .qwen/*
 !.qwen/agents/
+!.qwen/PROJECT_MEMORY.md
+!.qwen/docs/
