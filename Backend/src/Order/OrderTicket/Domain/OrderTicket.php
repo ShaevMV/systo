@@ -128,7 +128,7 @@ final class OrderTicket extends AggregateRoot
             $result->id,
             $result->getTicket(),
         ));
-        \Log::info('ProcessCreateTicket Ticket', $result->getTicket());
+
         $result->record(new ProcessUserNotificationOrderPaid(
                 $orderTicketDto->getEmail(),
                 $result->getTicket(),

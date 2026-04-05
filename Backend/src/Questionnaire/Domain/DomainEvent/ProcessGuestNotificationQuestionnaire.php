@@ -34,27 +34,6 @@ class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
             return;
         }
 
-        // Проверяем активность типа анкеты привязанного к типу билета
-        $questionnaireTypeActive = DB::table('ticket_type')
-            ->leftJoin('questionnaire_type', 'ticket_type.questionnaire_type_id', '=', 'questionnaire_type.id')
-            ->whereExists(function ($query) {
-                $query->select(DB::raw(1))
-                    ->from('order_ticket')
-                    ->whereColumn('order_ticket.id', 'ticket_type.id')
-                    ->where('order_ticket.id', $this->orderId);
-            })
-            ->where(function ($query) {
-                $query->whereNull('questionnaire_type.id')
-                    ->orWhere('questionnaire_type.active', true);
-            })
-            ->exists();
-
-        // Если тип анкеты не активен, не отправляем письмо
-        if (!$questionnaireTypeActive) {
-            Log::info('Тип анкеты не активен, письмо не отправлено ' . $this->email);
-            return;
-        }
-
         $mail = new TicketQuestionnaire(
             'https://org.spaceofjoy.ru/questionnaire/guest/'. $this->orderId . '/' . $this->ticketId
         );

@@ -7,6 +7,7 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin;
 use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Shared\Domain\Bus\Query\QueryHandler;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Filters;

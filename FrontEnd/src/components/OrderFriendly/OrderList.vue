@@ -191,7 +191,7 @@ export default {
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
-      'sendToChanceStatus'
+      'sendtoChangeStatus'
     ]),
     styleObject: function (status) {
       return {
@@ -275,7 +275,7 @@ export default {
           document.getElementById('modalOpenBtnLive').click();
         });
       } else {
-        this.sendToChanceStatus({
+        this.sendtoChangeStatus({
           'id': itemOrder.id,
           'status': status,
           'comment': null
@@ -287,7 +287,7 @@ export default {
      */
     sendDifficultiesArose() {
       let self = this;
-      this.sendToChanceStatus({
+      this.sendtoChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'comment': this.comment,
@@ -304,7 +304,7 @@ export default {
      */
     sendLive() {
       let self = this;
-      this.sendToChanceStatus({
+      this.sendtoChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'liveList': this.liveNumber,

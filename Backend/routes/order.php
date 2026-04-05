@@ -27,7 +27,7 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('role:pusher,admin');
 
     // сменить статус заказа АДМИН
-    Route::post('/toChanceStatus/{id}', [OrderTickets::class, 'toChanceStatus'])
+    Route::post('/toChangeStatus/{id}', [OrderTickets::class, 'toChangeStatus'])
         ->middleware('auth:api')
         ->middleware('role:seller,admin,pusher');
 

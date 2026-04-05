@@ -48,7 +48,7 @@
                   <span class="dropdown-item btn-link"
                         role="button"
                         v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
-                        @click="chanceStatus(key,itemOrder)">{{ statusItem }}</span>
+                        @click="changeStatus(key,itemOrder)">{{ statusItem }}</span>
                   </div>
                 </div>
               </td>
@@ -208,7 +208,7 @@ export default {
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
-      'sendToChanceStatus'
+      'sendToChangeStatus'
     ]),
     styleObject: function (status) {
       return {
@@ -267,7 +267,7 @@ export default {
      * @param status
      * @param id
      */
-    chanceStatus(status, itemOrder) {
+    changeStatus(status, itemOrder) {
       this.selectId = itemOrder.id;
       this.selectStatus = status;
 
@@ -288,7 +288,7 @@ export default {
           document.getElementById('modalOpenBtnLive').click();
         });
       } else {
-        this.sendToChanceStatus({
+        this.sendToChangeStatus({
           'id': itemOrder.id,
           'status': status,
           'comment': null
@@ -300,7 +300,7 @@ export default {
      */
     sendDifficultiesArose() {
       let self = this;
-      this.sendToChanceStatus({
+      this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'comment': this.comment,
@@ -317,7 +317,7 @@ export default {
      */
     sendLive() {
       let self = this;
-      this.sendToChanceStatus({
+      this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'liveList': this.liveNumber,

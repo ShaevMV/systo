@@ -41,8 +41,8 @@ return new class extends Migration
             DB::table('ticket_type_festival')->insert([
                 'festival_id' => FestivalHelper::UUID_FESTIVAL,
                 'ticket_type_id' => self::CHILD_TICKET_ID,
-                'pdf' => 'TypeTicketPdfChild.black.php',
-                'email' => 'TypeTicketMailOrderToPaidChild.black.php',
+                'pdf' => 'TypeTicketPdfChild',
+                'email' => 'TypeTicketMailOrderToPaidChild',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

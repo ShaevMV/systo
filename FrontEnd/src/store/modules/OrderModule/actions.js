@@ -102,8 +102,8 @@ export const loadOrderItem = (context, payload) => {
  * @param context
  * @param payload
  */
-export const sendToChanceStatus = (context, payload) => {
-    let promise = axios.post(API_ORDER + '/toChanceStatus/' + payload.id, {
+export const sendToChangeStatus = (context, payload) => {
+    let promise = axios.post(API_ORDER + '/toChangeStatus/' + payload.id, {
         'status': payload.status,
         'comment': payload.comment,
         'liveList': payload?.liveList,

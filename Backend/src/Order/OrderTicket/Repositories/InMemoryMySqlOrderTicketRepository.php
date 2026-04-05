@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filter;
 use Shared\Domain\Criteria\Filters;

@@ -40,9 +40,6 @@ class InviteController extends Controller
 
     public function isCorrectInviteLink(string $userId, InviteLinkService $inviteLinkService): JsonResponse
     {
-        Log::info('invoce', [
-            'userid' => $userId
-        ]);
         $user = User::where('id', '=', $userId)->first();
 
         if (empty($user->email)) {

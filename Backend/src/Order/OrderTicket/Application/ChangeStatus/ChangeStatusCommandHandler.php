@@ -33,7 +33,7 @@ class ChangeStatusCommandHandler implements CommandHandler
      * @throws ValidationException
      * @throws Throwable
      */
-    public function __invoke(ChanceStatusCommand $command)
+    public function __invoke(ChangeStatusCommand $command)
     {
         $orderTicketDto = $this->orderTicketRepository->findOrder($command->getOrderId());
         if (is_null($orderTicketDto)) {
