@@ -4,6 +4,7 @@ const API = '/api/v1/questionnaireType';
 
 
 export const loadList = (context, payload) => {
+    console.log(111112222);
     return new Promise((resolve, reject) => {
         let promise = axios.post(API + '/getList', payload);
         return promise.then(function (response) {

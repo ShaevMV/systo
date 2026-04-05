@@ -18,7 +18,7 @@ final class Filter
         return new self(
             new FilterField($values['field']),
             new FilterOperator($values['operator']),
-            is_bool($values['value']) ? new FilterBoolValue($values['value']) : new FilterValue($values['value'])
+            is_bool($values['value']) ? new FilterBoolValue($values['value']) : new FilterValue((string) $values['value'])
         );
     }
 

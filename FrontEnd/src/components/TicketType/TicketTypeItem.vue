@@ -146,7 +146,7 @@
                             v-model="questionnaire_type_id"
                             id="validationDefault02">
                       <option value="">Не выбран</option>
-                      <option v-for="(qItem) in getQuestionnaireTypeList"
+                      <option v-for="(qItem) in getList"
                               v-bind:key="qItem.id"
                               :selected="qItem.id == questionnaire_type_id"
                               v-bind:value="qItem.id">{{ qItem.name }}
@@ -211,7 +211,9 @@ export default {
       'getMessage',
       'getTemplateEmail',
       'getTemplatePdf',
-      'getQuestionnaireTypeList',
+    ]),
+    ...mapGetters('appQuestionnaireType', [
+      'getList',
     ]),
     ...mapGetters('appFestivalTickets', [
       'getFestivalList',
@@ -329,7 +331,7 @@ export default {
     questionnaire_type_id: {
       get: function () {
         if (this.newQuestionnaireTypeId === null) {
-          return this.getItem.questionnaire_type_id;
+          return this.getItem.questionnaireTypeId;
         }
         return this.newQuestionnaireTypeId;
       },
@@ -344,7 +346,6 @@ export default {
       'edit',
       'create',
       'loadTemplate',
-      'loadQuestionnaireTypeList',
     ]),
     back: function () {
       this.$router.push({name: 'TicketTypeListView'});
@@ -376,11 +377,6 @@ export default {
       }
 
     }
-  },
-  async created() {
-    await window.store.dispatch('appFestivalTickets/getListFestival');
-    await window.store.dispatch('appTicketType/loadTemplate');
-    await window.store.dispatch('appTicketType/loadQuestionnaireTypeList');
   }
 }
 </script>
