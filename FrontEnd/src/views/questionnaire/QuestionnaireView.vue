@@ -59,7 +59,7 @@
             </a>
 
             <questionnaire-ticket
-                :questionnaire="(isAdmin || isManager)? getQuestionnaireItem : questionnaire"
+                :questionnaire="currentQuestionnaire"
                 :questionnaire-type="questionnaireType"
                 :is-disabled="isAdmin || isManager"
                 @update-questionnaire="updateQuestionnaire"
@@ -119,6 +119,7 @@ export default {
     return {
       questionnaire: {},
       confirm: false,
+      isLoaded: false,
     }
   },
   computed: {
@@ -135,6 +136,13 @@ export default {
     questionnaireType() {
       return this.getItem || null;
     },
+    // Единый источник данных анкеты
+    currentQuestionnaire() {
+      if (this.isAdmin || this.isManager) {
+        return this.getQuestionnaireItem || {};
+      }
+      return this.questionnaire;
+    },
     isCorrect() {
       if (!this.questionnaireType || !this.questionnaireType.questions) return false;
 
@@ -144,7 +152,7 @@ export default {
       }
 
       for (let q of questions) {
-        if (q.required && (this.questionnaire[q.name] === null || this.questionnaire[q.name] === undefined || this.questionnaire[q.name] === '')) {
+        if (q.required && (this.currentQuestionnaire[q.name] === null || this.currentQuestionnaire[q.name] === undefined || this.currentQuestionnaire[q.name] === '')) {
           return false;
         }
       }
@@ -153,6 +161,16 @@ export default {
     }
   },
   watch: {
+    // Копируем данные анкеты из Vuex в локальный state (для админа)
+    getQuestionnaireItem: {
+      handler(item) {
+        if (item && Object.keys(item).length > 0) {
+          this.questionnaire = { ...item };
+        }
+      },
+      immediate: true,
+    },
+    // Инициализируем поля вопросов
     questionnaireType: {
       immediate: true,
       handler(type) {
@@ -162,15 +180,22 @@ export default {
             try { questions = JSON.parse(questions); } catch (e) { questions = []; }
           }
           const q = {};
-          questions.forEach(question => { q[question.name] = null; });
-          // Сохраняем существующие значения если они есть
+          questions.forEach(question => {
+            // Если значение уже есть — сохраняем, если нет — null
+            const existingValue = this.questionnaire[question.name];
+            q[question.name] = existingValue !== undefined && existingValue !== null
+              ? existingValue
+              : null;
+          });
           this.questionnaire = { ...this.questionnaire, ...q };
-          // Удаляем поля которых нет в новых вопросах
+          // Удаляем поля которых нет в новых вопросах (кроме стандартных)
+          const standardFields = ['id', 'status', 'link', 'message', 'user_id', 'order_id', 'ticket_id', 'questionnaire_type_id'];
           Object.keys(this.questionnaire).forEach(key => {
-            if (!questions.find(q => q.name === key)) {
+            if (!questions.find(q => q.name === key) && !standardFields.includes(key)) {
               delete this.questionnaire[key];
             }
           });
+          this.isLoaded = true;
         }
       }
     }
@@ -187,7 +212,7 @@ export default {
       let self = this;
       if (this.order_id && this.ticket_id) {
         this.sendQuestionnaire({
-          questionnaire: this.questionnaire,
+          questionnaire: this.currentQuestionnaire,
           orderId: this.order_id,
           ticketId: this.ticket_id,
           callback: function () {
@@ -201,7 +226,7 @@ export default {
 
       if (this.id) {
         this.editQuestionnaire({
-          questionnaire: this.questionnaire,
+          questionnaire: this.currentQuestionnaire,
           id: this.id,
           callback: function () {
             document.getElementById('modalOpenBtn').click();
@@ -211,7 +236,12 @@ export default {
 
     },
     updateQuestionnaire(updatedQuestionnaire) {
-      this.questionnaire = updatedQuestionnaire;
+      if (this.isAdmin || this.isManager) {
+        // Для админа обновляем Vuex store
+        this.$store.commit('appQuestionnaire/setQuestionnaireItem', updatedQuestionnaire);
+      } else {
+        this.questionnaire = updatedQuestionnaire;
+      }
     }
   },
   created() {
@@ -234,20 +264,33 @@ export default {
         }
         next();
       });
-    } else {
-      // Фоллбэк: загружаем первый активный тип анкеты (гостевая анкета)
-      window.store.dispatch('appQuestionnaireType/loadList', {
-        filter: { active: '1' },
-        orderBy: { sort: 'asc' }
+    } else if (to.params.id) {
+      // Режим редактирования анкеты — сначала анкета, потом тип
+      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+        id: to.params.id,
+      }).then((questionnaire) => {
+        if (questionnaire && questionnaire.questionnaire_type_id) {
+          // Возвращаем промис — ждём загрузки типа перед рендером
+          return window.store.dispatch('appQuestionnaireType/loadItem', {
+            id: questionnaire.questionnaire_type_id,
+          });
+        }
+        // Fallback: если questionnaire_type_id нет, пробуем загрузить гостевую
+        return window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByCode', {
+          code: 'guest',
+        });
       }).catch(() => {
         // Игнорируем ошибку
       }).finally(() => {
-        // Загружаем анкету если есть id
-        if (to.params.id) {
-          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-            id: to.params.id,
-          });
-        }
+        next();
+      });
+    } else {
+      // Фоллбэк: загружаем гостевую анкету по коду
+      window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByCode', {
+        code: 'guest',
+      }).catch(() => {
+        // Игнорируем ошибку
+      }).finally(() => {
         next();
       });
     }

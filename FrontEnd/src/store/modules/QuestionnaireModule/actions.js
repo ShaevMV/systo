@@ -177,13 +177,17 @@ export const getQuestionnaire = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.get(API + '/get/' + payload.id);
         return promise.then(function (response) {
-            context.commit('setQuestionnaireItem', response.data.questionnaire)
-            if(response.callback !== undefined) {
-                response.callback(response.data.questionnaire);
+            context.commit('setQuestionnaireItem', response.data.questionnaire);
+            context.commit('setError', []);
+            if (payload.callback !== undefined) {
+                payload.callback(response.data.questionnaire);
             }
+            resolve(response.data.questionnaire);
         }).catch(function (error) {
-            console.error(error);
-            //context.commit('setError', error.response.data.errors);
+            console.error('getQuestionnaire error:', error);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            }
             reject(error);
         });
     });

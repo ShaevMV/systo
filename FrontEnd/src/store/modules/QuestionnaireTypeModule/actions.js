@@ -25,7 +25,8 @@ export const loadItem = (context, payload) => {
             context.commit('setItem', response.data.item);
             resolve(response.data.item);
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            console.error('loadItem error:', error);
+            context.commit('setError', error.response?.data?.errors);
             reject(error);
         });
     });

@@ -91,7 +91,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters('appQuestionnaire', ['getError']),
+    ...mapGetters('appQuestionnaire', ['getError', 'getQuestionnaireItem']),
     canApprove() {
       return this.questionnaire && this.questionnaire.id && this.questionnaire.status !== 'APPROVE';
     },

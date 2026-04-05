@@ -40,7 +40,8 @@
       "Bash('aabbccdd-1111-2222-3333-444455556602', *)",
       "Bash(select *)",
       "Bash(git restore *)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(git stash)"
     ]
   },
   "$version": 3

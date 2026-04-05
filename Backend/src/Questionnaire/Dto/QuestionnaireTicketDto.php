@@ -115,7 +115,7 @@ class QuestionnaireTicketDto implements Response
 
     public function toArray(): array
     {
-        return [
+        $result = [
             'agy' => $this->agy,
             'howManyTimes' => $this->howManyTimes,
             'questionForSysto' => $this->questionForSysto,
@@ -135,8 +135,16 @@ class QuestionnaireTicketDto implements Response
             'order_id' => $this->orderId?->value(),
             'ticket_id' => $this->ticketId?->value(),
             'id' => $this->id,
+            'questionnaire_type_id' => $this->questionnaireTypeId?->value(),
             'message' => '',
         ];
+
+        // Добавляем динамические поля (детская анкета и др.)
+        foreach ($this->extraData as $key => $value) {
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     public function toArrayForMySql(): array
