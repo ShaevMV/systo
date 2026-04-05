@@ -11,51 +11,52 @@
         </label>
 
         <!-- Текстовое поле (большое) -->
-        <textarea
-            v-if="question.type === 'text'"
-            :id="'questionnaire_' + question.name"
-            class="form-control"
-            :class="{'is-invalid': getError(question.name)}"
-            :placeholder="question.title"
-            :value="getFieldValue(question.name)"
-            @input="updateField(question.name, $event.target.value)"
-            :disabled="isDisabled"
-        ></textarea>
-        <div class="messager text-danger" v-if="question.type === 'text' && getError(question.name)">
-          {{ getError(question.name) }}
-        </div>
+        <template v-if="question.type === 'text'">
+          <textarea
+              :id="'questionnaire_' + question.name"
+              class="form-control"
+              :class="{'is-invalid': getError(question.name)}"
+              :placeholder="question.title"
+              :value="getFieldValue(question.name)"
+              @input="updateField(question.name, $event.target.value)"
+              :disabled="isDisabled"
+          ></textarea>
+        </template>
 
         <!-- Число -->
-        <div v-else-if="question.type === 'number'" class="input-group" id="promo-input">
-          <input
-              type="number"
-              :id="'questionnaire_' + question.name"
-              class="form-control"
-              :class="{'is-invalid': getError(question.name)}"
-              :placeholder="question.title"
-              :value="getFieldValue(question.name)"
-              @input="updateField(question.name, $event.target.value)"
-              :disabled="isDisabled"
-          />
-        </div>
-        <div class="messager text-danger" v-if="question.type === 'number' && getError(question.name)">
-          {{ getError(question.name) }}
-        </div>
+        <template v-else-if="question.type === 'number'">
+          <div class="input-group" id="promo-input">
+            <input
+                type="number"
+                :id="'questionnaire_' + question.name"
+                class="form-control"
+                :class="{'is-invalid': getError(question.name)}"
+                :placeholder="question.title"
+                :value="getFieldValue(question.name)"
+                @input="updateField(question.name, $event.target.value)"
+                :disabled="isDisabled"
+            />
+          </div>
+        </template>
 
         <!-- Строка -->
-        <div v-else class="input-group" id="promo-input">
-          <input
-              :type="question.name === 'email' ? 'email' : 'text'"
-              :id="'questionnaire_' + question.name"
-              class="form-control"
-              :class="{'is-invalid': getError(question.name)}"
-              :placeholder="question.title"
-              :value="getFieldValue(question.name)"
-              @input="updateField(question.name, $event.target.value)"
-              :disabled="isDisabled"
-          />
-        </div>
-        <div class="messager text-danger" v-if="question.type !== 'text' && question.type !== 'number' && getError(question.name)">
+        <template v-else>
+          <div class="input-group" id="promo-input">
+            <input
+                :type="question.name === 'email' ? 'email' : 'text'"
+                :id="'questionnaire_' + question.name"
+                class="form-control"
+                :class="{'is-invalid': getError(question.name)}"
+                :placeholder="question.title"
+                :value="getFieldValue(question.name)"
+                @input="updateField(question.name, $event.target.value)"
+                :disabled="isDisabled"
+            />
+          </div>
+        </template>
+
+        <!-- Сообщение об ошибке -->
+        <div class="messager text-danger" v-if="getError(question.name)">
           {{ getError(question.name) }}
         </div>
       </div>
