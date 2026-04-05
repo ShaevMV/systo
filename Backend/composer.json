@@ -9,6 +9,7 @@
         "ext-openssl": "*",
         "barryvdh/laravel-dompdf": "^2.0",
         "endroid/qr-code": "^4.7",
+        "google/apiclient": "^2.13",
         "guzzlehttp/guzzle": "^7.5",
         "lambdish/phunctional": "^2.1",
         "laravel/framework": "^9.42.2",
@@ -68,7 +69,8 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
-            "pestphp/pest-plugin": true
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true
         }
     },
     "minimum-stability": "dev",

@@ -8,7 +8,8 @@ import VCalendar from 'v-calendar';
 
 window.store = store;
 
-axios.defaults.baseURL = 'https://api.spaceofjoy.ru/'
+// API URL из .env (локально) или production
+axios.defaults.baseURL = process.env.VUE_APP_API_URL || 'https://api.spaceofjoy.ru/'
 axios.defaults.withCredentials = true
 /*
 if (localStorage['secret'] !== 'XyzWar') {

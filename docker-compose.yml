@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
 
   nginx:
@@ -32,11 +30,22 @@ services:
       - ENV_DRUG_PATCH=${ENV_DRUG_PATCH}
 
     networks:
-      - backend
-    links:
-      - mysql
-      - node
-      - php
+      frontend:
+        aliases:
+          - api.tickets.loc
+          - api.spaceofjoy.ru
+      backend:
+    depends_on:
+      mysql:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      node:
+        condition: service_started
+      php:
+        condition: service_started
 
   php:
     hostname: ${ENV_ORG_BACKEND_HOST}
@@ -57,71 +66,104 @@ services:
       - WITH_XDEBUG=false
       - WORKING_DIR=${ENV_ORG_BACKEND_PATCH}
     networks:
-      - backend
+      backend:
+        aliases:
+          - ${ENV_ORG_BACKEND_HOST}
+      database:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   node:
     hostname: ${ENV_ORG_FRONTEND_HOST}
     build:
       context: ./Docker/node
     working_dir: ${ENV_ORG_FRONT_PATCH}
-    ports:
-      - "8082:8080"
+    expose:
+      - "8080"
     container_name: node-solarSysto
     volumes:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
-    command: tail -f /dev/null
+    command: bash -c "npm install && npm run serve"
     user: node
     environment:
       - VUE_APP_API_URL=${VUE_APP_API_URL:-http://api.tickets.loc/}
+      - VUE_APP_WS_PORT=${VUE_APP_WS_PORT:-50080}
     networks:
       - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-v"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   redis:
     build: ./Docker/redis
     container_name: redis-solarSysto
     command: redis-server --appendonly yes
-    ports:
-      - "8002:6379"
+    expose:
+      - "6379"
     networks:
-      - backend
+      - database
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
 
   mysql:
     image: mysql:8
     restart: unless-stopped
     mem_limit: 2g
     mem_reservation: 1g
-    ports:
-      - "33069:3306"
+    expose:
+      - "3306"
     environment:
-      MYSQL_DATABASE: 'systo'
-      MYSQL_ROOT_PASSWORD: 'secret'
-      MYSQL_USER: 'default'
-      MYSQL_PASSWORD: 'secret'
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-systo}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER:-default}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - ./Docker/mysql/db:/var/lib/mysql
       - ./Docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-    networks:
-      - backend
     healthcheck:
-      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    networks:
+      - database
 
   database:
     image: mysql:5.7
+    restart: unless-stopped
+    mem_limit: 2g
+    mem_reservation: 1g
     environment:
-      - "MYSQL_ROOT_PASSWORD=common404"
-      - "MYSQL_DATABASE=friendly"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_FRIENDLY_ROOT_PASSWORD}
+      MYSQL_DATABASE: friendly
     volumes:
       - ./Docker/mysqlFriendly/db:/var/lib/mysql
       - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
-    ports:
-      - "33065:3306"
+    expose:
+      - "3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
-      - backend
+      - database
 
   phpBaza:
     hostname: ${ENV_VHOD_BACKEND_HOST}
@@ -142,7 +184,17 @@ services:
       - WITH_XDEBUG=false
       - WORKING_DIR=${ENV_VHOD_PATCH}
     networks:
-      - backend
+      backend:
+        aliases:
+          - ${ENV_VHOD_BACKEND_HOST}
+      database:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "php", "-v"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   worker:
     build:
@@ -158,11 +210,19 @@ services:
     command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
     networks:
       - backend
+      - database
     depends_on:
       mysql:
+        condition: service_healthy
+      database:
         condition: service_healthy
     restart: unless-stopped
 
 networks:
+  frontend:
+    driver: bridge
   backend:
     driver: bridge
+  database:
+    driver: bridge
+    internal: true
