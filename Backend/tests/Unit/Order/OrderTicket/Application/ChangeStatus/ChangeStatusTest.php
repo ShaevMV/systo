@@ -95,7 +95,7 @@ class ChangeStatusTest extends TestCase
             true,
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
-        self::assertTrue($orderDto->getStatus()->isdDifficultiesArose());
+        self::assertTrue($orderDto->getStatus()->isDifficultiesArose());
         self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 

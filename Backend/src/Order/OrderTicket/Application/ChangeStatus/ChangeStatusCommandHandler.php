@@ -61,7 +61,7 @@ class ChangeStatusCommandHandler implements CommandHandler
             default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),
         };
 
-        if ($command->getNextStatus()->isdDifficultiesArose()) {
+        if ($command->getNextStatus()->isDifficultiesArose()) {
             $this->addComment->send(
                 $command->getOrderId(),
                 $command->getUserId(),

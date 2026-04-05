@@ -95,6 +95,7 @@
 
 - Актуальная цена — **последняя** по дате `before_date`
 - Цена фиксируется на момент создания заказа
+- **Исключения**: детский билет (400₽), групповой билет (24000₽), оргвзнос мульти фестиваль (7600₽) — фиксированные цены, не участвуют в волнах
 
 ### Типы билетов
 
@@ -190,7 +191,38 @@
 - Если есть telegram — отправка уведомления через Telegram-бота (`ProcessTelegramSend`)
 - Telegram-бот: POST на `http://77.222.60.58:8000`
 
-### Валидация Telegram
+### Валидация полей анкет
+
+Валидация строится динамически из JSON-конфигурации типа анкеты (`questionnaire_type.questions`):
+
+**Формат конфигурации поля:**
+```json
+{
+  "name": "telegram",
+  "label": "Никнейм Telegram",
+  "validate": {
+    "rules": ["nullable", "string", "min:5", "max:32", "regex:/^[a-zA-Z0-9_]+$/"],
+    "messages": {"min": "Минимум 5 символов"}
+  }
+}
+```
+
+**Или regex-строка:**
+```json
+{
+  "name": "telegram",
+  "validate": "/^[a-zA-Z0-9_]+$/"
+}
+```
+
+**Специальная обработка:**
+- `telegram` — автоматически добавляется `unique:questionnaire,telegram`
+- `phone` — валидация телефона (Laravel `phone` rule)
+- `email` — валидация email (Laravel `email` rule)
+
+Сервис: `QuestionnaireValidationService::buildValidationRules($questionnaireTypeId)`
+
+### Валидация Telegram (базовая)
 
 ```php
 'telegram' => [
@@ -211,8 +243,8 @@
 |------|----------|-------------------|
 | **guest** | Обычный пользователь | Покупка билетов, анкеты, свои заказы |
 | **admin** | Полный доступ | Всё + управление промокодами, типами билетов, пользователями, анкетами |
-| **seller** | Продавец живых билетов | Список заказов, смена статуса заказов |
-| **pusher** | Продавец Friendly-билетов | Создание Friendly-заказов, список Friendly-заказов |
+| **seller** | Продавец живых билетов | Просмотр списка заказов (`GET /api/v1/order/getList`), смена статуса заказов (`POST /api/v1/order/toChangeStatus`) |
+| **pusher** | Продавец Friendly-билетов | Создание Friendly-заказов (`POST /api/v1/order/createFriendly`), список Friendly-заказов (`POST /api/v1/order/getListForFriendly`), смена статуса (`POST /api/v1/order/toChangeStatus`) |
 | **manager** | Менеджер анкет | Просмотр и одобрение анкет |
 
 ### Проверка прав

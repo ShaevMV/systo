@@ -256,7 +256,7 @@
 
 ---
 
-### POST `/api/v1/order/toChanceStatus/{id}`
+### POST `/api/v1/order/toChangeStatus/{id}`
 **Middleware:** `auth:api` + `role:seller,admin,pusher`
 
 **Request:**
@@ -346,20 +346,29 @@
 ---
 
 ### POST `/api/v1/questionnaire/send/{orderId}/{ticketId}`
-**Middleware:** `auth:api` + `admin`
+**Middleware:** публичный
 
-**Request:** `{ "questionnaire": { "email": "...", "telegram": "...", ...все поля анкеты... } }`
-(`ticket_id` и `order_id` проставляются автоматически, `status` = `APPROVE`)
+**Описание:** Заполнение анкеты гостя. Тип анкеты определяется автоматически по `order_ticket.ticket_type_id → questionnaire_type_id`. Если тип не найден — fallback на гостевую анкету (`guest`).
+
+**Request:** `{ "questionnaire": { "email": "...", "telegram": "...", ...поля из questionnaire_type.questions... } }`
+- `ticket_id` и `order_id` проставляются автоматически
+- `status` = `NEW` (ожидает одобрения)
+- Валидация динамическая из `questionnaire_type.questions` (см. `QuestionnaireValidationService`)
 
 **Response 200:** `{ "success": true, "message": "Спасибо большие, ваши анкетные данные зарегистрированы..." }`
-**Response 422:** `{ "success": false, "errors": [...], "message": "Ошибка валидации" }`
+**Response 422:** `{ "success": false, "errors": {...}, "message": "Ошибка валидации" }`
 
 ---
 
 ### POST `/api/v1/questionnaire/sendNewUser`
-**Middleware:** `auth:api` + `admin`
+**Middleware:** публичный
 
-**Request:** `{ "questionnaire": { "telegram": "string (5-32, regex ^[a-zA-Z0-9_]+$)", "agy": "int?" } }`
+**Описание:** Заполнение анкеты нового пользователя. Используется тип анкеты с кодом `new_user`.
+
+**Request:** `{ "questionnaire": { "telegram": "string (5-32, regex ^[a-zA-Z0-9_]+$)", "agy": "int?", ...поля из questionnaire_type.questions... } }`
+
+**Response 200:** `{ "success": true, "message": "Анкета нового пользователя сохранена" }`
+**Response 422:** `{ "success": false, "errors": {...}, "message": "Ошибка валидации" }`
 
 ---
 
@@ -512,10 +521,10 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/* (кроме getQuestionnaireTypeByOrderTicket) |
-| **role: seller,admin** | order/getList |
-| **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
-| **role: seller,admin,pusher** | order/toChanceStatus |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get |
+| **role: seller,admin** | order/getList, order/toChangeStatus |
+| **role: pusher,admin** | order/getListForFriendly, order/createFriendly, order/toChangeStatus |
+| **role: seller,admin,pusher** | order/toChangeStatus |
 | **bot** | promoCode/savePromoCodeForBot |

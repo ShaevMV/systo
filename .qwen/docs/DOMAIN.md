@@ -178,7 +178,7 @@ class Questionnaire extends AggregateRoot {
 
 | DTO | Файл | Поля |
 |-----|------|------|
-| **QuestionnaireTicketDto** | `Questionnaire/Dto/` | `agy`, `phone`, `telegram`, `vk`, `email`, `status`, `userId`, `orderId`, `ticketId`, `link` + доп.поля |
+| **QuestionnaireTicketDto** | `Questionnaire/Dto/` | `id`, `email` (nullable), `phone` (nullable), `telegram` (nullable), `vk` (nullable), `agy` (nullable, ?string), `status`, `userId`, `orderId`, `ticketId`, `questionnaireTypeId` (UUID), `extraData` (JSON — динамические поля из `questionnaire_type.questions`), `link` |
 
 ### Festival Module
 
@@ -296,14 +296,17 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 
 ### QuestionnaireRepositoryInterface
 
+**Изменения:** Поля анкеты перенесены в JSON-колонку `data`. Стандартные поля (`agy`, `phone`, `telegram`, `vk`, `email`) стали nullable. Добавлена связь с типом анкеты через `questionnaireTypeId`.
+
 | Метод | Описание |
 |-------|----------|
-| `create(QuestionnaireTicketDto): bool` | Создание анкеты |
-| `getList(Filters): Collection` | Список с фильтрами |
-| `existByEmail(string): bool` | Проверка email |
-| `findByEmail(string): ?QuestionnaireTicketDto` | Поиск по email |
-| `get(int): QuestionnaireTicketDto` | По ID |
+| `create(QuestionnaireTicketDto): bool` | Создание анкеты (данные в `data` JSON) |
+| `getList(Filters): Collection` | Список с фильтрами (по `data->$.fieldName`) |
+| `existByEmail(string): bool` | Проверка email (nullable поле) |
+| `findByEmail(string): ?QuestionnaireTicketDto` | Поиск по email + `questionnaireTypeId` |
+| `get(int): QuestionnaireTicketDto` | По ID (с парсингом `data` в `extraData`) |
 | `cacheStatus(int, string): bool` | Обновить статус |
+| `getByQuestionnaireTypeId(int): Collection` | Список анкет по типу |
 
 ### TicketTypeInterfaceRepository
 
@@ -362,3 +365,42 @@ $this->filterBuilder->build($this->model, $criteria->filters);
 
 **Операторы:** `=`, `!=`, `>`, `<`, `LIKE`, `CONTAINS`, `NOT_CONTAINS`
 **OrderType:** `asc`, `desc`, `none`
+
+---
+
+## Изменения в схеме БД (ветка questionnaire_multi)
+
+### Таблица `questionnaire`
+
+**Удалённые колонки** (перенесены в `data` JSON):
+`agy`, `howManyTimes`, `questionForSysto`, `is_have_in_club`, `creationOfSisto`, `activeOfEvent`, `whereSysto`, `musicStyles`, `name`, `vk`
+
+**Новая структура:**
+```sql
+id INT PRIMARY KEY,
+email VARCHAR(255) NULL,
+phone VARCHAR(50) NULL,
+telegram VARCHAR(100) NULL,
+vk VARCHAR(255) NULL,
+status VARCHAR(50),
+questionnaire_type_id INT,
+data JSON,  -- динамические поля из questionnaire_type.questions
+user_id VARCHAR(36),
+order_id VARCHAR(36),
+ticket_id VARCHAR(36),
+link VARCHAR(255) NULL,
+created_at TIMESTAMP,
+updated_at TIMESTAMP
+```
+
+### FilterBuilder
+
+**Изменение:** проверка значений изменена с `!== null` на `!empty()` для корректной обработки `0` и пустых строк.
+
+```php
+// Было
+if ($filter->value()->value() !== null) { ... }
+
+// Стало
+if (!empty($filter->value()->value())) { ... }
+```
