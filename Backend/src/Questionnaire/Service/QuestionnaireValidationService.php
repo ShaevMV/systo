@@ -23,10 +23,6 @@ class QuestionnaireValidationService
 
         if ($questionnaireTypeId) {
             $rules = $this->buildValidationRules($questionnaireTypeId, $messages);
-        } else {
-            // Фоллбэк на стандартную валидацию для гостевой анкеты
-            $rules = $this->getDefaultValidationRules();
-            $messages = $this->getDefaultValidationMessages();
         }
 
         if (empty($rules)) {
@@ -112,44 +108,5 @@ class QuestionnaireValidationService
         }
 
         return $rules;
-    }
-
-    /**
-     * Стандартные правила валидации для гостевой анкеты
-     *
-     * @return array
-     */
-    private function getDefaultValidationRules(): array
-    {
-        return [
-            'telegram' => [
-                'nullable',
-                'string',
-                'min:5',
-                'max:32',
-                'regex:/^[a-zA-Z0-9_]+$/',
-                'unique:questionnaire,telegram',
-            ],
-            'agy' => [
-                'nullable',
-                'integer',
-            ],
-        ];
-    }
-
-    /**
-     * Стандартные сообщения об ошибках для гостевой анкеты
-     *
-     * @return array
-     */
-    private function getDefaultValidationMessages(): array
-    {
-        return [
-            'telegram.min' => 'должен содержать минимум 5 символов.',
-            'telegram.max' => 'не может превышать 32 символа.',
-            'telegram.regex' => 'Разрешены только латинские буквы (a-z), цифры (0-9) и подчеркивание (_).',
-            'telegram.unique' => 'Этот telegram уже занят.',
-            'agy.integer' => 'Возраст только цифрами',
-        ];
     }
 }

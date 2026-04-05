@@ -12,9 +12,9 @@ class QuestionnaireTicketDto implements Response
 {
     protected ?string $link;
     public function __construct(
-        protected int                 $agy,
-        protected string              $questionForSysto,
-        protected string              $phone,
+        protected ?int                $agy = null,
+        protected ?string             $questionForSysto = null,
+        protected ?string             $phone = null,
         protected ?string              $howManyTimes = null,
         protected string              $status = QuestionnaireStatus::NEW,
         protected bool                $is_have_in_club = false,
@@ -52,9 +52,9 @@ class QuestionnaireTicketDto implements Response
         }
 
         return new self(
-            (int)($jsonData['agy'] ?? $data['agy'] ?? 0),
-            $jsonData['questionForSysto'] ?? $data['questionForSysto'] ?? '',
-            $jsonData['phone'] ?? $data['phone'] ?? '',
+            empty($jsonData['agy'] ?? $data['agy'] ?? null) ? null : (int)($jsonData['agy'] ?? $data['agy']),
+            $jsonData['questionForSysto'] ?? $data['questionForSysto'] ?? null,
+            $jsonData['phone'] ?? $data['phone'] ?? null,
             (string)($jsonData['howManyTimes'] ?? $data['howManyTimes'] ?? null),
             $data['status'] ?? QuestionnaireStatus::NEW,
             (bool)($jsonData['is_have_in_club'] ?? $data['is_have_in_club'] ?? false),

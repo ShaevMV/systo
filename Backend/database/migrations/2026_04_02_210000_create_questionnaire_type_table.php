@@ -13,14 +13,16 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('questionnaire_type', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->string('name')->comment('Название типа анкеты');
-            $table->json('questions')->comment('Список вопросов анкеты');
-            $table->boolean('active')->default(true)->comment('Активность типа анкеты');
-            $table->integer('sort')->default(0)->comment('Сортировка');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('questionnaire_type')) {
+            Schema::create('questionnaire_type', function (Blueprint $table) {
+                $table->uuid('id')->primary();
+                $table->string('name')->comment('Название типа анкеты');
+                $table->json('questions')->comment('Список вопросов анкеты');
+                $table->boolean('active')->default(true)->comment('Активность типа анкеты');
+                $table->integer('sort')->default(0)->comment('Сортировка');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

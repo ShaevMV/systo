@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Shared\Domain\ValueObject\Uuid;
 
+use Tickets\Database\Seeders\TypeTicketsSeeder;
+
 class TypeTicketsPriceSeeder extends Seeder
 {
     public const ID_FOR_WAVE = 'bdec45aa-06e6-45d7-8b6b-f12f0b289d78',

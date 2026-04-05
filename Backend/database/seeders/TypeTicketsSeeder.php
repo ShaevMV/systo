@@ -18,6 +18,9 @@ class TypeTicketsSeeder extends Seeder
     PUBLIC CONST ID_LIVE_FOR_MULTI_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf00';
     PUBLIC CONST ID_LIVE_FOR_NEXT_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
 
+    public const ID_CHILD_TICKET = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
+    public const CHILD_TICKET_PRICE = 400;
+
     public const DEFAULT_MULTI_FESTIVAL_PRICE = 7600;
     /**
      * Run the database seeds.

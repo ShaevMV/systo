@@ -29,7 +29,6 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
-use Illuminate\Database\Eloquent\Builder
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
 {

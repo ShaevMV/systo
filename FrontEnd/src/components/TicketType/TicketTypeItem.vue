@@ -139,6 +139,22 @@
                   </div>
                   <small class="form-text text-muted"> {{ getError('festival_id') }}</small>
                 </div>
+                <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Тип анкеты:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="questionnaire_type_id"
+                            id="validationDefault02">
+                      <option value="">Не выбран</option>
+                      <option v-for="(qItem) in getQuestionnaireTypeList"
+                              v-bind:key="qItem.id"
+                              :selected="qItem.id == questionnaire_type_id"
+                              v-bind:value="qItem.id">{{ qItem.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('questionnaire_type_id') }}</small>
+                </div>
 
                 <div class="row messager">{{ getMessage }}</div>
                 <div class="row b-row mt-2">
@@ -185,6 +201,7 @@ export default {
       newDescription: null,
       newEmail: null,
       newPdf: null,
+      newQuestionnaireTypeId: null,
     }
   },
   computed: {
@@ -194,6 +211,7 @@ export default {
       'getMessage',
       'getTemplateEmail',
       'getTemplatePdf',
+      'getQuestionnaireTypeList',
     ]),
     ...mapGetters('appFestivalTickets', [
       'getFestivalList',
@@ -307,6 +325,17 @@ export default {
       set: function (newValue) {
         this.newIsLiveTicket = newValue;
       },
+    },
+    questionnaire_type_id: {
+      get: function () {
+        if (this.newQuestionnaireTypeId === null) {
+          return this.getItem.questionnaire_type_id;
+        }
+        return this.newQuestionnaireTypeId;
+      },
+      set: function (newValue) {
+        this.newQuestionnaireTypeId = newValue;
+      },
     }
   },
   methods: {
@@ -314,7 +343,8 @@ export default {
       'clearError',
       'edit',
       'create',
-      'loadTemplate'
+      'loadTemplate',
+      'loadQuestionnaireTypeList',
     ]),
     back: function () {
       this.$router.push({name: 'TicketTypeListView'});
@@ -331,6 +361,7 @@ export default {
         'festival_pdf': this.festival_pdf,
         'festival_email': this.festival_email,
         'festival_description': this.festival_description,
+        'questionnaire_type_id': this.questionnaire_type_id || null,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {
@@ -349,6 +380,7 @@ export default {
   async created() {
     await window.store.dispatch('appFestivalTickets/getListFestival');
     await window.store.dispatch('appTicketType/loadTemplate');
+    await window.store.dispatch('appTicketType/loadQuestionnaireTypeList');
   }
 }
 </script>

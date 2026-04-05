@@ -29,3 +29,7 @@ export const setOrderBy = (state, payload) => {
 export const setTemplateList = (state, payload) => {
     state.templateList = payload;
 };
+
+export const setQuestionnaireTypeList = (state, payload) => {
+    state.questionnaireTypeList = payload;
+};
