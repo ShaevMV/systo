@@ -15,11 +15,15 @@
             v-if="question.type === 'text'"
             :id="'questionnaire_' + question.name"
             class="form-control"
+            :class="{'is-invalid': getError(question.name)}"
             :placeholder="question.title"
             :value="getFieldValue(question.name)"
             @input="updateField(question.name, $event.target.value)"
             :disabled="isDisabled"
         ></textarea>
+        <div class="messager text-danger" v-if="question.type === 'text' && getError(question.name)">
+          {{ getError(question.name) }}
+        </div>
 
         <!-- Число -->
         <div v-else-if="question.type === 'number'" class="input-group" id="promo-input">
@@ -27,11 +31,15 @@
               type="number"
               :id="'questionnaire_' + question.name"
               class="form-control"
+              :class="{'is-invalid': getError(question.name)}"
               :placeholder="question.title"
               :value="getFieldValue(question.name)"
               @input="updateField(question.name, $event.target.value)"
               :disabled="isDisabled"
           />
+        </div>
+        <div class="messager text-danger" v-if="question.type === 'number' && getError(question.name)">
+          {{ getError(question.name) }}
         </div>
 
         <!-- Строка -->
@@ -40,16 +48,15 @@
               :type="question.name === 'email' ? 'email' : 'text'"
               :id="'questionnaire_' + question.name"
               class="form-control"
-              :class="{'is-invalid': getError('questionnaire.' + question.name)}"
+              :class="{'is-invalid': getError(question.name)}"
               :placeholder="question.title"
               :value="getFieldValue(question.name)"
               @input="updateField(question.name, $event.target.value)"
               :disabled="isDisabled"
           />
         </div>
-
-        <div class="messager text-danger" v-show="getError('questionnaire.' + question.name)">
-          {{ getError('questionnaire.' + question.name) }}
+        <div class="messager text-danger" v-if="question.type !== 'text' && question.type !== 'number' && getError(question.name)">
+          {{ getError(question.name) }}
         </div>
       </div>
     </div>

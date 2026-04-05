@@ -82,19 +82,29 @@ class QuestionnaireValidationService
             // Laravel validation rules from JSON
             if (!empty($question['validate']) && is_string($question['validate'])) {
                 $validateConfig = json_decode($question['validate'], true);
-                
+
                 if (is_array($validateConfig)) {
                     // Формат: {"rules": ["string", "min:5"], "messages": {"min": "Минимум 5 символов"}}
                     if (isset($validateConfig['rules']) && is_array($validateConfig['rules'])) {
                         $fieldRules = array_merge($fieldRules, $validateConfig['rules']);
                     }
-                    
+
                     // Custom messages
                     if (isset($validateConfig['messages']) && is_array($validateConfig['messages'])) {
                         foreach ($validateConfig['messages'] as $rule => $message) {
                             $messages[$fieldName . '.' . $rule] = $message;
                         }
                     }
+                } elseif (str_starts_with($question['validate'], '/')) {
+                    // Формат: строка-regex /^pattern$/
+                    $pattern = $question['validate'];
+                    // Проверка валидности regex
+                    if (@preg_match($pattern, '') === false) {
+                        \Illuminate\Support\Facades\Log::warning("Invalid regex in questionnaire field: {$fieldName} = {$pattern}");
+                        continue;
+                    }
+                    $fieldRules[] = 'regex:' . $pattern;
+                    $messages[$fieldName . '.regex'] = 'Неверный формат поля "' . ($question['title'] ?? $fieldName) . '".';
                 }
             }
 

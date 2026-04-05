@@ -83,12 +83,13 @@ class QuestionnaireController extends Controller
                 $data['questionnaire']['ticket_id'] = $ticketId;
                 $data['questionnaire']['order_id'] = $orderId;
                 $data['questionnaire']['status'] = 'APPROVE';
+                $data['questionnaire']['questionnaire_type_id'] = $questionnaireTypeId;
                 $questionnaireApplication->create(
                     QuestionnaireTicketDto::fromState(
                         $data['questionnaire']
                     )
                 );
-                if ($questionnaireDto = $questionnaireRepository->findByEmail($data['questionnaire']['email'])) {
+                if ($questionnaireDto = $questionnaireRepository->findByEmail($data['questionnaire']['email'] ?? null)) {
                     $questionnaireApplication->sendTelegram($questionnaireDto->getId());
                 };
             }

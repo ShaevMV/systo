@@ -11,6 +11,8 @@ use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 class QuestionnaireTicketDto implements Response
 {
     protected ?string $link;
+    protected array $extraData = [];
+
     public function __construct(
         protected ?int                $agy = null,
         protected ?string             $questionForSysto = null,
@@ -36,6 +38,11 @@ class QuestionnaireTicketDto implements Response
         $this->link = $this->getLink();
     }
 
+    public function setExtraData(array $data): void
+    {
+        $this->extraData = $data;
+    }
+
     public static function fromState(
         array $data,
     ): self
@@ -51,7 +58,33 @@ class QuestionnaireTicketDto implements Response
             $jsonData = json_decode($jsonData, true) ?? [];
         }
 
-        return new self(
+        // Собираем динамические поля (детская анкета и др.)
+        $knownFields = ['agy', 'questionForSysto', 'phone', 'howManyTimes', 'is_have_in_club',
+            'email', 'telegram', 'vk', 'musicStyles', 'name', 'whereSysto',
+            'creationOfSisto', 'activeOfEvent'];
+        $reservedRootKeys = array_merge($knownFields, [
+            'id', 'user_id', 'ticket_id', 'order_id', 'status',
+            'questionnaire_type_id', 'data',
+        ]);
+        $extraData = [];
+
+        // Собираем из JSON data
+        if (is_array($jsonData)) {
+            foreach ($jsonData as $key => $value) {
+                if (!in_array($key, $knownFields, true)) {
+                    $extraData[$key] = $value;
+                }
+            }
+        }
+
+        // Собираем из корневого $data — все поля кроме зарезервированных
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $reservedRootKeys, true) && !isset($extraData[$key])) {
+                $extraData[$key] = $value;
+            }
+        }
+
+        $instance = new self(
             empty($jsonData['agy'] ?? $data['agy'] ?? null) ? null : (int)($jsonData['agy'] ?? $data['agy']),
             $jsonData['questionForSysto'] ?? $data['questionForSysto'] ?? null,
             $jsonData['phone'] ?? $data['phone'] ?? null,
@@ -72,6 +105,12 @@ class QuestionnaireTicketDto implements Response
             $id,
             $questionnaireTypeId,
         );
+
+        if (!empty($extraData)) {
+            $instance->setExtraData($extraData);
+        }
+
+        return $instance;
     }
 
     public function toArray(): array
@@ -102,22 +141,25 @@ class QuestionnaireTicketDto implements Response
 
     public function toArrayForMySql(): array
     {
-        $dataFields = [
-            'agy' => $this->agy,
-            'howManyTimes' => $this->howManyTimes,
-            'questionForSysto' => $this->questionForSysto,
-            'phone' => $this->phone,
-            'is_have_in_club' => $this->is_have_in_club,
-            'vk' => $this->vk,
-            'name' => $this->name,
-            'musicStyles' => $this->musicStyles,
-            'whereSysto' => $this->whereSysto,
-            'creationOfSisto' => $this->creationOfSisto,
-            'activeOfEvent' => $this->activeOfEvent,
-        ];
+        // Стандартные поля имеют приоритет над extraData
+        $dataFields = [];
+        foreach ($this->extraData as $key => $value) {
+            $dataFields[$key] = $value;
+        }
+        $dataFields['agy'] = $this->agy;
+        $dataFields['howManyTimes'] = $this->howManyTimes;
+        $dataFields['questionForSysto'] = $this->questionForSysto;
+        $dataFields['phone'] = $this->phone;
+        $dataFields['is_have_in_club'] = $this->is_have_in_club;
+        $dataFields['vk'] = $this->vk;
+        $dataFields['name'] = $this->name;
+        $dataFields['musicStyles'] = $this->musicStyles;
+        $dataFields['whereSysto'] = $this->whereSysto;
+        $dataFields['creationOfSisto'] = $this->creationOfSisto;
+        $dataFields['activeOfEvent'] = $this->activeOfEvent;
 
         return [
-            'data' => json_encode($dataFields),
+            'data' => json_encode($dataFields, JSON_UNESCAPED_UNICODE),
             'email' => $this->email,
             'telegram' => $this->telegram,
             'order_id' => $this->orderId?->value(),

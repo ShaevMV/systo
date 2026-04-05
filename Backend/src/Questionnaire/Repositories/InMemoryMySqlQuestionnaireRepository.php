@@ -106,9 +106,9 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         return $rawData->save();
     }
 
-    public function findByEmail(string $email): ?QuestionnaireTicketDto
+    public function findByEmail(?string $email): ?QuestionnaireTicketDto
     {
-        if (!$data = $this->model::whereEmail($email)->first()?->toArray()) {
+        if (!$email || !$data = $this->model::whereEmail($email)->first()?->toArray()) {
             return null;
         }
 

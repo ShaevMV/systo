@@ -88,6 +88,7 @@ class OrderTicketDto
             new Status($status),
             $data['promo_code'],
             $isLiveTicket,
+            empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $id,
             friendly_id: $pusherId
         );

@@ -18,7 +18,11 @@ export const sendNotitificationUser = (context, payload) => {
             context.commit('setMessage', response.data.message)
             payload.callback();
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            } else {
+                context.commit('setError', {});
+            }
             reject(error);
         });
     });
@@ -98,7 +102,11 @@ export const sendNewUserQuestionnaire = (context, payload) => {
             context.commit('setMessage', response.data.message)
             payload.callback();
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            } else {
+                context.commit('setError', {});
+            }
             reject(error);
         });
     });
@@ -148,7 +156,11 @@ export const editQuestionnaire = (context, payload) => {
             context.commit('setMessage', response.data.message)
             payload.callback();
         }).catch(function (error) {
-            context.commit('setError', error.response.data.errors);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            } else {
+                context.commit('setError', {});
+            }
             reject(error);
         });
     });
