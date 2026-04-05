@@ -10,3 +10,10 @@
 /Friendly/bootstrap/cache/
 /Backend/bootstrap/cache/
 /Baza/bootstrap/cache/
+/FrontEnd/src/main.js
+*.sql
+.qwen/*
+!.qwen/agents/
+!.qwen/PROJECT_MEMORY.md
+!.qwen/docs/
+!.qwen/BOARD.md

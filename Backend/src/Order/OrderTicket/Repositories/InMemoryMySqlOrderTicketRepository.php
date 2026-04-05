@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Filter;
 use Shared\Domain\Criteria\Filters;
@@ -144,10 +145,15 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ])
             ->first();
 
+        if (!$rawData) {
+            return null;
+        }
+
         $rawDataArr = $rawData->toArray();
-        $rawDataArr['email'] = $rawDataArr['users']['email'];
+        $rawDataArr['email'] = $rawDataArr['users']['email'] ?? '';
+        $rawDataArr['questionnaire_type_id'] = $rawData->ticketType->questionnaire_type_id ?? null;
         $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
-        return $rawDataArr !== null ? OrderTicketDto::fromState(
+        return OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
             new PriceDto(
@@ -156,7 +162,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 $rawData['discount']
             ),
             (bool)$rawData['ticketType']['is_live_ticket'] ?? false,
-        ) : null;
+        );
     }
 
     /**
@@ -165,6 +171,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getList(Filters $filters): array
     {
+        /** @var Builder $builder */
         $builder = $this->model::leftJoin(
             User::TABLE, $this->model::TABLE . '.user_id',
             '=',
@@ -260,6 +267,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      */
     public function getFriendlyList(Filters $filters): array
     {
+        /** @var Builder $builder */
         $builder = $this->model
             ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
                 '=',

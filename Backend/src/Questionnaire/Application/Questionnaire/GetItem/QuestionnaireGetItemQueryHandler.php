@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tickets\Questionnaire\Application\Questionnaire\GetItem;
+
+use Illuminate\Support\Collection;
+use Shared\Domain\Bus\Query\QueryHandler;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
+use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
+
+class QuestionnaireGetItemQueryHandler implements QueryHandler
+{
+    public function __construct(
+        private QuestionnaireRepositoryInterface $repository
+    )
+    {
+    }
+
+    public function __invoke(QuestionnaireGetItemQuery $query): ?QuestionnaireTicketDto
+    {
+        return $this->repository->get($query->getId());
+    }
+}

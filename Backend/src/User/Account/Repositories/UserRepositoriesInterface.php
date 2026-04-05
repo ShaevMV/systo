@@ -24,5 +24,5 @@ interface UserRepositoriesInterface
 
     public function edit(Uuid $id, UserInfoDto $userInfoDto): bool;
 
-    public function chanceRole(Uuid $id, string $role): bool;
+    public function changeRole(Uuid $id, string $role): bool;
 }

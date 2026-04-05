@@ -10,6 +10,7 @@ export default {
         filter: {},
         orderBy: {},
         templateList: {},
+        questionnaireTypeList: [],
         isLoading: false,
         dataError: [],
         message: null,

@@ -115,7 +115,7 @@ final class Status implements EntityDataInterface
         return $this->name === self::CANCEL;
     }
 
-    public function isdDifficultiesArose(): bool
+    public function isDifficultiesArose(): bool
     {
         return $this->name === self::DIFFICULTIES_AROSE;
     }

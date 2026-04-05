@@ -60,6 +60,7 @@
 
             <questionnaire-ticket
                 :questionnaire="(isAdmin || isManager)? getQuestionnaireItem : questionnaire"
+                :questionnaire-type="questionnaireType"
                 :is-disabled="isAdmin || isManager"
                 @update-questionnaire="updateQuestionnaire"
             />
@@ -116,21 +117,7 @@ export default {
   },
   data() {
     return {
-      questionnaire: {
-        name: null,    // Добавил дату для имени и фамилии
-        agy: null,
-        email: null,
-        telegram: null,
-        vk: null,
-        phone: null,
-        howManyTimes: null,
-        musicStyles: null,
-        questionForSysto: null,
-        creationOfSisto: null,
-        is_have_in_club: false,
-        activeOfEvent: null,
-        whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
-      },
+      questionnaire: {},
       confirm: false,
     }
   },
@@ -142,13 +129,50 @@ export default {
     ...mapGetters('appQuestionnaire', [
       'getQuestionnaireItem'
     ]),
+    ...mapGetters('appQuestionnaireType', [
+      'getItem'
+    ]),
+    questionnaireType() {
+      return this.getItem || null;
+    },
     isCorrect() {
-      return this.questionnaire.agy !== null &&
-          this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto !== null &&
-          this.questionnaire.email !== null &&
-          this.questionnaire.phone !== null &&
-          this.confirm;
+      if (!this.questionnaireType || !this.questionnaireType.questions) return false;
+
+      let questions = this.questionnaireType.questions;
+      if (typeof questions === 'string') {
+        questions = JSON.parse(questions);
+      }
+
+      for (let q of questions) {
+        if (q.required && (this.questionnaire[q.name] === null || this.questionnaire[q.name] === undefined || this.questionnaire[q.name] === '')) {
+          return false;
+        }
+      }
+
+      return this.confirm;
+    }
+  },
+  watch: {
+    questionnaireType: {
+      immediate: true,
+      handler(type) {
+        if (type && type.questions) {
+          let questions = type.questions;
+          if (typeof questions === 'string') {
+            try { questions = JSON.parse(questions); } catch (e) { questions = []; }
+          }
+          const q = {};
+          questions.forEach(question => { q[question.name] = null; });
+          // Сохраняем существующие значения если они есть
+          this.questionnaire = { ...this.questionnaire, ...q };
+          // Удаляем поля которых нет в новых вопросах
+          Object.keys(this.questionnaire).forEach(key => {
+            if (!questions.find(q => q.name === key)) {
+              delete this.questionnaire[key];
+            }
+          });
+        }
+      }
     }
   },
   methods: {
@@ -168,17 +192,9 @@ export default {
           ticketId: this.ticket_id,
           callback: function () {
             document.getElementById('modalOpenBtn').click();
-            self.questionnaire = {
-              agy: null,
-              telegram: null,
-              vk: null,
-              phone: null,
-              howManyTimes: null,
-              musicStyles: null,
-              questionForSysto: null,
-              creationOfSisto: null,
-              activeOfEvent: null,
-            };
+            // Сбросить значения
+            Object.keys(self.questionnaire).forEach(key => { self.questionnaire[key] = null; });
+            self.confirm = false;
           },
         })
       }
@@ -202,13 +218,39 @@ export default {
     document.title = "Анкета участника Solar Systo Togathering"
   },
   beforeRouteEnter: (to, from, next) => {
-    if (to.params.id) {
-      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-        id: to.params.id,
+    // Если есть order_id и ticket_id, загружаем тип анкеты по заказу/билету
+    if (to.params.order_id && to.params.ticket_id) {
+      window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByOrderTicket', {
+        orderId: to.params.order_id,
+        ticketId: to.params.ticket_id,
+      }).catch(() => {
+        // Игнорируем ошибку, страница всё равно загрузится
+      }).finally(() => {
+        // Загружаем анкету если есть id
+        if (to.params.id) {
+          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+            id: to.params.id,
+          });
+        }
+        next();
+      });
+    } else {
+      // Фоллбэк: загружаем первый активный тип анкеты (гостевая анкета)
+      window.store.dispatch('appQuestionnaireType/loadList', {
+        filter: { active: '1' },
+        orderBy: { sort: 'asc' }
+      }).catch(() => {
+        // Игнорируем ошибку
+      }).finally(() => {
+        // Загружаем анкету если есть id
+        if (to.params.id) {
+          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+            id: to.params.id,
+          });
+        }
+        next();
       });
     }
-
-    next();
   },
 }
 </script>

@@ -6,13 +6,13 @@ namespace Tickets\Billing\Application\WebHook;
 
 use Shared\Domain\Bus\Command\CommandHandler;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Application\ChanceStatus\ChanceStatus;
+use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Shared\Domain\ValueObject\Status;
 
 class WebHookCommandHandler implements CommandHandler
 {
     public function __construct(
-        private ChanceStatus $chanceStatus,
+        private ChangeStatus $chanceStatus,
     )
     {
     }
@@ -35,7 +35,7 @@ class WebHookCommandHandler implements CommandHandler
         };
 
         if($command->getStatus()->isPaymentCompleted()) {
-            $this->chanceStatus->chance(
+            $this->chanceStatus->change(
                 $command->getOrderId(),
                 $status,
                 new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),

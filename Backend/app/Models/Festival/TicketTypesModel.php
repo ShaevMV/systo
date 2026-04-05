@@ -60,7 +60,8 @@ class TicketTypesModel extends Model
         'sort',
         'active',
         'is_live_ticket',
-        'groupLimit'
+        'groupLimit',
+        'questionnaire_type_id',
     ];
 
     public function ticketTypePrice(): HasMany
@@ -76,5 +77,10 @@ class TicketTypesModel extends Model
             'ticket_type_id',
             'festival_id'
         )->withPivot(['email', 'pdf']);
+    }
+
+    public function questionnaireType(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Questionnaire\QuestionnaireTypeModel::class, 'questionnaire_type_id');
     }
 }

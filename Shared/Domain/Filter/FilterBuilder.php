@@ -13,7 +13,7 @@ class FilterBuilder
     public static function build(Model|Builder $builder, Filters $filters): Model|Builder|null
     {
         foreach ($filters as $filter) {
-            if (null !== $filter->value()->value()) {
+            if (!empty($filter->value()->value())) {
                 $builder = $builder->where(
                     $filter->field()->value(),
                     $filter->operator()->value(),

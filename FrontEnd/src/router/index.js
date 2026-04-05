@@ -1,6 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import FrendlyView from '../views/FrendlyView.vue'
+import FriendlyView from '../views/FriendlyView.vue'
 import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
@@ -31,6 +31,9 @@ import TicketTypeItemView from "@/views/ticketType/TicketTypeItemView.vue";
 import TypesOfPaymentListView from "@/views/typesOfPayment/TypesOfPaymentListView.vue";
 import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemView.vue";
 
+import QuestionnaireTypeListView from "@/views/questionnaireType/QuestionnaireTypeListView.vue";
+import QuestionnaireTypeItemView from "@/views/questionnaireType/QuestionnaireTypeItemView.vue";
+
 import AccountListView from "@/views/account/AccountListView.vue";
 
 import RegView from "@/views/auth/RegView.vue";
@@ -45,7 +48,7 @@ const routes = [
     {
         path: '/frendlyOrder',
         name: 'frendlyOrder',
-        component: FrendlyView,
+        component: FriendlyView,
         meta: {
             'requiresAuth': true,
             'role': ['admin', 'pusher'],
@@ -283,6 +286,28 @@ const routes = [
         path: '/ticketType/:id?',
         name: 'TicketTypeItemView',
         component: TicketTypeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Типы анкет
+    {
+        path: '/questionnaireType/list',
+        name: 'QuestionnaireTypeListView',
+        component: QuestionnaireTypeListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/questionnaireType/:id?',
+        name: 'QuestionnaireTypeItemView',
+        component: QuestionnaireTypeItemView,
         props: true,
         meta: {
             'requiresAuth': true,

@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tickets\Questionnaire\Responses;
+
+use Illuminate\Support\Collection;
+use Shared\Domain\Bus\Query\Response;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
+
+class QuestionnaireGetListQueryResponse implements Response
+{
+
+    public function __construct(
+        private Collection $collection
+    )
+    {
+    }
+
+    public function toArray(): array
+    {
+        $result = [];
+        /** @var QuestionnaireTicketDto $item */
+        foreach ($this->collection as $item) {
+            $result[] = $item->toArray();
+        }
+        return $result;
+    }
+
+    public function first(): ?QuestionnaireTicketDto
+    {
+        return $this->collection->first();
+    }
+}

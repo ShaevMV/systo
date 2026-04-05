@@ -36,3 +36,7 @@ export const getTemplateEmail = state => {
 export const getTemplatePdf = state => {
     return state.templateList?.pdf
 }
+
+export const getQuestionnaireTypeList = state => {
+    return state.questionnaireTypeList;
+}

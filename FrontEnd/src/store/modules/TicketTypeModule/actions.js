@@ -27,6 +27,18 @@ export const loadTemplate = (context) => {
     });
 };
 
+export const loadQuestionnaireTypeList = (context) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.post('/api/v1/questionnaireType/getList', {filter: {active: 1}});
+        return promise.then(function (response) {
+            context.commit('setQuestionnaireTypeList', response.data.list)
+        }).catch(function (error) {
+            context.commit('setError', error);
+            reject(error);
+        });
+    });
+};
+
 
 export const loadItem = (context, payload) => {
     return new Promise((resolve, reject) => {

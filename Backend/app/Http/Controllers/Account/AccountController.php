@@ -70,14 +70,14 @@ class AccountController extends Controller
     /**
      * @throws Throwable
      */
-    public function chanceRole(
+    public function changeRole(
         string             $id,
         Request            $request,
         AccountApplication $accountApplication,
     ): JsonResponse
     {
         return response()->json([
-            'success' => $accountApplication->chanceRole(
+            'success' => $accountApplication->changeRole(
                 new Uuid($id),
                 $request->get('role'),
             ),
