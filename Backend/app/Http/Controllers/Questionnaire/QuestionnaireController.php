@@ -57,14 +57,23 @@ class QuestionnaireController extends Controller
         // Получаем тип анкеты по заказу
         $questionnaireTypeId = null;
         try {
-            $orderTicket = $orderTicketRepository->findOrder(
-                new \Shared\Domain\ValueObject\Uuid($orderId)
-            );
+            $uuid = new \Shared\Domain\ValueObject\Uuid($orderId);
+            $orderTicket = $orderTicketRepository->findOrder($uuid);
             if ($orderTicket) {
                 $questionnaireTypeId = $orderTicket->getQuestionnaireTypeId()?->value();
             }
-        } catch (\Throwable $e) {
+        } catch (\Throwable) {
             // Игнорируем ошибку
+        }
+
+        // Fallback: если заказ не найден или нет questionnaire_type_id — используем гостевую анкету
+        if ($questionnaireTypeId === null) {
+            $guestQuestionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('code', 'guest')
+                ->where('active', true)
+                ->first();
+            if ($guestQuestionnaireType) {
+                $questionnaireTypeId = $guestQuestionnaireType->id;
+            }
         }
 
         // Валидация через сервис

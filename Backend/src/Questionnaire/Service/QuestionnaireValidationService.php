@@ -103,6 +103,7 @@ class QuestionnaireValidationService
                         \Illuminate\Support\Facades\Log::warning("Invalid regex in questionnaire field: {$fieldName} = {$pattern}");
                         continue;
                     }
+                    // Laravel regex: ожидает полный паттерн с разделителями /^pattern$/
                     $fieldRules[] = 'regex:' . $pattern;
                     $messages[$fieldName . '.regex'] = 'Неверный формат поля "' . ($question['title'] ?? $fieldName) . '".';
                 }
