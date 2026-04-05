@@ -24,9 +24,9 @@ class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
     public function isPaidOrderByUserId(Uuid $userId): bool
     {
         return $this->orderTicketModel::where([
-            'user_id' => $userId->value(),
-            'status' => Status::PAID,
-        ])->exists();
+            'user_id' => $userId->value()])
+            ->whereIn('status', [Status::PAID, Status::PAID_FOR_LIVE])
+            ->exists();
     }
 
     /**
