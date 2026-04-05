@@ -25,7 +25,7 @@ class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
     {
         return $this->orderTicketModel::where([
             'user_id' => $userId->value()])
-            ->whereIn('status', [Status::PAID, Status::PAID_FOR_LIVE])
+            ->whereIn('status', [Status::PAID, Status::PAID_FOR_LIVE, Status::LIVE_TICKET_ISSUED])
             ->exists();
     }
 
