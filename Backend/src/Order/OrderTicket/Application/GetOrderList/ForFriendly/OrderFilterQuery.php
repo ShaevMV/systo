@@ -16,12 +16,13 @@ class OrderFilterQuery implements Query
         private ?Uuid $userId = null,
         private ?string $name = null,
         private ?Uuid $friendlyId = null,
+        private ?string $status = null,
     ) {
     }
 
     public static function fromState(array $data, ?Uuid $userId = null): self
     {
-        if(!isset($data['festivalId'])) {
+        if (! isset($data['festivalId'])) {
             throw new InvalidArgumentException('festivalId обязательное поле!');
         }
 
@@ -31,6 +32,7 @@ class OrderFilterQuery implements Query
             $userId,
             $data['name'] ?? null,
             isset($data['friendlyId']) ? new Uuid($data['friendlyId']) : null,
+            $data['status'] ?? null,
         );
     }
 
@@ -57,5 +59,10 @@ class OrderFilterQuery implements Query
     public function getFriendlyId(): ?Uuid
     {
         return $this->friendlyId;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
     }
 }
