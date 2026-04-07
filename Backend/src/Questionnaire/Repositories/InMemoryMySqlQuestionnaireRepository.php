@@ -5,32 +5,30 @@ declare(strict_types=1);
 namespace Tickets\Questionnaire\Repositories;
 
 use App\Models\Questionnaire\QuestionnaireModel;
+use App\Models\Questionnaire\QuestionnaireTypeModel;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Filter\FilterBuilder;
-use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
-use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
-use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Throwable;
-use Illuminate\Support\Collection;
+use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
 class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInterface
 {
     public function __construct(
         private QuestionnaireModel $model
-    )
-    {
+    ) {
     }
 
-    function getSql($query)
+    public function getSql($query)
     {
         $sql = $query->toSql();
         $bindings = $query->getBindings();
 
         foreach ($bindings as $binding) {
-            $value = is_numeric($binding) ? $binding : "'" . addslashes($binding) . "'";
+            $value = is_numeric($binding) ? $binding : "'".addslashes($binding)."'";
             $sql = preg_replace('/\?/', $value, $sql, 1);
         }
 
@@ -45,27 +43,32 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         $data = $questionnaireTicketDto->toArrayForMySql();
         DB::beginTransaction();
         try {
-
             $rawModel = $this->model;
+            $isChildQuestionnaire = $this->isChildType($questionnaireTicketDto->getQuestionnaireTypeId());
+
+            // Приоритет 1: поиск по order_id + ticket_id (всегда)
             if ($questionnaireTicketDto->getTicketId() && $questionnaireTicketDto->getOrderId()) {
                 $rawModel = $this->model::whereOrderId($questionnaireTicketDto->getOrderId()->value())
                     ->whereTicketId($questionnaireTicketDto->getTicketId()->value());
             }
-            if ($questionnaireTicketDto->getEmail()) {
+            // Приоритет 2: поиск по email (НО НЕ для детских анкет!)
+            elseif ($questionnaireTicketDto->getEmail() && ! $isChildQuestionnaire) {
                 $rawModel = $this->model::whereEmail($questionnaireTicketDto->getEmail());
             }
+
             if ($rawModel->exists()) {
                 $rawModel->update($data);
             } else {
                 $this->model->insert(
                     array_merge($data,
                         [
-                            'created_at' => (string)(new Carbon()),
-                            'updated_at' => (string)(new Carbon()),
+                            'created_at' => (string) (new Carbon()),
+                            'updated_at' => (string) (new Carbon()),
                         ]
                     ));
             }
             DB::commit();
+
             return true;
         } catch (Throwable $exception) {
             DB::rollBack();
@@ -73,13 +76,32 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
     }
 
+    /**
+     * Проверяет, является ли тип анкеты "child"
+     */
+    private function isChildType(?string $questionnaireTypeId): bool
+    {
+        if (! $questionnaireTypeId) {
+            return false;
+        }
+
+        try {
+            $type = QuestionnaireTypeModel::find($questionnaireTypeId);
+
+            return $type && $type->code === 'child';
+        } catch (\Throwable $e) {
+            Log::warning('Failed to check questionnaire type: '.$e->getMessage());
+
+            return false;
+        }
+    }
 
     public function getList(Filters $filters): Collection
     {
         return FilterBuilder::build($this->model, $filters)
-            ->orderBy('created_at','DESC')
+            ->orderBy('created_at', 'DESC')
             ->get()
-            ->each(fn(QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
+            ->each(fn (QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
     }
 
     public function existByEmail(string $email): bool
@@ -89,7 +111,7 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
     public function get(int $id): QuestionnaireTicketDto
     {
-        if (!$rawData = $this->model::whereId($id)->first()?->toArray()) {
+        if (! $rawData = $this->model::whereId($id)->first()?->toArray()) {
             throw new \DomainException("Анкета с $id не найдена");
         }
 
@@ -99,16 +121,17 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     public function cacheStatus(int $id, string $questionnaireStatus): bool
     {
         $rawData = $this->model::find($id);
-        if (!$rawData) {
+        if (! $rawData) {
             throw new \DomainException("Анкета с $id не найдена");
         }
         $rawData->status = $questionnaireStatus;
+
         return $rawData->save();
     }
 
     public function findByEmail(?string $email): ?QuestionnaireTicketDto
     {
-        if (!$email || !$data = $this->model::whereEmail($email)->first()?->toArray()) {
+        if (! $email || ! $data = $this->model::whereEmail($email)->first()?->toArray()) {
             return null;
         }
 
