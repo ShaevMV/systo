@@ -46,5 +46,10 @@ interface QuestionnaireRepositoryInterface
      */
     public function findByOrderIdAndTicketId(Uuid $orderId, Uuid $ticketId): ?QuestionnaireTicketDto;
 
+    /**
+     * Найти анкету по email и типу анкеты
+     */
+    public function findByEmailAndQuestionnaireType(string $email, Uuid $questionnaireTypeId): ?QuestionnaireTicketDto;
+
     public function cacheStatus(int $id, string $questionnaireStatus): bool;
 }

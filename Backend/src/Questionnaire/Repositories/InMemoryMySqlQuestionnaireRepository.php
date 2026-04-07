@@ -147,4 +147,13 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
 
         return $data ? QuestionnaireTicketDto::fromState($data) : null;
     }
+
+    public function findByEmailAndQuestionnaireType(string $email, Uuid $questionnaireTypeId): ?QuestionnaireTicketDto
+    {
+        $data = $this->model::whereEmail($email)
+            ->where('questionnaire_type_id', $questionnaireTypeId->value())
+            ->first()?->toArray();
+
+        return $data ? QuestionnaireTicketDto::fromState($data) : null;
+    }
 }

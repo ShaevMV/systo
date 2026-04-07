@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire\GetByOrderTicket;
 
+use App\Models\Questionnaire\QuestionnaireTypeModel;
 use Shared\Domain\Bus\Query\QueryHandler;
+use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
@@ -52,7 +54,7 @@ class QuestionnaireGetByOrderTicketQueryHandler implements QueryHandler
      */
     private function findNewUserByEmail(string $email): ?QuestionnaireTicketDto
     {
-        $newUserType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('code', 'new_user')
+        $newUserType = QuestionnaireTypeModel::where('code', 'new_user')
             ->where('active', true)
             ->first();
 
@@ -60,14 +62,9 @@ class QuestionnaireGetByOrderTicketQueryHandler implements QueryHandler
             return null;
         }
 
-        $allQuestionnaires = $this->questionnaireRepository->findByEmail($email);
-        if ($allQuestionnaires !== null && $allQuestionnaires->getQuestionnaireTypeId() !== null) {
-            $typeId = $allQuestionnaires->getQuestionnaireTypeId()->value();
-            if ($typeId === $newUserType->id) {
-                return $allQuestionnaires;
-            }
-        }
-
-        return null;
+        return $this->questionnaireRepository->findByEmailAndQuestionnaireType(
+            $email,
+            new Uuid($newUserType->id)
+        );
     }
 }
