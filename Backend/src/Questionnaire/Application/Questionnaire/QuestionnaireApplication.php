@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tickets\Questionnaire\Application\Questionnaire;
 
-use App\Models\Questionnaire\QuestionnaireTypeModel;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
@@ -27,6 +26,7 @@ use Tickets\Questionnaire\Application\Questionnaire\SendTelegram\SendTelegramCom
 use Tickets\Questionnaire\Application\Questionnaire\SendTelegram\SendTelegramCommandHandler;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Responses\QuestionnaireGetListQueryResponse;
+use Tickets\QuestionnaireType\Dto\QuestionnaireTypeDto;
 
 class QuestionnaireApplication
 {
@@ -108,9 +108,9 @@ class QuestionnaireApplication
         return $result;
     }
 
-    public function getQuestionnaireTypeByOrderTicket(Uuid $orderId, Uuid $ticketId): ?QuestionnaireTypeModel
+    public function getQuestionnaireTypeByOrderTicket(Uuid $orderId, Uuid $ticketId): ?QuestionnaireTypeDto
     {
-        /** @var QuestionnaireTypeModel|null $result */
+        /** @var QuestionnaireTypeDto|null $result */
         $result = $this->queryBus->ask(new GetQuestionnaireTypeByOrderTicketQuery($orderId, $ticketId));
 
         return $result;
