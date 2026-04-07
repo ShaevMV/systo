@@ -248,21 +248,24 @@ export default {
     document.title = "Анкета участника Solar Systo Togathering"
   },
   beforeRouteEnter: (to, from, next) => {
-    // Если есть order_id и ticket_id, загружаем тип анкеты по заказу/билету
+    // Если есть order_id и ticket_id, загружаем анкету + тип анкеты
     if (to.params.order_id && to.params.ticket_id) {
-      window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByOrderTicket', {
+      // Сначала загружаем существующую анкету для предзаполнения
+      window.store.dispatch('appQuestionnaire/loadQuestionnaireByOrderTicket', {
         orderId: to.params.order_id,
         ticketId: to.params.ticket_id,
       }).catch(() => {
-        // Игнорируем ошибку, страница всё равно загрузится
+        // Игнорируем ошибку — форма загрузится пустой
       }).finally(() => {
-        // Загружаем анкету если есть id
-        if (to.params.id) {
-          window.store.dispatch('appQuestionnaire/getQuestionnaire', {
-            id: to.params.id,
-          });
-        }
-        next();
+        // Затем загружаем тип анкеты (вопросы)
+        window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByOrderTicket', {
+          orderId: to.params.order_id,
+          ticketId: to.params.ticket_id,
+        }).catch(() => {
+          // Игнорируем ошибку, страница всё равно загрузится
+        }).finally(() => {
+          next();
+        });
       });
     } else if (to.params.id) {
       // Режим редактирования анкеты — сначала анкета, потом тип

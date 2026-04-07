@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Filter\FilterBuilder;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 
@@ -136,5 +137,14 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
         }
 
         return QuestionnaireTicketDto::fromState($data);
+    }
+
+    public function findByOrderIdAndTicketId(Uuid $orderId, Uuid $ticketId): ?QuestionnaireTicketDto
+    {
+        $data = $this->model::whereOrderId($orderId->value())
+            ->whereTicketId($ticketId->value())
+            ->first()?->toArray();
+
+        return $data ? QuestionnaireTicketDto::fromState($data) : null;
     }
 }

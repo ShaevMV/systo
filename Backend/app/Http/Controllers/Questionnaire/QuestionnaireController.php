@@ -7,23 +7,21 @@ namespace App\Http\Controllers\Questionnaire;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Throwable;
+use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
 use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
 use Tickets\Questionnaire\Dto\QuestionnaireTicketDto;
 use Tickets\Questionnaire\Repositories\QuestionnaireRepositoryInterface;
 use Tickets\Questionnaire\Service\QuestionnaireValidationService;
-use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
-use Throwable;
 
 class QuestionnaireController extends Controller
 {
-
     public function loadQuestionnaireList(
-        Request                  $request,
+        Request $request,
         QuestionnaireApplication $application,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         return response()->json([
             'success' => true,
             'questionnaireList' => $application->getList(new QuestionnaireGetListQuery(
@@ -32,7 +30,7 @@ class QuestionnaireController extends Controller
                 $request->get('vk'),
                 $request->get('is_have_in_club'),
                 $request->get('status'),
-            ))->toArray()
+            ))->toArray(),
         ]);
     }
 
@@ -42,15 +40,14 @@ class QuestionnaireController extends Controller
      * @throws Throwable
      */
     public function setQuestionnaire(
-        Request                          $request,
-        QuestionnaireApplication         $questionnaireApplication,
+        Request $request,
+        QuestionnaireApplication $questionnaireApplication,
         QuestionnaireRepositoryInterface $questionnaireRepository,
-        QuestionnaireValidationService   $validationService,
-        OrderTicketRepositoryInterface   $orderTicketRepository,
-        string                           $orderId,
-        string                           $ticketId,
-    ): JsonResponse
-    {
+        QuestionnaireValidationService $validationService,
+        OrderTicketRepositoryInterface $orderTicketRepository,
+        string $orderId,
+        string $ticketId,
+    ): JsonResponse {
         $data = $request->toArray();
         $questionnaireData = $data['questionnaire'] ?? [];
 
@@ -79,11 +76,11 @@ class QuestionnaireController extends Controller
         // Валидация через сервис
         $errors = $validationService->validate($questionnaireTypeId, $questionnaireData);
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             return response()->json([
                 'success' => false,
                 'errors' => $errors,
-                'message' => 'Ошибка валидации'
+                'message' => 'Ошибка валидации',
             ], 422);
         }
 
@@ -100,20 +97,20 @@ class QuestionnaireController extends Controller
                 );
                 if ($questionnaireDto = $questionnaireRepository->findByEmail($data['questionnaire']['email'] ?? null)) {
                     $questionnaireApplication->sendTelegram($questionnaireDto->getId());
-                };
+                }
             }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
+                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо',
             ]);
         } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
-                'message' => $throwable->getMessage()
+                'message' => $throwable->getMessage(),
             ], 422);
         }
     }
-
 
     /**
      * Записать анкету нового пользователя
@@ -121,11 +118,10 @@ class QuestionnaireController extends Controller
      * @throws Throwable
      */
     public function setNewUserQuestionnaire(
-        Request                  $request,
+        Request $request,
         QuestionnaireApplication $questionnaireApplication,
-        QuestionnaireValidationService   $validationService,
-    ): JsonResponse
-    {
+        QuestionnaireValidationService $validationService,
+    ): JsonResponse {
         $data = $request->toArray();
         $questionnaireData = $data['questionnaire'] ?? [];
 
@@ -139,11 +135,11 @@ class QuestionnaireController extends Controller
         // Валидация через сервис
         $errors = $validationService->validate($questionnaireTypeId, $questionnaireData);
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             return response()->json([
                 'success' => false,
                 'errors' => $errors,
-                'message' => 'Ошибка валидации'
+                'message' => 'Ошибка валидации',
             ], 422);
         }
 
@@ -157,14 +153,15 @@ class QuestionnaireController extends Controller
                     )
                 );
             }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо'
+                'message' => 'Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо',
             ]);
         } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
-                'message' => $throwable->getMessage()
+                'message' => $throwable->getMessage(),
             ], 422);
         }
     }
@@ -172,17 +169,16 @@ class QuestionnaireController extends Controller
     /**
      * Повторно отправить письмо на заполнение анкеты
      *
-     * @param Request $request
-     * @param \Bus $bus
-     * @param string $id
+     * @param  Request  $request
+     * @param  \Bus  $bus
+     * @param  string  $id
      * @return JsonResponse
      */
     public function replayNotificationUser(
         Request $request,
-        \Bus    $bus,
-        string  $id,
-    ): JsonResponse
-    {
+        \Bus $bus,
+        string $id,
+    ): JsonResponse {
         $request->validate([
             'email' => 'required|string|email',
         ]);
@@ -194,7 +190,7 @@ class QuestionnaireController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Ссылка на анкету отправлена'
+            'message' => 'Ссылка на анкету отправлена',
         ]);
     }
 
@@ -203,22 +199,20 @@ class QuestionnaireController extends Controller
      */
     public function approve(
         QuestionnaireApplication $questionnaireApplication,
-        int                      $id,
-    ): JsonResponse
-    {
+        int $id,
+    ): JsonResponse {
         $questionnaireApplication->approve($id);
 
         return response()->json([
             'success' => true,
-            'message' => 'Анкета одобрена'
+            'message' => 'Анкета одобрена',
         ]);
     }
 
     public function getQuestionnaire(
         QuestionnaireApplication $questionnaireApplication,
-        int                      $id,
-    ): JsonResponse
-    {
+        int $id,
+    ): JsonResponse {
         return response()->json([
             'success' => true,
             'questionnaire' => $questionnaireApplication->getItemId($id)->toArray(),
@@ -231,39 +225,18 @@ class QuestionnaireController extends Controller
     public function getQuestionnaireTypeByOrderTicket(
         string $orderId,
         string $ticketId,
-        OrderTicketRepositoryInterface $orderTicketRepository,
-    ): JsonResponse
-    {
+        QuestionnaireApplication $questionnaireApplication,
+    ): JsonResponse {
         try {
-            $orderTicket = $orderTicketRepository->findOrder(new \Shared\Domain\ValueObject\Uuid($orderId));
-            
-            if (!$orderTicket || !$orderTicket->getQuestionnaireTypeId()) {
-                // Возвращаем тип анкеты "Гостевая анкета" по коду
-                $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::where('code', 'guest')
-                    ->where('active', true)
-                    ->first();
+            $orderUuid = new \Shared\Domain\ValueObject\Uuid($orderId);
+            $ticketUuid = new \Shared\Domain\ValueObject\Uuid($ticketId);
 
-                if (!$questionnaireType) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Тип анкеты не найден'
-                    ], 404);
-                }
+            $questionnaireType = $questionnaireApplication->getQuestionnaireTypeByOrderTicket($orderUuid, $ticketUuid);
 
-                return response()->json([
-                    'success' => true,
-                    'questionnaire_type' => $questionnaireType->toArray(),
-                ]);
-            }
-
-            $questionnaireType = \App\Models\Questionnaire\QuestionnaireTypeModel::find(
-                $orderTicket->getQuestionnaireTypeId()->value()
-            );
-
-            if (!$questionnaireType) {
+            if (! $questionnaireType) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Тип анкеты не найден'
+                    'message' => 'Тип анкеты не найден',
                 ], 404);
             }
 
@@ -274,7 +247,33 @@ class QuestionnaireController extends Controller
         } catch (\Throwable $throwable) {
             return response()->json([
                 'success' => false,
-                'message' => $throwable->getMessage()
+                'message' => $throwable->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Получить анкету по order_id и ticket_id для предзаполнения
+     */
+    public function getByOrderTicket(
+        string $orderId,
+        string $ticketId,
+        QuestionnaireApplication $questionnaireApplication,
+    ): JsonResponse {
+        try {
+            $orderUuid = new \Shared\Domain\ValueObject\Uuid($orderId);
+            $ticketUuid = new \Shared\Domain\ValueObject\Uuid($ticketId);
+
+            $questionnaire = $questionnaireApplication->getByOrderTicket($orderUuid, $ticketUuid);
+
+            return response()->json([
+                'success' => true,
+                'questionnaire' => $questionnaire?->toArray(),
+            ]);
+        } catch (\Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'message' => $throwable->getMessage(),
             ], 422);
         }
     }
