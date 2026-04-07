@@ -13,7 +13,8 @@
             <tr>
               <th scope="col" class="mobile">№ заказа</th>
               <th scope="col" class="mobile"></th>
-              <th scope="col">Продовец</th>
+              <th scope="col">Email продавца</th>
+              <th scope="col">ФИО продавца</th>
               <th scope="col">Email</th>
               <th scope="col" class="mobile">Гости</th>
               <th scope="col">Тип оргвзноса</th>
@@ -48,7 +49,8 @@
                   </div>
                 </div>
               </td>
-              <td>{{ itemOrder.pusher_name }} <br/> {{ itemOrder.pusher_email }}</td>
+              <td>{{ itemOrder.pusher_email }}</td>
+              <td>{{ itemOrder.pusher_name }}</td>
               <td>{{ itemOrder.email }}</td>
               <td :title="getListQuests(itemOrder.guests, true) " class="mobile">
                 {{ getListQuests(itemOrder.guests, false) }}

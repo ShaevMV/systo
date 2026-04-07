@@ -192,3 +192,27 @@ export const getQuestionnaire = (context, payload) => {
         });
     });
 };
+
+/**
+ * Загрузить анкету по orderId и ticketId для предзаполнения
+ *
+ * @param context
+ * @param payload
+ * @returns {Promise<unknown>}
+ */
+export const loadQuestionnaireByOrderTicket = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        let promise = axios.get(API + '/getByOrderTicket/' + payload.orderId + '/' + payload.ticketId);
+        return promise.then(function (response) {
+            context.commit('setQuestionnaireItem', response.data.questionnaire);
+            context.commit('setError', []);
+            resolve(response.data.questionnaire);
+        }).catch(function (error) {
+            console.error('loadQuestionnaireByOrderTicket error:', error);
+            if (error.response && error.response.data && error.response.data.errors) {
+                context.commit('setError', error.response.data.errors);
+            }
+            reject(error);
+        });
+    });
+};

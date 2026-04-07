@@ -166,10 +166,10 @@ export default {
         let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
         let self = this;
         this.getOrderListForFrendly({
-          'name': self.email,
-          'typePrice': typePrice,
+          'name': self.name,
           'email': self.email,
           'status': self.status,
+          'typePrice': typePrice,
           'festivalId': self.festival_id,
           'city': self.city,
           'friendlyId': self.friendlyId,
