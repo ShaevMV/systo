@@ -11,30 +11,30 @@ use Tickets\Questionnaire\Domain\ValueObject\QuestionnaireStatus;
 class QuestionnaireTicketDto implements Response
 {
     protected ?string $link;
+
     protected array $extraData = [];
 
     public function __construct(
-        protected ?int                $agy = null,
-        protected ?string             $questionForSysto = null,
-        protected ?string             $phone = null,
-        protected ?string              $howManyTimes = null,
-        protected string              $status = QuestionnaireStatus::NEW,
-        protected bool                $is_have_in_club = false,
-        protected ?string             $email = null,
-        protected ?string             $telegram = null,
-        protected ?string             $vk = null,
-        protected ?string             $musicStyles = null,
-        protected ?string             $name = null,
-        protected ?string             $whereSysto = null,
-        protected ?string             $creationOfSisto = null,
-        protected ?string             $activeOfEvent = null,
-        protected ?Uuid               $userId = null,
+        protected ?int $agy = null,
+        protected ?string $questionForSysto = null,
+        protected ?string $phone = null,
+        protected ?string $howManyTimes = null,
+        protected string $status = QuestionnaireStatus::NEW,
+        protected bool $is_have_in_club = false,
+        protected ?string $email = null,
+        protected ?string $telegram = null,
+        protected ?string $vk = null,
+        protected ?string $musicStyles = null,
+        protected ?string $name = null,
+        protected ?string $whereSysto = null,
+        protected ?string $creationOfSisto = null,
+        protected ?string $activeOfEvent = null,
+        protected ?Uuid $userId = null,
         protected ?Uuid $orderId = null,
         protected ?Uuid $ticketId = null,
         protected ?int $id = null,
         protected ?Uuid $questionnaireTypeId = null,
-    )
-    {
+    ) {
         $this->link = $this->getLink();
     }
 
@@ -45,8 +45,7 @@ class QuestionnaireTicketDto implements Response
 
     public static function fromState(
         array $data,
-    ): self
-    {
+    ): self {
         $id = (empty($data['id'])) ? null : (int) $data['id'];
         $userId = (empty($data['user_id'])) ? null : new Uuid($data['user_id']);
         $ticketId = (empty($data['ticket_id'] ?? null)) ? null : new Uuid($data['ticket_id']);
@@ -61,7 +60,7 @@ class QuestionnaireTicketDto implements Response
         // Собираем динамические поля (детская анкета и др.)
         $knownFields = ['agy', 'questionForSysto', 'phone', 'howManyTimes', 'is_have_in_club',
             'email', 'telegram', 'vk', 'musicStyles', 'name', 'whereSysto',
-            'creationOfSisto', 'activeOfEvent'];
+            'creationOfSisto', 'activeOfEvent', ];
         $reservedRootKeys = array_merge($knownFields, [
             'id', 'user_id', 'ticket_id', 'order_id', 'status',
             'questionnaire_type_id', 'data',
@@ -71,7 +70,7 @@ class QuestionnaireTicketDto implements Response
         // Собираем из JSON data
         if (is_array($jsonData)) {
             foreach ($jsonData as $key => $value) {
-                if (!in_array($key, $knownFields, true)) {
+                if (! in_array($key, $knownFields, true)) {
                     $extraData[$key] = $value;
                 }
             }
@@ -79,18 +78,18 @@ class QuestionnaireTicketDto implements Response
 
         // Собираем из корневого $data — все поля кроме зарезервированных
         foreach ($data as $key => $value) {
-            if (!in_array($key, $reservedRootKeys, true) && !isset($extraData[$key])) {
+            if (! in_array($key, $reservedRootKeys, true) && ! isset($extraData[$key])) {
                 $extraData[$key] = $value;
             }
         }
 
         $instance = new self(
-            empty($jsonData['agy'] ?? $data['agy'] ?? null) ? null : (int)($jsonData['agy'] ?? $data['agy']),
+            empty($jsonData['agy'] ?? $data['agy'] ?? null) ? null : (int) ($jsonData['agy'] ?? $data['agy']),
             $jsonData['questionForSysto'] ?? $data['questionForSysto'] ?? null,
             $jsonData['phone'] ?? $data['phone'] ?? null,
-            (string)($jsonData['howManyTimes'] ?? $data['howManyTimes'] ?? null),
+            (string) ($jsonData['howManyTimes'] ?? $data['howManyTimes'] ?? null),
             $data['status'] ?? QuestionnaireStatus::NEW,
-            (bool)($jsonData['is_have_in_club'] ?? $data['is_have_in_club'] ?? false),
+            (bool) ($jsonData['is_have_in_club'] ?? $data['is_have_in_club'] ?? false),
             $jsonData['email'] ?? $data['email'] ?? null,
             $jsonData['telegram'] ?? $data['telegram'] ?? null,
             $jsonData['vk'] ?? $data['vk'] ?? null,
@@ -106,7 +105,7 @@ class QuestionnaireTicketDto implements Response
             $questionnaireTypeId,
         );
 
-        if (!empty($extraData)) {
+        if (! empty($extraData)) {
             $instance->setExtraData($extraData);
         }
 
@@ -197,7 +196,7 @@ class QuestionnaireTicketDto implements Response
     {
         $host = \App::isLocal() ? 'http://org.tickets.loc/' : 'https://org.spaceofjoy.ru/';
 
-        if($this->ticketId?->value() && $this->orderId?->value()) {
+        if ($this->ticketId?->value() && $this->orderId?->value()) {
             return $host.'questionnaire/quest/'.$this->ticketId->value().'/'.$this->orderId->value();
         }
 
@@ -222,5 +221,10 @@ class QuestionnaireTicketDto implements Response
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaireTypeId;
     }
 }

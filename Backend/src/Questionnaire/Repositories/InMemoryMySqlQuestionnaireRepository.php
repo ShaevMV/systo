@@ -80,14 +80,14 @@ class InMemoryMySqlQuestionnaireRepository implements QuestionnaireRepositoryInt
     /**
      * Проверяет, является ли тип анкеты "child"
      */
-    private function isChildType(?string $questionnaireTypeId): bool
+    private function isChildType(?Uuid $questionnaireTypeId): bool
     {
-        if (! $questionnaireTypeId) {
+        if ($questionnaireTypeId === null) {
             return false;
         }
 
         try {
-            $type = QuestionnaireTypeModel::find($questionnaireTypeId);
+            $type = QuestionnaireTypeModel::find($questionnaireTypeId->value());
 
             return $type && $type->code === 'child';
         } catch (\Throwable $e) {
