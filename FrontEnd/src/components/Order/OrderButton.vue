@@ -11,6 +11,17 @@
                 style="display: block;">Скачать билет для {{ item.name }}
         </button>
       </div>
+
+      <h4 class="download-title mt-4">Ссылки на анкеты гостей:</h4>
+      <div class="mb-3 mt-3">
+        <a v-for="(item, index) in listTickets"
+           v-bind:key="'questionnaire-' + index"
+           :href="getQuestionnaireUrl(item.id)"
+           target="_blank"
+           class="btn btn-outline-secondary btn-sm d-block mb-2">
+          Заполнить анкету для {{ item.name }}
+        </a>
+      </div>
   </div>
 </template>
 
@@ -58,6 +69,14 @@ export default {
       const win = window.open('about:blank', '_target=blank');
       var ticket = await this.getUrlForPdf(id);
       win.location = ticket;
+    },
+    /**
+     * Получить ссылку на анкету для билета
+     * @param ticketId
+     * @returns {string}
+     */
+    getQuestionnaireUrl(ticketId) {
+      return `/questionnaire/guest/${this.id}/${ticketId}`;
     }
   }
 }
