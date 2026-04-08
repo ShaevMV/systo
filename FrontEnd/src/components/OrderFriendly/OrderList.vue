@@ -76,15 +76,7 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
-            data-target="#exampleModal">
-      Launch demo modal
-    </button>
 
-    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtnLive"
-            data-target="#exampleModalLive">
-      Launch demo modal
-    </button>
 
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -193,7 +185,7 @@ export default {
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
-      'sendtoChangeStatus'
+      'sendToChangeStatus'
     ]),
     styleObject: function (status) {
       return {
@@ -261,7 +253,9 @@ export default {
       this.selectStatus = status;
 
       if (['difficulties_arose'].includes(status)) {
-        document.getElementById('modalOpenBtn').click();
+        const modalEl = document.getElementById('exampleModal');
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
       } else if (['live_ticket_issued'].includes(status)) {
         this.selectItem = itemOrder;
 
@@ -274,10 +268,12 @@ export default {
 
         // Ждем, пока Vue обновит DOM, и только потом открываем модалку
         this.$nextTick(() => {
-          document.getElementById('modalOpenBtnLive').click();
+          const modalElLive = document.getElementById('exampleModalLive');
+          const modalLive = new bootstrap.Modal(modalElLive);
+          modalLive.show();
         });
       } else {
-        this.sendtoChangeStatus({
+        this.sendToChangeStatus({
           'id': itemOrder.id,
           'status': status,
           'comment': null
@@ -289,12 +285,14 @@ export default {
      */
     sendDifficultiesArose() {
       let self = this;
-      this.sendtoChangeStatus({
+      this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'comment': this.comment,
         'callback': function () {
-          document.getElementById('closeModal').click();
+          const modalEl = document.getElementById('exampleModal');
+          const modal = bootstrap.Modal.getInstance(modalEl);
+          if (modal) modal.hide();
           self.selectId = null;
           self.selectStatus = null;
           self.comment = null;
@@ -306,12 +304,14 @@ export default {
      */
     sendLive() {
       let self = this;
-      this.sendtoChangeStatus({
+      this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'liveList': this.liveNumber,
         'callback': function () {
-          document.getElementById('closeModalLive').click();
+          const modalElLive = document.getElementById('exampleModalLive');
+          const modalLive = bootstrap.Modal.getInstance(modalElLive);
+          if (modalLive) modalLive.hide();
           self.selectId = null;
           self.selectStatus = null;
           self.comment = null;

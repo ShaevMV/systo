@@ -40,6 +40,9 @@
     "parserOptions": {
       "parser": "@babel/eslint-parser"
     },
+    "globals": {
+      "bootstrap": "readonly"
+    },
     "rules": {}
   },
   "browserslist": [
