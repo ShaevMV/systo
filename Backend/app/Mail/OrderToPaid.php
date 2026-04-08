@@ -40,12 +40,30 @@ class OrderToPaid extends Mailable
         ini_set('memory_limit', '-1');
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
 
+        $emailView = $this->tickets[0]->getEmailView();
+        $isChildTicket = $emailView === 'TypeTicketMailOrderToPaidChild';
+
+        $questionnaireLinks = [];
+        if ($isChildTicket) {
+            foreach ($this->tickets as $ticket) {
+                $orderId = $ticket->getOrderId();
+                $ticketId = $ticket->getId();
+                if ($orderId && $ticketId) {
+                    $questionnaireLinks[] = [
+                        'name' => $ticket->getName(),
+                        'url' => "https://org.spaceofjoy.ru/questionnaire/{$orderId->value()}/{$ticketId->value()}"
+                    ];
+                }
+            }
+        }
+
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
-        \Log::info('Шаблон  '. $this->tickets[0]->getEmailView());
-        $mail = $this->view('email.'. (empty($this->tickets[0]->getEmailView()) ? 'orderToPaid' : $this->tickets[0]->getEmailView()),[
+        \Log::info('Шаблон  '. $emailView);
+        $mail = $this->view('email.'. (empty($emailView) ? 'orderToPaid' : $emailView),[
             'festivalName' => $festivalName,
             'comment' => $this->comment,
             'promocode' => $this->promocode,
+            'questionnaireLinks' => $questionnaireLinks,
         ]);
 
         foreach ($this->tickets as $ticket) {

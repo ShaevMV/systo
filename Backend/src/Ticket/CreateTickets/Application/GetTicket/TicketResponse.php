@@ -28,6 +28,7 @@ class TicketResponse extends AbstractionEntity implements Response
         protected bool $is_need_seedling = false,
         protected ?Uuid $type_ticket_id = null,
         protected ?string $type_ticket = null,
+        protected ?Uuid $order_id = null,
     )
     {
     }
@@ -105,5 +106,10 @@ class TicketResponse extends AbstractionEntity implements Response
     public function getTypeTicket(): ?string
     {
         return $this->type_ticket;
+    }
+
+    public function getOrderId(): ?Uuid
+    {
+        return $this->order_id;
     }
 }

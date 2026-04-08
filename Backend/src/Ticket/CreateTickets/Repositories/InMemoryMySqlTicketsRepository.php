@@ -138,6 +138,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
+                OrderTicketModel::TABLE . '.id as order_id',
                 $this->model::TABLE . '.festival_id',
                 $this->model::TABLE . '.email',
                 User::TABLE . '.email as email_user',
@@ -166,7 +167,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             new Uuid($result['ticket_type_id']),
-            $result['name_type']
+            $result['name_type'],
+            isset($result['order_id']) ? new Uuid($result['order_id']) : null
         );
     }
 

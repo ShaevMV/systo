@@ -21,6 +21,8 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
 
 final class OrderTicket extends AggregateRoot
 {
+    public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
+
     /**
      * @param GuestsDto[] $ticket
      */
@@ -87,13 +89,15 @@ final class OrderTicket extends AggregateRoot
             )
         );
 
-        foreach ($orderTicketDto->getTicket() as $item) {
-            $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail(),
-                    $orderTicketDto->getId()->value(),
-                    $item->getId()->value(),
-                )
-            );
+        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            foreach ($orderTicketDto->getTicket() as $item) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail(),
+                        $orderTicketDto->getId()->value(),
+                        $item->getId()->value(),
+                    )
+                );
+            }
         }
 
         return $result;
@@ -101,6 +105,10 @@ final class OrderTicket extends AggregateRoot
 
     public static function toProcessGuestNotificationQuestionnaire(OrderTicketDto $orderTicketDto): self
     {
+        if (self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            return self::fromOrderTicketDto($orderTicketDto);
+        }
+
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         foreach ($orderTicketDto->getTicket() as $item) {
@@ -138,19 +146,21 @@ final class OrderTicket extends AggregateRoot
             )
         );
 
-        $orderId = $orderTicketDto->getId();
+        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            $orderId = $orderTicketDto->getId();
 
-        foreach ($orderTicketDto->getTicket() as $item) {
-            $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail() ?? $orderTicketDto->getEmail(),
-                    $orderId->value(),
-                    $item->getId()->value(),
-                )
-            );
-            $result->record(new ProcessTelegramByQuestionnaireSend(
-                    $item->getEmail() ?? $orderTicketDto->getEmail()
-                )
-            );
+            foreach ($orderTicketDto->getTicket() as $item) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail() ?? $orderTicketDto->getEmail(),
+                        $orderId->value(),
+                        $item->getId()->value(),
+                    )
+                );
+                $result->record(new ProcessTelegramByQuestionnaireSend(
+                        $item->getEmail() ?? $orderTicketDto->getEmail()
+                    )
+                );
+            }
         }
 
         return $result;
@@ -205,13 +215,15 @@ final class OrderTicket extends AggregateRoot
             $result->getTicket(),
         ));
 
-        foreach ($orderTicketDto->getTicket() as $item) {
-            $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail(),
-                    $orderTicketDto->getId()->value(),
-                    $item->getId()->value(),
-                )
-            );
+        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            foreach ($orderTicketDto->getTicket() as $item) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail(),
+                        $orderTicketDto->getId()->value(),
+                        $item->getId()->value(),
+                    )
+                );
+            }
         }
 
         foreach ($liveNumber as $key => $item) {
@@ -265,6 +277,11 @@ final class OrderTicket extends AggregateRoot
     public function getTicket(): array
     {
         return $this->ticket;
+    }
+
+    private static function isChildTicket(Uuid $ticketTypeId): bool
+    {
+        return $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
     }
 
 }
