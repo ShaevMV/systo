@@ -1,3 +1,14 @@
+---
+name: frontend-helper
+description: Helps with Vue/Vuex development, creates CRUD modules, unifies with Backend, suggests improvements. Use when working on frontend components, store modules, routes, or API integration.
+tools:
+  - read_file
+  - edit
+  - write_file
+  - grep_search
+  - glob
+---
+
 # Frontend Helper Agent
 
 ## Роль

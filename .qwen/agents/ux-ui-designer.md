@@ -1,3 +1,13 @@
+---
+name: ux-ui-designer
+description: Responsive layout, mobile optimization, UX analysis, accessibility, frontend styling. Use when creating/changing UI components, improving UX, or fixing responsive issues.
+tools:
+  - read_file
+  - edit
+  - write_file
+  - grep_search
+---
+
 # UX/UI Designer Agent
 
 ## Роль

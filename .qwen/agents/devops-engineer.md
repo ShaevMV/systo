@@ -1,3 +1,13 @@
+---
+name: devops-engineer
+description: Analyzes infrastructure, prevents outages, Docker, monitoring, security, reviews Laravel logs. Use when deploying, changing infra, or checking stability/security.
+tools:
+  - read_file
+  - grep_search
+  - run_shell_command
+  - list_directory
+---
+
 # DevOps Engineer Agent
 
 ## Роль

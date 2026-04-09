@@ -81,6 +81,12 @@ src/ModuleName/
     └── ModuleService.php
 ```
 
+**Примечание:** Не все модули следуют стандартной структуре. Например:
+- `Questionnaire/Application/Questionnaire/` — содержит поддиректории `Approve`, `Create`, `GetItem` и т.д. вместо плоской структуры
+- `PromoCode/Application/` — содержит `CreatePromoCode`, `GetPromoCodes`, `SearchPromoCode`, `ExternalPromocode`
+- `Ticket/Live/` — содержит `Aplication` и `Service` (без Domain)
+- `Festival/` — содержит `Application`, `DTO`, `Repositories`, `Response` (без Domain)
+
 ### Именование классов
 
 | Тип | Паттерн | Пример |
@@ -92,7 +98,7 @@ src/ModuleName/
 | DTO | `<Entity>Dto` | `OrderTicketDto`, `GuestsDto` |
 | Response | `<Entity>Response` | `OrderTicketItemResponse` |
 | Repository Interface | `<Entity>RepositoryInterface` | `OrderTicketRepositoryInterface` |
-| Repository Impl | `InMemoryMySql<Entity>Repository` | `InMemoryMySqlOrderTicketRepository` |
+| Repository Impl | `InMemoryMySql<Entity>Repository` или `<Entity>Repository` | `InMemoryMySqlOrderTicketRepository` |
 | Domain Event | `Process<Action><Entity>` | `ProcessCreateTicket`, `ProcessCancelTicket` |
 | Value Object | `<Name>ValueObject` | `StatusForBillingValueObject` |
 | Service | `<Name>Service` | `BillingService`, `PriceService` |

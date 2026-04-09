@@ -1,3 +1,12 @@
+---
+name: tester
+description: Manual QA testing with step-by-step checklists, positive/negative scenarios, regression testing. Use before commits, after new features, or for release validation. 60+ test cases ready.
+tools:
+  - read_file
+  - grep_search
+  - run_shell_command
+---
+
 # Tester Agent
 
 ## Роль

@@ -1,3 +1,14 @@
+---
+name: auto-tester
+description: Writes PHPUnit tests, BDD tests (future), and maintains Seeders. Blocks commits if no tests for new/changed code. Use when writing tests or updating test coverage.
+tools:
+  - read_file
+  - write_file
+  - edit
+  - grep_search
+  - run_shell_command
+---
+
 # Auto-Tester Agent
 
 ## Роль
@@ -234,7 +245,8 @@ Feature: Order Ticket
 |--------|--------------|-----------------|
 | **FestivalSeeder** | 2 фестиваля | При изменении модели Festival |
 | **TypeTicketsSeeder** | 6 типов билетов | При добавлении нового типа билета |
-| **TypeTicketsPriceSeeder** | Волны цен | При изменении ценообразования |
+| **TypeTicketsPriceSeeder** | Волны цен (1-я, 2-я) | При изменении ценообразования |
+| **TypeTicketsPriceThirdWaveSeeder** | 3-я волна цен | При изменении 3-й волны |
 | **TypesOfPaymentSeeder** | 3 способа оплаты | При добавлении нового способа |
 | **PromoCodSeeder** | 2 промокода | При изменении логики промокодов |
 | **UserSeeder** | 3 пользователя (admin, user, manager) | При добавлении ролей/полей пользователя |
@@ -247,19 +259,21 @@ Feature: Order Ticket
 
 ```php
 // database/seeders/DatabaseSeeder.php
-$this->call([
-    PromoCodSeeder::class,
-    TypesOfPaymentSeeder::class,
-    FestivalSeeder::class,
-    TypeTicketsSeeder::class,
-    TypeTicketsPriceSeeder::class,
-    UserSeeder::class,
-    OrderSeeder::class,
-    CommentSeeder::class,
-    TypeTicketsSecondFestivalSeeder::class,
-    TypeTicketsGroupSeeder::class,
-]);
+$this->promoCodSeeder->run();
+$this->typesOfPaymentSeeder->run();
+
+$this->festivalSeeder->run();
+$this->typeTicketsSeeder->run();
+$this->typeTicketsPriceSeeder->run();
+
+$this->userSeeder->run();
+$this->orderSeeder->run();
+$this->commentSeeder->run();
+$this->secondFestivalSeeder->run();
+$this->groupSeeder->run();
 ```
+
+**Примечание:** `TypeTicketsPriceThirdWaveSeeder` не добавлен в DatabaseSeeder — вызывается отдельно при необходимости.
 
 ### Пример создания нового Seeder
 

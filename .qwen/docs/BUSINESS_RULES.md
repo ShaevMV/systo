@@ -140,7 +140,7 @@
 ### Шаблоны PDF
 
 - Шаблоны зависят от фестиваля (`$festivalView`)
-- Расположены в `resources/views/pdf/`, `resources/views/pdf2/`
+- Расположены в `resources/views/pdf.blade.php`, `resources/views/pdf2.blade.php`
 - Шрифты: `istok-r.ttf` (Shared/Services/assets/)
 
 ---
@@ -243,7 +243,7 @@
 |------|----------|-------------------|
 | **guest** | Обычный пользователь | Покупка билетов, анкеты, свои заказы |
 | **admin** | Полный доступ | Всё + управление промокодами, типами билетов, пользователями, анкетами |
-| **seller** | Продавец живых билетов | Просмотр списка заказов (`GET /api/v1/order/getList`), смена статуса заказов (`POST /api/v1/order/toChangeStatus`) |
+| **seller** | Продавец живых билетов | Просмотр списка заказов (`POST /api/v1/order/getList`), смена статуса заказов (`POST /api/v1/order/toChangeStatus`) |
 | **pusher** | Продавец Friendly-билетов | Создание Friendly-заказов (`POST /api/v1/order/createFriendly`), список Friendly-заказов (`POST /api/v1/order/getListForFriendly`), смена статуса (`POST /api/v1/order/toChangeStatus`) |
 | **manager** | Менеджер анкет | Просмотр и одобрение анкет |
 

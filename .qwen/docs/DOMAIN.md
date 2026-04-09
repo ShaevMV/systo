@@ -8,6 +8,8 @@
 
 ```php
 class OrderTicket extends AggregateRoot {
+    public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
+
     Uuid $festival_id;
     Uuid $user_id;
     Uuid $types_of_payment_id;
@@ -303,19 +305,21 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `create(QuestionnaireTicketDto): bool` | Создание анкеты (данные в `data` JSON) |
 | `getList(Filters): Collection` | Список с фильтрами (по `data->$.fieldName`) |
 | `existByEmail(string): bool` | Проверка email (nullable поле) |
-| `findByEmail(string): ?QuestionnaireTicketDto` | Поиск по email + `questionnaireTypeId` |
+| `findByEmail(?string): ?QuestionnaireTicketDto` | Поиск по email (nullable) |
 | `get(int): QuestionnaireTicketDto` | По ID (с парсингом `data` в `extraData`) |
+| `findByOrderIdAndTicketId(Uuid, Uuid): ?QuestionnaireTicketDto` | Поиск по заказу и билету |
+| `findByEmailAndQuestionnaireType(string, Uuid): ?QuestionnaireTicketDto` | Поиск по email + типу анкеты |
 | `cacheStatus(int, string): bool` | Обновить статус |
-| `getByQuestionnaireTypeId(int): Collection` | Список анкет по типу |
 
-### TicketTypeInterfaceRepository
+### TicketTypeRepositoryInterface
 
 | Метод | Описание |
 |-------|----------|
-| `getList(Uuid, bool, ?Carbon): TicketTypeDto[]` | Список типов билетов |
-| `getById(Uuid, ?Carbon): TicketTypeDto` | По ID |
-| `getListPrice(Uuid): array` | Список цен |
-| `create(TicketTypeDto): bool` | Создание |
+| `getList(TicketTypeGetListFilter, Order): Collection` | Список типов билетов с фильтрами |
+| `getItem(Uuid): TicketTypeDto` | По ID |
+| `editItem(Uuid, TicketTypeDto): bool` | Редактировать |
+| `create(TicketTypeDto): bool` | Создать |
+| `remove(Uuid): bool` | Удалить |
 
 ---
 

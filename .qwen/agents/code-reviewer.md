@@ -1,3 +1,12 @@
+---
+name: code-reviewer
+description: Reviews code for CQRS/DDD compliance, naming, structure, Shared usage, security. Use when checking code before commits, reviewing PRs, or validating architecture.
+tools:
+  - read_file
+  - grep_search
+  - glob
+---
+
 # Code Reviewer Agent
 
 ## Роль
