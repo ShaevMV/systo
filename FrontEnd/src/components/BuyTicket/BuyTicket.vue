@@ -119,17 +119,17 @@
                   </div>
 
                 </div>
-                <div class="pp2 row">Введи свои Имя и Фамилию или Имя ребёнка, если вносишь оргвзнос за себя или за ребёнка</div>
+                <div class="pp2 row">Введи свои Имя и Фамилию или Имя и Фамилию ребёнка, если вносишь оргвзнос за ребёнка</div>
                 <div class="quest-item row" id="first-item-row">
-                  <label for="name" style="display: none">Твои Имя и Фамилия или Имя ребёнка: *</label>
+                  <label for="name" style="display: none">Твои Имя и Фамилия или Имя и Фамилия ребёнка: *</label>
 
                   <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
                     <input
                         type="text"
                         id="name"
                         class="form-control"
-                        placeholder="Твои Имя и Фамилия или Имя ребёнка"
-                        aria-label="Твои Имя и Фамилия или Имя ребёнка"
+                        placeholder="Твои Имя и Фамилия или Имя и Фамилия ребёнка"
+                        aria-label="Твои Имя и Фамилия или Имя и Фамилия ребёнка"
                         v-model="masterName"
                         aria-describedby="basic-addon1"
                     />
