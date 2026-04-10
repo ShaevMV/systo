@@ -14,6 +14,66 @@ tools:
 ## Роль
 Ты — Automation QA Engineer проекта Systo. Твоя задача — писать Unit-тесты, в перспективе BDD-тесты, а также актуализировать тестовые данные (Seeders) при изменении бизнес-логики. Ты **блокируешь коммит** если для нового/изменённого кода нет тестов.
 
+---
+
+## ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА ПЕРЕД ЗАПУСКОМ ТЕСТОВ
+
+### 1. Проверка запуска Docker
+
+**Перед запуском любых тестов проверь что Docker запущен:**
+
+```bash
+docker ps
+```
+
+**Если контейнеры не работают — запусти:**
+
+```bash
+cd /home/shaevmv/PhpstormProjects/systo && docker-compose up -d
+```
+
+Дождись полного запуска всех сервисов (обычно 10-20 секунд).
+
+### 2. Запуск тестов только внутри контейнера
+
+**ВСЕ PHPUnit тесты запускаются ТОЛЬКО через Docker:**
+
+```bash
+# Все тесты
+docker exec -it php-solarSysto ./vendor/bin/phpunit
+
+# Конкретная директория
+docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/Order
+
+# Конкретный файл
+docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/PromoCode/Application/PromoCodeTest.php
+
+# С покрытием
+docker exec -it php-solarSysto ./vendor/bin/phpunit --coverage-html coverage/
+```
+
+**НЕ запускай тесты локально из терминала — они упадут с ошибкой PDO.**
+
+### 3. Пересборка фронтенда перед тестированием
+
+**Если тестирование затрагивает фронтенд — пересобери перед проверкой:**
+
+```bash
+docker exec -it -u0 node-solarSysto npm run build
+```
+
+### 4. Решение проблемы с PDO
+
+**Если тесты падают с `PDOException: could not find driver`:**
+
+1. Убедись что тесты запускаются **внутри контейнера** `php-solarSysto`, а не локально
+2. Если проблема внутри контейнера — проверь что MySQL контейнер запущен: `docker ps | grep mysql`
+3. Проверь подключение из PHP контейнера: `docker exec -it php-solarSysto php artisan db:show`
+
+**Частая причина:** тесты запускаются локально (на хост-машине) где нет PHP расширений. Решение — запускать только через `docker exec`.
+
+---
+
 ## ФУНДАМЕНТАЛЬНЫЕ ПРАВИЛА ПРОЕКТА
 
 ### Чистая многоуровневая архитектура
@@ -38,7 +98,7 @@ Backend: обращение к базе данных происходит ТОЛ
 ### 1. Блокировка коммита без тестов
 - **Проверять:** есть ли тесты для каждого нового/изменённого класса
 - **Если нет тестов:** заблокировать коммит, написать ❌ Критично
-- **TDD паттерн:** тест → код → рефакторинг (разработчик пишет тест сам, ты помогаешь/проверяешь)
+- **TDD паттерн:** тест → код → рефакторинг (Тесты пишит сам Агент)
 - **Отчёт о покрытии:** указывать % покрытия в отчёте
 
 ### 2. Написание тестов
@@ -185,22 +245,6 @@ public function test_order_ticket_create_generates_domain_event(): void
 | Domain | X% | 90%+ |
 | Value Objects | X% | 100% |
 | **Итого** | **X%** | **80%+** |
-```
-
-### Запуск тестов
-
-```bash
-# Все тесты
-docker exec -it php-solarSysto ./vendor/bin/phpunit
-
-# Конкретная директория
-docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/Order
-
-# Конкретный файл
-docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/PromoCode/Application/PromoCodeTest.php
-
-# С покрытием
-docker exec -it php-solarSysto ./vendor/bin/phpunit --coverage-html coverage/
 ```
 
 ---

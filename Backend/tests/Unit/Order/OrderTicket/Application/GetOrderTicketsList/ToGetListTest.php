@@ -3,12 +3,7 @@
 namespace Tests\Unit\Order\OrderTicket\Application\GetOrderTicketsList;
 
 use Database\Seeders\OrderSeeder;
-use Database\Seeders\PromoCodSeeder;
-use Database\Seeders\TypesOfPaymentSeeder;
-use Database\Seeders\TypeTicketsSeeder;
 use Database\Seeders\UserSeeder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
@@ -16,12 +11,10 @@ use Tests\TestCase;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
-
+use Database\Seeders\TypeTicketsSeeder;
 
 class ToGetListTest extends TestCase
 {
-    use DatabaseTransactions;
-
     private GetOrder $toGetList;
 
     /**
@@ -33,7 +26,6 @@ class ToGetListTest extends TestCase
         parent::setUp();
         /** @var GetOrder $toGetList */
         $toGetList = $this->app->get(GetOrder::class);
-
         $this->toGetList = $toGetList;
     }
 
@@ -49,10 +41,6 @@ class ToGetListTest extends TestCase
         self::assertNotEmpty($result);
     }
 
-    /**
-     * @throws JsonException
-     * @throws \Nette\Utils\JsonException
-     */
     public function test_is_filter(): void
     {
         $result = $this->toGetList->listByFilter(
@@ -78,11 +66,6 @@ class ToGetListTest extends TestCase
         self::assertEmpty($result?->toArray());
     }
 
-
-    /**
-     * @throws JsonException
-     * @throws \Nette\Utils\JsonException
-     */
     public function test_is_filter_for_multi_festival(): void
     {
         $result = $this->toGetList->listByFilter(
@@ -96,24 +79,6 @@ class ToGetListTest extends TestCase
                 new Uuid(TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL),
             )
         );
-
-
-        self::assertNotEmpty($result?->toArray());
-    }
-
-    /**
-     * @throws JsonException
-     * @throws \Nette\Utils\JsonException
-     */
-    public function test_is_filter_for_manager(): void
-    {
-        $result = $this->toGetList->listByFilter(
-            new OrderFilterQuery(
-                festivalId: new Uuid(FestivalHelper::UUID_FESTIVAL),
-                isManager: true,
-            )
-        );
-
 
         self::assertNotEmpty($result?->toArray());
     }

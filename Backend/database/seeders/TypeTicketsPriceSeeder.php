@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Shared\Domain\ValueObject\Uuid;
 
-use Tickets\Database\Seeders\TypeTicketsSeeder;
+use Database\Seeders\TypeTicketsSeeder;
 
 class TypeTicketsPriceSeeder extends Seeder
 {

@@ -16,6 +16,7 @@ class QuestionnaireGetListQuery implements Query
         private ?string $vk = null,
         ?string $is_have_in_club = null,
         private ?string $status = null,
+        private ?string $questionnaire_type_id = null,
     )
     {
         if(!empty($is_have_in_club)) {
@@ -46,5 +47,10 @@ class QuestionnaireGetListQuery implements Query
     public function getStatus(): ?string
     {
         return $this->status;
+    }
+
+    public function getQuestionnaireTypeId(): ?string
+    {
+        return $this->questionnaire_type_id;
     }
 }

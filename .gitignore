@@ -17,3 +17,7 @@
 !.qwen/PROJECT_MEMORY.md
 !.qwen/docs/
 !.qwen/BOARD.md
+
+# Тестовые артефакты
+Backend/tests/**/QR/*.png
+Backend/storage/app/public/tickets/*.pdf

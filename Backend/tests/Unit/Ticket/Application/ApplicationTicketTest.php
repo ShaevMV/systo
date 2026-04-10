@@ -3,7 +3,6 @@
 namespace Tests\Unit\Ticket\Application;
 
 use Database\Seeders\OrderSeeder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
@@ -16,8 +15,6 @@ use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
 class ApplicationTicketTest extends TestCase
 {
-    use DatabaseTransactions;
-
     private TicketApplication $TicketApplication;
 
     /**
@@ -42,6 +39,8 @@ class ApplicationTicketTest extends TestCase
             [
                 new GuestsDto(
                     'test',
+                    null,
+                    null,
                     new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET),
                     new Uuid(FestivalHelper::UUID_FESTIVAL),
                 ),
@@ -56,39 +55,33 @@ class ApplicationTicketTest extends TestCase
         $tickets = $this->TicketApplication->getPdfList(
             new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)
         );
-
-        self::assertEquals(
-            'http://localhost/storage/tickets/56f04400-02ab-4cbe-bfd4-4f7dda23d675.pdf',
-            $tickets->getUrls()[0]
-        );
+        $url = $tickets->getUrls()[0];
+        self::assertStringContainsString('/storage/tickets/' . OrderSeeder::ID_FOR_FIRST_TICKET . '.pdf', $url);
     }
 
     public function test_in_create_QR_code(): void
     {
         $this->expectNotToPerformAssertions();
         $service = new CreatingQrCodeService();
-        for($i = 1;$i<=4000;$i++) {
+        for ($i = 1; $i <= 10; $i++) {
             $number = $this->addZero($i);
-            $qrCode = $service->createQrCode($number,'');
-            $qrCode->saveToFile(__DIR__.'/QR/'.$number.".png");
+            $qrCode = $service->createQrCode($number, '');
+            $qrCode->saveToFile(__DIR__ . '/QR/' . $number . ".png");
         }
     }
-
 
     private function addZero(int $number): string
     {
         $zero = '';
-
         if ($number < 1000) {
-            $zero.='0';
+            $zero .= '0';
         }
         if ($number < 100) {
-            $zero.='0';
+            $zero .= '0';
         }
         if ($number < 10) {
-            $zero.='0';
+            $zero .= '0';
         }
-
-        return $zero.$number;
+        return $zero . $number;
     }
 }

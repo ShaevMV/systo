@@ -30,6 +30,7 @@ class QuestionnaireController extends Controller
                 $request->get('vk'),
                 $request->get('is_have_in_club'),
                 $request->get('status'),
+                $request->get('questionnaire_type_id'),
             ))->toArray(),
         ]);
     }
