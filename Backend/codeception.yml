@@ -1,0 +1,22 @@
+namespace: Tests
+support_namespace: Support
+paths:
+    tests: tests
+    output: tests/_output
+    data: tests/Support/Data
+    support: tests/Support
+    envs: tests/_envs
+actor_suffix: Tester
+extensions:
+    enabled:
+        - Codeception\Extension\RunFailed
+settings:
+    colors: true
+    memory_limit: 1024M
+coverage:
+    enabled: true
+    include:
+        - app/*
+        - src/*
+    exclude:
+        - vendor/*

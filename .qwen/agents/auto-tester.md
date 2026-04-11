@@ -34,19 +34,84 @@ cd /home/shaevmv/PhpstormProjects/systo && docker-compose up -d
 
 Дождись полного запуска всех сервисов (обычно 10-20 секунд).
 
-### 2. Запуск тестов только внутри контейнера
+### 2. WORKFLOW ТЕСТИРОВАНИЯ (новый процесс)
+
+```
+1. Tester Agent тестирует на systo (без очистки) и описывает BDD сценарий
+2. Auto-Tester Agent (ты):
+   ✅ Переключаешься на systo_test (через .env.testing)
+   ✅ Проверяешь все ли данные для теста есть в seeders
+   ✅ Если данных нет — создаёшь новые seeders
+   ✅ Запускаешь BDD тесты по сценарию от Tester Agent
+3. DevOps Engineer → читает логи
+4. Project Manager → подробный отчёт
+```
+
+### 3. Переключение на тестовую БД `systo_test`
+
+**Unit/Feature тесты (PHPUnit):**
+```bash
+# phpunit.xml уже содержит DB_DATABASE=systo_test
+# Убедись что .env.testing существует:
+test -f /home/shaevmv/PhpstormProjects/systo/Backend/.env.testing
+
+# Если нет — создай (см. Backend/.env.testing)
+```
+
+**Acceptance тесты (Codeception):**
+```bash
+# Codeception использует .env.testing автоматически
+# Убедись что APP_ENV=testing установлен
+```
+
+### 4. Проверка/создание БД `systo_test`
+
+```bash
+# Создать БД (если ещё не существует)
+docker exec systo-mysql-1 mysql -u default -psecret -e "CREATE DATABASE IF NOT EXISTS systo_test;"
+
+# Применить миграции
+docker exec -it php-solarSysto php artisan migrate --env=testing
+
+# Запустить seeders
+docker exec -it php-solarSysto php artisan db:seed --env=testing
+```
+
+### 5. Проверка полноты Seeders перед BDD тестами
+
+**Перед запуском Acceptance тестов — проверь что seeders содержат ВСЕ данные:**
+
+```markdown
+Чек-лист проверки Seeders:
+
+1. Прочитай сценарий из .qwen/docs/BDD_SCENARIOS.md
+2. Выпиши какие сущности нужны (пользователи, фестивали, анкеты и т.д.)
+3. Проверь есть ли Seeder для каждой сущности:
+   - FestivalSeeder ✅
+   - TypeTicketsSeeder ✅
+   - TypesOfPaymentSeeder ✅
+   - UserSeeder ✅
+   - OrderSeeder ✅
+   - PromoCodSeeder ✅
+   - QuestionnaireTypeSeeder ❓ (создать если нет)
+   - QuestionnaireSeeder ❓ (создать если нет)
+4. Если нет — создай Seeder с тестовыми данными
+5. Добавь в DatabaseSeeder
+```
+
+### 6. Запуск тестов только внутри контейнера
 
 **ВСЕ PHPUnit тесты запускаются ТОЛЬКО через Docker:**
 
 ```bash
-# Все тесты
+# Все Unit тесты
 docker exec -it php-solarSysto ./vendor/bin/phpunit
 
-# Конкретная директория
-docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/Order
+# Все Acceptance тесты
+docker exec -it php-solarSysto php vendor/bin/codecept run Acceptance
 
 # Конкретный файл
-docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/PromoCode/Application/PromoCodeTest.php
+docker exec -it php-solarSysto ./vendor/bin/phpunit tests/Unit/Order
 
 # С покрытием
 docker exec -it php-solarSysto ./vendor/bin/phpunit --coverage-html coverage/
@@ -54,7 +119,7 @@ docker exec -it php-solarSysto ./vendor/bin/phpunit --coverage-html coverage/
 
 **НЕ запускай тесты локально из терминала — они упадут с ошибкой PDO.**
 
-### 3. Пересборка фронтенда перед тестированием
+### 7. Пересборка фронтенда перед тестированием
 
 **Если тестирование затрагивает фронтенд — пересобери перед проверкой:**
 
@@ -62,7 +127,7 @@ docker exec -it php-solarSysto ./vendor/bin/phpunit --coverage-html coverage/
 docker exec -it -u0 node-solarSysto npm run build
 ```
 
-### 4. Решение проблемы с PDO
+### 8. Решение проблемы с PDO
 
 **Если тесты падают с `PDOException: could not find driver`:**
 
@@ -249,7 +314,133 @@ public function test_order_ticket_create_generates_domain_event(): void
 
 ---
 
-## BDD-тесты (в перспективе)
+## BDD-тесты (Acceptance через Codeception + WebDriver)
+
+### Конфигурация
+
+Codeception установлен в `Backend/` с WebDriver (Selenium Chrome):
+
+```yaml
+# tests/Acceptance.suite.yml
+modules:
+    enabled:
+        - WebDriver:
+            url: 'http://org.tickets.loc/'
+            browser: chrome
+            host: chromedriver
+            port: 4444
+```
+
+**Docker сервис:** `chromedriver-solarSysto` (selenium/standalone-chrome:latest)
+
+### Когда использовать Acceptance тесты
+
+| Ситуация | Используем |
+|----------|------------|
+| Проверка DOM элементов на странице | ✅ Acceptance |
+| Проверка Vue.js реактивности | ✅ Acceptance |
+| Проверка редиректов после логина | ✅ Acceptance |
+| Проверка API ответов | ❌ Unit/Feature (PHPUnit) |
+| Проверка бизнес-логики | ❌ Unit (PHPUnit) |
+| Проверка генерации PDF | ❌ Unit (мокать PDF сервис) |
+
+### Паттерн Acceptance теста (Cest)
+
+```php
+<?php
+
+namespace Tests\Acceptance;
+
+use Tests\Support\AcceptanceTester;
+
+class LoginTestCest
+{
+    public function checkUserCanLogin(AcceptanceTester $I): void
+    {
+        // Arrange: Открыть страницу
+        $I->amOnPage('/');
+        
+        // Act: Заполнить форму
+        $I->fillField('input[type="email"]', 'admin@systo.ru');
+        $I->fillField('input[type="password"]', 'password');
+        $I->click('button[type="submit"]');
+        
+        // Assert: Проверить DOM элементы и редирект
+        $I->wait(2); // Ждём Vue.js реактивность
+        $I->seeInCurrentUrl('/dashboard');
+        $I->seeElement('.user-menu');
+    }
+}
+```
+
+### Основные методы AcceptanceTester
+
+| Метод | Описание | Пример |
+|-------|----------|--------|
+| `amOnPage('/url')` | Перейти на страницу | `$I->amOnPage('/orders')` |
+| `seeElement('selector')` | Проверить что DOM элемент есть | `$I->seeElement('#filter')` |
+| `dontSeeElement('selector')` | Проверить что элемента НЕТ | `$I->dontSeeElement('.error')` |
+| `fillField('selector', 'value')` | Заполнить поле | `$I->fillField('input[name="email"]', 'test@example.com')` |
+| `click('button')` | Кликнуть | `$I->click('.btn-submit')` |
+| `see('текст')` | Проверить что текст есть на странице | `$I->see('Анкета одобрена')` |
+| `dontSee('текст')` | Проверить что текста НЕТ | `$I->dontSee('Ошибка')` |
+| `seeInCurrentUrl('/url')` | Проверить URL | `$I->seeInCurrentUrl('/orders')` |
+| `waitForElement('selector')` | Ждать появления элемента | `$I->waitForElement('.list-item', 5)` |
+| `wait(seconds)` | Пауза (для AJAX/Vue) | `$I->wait(2)` |
+| `grabTextFrom('selector')` | Получить текст элемента | `$text = $I->grabTextFrom('.status')` |
+| `selectOption('select', 'value')` | Выбрать из dropdown | `$I->selectOption('#type-select', '123')` |
+
+### Запуск Acceptance тестов
+
+```bash
+# Все Acceptance тесты
+docker exec -it php-solarSysto php vendor/bin/codecept run acceptance
+
+# Конкретный файл
+docker exec -it php-solarSysto php vendor/bin/codecept run tests/Acceptance/LoginTestCest.php
+
+# С выводом в консоль
+docker exec -it php-solarSysto php vendor/bin/codecept run acceptance --steps
+
+# Без headless (для отладки — нужен VNC на chromedriver)
+# Изменить tests/Acceptance.suite.yml: убрать "--headless" из capabilities
+```
+
+### Файлы сценариев
+
+**Все 47 BDD сценариев описаны в:** `.qwen/docs/BDD_SCENARIOS.md`
+
+Этот файл — **единственный источник истины** для написания Acceptance тестов. Каждый сценарий содержит:
+- URL страницы
+- Пошаговые действия с Codeception методами
+- Ожидаемые DOM элементы (CSS селекторы)
+- Ожидаемые изменения URL
+- Проверка контента
+
+### Рекомендации
+
+1. **Стабильные селекторы:** Использовать `id`, `data-testid`, `name`. Избегать XPath с позициями.
+2. **Vue.js реактивность:** Всегда добавлять `$I->wait(1)` после кликов которые вызывают AJAX.
+3. **Авторизация:** Для тестов требующих логин — создать хелпер `$I->amLoggedInAs('admin')` который заполняет форму.
+4. **Тестовые данные:** Использовать сидеры для создания начальных данных (пользователи, фестивали, типы билетов).
+5. **Headless режим:** По умолчанию включён. Для отладки — убрать `--headless` и подключиться к VNC на порту 5900.
+
+### Проверка работы
+
+```bash
+# 1. Убедиться что chromedriver запущен
+docker ps | grep chromedriver
+
+# 2. Запустить один тест
+docker exec -it php-solarSysto php vendor/bin/codecept run tests/Acceptance/LoginTestCest.php
+
+# 3. Проверить результат
+# Ожидаемый вывод: OK (X tests, Y assertions)
+```
+
+---
+
+## Формат отчёта
 
 ### Behat (когда будет настроен)
 
