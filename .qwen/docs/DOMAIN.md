@@ -408,3 +408,31 @@ if ($filter->value()->value() !== null) { ... }
 // Стало
 if (!empty($filter->value()->value())) { ... }
 ```
+
+### Исправление вывода полей из JSON `data` (2026-04-11)
+
+**Проблема:** В админке анкет все поля отображались как "—" (прочерк), хотя данные присутствовали в JSON-колонке `data`.
+
+**Найденные проблемы:**
+
+1. **`phone` колонка имела NOT NULL ограничение** — при вставке записей где данные только в JSON `data`, Laravel пытался вставить NULL в корневую колонку `phone` что вызывало ошибку.
+
+2. **`InMemoryMySqlQuestionnaireRepository::getList()` использовал `each()` вместо `map()`** — это означало что модели НЕ конвертировались в DTO, и контроллер возвращал сырые данные модели (корневые колонки) вместо данных из JSON `data`.
+
+**Исправления:**
+
+1. Миграция `2026_04_11_140005_fix_questionnaire_phone_nullable.php` — сделала `phone` NULLable.
+
+2. Изменён `each()` на `map()` в `InMemoryMySqlQuestionnaireRepository::getList()`:
+```php
+// Было
+->each(fn (QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
+
+// Стало
+->map(fn (QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
+```
+
+**Тесты:**
+- Unit: `tests/Unit/Questionnaire/Dto/QuestionnaireTicketDtoTest.php` (4 теста)
+- Feature: `tests/Feature/Questionnaire/QuestionnaireDataFieldsApiTest.php` (2 теста)
+- Сидер: `QuestionnaireTestDataSeeder` — создаёт 3 тестовые анкеты с данными только в JSON `data`
