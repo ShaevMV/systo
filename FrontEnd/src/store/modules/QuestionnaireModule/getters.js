@@ -28,3 +28,11 @@ export const getQuestionnaireList = state => {
 export const getQuestionnaireItem = state => {
     return state.questionnaireItem;
 };
+
+export const getIsLoading = state => {
+    return state.isLoading;
+};
+
+export const getMessage = state => {
+    return state.message;
+};

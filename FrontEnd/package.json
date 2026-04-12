@@ -41,7 +41,9 @@
       "parser": "@babel/eslint-parser"
     },
     "globals": {
-      "bootstrap": "readonly"
+      "bootstrap": "readonly",
+      "$": "readonly",
+      "jQuery": "readonly"
     },
     "rules": {}
   },

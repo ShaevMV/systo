@@ -75,4 +75,13 @@ interface OrderTicketRepositoryInterface
         Status $newStatus,
         array $guests
     ): bool;
+
+    /**
+     * Изменить цену заказа (только для admin)
+     *
+     * @param Uuid $orderId
+     * @param float $newPrice
+     * @return bool
+     */
+    public function changePrice(Uuid $orderId, float $newPrice): bool;
 }

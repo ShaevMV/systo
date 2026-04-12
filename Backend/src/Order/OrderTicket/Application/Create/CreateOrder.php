@@ -103,7 +103,7 @@ final class CreateOrder
 
 
             if (!$orderTicketDto->isIsLiveTicket()) {
-                $orderTicket = OrderTicket::toPaid($orderTicketDto);
+                $orderTicket = OrderTicket::toPaidFriendly($orderTicketDto);
             } else {
                 $orderTicket = OrderTicket::toLiveIssued($orderTicketDto, $this->getLiveTicketByFriendly($orderTicketDto->getTicket()));
             }

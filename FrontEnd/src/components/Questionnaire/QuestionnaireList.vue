@@ -13,13 +13,12 @@
               <th scope="col" class="mobile">№</th>
               <th scope="col" class="mobile"></th>
               <th scope="col">Email</th>
-              <th scope="col" class="mobile">Имя</th>
               <th scope="col">Телефон</th>
-              <th scope="col">Возраст</th>
-              <th scope="col" class="mobile">Telegram-аккаунт:</th>
-              <th scope="col">Профайл Вконтакте</th>
-              <th scope="col" class="mobile">Сколько раз на Систо?</th>
-              <th scope="col">Откуда</th>
+              <th scope="col">Telegram</th>
+              <th scope="col">VK</th>
+              <th scope="col" class="mobile">Тип анкеты</th>
+              <th scope="col">Статус</th>
+              <th scope="col">В клубе</th>
               <th scope="col">Отправить повторно</th>
             </tr>
             </thead>
@@ -48,14 +47,13 @@
                   </div>
                 </div>
               </td>
-              <td>{{ item.email }}</td>
-              <td class="mobile">{{ item.name }}</td>
-              <td>{{ item.phone }}</td>
-              <td>{{ item.agy }}</td>
-              <td class="mobile">{{ item.telegram }}</td>
-              <td>{{ item.vk }}</td>
-              <td class="mobile">{{ item.howManyTimes }}</td>
-              <td>{{ item.whereSysto }}</td>
+              <td>{{ item.email || '—' }}</td>
+              <td>{{ item.phone || '—' }}</td>
+              <td class="mobile">{{ item.telegram || '—' }}</td>
+              <td>{{ item.vk || '—' }}</td>
+              <td class="mobile">{{ getQuestionnaireTypeName(item.questionnaire_type_id) }}</td>
+              <td>{{ getStatusName(item.status) }}</td>
+              <td>{{ item.is_have_in_club ? 'Да' : 'Нет' }}</td>
               <td>
                 <span
                     v-show="item.email"
@@ -86,9 +84,12 @@ export default {
     ...mapGetters('appQuestionnaire', [
       'getQuestionnaireList'
     ]),
+    ...mapGetters('appTicketType', [
+      'getQuestionnaireTypeList'
+    ]),
     listCorrectNextStatus: function () {
       return {
-        approve: "Подвердить"
+        approve: "Подтвердить"
       }
     }
   },
@@ -118,10 +119,24 @@ export default {
         id: id,
         email: email,
         callback: function () {
-          alert('На почту отлитело!')
+          alert('На почту отправлено!')
         }
       });
 
+    },
+    getQuestionnaireTypeName(questionnaireTypeId) {
+      if (!questionnaireTypeId) {
+        return '—';
+      }
+      const type = this.getQuestionnaireTypeList.find(t => t.id === questionnaireTypeId);
+      return type ? type.name : '—';
+    },
+    getStatusName(status) {
+      const statusMap = {
+        'NEW': 'Новая',
+        'APPROVE': 'Одобрена',
+      };
+      return statusMap[status] || status;
     }
   },
   async created() {

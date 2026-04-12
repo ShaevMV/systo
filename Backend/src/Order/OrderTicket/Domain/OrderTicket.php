@@ -166,6 +166,58 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    /**
+     * Оплата Friendly-заказа (созданного пушером).
+     *
+     * Отличается от toPaid() тем что:
+     * - Использует ProcessUserNotificationOrderPaidFriendly (без ссылки на /myOrders)
+     * - У гостей friendly-заказов нет личного кабинета
+     *
+     * Источник: Роберт Мартин — «Чистая архитектура», глава «Зависимости» (Dependency Rule)
+     * Domain Events остаются чистыми — каждый описывает один конкретный случай.
+     */
+    public static function toPaidFriendly(
+        OrderTicketDto        $orderTicketDto,
+        ?string               $comment = null,
+        ?ExternalPromoCodeDto $externalPromoCodeDto = null
+    ): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
+
+        $result->record(new ProcessUserNotificationOrderPaidFriendly(
+                $orderTicketDto->getEmail(),
+                $result->getTicket(),
+                $orderTicketDto->getTicketTypeId(),
+                $comment,
+                $externalPromoCodeDto?->getPromocode(),
+            )
+        );
+
+        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            $orderId = $orderTicketDto->getId();
+
+            foreach ($orderTicketDto->getTicket() as $item) {
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                        $item->getEmail() ?? $orderTicketDto->getEmail(),
+                        $orderId->value(),
+                        $item->getId()->value(),
+                    )
+                );
+                $result->record(new ProcessTelegramByQuestionnaireSend(
+                        $item->getEmail() ?? $orderTicketDto->getEmail()
+                    )
+                );
+            }
+        }
+
+        return $result;
+    }
+
     public static function toCancel(OrderTicketDto $orderTicketDto): self
     {
         $result = self::fromOrderTicketDto($orderTicketDto);

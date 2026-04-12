@@ -9,10 +9,12 @@
 | 🔴 High | Обновление Laravel 9 → 11 | Tech Lead | 2026-04-04 | **После 1 июня** |
 | 🔴 High | Реальная фикс Race Condition воркера (Healthchecks) | Tech Lead | 2026-04-04 | **До фестиваля** |
 | 🔴 High | Восстановление и починка Unit-тестов (PDO/Connection) | Auto-Tester | 2026-04-04 | ASAP |
+| 🔴 High | Исправить фильтрацию `festivalId` в Vuex store OrderModule | Frontend Helper | 2026-04-12 | Сделано |
 | Medium | Рефакторинг использования Shared кода в Baza | Tech Lead | 2026-04-04 | Когда будет время |
 | Medium | Покрыть тестами контроллеры (HTTP слой) | Auto-Tester | 2026-04-04 | — |
 | Medium | Логирование действий админов (смена статусов, удаление) | DevOps | 2026-04-04 | — |
 | Medium | Настроить CI/CD пайплайн (GitHub Actions) | DevOps | 2026-04-04 | — |
+| Medium | Миграция Bootstrap 4 → 5 (модалки через vanilla JS) | Frontend Helper | 2026-04-12 | — |
 | Low | Миграция на Vue Router lazy loading | Frontend Helper | 2026-04-04 | — |
 | Low | Заменить jQuery модалки на нативные Vue | Tester | 2026-04-04 | — |
 | Low | Единый Response Interceptor для Axios | Frontend Helper | 2026-04-04 | — |

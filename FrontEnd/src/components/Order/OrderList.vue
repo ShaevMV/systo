@@ -179,6 +179,7 @@ export default {
       selectStatus: null,
       selectItem: {},
       liveNumber: {},
+      isChangingStatus: false,
     }
   },
   props: {
@@ -190,12 +191,21 @@ export default {
   computed: {
     ...mapGetters('appOrder', [
       'getOrderList',
-      'getError'
+      'getError',
+      'getIsLoading'
     ]),
     getListGuest: function () {
       return this.selectItem?.guests ?? [];
     },
 
+  },
+  watch: {
+    getIsLoading(newValue) {
+      // Сбрасываем флаг блокировки при завершении загрузки
+      if (!newValue) {
+        this.isChangingStatus = false;
+      }
+    }
   },
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
@@ -264,9 +274,10 @@ export default {
       this.selectStatus = status;
 
       if (['difficulties_arose'].includes(status)) {
-        const modalEl = document.getElementById('exampleModal');
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+        // Открытие модалки через jQuery (Bootstrap 4)
+        if (typeof $ !== 'undefined') {
+          $('#exampleModal').modal('show');
+        }
       } else if (['live_ticket_issued'].includes(status)) {
         this.selectItem = itemOrder;
 
@@ -279,11 +290,12 @@ export default {
 
         // Ждем, пока Vue обновит DOM, и только потом открываем модалку
         this.$nextTick(() => {
-          const modalElLive = document.getElementById('exampleModalLive');
-          const modalLive = new bootstrap.Modal(modalElLive);
-          modalLive.show();
+          if (typeof $ !== 'undefined') {
+            $('#exampleModalLive').modal('show');
+          }
         });
       } else {
+        this.isChangingStatus = true;
         this.sendToChangeStatus({
           'id': itemOrder.id,
           'status': status,
@@ -296,14 +308,22 @@ export default {
      */
     sendDifficultiesArose() {
       let self = this;
+      this.isChangingStatus = true;
       this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'comment': this.comment,
         'callback': function () {
-          const modalEl = document.getElementById('exampleModal');
-          const modal = bootstrap.Modal.getInstance(modalEl);
-          if (modal) modal.hide();
+          // Убираем фокус с кнопки перед закрытием (accessibility fix)
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
+          
+          // Закрытие модалки через jQuery (Bootstrap 4)
+          if (typeof $ !== 'undefined') {
+            $('#exampleModal').modal('hide');
+          }
+          
           self.selectId = null;
           self.selectStatus = null;
           self.comment = null;
@@ -315,14 +335,22 @@ export default {
      */
     sendLive() {
       let self = this;
+      this.isChangingStatus = true;
       this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'liveList': this.liveNumber,
         'callback': function () {
-          const modalElLive = document.getElementById('exampleModalLive');
-          const modalLive = bootstrap.Modal.getInstance(modalElLive);
-          if (modalLive) modalLive.hide();
+          // Убираем фокус с кнопки перед закрытием (accessibility fix)
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
+          
+          // Закрытие модалки через jQuery (Bootstrap 4)
+          if (typeof $ !== 'undefined') {
+            $('#exampleModalLive').modal('hide');
+          }
+          
           self.selectId = null;
           self.selectStatus = null;
           self.comment = null;

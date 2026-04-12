@@ -130,7 +130,7 @@
 
 ---
 
-### GET `/api/findUserByEmail/{email}`
+### GET `/api/findUserByEmail/:email`
 **Middleware:** публичный
 
 **Response:** `{ "success": true/false }`
@@ -403,6 +403,16 @@
 
 ---
 
+### GET `/api/v1/questionnaire/getByOrderTicket/{orderId}/{ticketId}`
+**Middleware:** публичный
+
+**Описание:** Получить заполненную анкету по заказу и билету.
+
+**Response 200:** `{ "success": true, "questionnaire": {...} }`
+**Response 404:** `{ "success": false, "message": "Анкета не найдена" }`
+
+---
+
 ## 6. Типы анкет
 
 Префикс: **`/api/v1/questionnaireType`**
@@ -411,6 +421,7 @@
 |-------|---------|------------|----------|
 | POST | `/getList` | публичный | Список с фильтрацией |
 | GET | `/getItem/{id}` | публичный | Один тип анкеты |
+| GET | `/getByCode/{code}` | публичный | Найти тип анкеты по коду |
 | POST | `/create` | публичный | Создать (UUID в `data.id`) |
 | POST | `/edit/{id}` | публичный | Редактировать |
 | DELETE | `/delete/{id}` | публичный | Удалить |
@@ -481,9 +492,9 @@
 | POST | `/getList` | Список с фильтрацией |
 | GET | `/getItem/{email}` | Один пользователь |
 | POST | `/edit/{id}` | Редактировать |
-| POST | `/chanceRole/{id}` | Сменить роль |
+| POST | `/changeRole/{id}` | Сменить роль |
 
-**chanceRole Request:** `{ "role": "string (admin/seller/pusher/manager)" }`
+**changeRole Request:** `{ "role": "string (admin/seller/pusher/manager)" }`
 
 ---
 
@@ -521,7 +532,7 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
 | **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get |
 | **role: seller,admin** | order/getList, order/toChangeStatus |

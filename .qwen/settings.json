@@ -41,7 +41,10 @@
       "Bash(select *)",
       "Bash(git restore *)",
       "Bash(true)",
-      "Bash(git stash)"
+      "Bash(git stash)",
+      "Bash(php *)",
+      "WebFetch(sme-ecomm-merchant-shopping-docs-external.t-static.ru)",
+      "WebSearch"
     ]
   },
   "$version": 3

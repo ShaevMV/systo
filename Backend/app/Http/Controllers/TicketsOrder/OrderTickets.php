@@ -18,6 +18,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
+use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
@@ -44,6 +45,7 @@ class OrderTickets extends Controller
         private GetOrder           $getOrder,
         private TotalNumber        $totalNumber,
         private ChangeStatus       $chanceStatus,
+        private ChangeOrderPrice   $changeOrderPrice,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
        // private Billing            $billing,
@@ -346,13 +348,72 @@ class OrderTickets extends Controller
             liveList: $request->get('liveList', [])
         );
 
+        // Получаем обновлённый заказ для возврата полного объекта
+        $updatedOrder = $this->getOrder->getItemById(new Uuid($id));
+
         return response()->json([
             'success' => true,
             'status' => [
                 'name' => $request->get('status'),
                 'humanStatus' => $status->getHumanStatus(),
                 'listCorrectNextStatus' => $status->getListNextStatus(),
-            ]
+            ],
+            'order' => $updatedOrder?->toArray()
+        ]);
+    }
+
+    /**
+     * Изменить цену заказа (только для admin)
+     *
+     * @param string $id
+     * @param Request $request
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function changePrice(
+        string  $id,
+        Request $request,
+    ): JsonResponse
+    {
+        // Проверяем что пользователь — admin
+        $user = Auth::user();
+        if (!$user || !$user->is_admin) {
+            return response()->json([
+                'success' => false,
+                'errors' => ['error' => 'Изменять цену может только администратор']
+            ], 403);
+        }
+
+        // Валидация
+        $rules = [
+            'price' => 'required|numeric|gt:0',
+        ];
+        $messages = [
+            'price.required' => 'Цена обязательна',
+            'price.numeric' => 'Цена должна быть числом',
+            'price.gt' => 'Цена должна быть больше 0',
+        ];
+
+        $validator = \Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $newPrice = (float) $request->get('price');
+
+        $this->changeOrderPrice->change(
+            new Uuid($id),
+            $newPrice,
+            new Uuid(Auth::id())
+        );
+
+        return response()->json([
+            'success' => true,
+            'price' => $newPrice,
         ]);
     }
 

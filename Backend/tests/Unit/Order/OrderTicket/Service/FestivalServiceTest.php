@@ -9,7 +9,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
-use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class FestivalServiceTest extends TestCase
@@ -23,7 +22,6 @@ class FestivalServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $festivalService = $this->app->get(FestivalService::class);
         /** @var FestivalService $festivalService */
         $this->festivalService = $festivalService;
@@ -31,7 +29,6 @@ class FestivalServiceTest extends TestCase
 
     /**
      * @dataProvider dataProvider
-     * @return void
      */
     public function test_get_correct_festival_name(string $ticketTypeId, string $nameFestival): void
     {
@@ -44,16 +41,15 @@ class FestivalServiceTest extends TestCase
         return [
             [
                 TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL,
-                'Solar Systo Togathering '.date('Y').' и на Систо-Осень '. date('Y')
+                'Solar Systo Togathering 2026 и на Систо-Осень 2026'
             ],
             [
                 TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-                'Solar Systo Togathering '.date('Y')
+                'Solar Systo Togathering 2026'
             ],
-
             [
                 TypeTicketsSeeder::ID_FOR_NEXT_FESTIVAL,
-                'Систо-Осень '. date('Y')
+                'Систо-Осень 2026'
             ],
         ];
     }

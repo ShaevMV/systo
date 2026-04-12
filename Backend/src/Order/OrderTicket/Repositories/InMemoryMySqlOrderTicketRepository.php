@@ -234,10 +234,39 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
         DB::beginTransaction();
         try {
-
             $order = $this->model::find($orderId->value());
+
+            // Optimistic concurrency: проверяем что статус не был изменён другим запросом
+            if ($order->status === (string)$newStatus) {
+                DB::commit();
+                return true; // Уже в целевом статусе — идемпотентность
+            }
+
             $order->status = (string)$newStatus;
             $order->guests = $arrGuests;
+            $order->save();
+            DB::commit();
+
+            return true;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param Uuid $orderId
+     * @param float $newPrice
+     * @return bool
+     * @throws Throwable
+     */
+    public function changePrice(Uuid $orderId, float $newPrice): bool
+    {
+        DB::beginTransaction();
+        try {
+            $order = $this->model::find($orderId->value());
+            $order->price = $newPrice;
+            $order->discount = 0; // Сбрасываем скидку при ручном изменении цены
             $order->save();
             DB::commit();
 

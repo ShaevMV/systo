@@ -40,6 +40,11 @@ class ChangeStatusCommandHandler implements CommandHandler
             throw new DomainException('Не найден заказ ' . $command->getOrderId());
         }
 
+        // Проверка idempotency: если заказ уже в целевом статусе — это повторный запрос
+        if ($orderTicketDto->getStatus()->equals($command->getNextStatus())) {
+            throw new DomainException("Заказ уже находится в статусе {$orderTicketDto->getStatus()->getHumanStatus()}");
+        }
+
         if (!$orderTicketDto->getStatus()->isCorrectNextStatus($command->getNextStatus())) {
             throw new DomainException("Из текущего статуса {$orderTicketDto->getStatus()->getHumanStatus()}
             нельзя перевести в статус " . $command->getNextStatus()->getHumanStatus());

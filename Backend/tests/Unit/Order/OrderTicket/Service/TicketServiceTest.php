@@ -24,7 +24,6 @@ class TicketServiceTest extends TestCase
         parent::setUp();
         /** @var TicketService $ticketService */
         $ticketService = $this->app->get(TicketService::class);
-
         $this->ticketService = $ticketService;
     }
 
@@ -34,11 +33,14 @@ class TicketServiceTest extends TestCase
             ->initFestivalId([
                 [
                     'value' => '1235',
+                    'email' => 'test@example.com',
                 ]
             ], [
                 new Uuid(FestivalHelper::UUID_FESTIVAL),
                 new Uuid(FestivalHelper::UUID_SECOND_FESTIVAL),
             ]);
         self::assertCount(2, $result);
+        self::assertArrayHasKey('email', $result[0]);
+        self::assertArrayHasKey('festival_id', $result[0]);
     }
 }

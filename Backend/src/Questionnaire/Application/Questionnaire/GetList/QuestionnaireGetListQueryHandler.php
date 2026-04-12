@@ -58,6 +58,11 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getIsHaveInClub(),
             ],
+            [
+                'field' => QuestionnaireModel::TABLE . '.questionnaire_type_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getQuestionnaireTypeId(),
+            ],
         ];
     }
 }

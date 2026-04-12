@@ -8,6 +8,8 @@
 
 ```php
 class OrderTicket extends AggregateRoot {
+    public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
+
     Uuid $festival_id;
     Uuid $user_id;
     Uuid $types_of_payment_id;
@@ -122,7 +124,7 @@ class Questionnaire extends AggregateRoot {
 | VO | Путь | Описание |
 |----|------|----------|
 | **Uuid** | `Shared/Domain/ValueObject/Uuid.php` | UUID v4 (Ramsey), методы: `random()`, `value()`, `equals()` |
-| **Status** | `Shared/Domain/ValueObject/Status.php` | Статусы заказов с матрицей переходов |
+| **Status** | `Shared/Domain/ValueObject/Status.php` | Статусы заказов с матрицей переходов. **См. BUSINESS_RULES.md §1** |
 | **Enum** | `Shared/Domain/ValueObject/Enum.php` | Абстрактный Enum: `__callStatic()`, `fromString()`, `randomValue()` |
 | **StringValueObject** | `Shared/Domain/ValueObject/StringValueObject.php` | Абстрактная обёртка `?string` |
 | **IntValueObject** | `Shared/Domain/ValueObject/IntValueObject.php` | Абстрактная обёртка `int`, метод `isBiggerThan()` |
@@ -303,19 +305,21 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `create(QuestionnaireTicketDto): bool` | Создание анкеты (данные в `data` JSON) |
 | `getList(Filters): Collection` | Список с фильтрами (по `data->$.fieldName`) |
 | `existByEmail(string): bool` | Проверка email (nullable поле) |
-| `findByEmail(string): ?QuestionnaireTicketDto` | Поиск по email + `questionnaireTypeId` |
+| `findByEmail(?string): ?QuestionnaireTicketDto` | Поиск по email (nullable) |
 | `get(int): QuestionnaireTicketDto` | По ID (с парсингом `data` в `extraData`) |
+| `findByOrderIdAndTicketId(Uuid, Uuid): ?QuestionnaireTicketDto` | Поиск по заказу и билету |
+| `findByEmailAndQuestionnaireType(string, Uuid): ?QuestionnaireTicketDto` | Поиск по email + типу анкеты |
 | `cacheStatus(int, string): bool` | Обновить статус |
-| `getByQuestionnaireTypeId(int): Collection` | Список анкет по типу |
 
-### TicketTypeInterfaceRepository
+### TicketTypeRepositoryInterface
 
 | Метод | Описание |
 |-------|----------|
-| `getList(Uuid, bool, ?Carbon): TicketTypeDto[]` | Список типов билетов |
-| `getById(Uuid, ?Carbon): TicketTypeDto` | По ID |
-| `getListPrice(Uuid): array` | Список цен |
-| `create(TicketTypeDto): bool` | Создание |
+| `getList(TicketTypeGetListFilter, Order): Collection` | Список типов билетов с фильтрами |
+| `getItem(Uuid): TicketTypeDto` | По ID |
+| `editItem(Uuid, TicketTypeDto): bool` | Редактировать |
+| `create(TicketTypeDto): bool` | Создать |
+| `remove(Uuid): bool` | Удалить |
 
 ---
 
@@ -404,3 +408,31 @@ if ($filter->value()->value() !== null) { ... }
 // Стало
 if (!empty($filter->value()->value())) { ... }
 ```
+
+### Исправление вывода полей из JSON `data` (2026-04-11)
+
+**Проблема:** В админке анкет все поля отображались как "—" (прочерк), хотя данные присутствовали в JSON-колонке `data`.
+
+**Найденные проблемы:**
+
+1. **`phone` колонка имела NOT NULL ограничение** — при вставке записей где данные только в JSON `data`, Laravel пытался вставить NULL в корневую колонку `phone` что вызывало ошибку.
+
+2. **`InMemoryMySqlQuestionnaireRepository::getList()` использовал `each()` вместо `map()`** — это означало что модели НЕ конвертировались в DTO, и контроллер возвращал сырые данные модели (корневые колонки) вместо данных из JSON `data`.
+
+**Исправления:**
+
+1. Миграция `2026_04_11_140005_fix_questionnaire_phone_nullable.php` — сделала `phone` NULLable.
+
+2. Изменён `each()` на `map()` в `InMemoryMySqlQuestionnaireRepository::getList()`:
+```php
+// Было
+->each(fn (QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
+
+// Стало
+->map(fn (QuestionnaireModel $model) => QuestionnaireTicketDto::fromState($model->toArray()));
+```
+
+**Тесты:**
+- Unit: `tests/Unit/Questionnaire/Dto/QuestionnaireTicketDtoTest.php` (4 теста)
+- Feature: `tests/Feature/Questionnaire/QuestionnaireDataFieldsApiTest.php` (2 теста)
+- Сидер: `QuestionnaireTestDataSeeder` — создаёт 3 тестовые анкеты с данными только в JSON `data`

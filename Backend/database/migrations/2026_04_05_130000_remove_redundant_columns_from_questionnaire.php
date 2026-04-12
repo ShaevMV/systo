@@ -9,26 +9,31 @@ return new class extends Migration
     /**
      * Run the migrations.
      *
+     * Эта миграция удаляет старые колонки из questionnaire после переноса
+     * данных в JSON. На чистой БД этих колонок может уже не быть.
+     *
      * @return void
      */
     public function up()
     {
-        // Удаляем старые колонки — все данные уже в JSON колонке data,
-        // а nullable-колонки уже не вызывают ошибок
-        Schema::table('questionnaire', function (Blueprint $table) {
-            $table->dropColumn([
-                'agy',
-                'howManyTimes',
-                'questionForSysto',
-                'is_have_in_club',
-                'creationOfSisto',
-                'activeOfEvent',
-                'whereSysto',
-                'musicStyles',
-                'name',
-                'vk',
-            ]);
-        });
+        $columnsToRemove = [
+            'agy', 'howManyTimes', 'questionForSysto', 'is_have_in_club',
+            'creationOfSisto', 'activeOfEvent', 'whereSysto', 'musicStyles',
+            'name', 'vk',
+        ];
+
+        $existingColumns = [];
+        foreach ($columnsToRemove as $col) {
+            if (Schema::hasColumn('questionnaire', $col)) {
+                $existingColumns[] = $col;
+            }
+        }
+
+        if (!empty($existingColumns)) {
+            Schema::table('questionnaire', function (Blueprint $table) use ($existingColumns) {
+                $table->dropColumn($existingColumns);
+            });
+        }
     }
 
     /**
@@ -39,16 +44,36 @@ return new class extends Migration
     public function down()
     {
         Schema::table('questionnaire', function (Blueprint $table) {
-            $table->integer('agy')->nullable()->default(null);
-            $table->string('howManyTimes')->nullable()->default(null);
-            $table->text('questionForSysto')->nullable()->default(null);
-            $table->boolean('is_have_in_club')->nullable()->default(null);
-            $table->text('creationOfSisto')->nullable()->default(null);
-            $table->text('activeOfEvent')->nullable()->default(null);
-            $table->text('whereSysto')->nullable()->default(null);
-            $table->text('musicStyles')->nullable()->default(null);
-            $table->string('name')->nullable()->default(null);
-            $table->string('vk')->nullable()->default(null);
+            if (!Schema::hasColumn('questionnaire', 'agy')) {
+                $table->integer('agy')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'howManyTimes')) {
+                $table->string('howManyTimes')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'questionForSysto')) {
+                $table->text('questionForSysto')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'is_have_in_club')) {
+                $table->boolean('is_have_in_club')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'creationOfSisto')) {
+                $table->text('creationOfSisto')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'activeOfEvent')) {
+                $table->text('activeOfEvent')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'whereSysto')) {
+                $table->text('whereSysto')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'musicStyles')) {
+                $table->text('musicStyles')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'name')) {
+                $table->string('name')->nullable()->default(null);
+            }
+            if (!Schema::hasColumn('questionnaire', 'vk')) {
+                $table->string('vk')->nullable()->default(null);
+            }
         });
     }
 };

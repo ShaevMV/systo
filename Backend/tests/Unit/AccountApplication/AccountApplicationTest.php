@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Unit\AccountApplication;
 
 use Database\Seeders\UserSeeder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
@@ -15,8 +14,6 @@ use Tickets\User\Account\Dto\AccountDto;
 
 class AccountApplicationTest extends TestCase
 {
-    use DatabaseTransactions;
-
     private AccountApplication $accountApplication;
 
     /**
@@ -31,7 +28,6 @@ class AccountApplicationTest extends TestCase
         $this->accountApplication = $accountApplication;
     }
 
-
     /**
      * @throws Throwable
      */
@@ -44,9 +40,7 @@ class AccountApplicationTest extends TestCase
         ]);
 
         $idAfterCreate = $this->accountApplication
-            ->creatingOrGetAccountId(
-                $accountDto
-            );
+            ->creatingOrGetAccountId($accountDto);
 
         self::assertTrue($accountDto->getId()->equals($idAfterCreate));
     }
@@ -61,11 +55,10 @@ class AccountApplicationTest extends TestCase
 
         self::assertNotFalse($token);
 
-
         $token = auth()->attempt(
             [
                 'email' => UserSeeder::EMAIL_ADMIN,
-                'password' => UserSeeder::PASSWORD_ADMIN.'1564',
+                'password' => UserSeeder::PASSWORD_ADMIN . '1564',
             ], true);
 
         self::assertFalse($token);
