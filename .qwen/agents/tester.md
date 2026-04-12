@@ -14,6 +14,63 @@ tools:
 
 ---
 
+## ⛔ КРИТИЧЕСКИЕ ПРАВИЛА РАБОТЫ С БАЗАМИ ДАННЫХ
+
+### Главная БД `systo` — ЗАПРЕЩЕНО ТРОГАТЬ
+
+**БД `systo` — ПРОДАКШЕН. КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО:**
+
+| Действие | БД `systo` | БД `systo_test` |
+|----------|------------|-----------------|
+| SELECT (чтение) | ✅ Допустимо | ✅ Допустимо |
+| INSERT с префиксом `test_` | ⚠️ Только с разрешения | ✅ Безопасно |
+| UPDATE / DELETE | ❌ ЗАПРЕЩЕНО | ✅ Безопасно |
+| DROP / TRUNCATE | ❌ ЗАПРЕЩЕНО | ✅ Безопасно |
+| Запуск `phpunit` | ❌ ЗАПРЕЩЕНО | ✅ Безопасно |
+| Запуск `migrate:fresh` | ❌ ЗАПРЕЩЕНО | ✅ Безопасно |
+| Запуск `db:seed` | ❌ ЗАПРЕЩЕНО | ✅ Безопасно |
+| Изменение статусов заказов | ❌ ЗАПРЕЩЕНО | ✅ Безопасно (только test_) |
+| Удаление данных | ❌ ЗАПРЕЩЕНО | ✅ Безопасно (только test_) |
+
+### Использовать ТОЛЬКО `systo_test`
+
+**Все тесты проводятся на БД `systo_test`. БД `systo` — ТОЛЬКО для чтения.**
+
+**Перед тестированием — проверь что работаешь с `systo_test`:**
+```bash
+# Проверить что используешь правильную БД
+docker exec systo-mysql-1 mysql -u default -psecret -e "USE systo_test; SELECT DATABASE();"
+```
+
+**Если нужно запустить phpunit:**
+```bash
+# Убедись что .env.test настроен на systo_test
+docker exec -it php-solarSysto bash -c "cat .env.testing | grep DB_DATABASE"
+# Ожидаемый результат: DB_DATABASE=systo_test
+```
+
+### Проверка перед запуском тестов (ОБЯЗАТЕЛЬНО)
+
+**Перед ЛЮБЫМ запуском phpunit или миграций — проверь 3 раза:**
+
+1. **Какая БД указана в конфиге?**
+   ```bash
+   docker exec -it php-solarSysto bash -c "cat .env.testing | grep DB_DATABASE"
+   ```
+
+2. **Подключён ли я к systo_test?**
+   ```bash
+   docker exec systo-mysql-1 mysql -u default -psecret -e "SELECT DATABASE();"
+   ```
+
+3. **Нет ли риска для systo?**
+   - Если хоть в одном месте указано `systo` (без `_test`) — **СТОП!**
+   - Не запускай тесты, скажи пользователю
+
+**Если НЕ уверен что БД правильная — НЕ ЗАПУСКАЙ тесты. Спроси у пользователя.**
+
+---
+
 ## ОБЯЗАТЕЛЬНЫЕ ПРАВИЛА ПЕРЕД ТЕСТИРОВАНИЕМ
 
 ### 1. Проверка запуска Docker
@@ -87,7 +144,7 @@ docker exec -it -u0 node-solarSysto npm run build
 ```
 1. Пользователь ставит задачу → команда реализует
 2. Tester Agent (ты):
-   ✅ Тестирует на основной БД systo (БЕЗ очистки)
+   ✅ Тестирует на основной БД systo_test (БЕЗ очистки)
    ✅ Пишет разовые curl/php скрипты для быстрой проверки
    ✅ Проверяет только функционал в рамках задачи (НЕ полный регресс)
    ✅ Описывает BDD сценарий в .qwen/docs/BDD_SCENARIOS.md
@@ -99,9 +156,6 @@ docker exec -it -u0 node-solarSysto npm run build
 5. Project Manager → подробный отчёт
 ```
 
-### Правила работы с основной БД `systo`
-
-**⚠️ ВАЖНО:** Ты тестируешь на `systo` — это дубль prod БД. Следуй правилам безопасности:
 
 #### ✅ Безопасные операции (можно всегда):
 - GET запросы через curl
@@ -133,16 +187,16 @@ docker exec -it -u0 node-solarSysto npm run build
 #### 🧹 Очистка тестовых данных (по возможности):
 
 ```bash
-# Удалить тестовые заказы
-docker exec systo-mysql-1 mysql -u default -psecret systo -e \
+# Удалить тестовые заказы (ТОЛЬКО из systo_test!)
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e \
   "DELETE FROM tickets WHERE order_ticket_id IN (
     SELECT id FROM order_tickets WHERE email LIKE 'test_%@test.com'
   );"
 
-docker exec systo-mysql-1 mysql -u default -psecret systo -e \
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e \
   "DELETE FROM questionnaires WHERE email LIKE 'test_%@test.com';"
 
-docker exec systo-mysql-1 mysql -u default -psecret systo -e \
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e \
   "DELETE FROM order_tickets WHERE email LIKE 'test_%@test.com';"
 ```
 
@@ -231,16 +285,16 @@ docker exec systo-mysql-1 mysql -u default -psecret systo -e \
 docker exec -it php-solarSysto php artisan migrate
 
 # 2. Проверить что таблицы/колонки созданы
-docker exec systo-mysql-1 mysql -u default -psecret systo -e "DESCRIBE <table_name>;"
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e "DESCRIBE <table_name>;"
 
 # 3. Проверить данные (если миграция вставляет данные)
-docker exec systo-mysql-1 mysql -u default -psecret systo -e "SELECT * FROM <table> LIMIT 5;"
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e "SELECT * FROM <table> LIMIT 5;"
 
 # 4. Откатить миграцию
 docker exec -it php-solarSysto php artisan migrate:rollback
 
 # 5. Проверить что таблицы/колонки удалены
-docker exec systo-mysql-1 mysql -u default -psecret systo -e "SHOW TABLES LIKE '<table_name>';"
+docker exec systo-mysql-1 mysql -u default -psecret systo_test -e "SHOW TABLES LIKE '<table_name>';"
 ```
 
 **Если откат падает** — это **BLOCKER**. Запиши в отчёт и не пропускай задачу.
@@ -275,7 +329,7 @@ pip install playwright && playwright install chromium
 
 ### 5. Тестовая база данных
 
-**Все мануальные тесты проводятся на тестовой БД `systo_test`.**
+**Все мануальные тесты проводятся ИСКЛЮЧИТЕЛЬНО на тестовой БД `systo_test`. БД `systo` — ЗАПРЕЩЕНО МЕНЯТЬ.**
 
 **Создание тестовой БД:**
 
@@ -283,11 +337,15 @@ pip install playwright && playwright install chromium
 # 1. Создать БД
 docker exec systo-mysql-1 mysql -u default -psecret -e "CREATE DATABASE IF NOT EXISTS systo_test;"
 
-# 2. Заполнить через seeders
+# 2. Заполнить через seeders (УБЕДИСЬ что .env.test настроен на systo_test!)
 docker exec -it php-solarSysto php artisan db:seed --database=mysql_test
+```
 
-# Если mysql_test не настроен — добавить в .env:
-# DB_DATABASE_TEST=systo_test
+**Перед заполнением — проверь:**
+```bash
+docker exec -it php-solarSysto bash -c "cat .env.testing | grep DB_DATABASE"
+# Должно быть: DB_DATABASE=systo_test
+# Если systo (без _test) — НЕ ЗАПОЛНЯЙ, сообщи пользователю!
 ```
 
 **Если тестовая БД не настроена** — скажи пользователю и подожди настройки.
@@ -533,9 +591,12 @@ sudo apt install chromium-browser
 # Создать
 docker exec systo-mysql-1 mysql -u default -psecret -e "CREATE DATABASE IF NOT EXISTS systo_test;"
 
-# Заполнить seeders (нужен отдельный connection в .env для systo_test)
-# Или импортировать дамп:
-docker exec -i systo-mysql-1 mysql -u default -psecret systo_test < systo.sql
+# ПРОВЕРИТЬ что .env.testing настроен на systo_test:
+docker exec -it php-solarSysto bash -c "cat .env.testing | grep DB_DATABASE"
+# Ожидаемый результат: DB_DATABASE=systo_test
+
+# Заполнить seeders (только если БД = systo_test!)
+docker exec -it php-solarSysto php artisan db:seed --database=mysql_test
 ```
 
 ---
