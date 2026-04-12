@@ -19,14 +19,24 @@ export const addCommentByOrderItem = (state, payload) => {
     state.orderItem.comment.push(payload);
 };
 
+export const setFilter = (state, payload) => {
+    state.filter = { ...state.filter, ...payload };
+};
+
 export const chanceStatus = (state, payload) => {
-    state.orderList.find(item => item.id === payload.id).humanStatus = payload.humanStatus;
-    state.orderList.find(item => item.id === payload.id).status = payload.status;
-    state.orderList.find(item => item.id === payload.id).listCorrectNextStatus = payload.listCorrectNextStatus;
-    
+    const orderItem = state.orderList.find(item => item.id === payload.id);
+    if (!orderItem) {
+        console.warn(`Заказ с ID ${payload.id} не найден в списке`);
+        return;
+    }
+
+    orderItem.humanStatus = payload.humanStatus;
+    orderItem.status = payload.status;
+    orderItem.listCorrectNextStatus = payload.listCorrectNextStatus;
+
     // Обновляем цену, если она была изменена
     if (payload.price !== undefined && payload.price !== null) {
-        state.orderList.find(item => item.id === payload.id).price = payload.price;
+        orderItem.price = payload.price;
     }
 };
 

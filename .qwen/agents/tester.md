@@ -156,6 +156,91 @@ docker exec -it -u0 node-solarSysto npm run build
 5. Project Manager → подробный отчёт
 ```
 
+### ⚠️ ОБЯЗАТЕЛЬНАЯ ПРОВЕРКА ЗАТРОНУТЫХ API-ЭНДПОИНТОВ
+
+**После завершения задачи — обязательно протестируй все API-эндпоинты которые были изменены.**
+
+**Как определить затронутые API:**
+
+1. **Посмотри какие файлы контроллеров изменились** (маршруты в `routes/` или `app/Http/Controllers/`)
+2. **Посмотри какие Vuex actions изменились** (файлы `actions.js` в store модулях)
+3. **Посмотри какие Command/Query Handler изменены** (они вызываются из контроллеров)
+
+**Для каждого затронутого API-эндпоинта:**
+
+```bash
+# 1. Проверь что эндпоинт доступен (HTTP 200/401 для защищённых)
+curl -i http://api.tickets.loc/api/v1/<endpoint>
+
+# 2. Проверь позитивный сценарий (валидный запрос)
+curl -X POST http://api.tickets.loc/api/v1/<endpoint> \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"<valid_data>"}'
+
+# 3. Проверь негативный сценарий (невалидный запрос → 422)
+curl -X POST http://api.tickets.loc/api/v1/<endpoint> \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"<invalid_or_empty_data>"}'
+
+# 4. Проверь что ответ соответствует ожидаемой структуре
+#    - success: true/false
+#    - data / list / order
+#    - errors (при ошибке)
+```
+
+**Что проверять в ответе API:**
+
+| Проверка | Что искать |
+|----------|-------------|
+| HTTP статус код | 200 (OK), 422 (Validation), 500 (Error) |
+| Структура JSON | Ключи совпадают с ожидаемыми |
+| Типы данных | string/int/bool/array — корректны |
+| Ошибки валидации | `errors` объект заполнен при невалидных данных |
+| Бизнес-логика | Статус changed, цена updated, и т.д. |
+
+**Если найдена ошибка в API (500, undefined method, и т.д.):**
+- Запиши в отчёт как **BLOCKER** или **CRITICAL**
+- Не продолжай тестирование смежных функций — сначала исправь
+- Укажи стек-трейс и файл/строку ошибки
+
+**Пример для задачи «Смена статуса заказа»:**
+
+```bash
+# Затронутый эндпоинт: POST /api/v1/order/toChangeStatus/{id}
+
+# 1. Позитивный: NEW → PAID
+curl -X POST http://api.tickets.loc/api/v1/order/toChangeStatus/<order_id> \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "paid"}'
+
+# 2. Негативный: повторная смена на тот же статус (idempotency check)
+curl -X POST http://api.tickets.loc/api/v1/order/toChangeStatus/<order_id> \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "paid"}'
+# Ожидаемый результат: 422 или 409 с сообщением "Заказ уже находится в статусе..."
+
+# 3. Негативный: недопустимый переход (например PAID → NEW)
+curl -X POST http://api.tickets.loc/api/v1/order/toChangeStatus/<order_id> \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "new"}'
+# Ожидаемый результат: 422 с сообщением о недопустимом переходе
+
+# 4. Негативный: DIFFICULTIES_AROSE без комментария
+curl -X POST http://api.tickets.loc/api/v1/order/toChangeStatus/<order_id> \
+  -H "Authorization: Bearer <admin_token>" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "difficulties_arose"}'
+# Ожидаемый результат: 422 с ошибкой валидации "comment обязателен"
+
+# 5. Проверка что ответ содержит обновлённый заказ
+#    Ответ должен содержать: order.id, order.status, order.lastComment, order.questionnaire_count
+```
+
 
 #### ✅ Безопасные операции (можно всегда):
 - GET запросы через curl

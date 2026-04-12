@@ -234,8 +234,14 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
         DB::beginTransaction();
         try {
-
             $order = $this->model::find($orderId->value());
+
+            // Optimistic concurrency: проверяем что статус не был изменён другим запросом
+            if ($order->status === (string)$newStatus) {
+                DB::commit();
+                return true; // Уже в целевом статусе — идемпотентность
+            }
+
             $order->status = (string)$newStatus;
             $order->guests = $arrGuests;
             $order->save();

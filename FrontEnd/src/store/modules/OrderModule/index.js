@@ -31,6 +31,9 @@ export default {
             phone: null,
             friendly_id: null,
         },
+        filter: {
+            festivalId: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
+        },
         isLoading: false,
     },
     getters,

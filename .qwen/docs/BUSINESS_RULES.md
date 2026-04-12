@@ -4,18 +4,49 @@
 
 ### Матрица допустимых переходов
 
-| Из статуса | → PAID | → CANCEL | → DIFFICULTIES_AROSE | → LIVE_TICKET_ISSUED |
-|------------|--------|----------|----------------------|----------------------|
-| **NEW** / **NEW_FOR_LIVE** | ✅ | ✅ | ✅ | ✅ |
-| **PAID** | — | — | ✅ | — |
-| **PAID_FOR_LIVE** | — | ✅ | — | ✅ |
+#### Обычные билеты (NEW → PAID)
+
+| Из статуса | → PAID | → CANCEL | → DIFFICULTIES_AROSE |
+|------------|--------|----------|----------------------|
+| **NEW** | ✅ | ✅ | ✅ |
+| **PAID** | — | — | ✅ |
+| **DIFFICULTIES_AROSE** | ✅ | ✅ | — |
+
+#### Живые билеты (NEW_FOR_LIVE → PAID_FOR_LIVE → LIVE_TICKET_ISSUED)
+
+| Из статуса | → PAID_FOR_LIVE | → CANCEL | → DIFFICULTIES_AROSE | → LIVE_TICKET_ISSUED |
+|------------|-----------------|----------|----------------------|----------------------|
+| **NEW_FOR_LIVE** | ✅ | ✅ | ✅ | ✅ |
+| **PAID_FOR_LIVE** | — | ✅ (CANCEL_FOR_LIVE) | — | ✅ |
 | **DIFFICULTIES_AROSE** | ✅ | ✅ | — | — |
 | **LIVE_TICKET_ISSUED** | — | ✅ (CANCEL_FOR_LIVE) | — | — |
-| **CANCEL** / **CANCEL_FOR_LIVE** | ❌ терминальный | ❌ терминальный | ❌ терминальный | ❌ терминальный |
+
+#### Терминальные статусы
+
+| Из статуса | → Любые другие |
+|------------|----------------|
+| **CANCEL** / **CANCEL_FOR_LIVE** | ❌ терминальный |
+
+### Краткая сводка переходов
+
+```
+Обычные билеты:
+  NEW ──→ PAID ──→ DIFFICULTIES_AROSE ──→ PAID (цикл)
+   │         │
+   └──→ CANCEL  └──→ DIFFICULTIES_AROSE ──→ CANCEL
+
+Живые билеты:
+  NEW_FOR_LIVE ──→ PAID_FOR_LIVE ──→ LIVE_TICKET_ISSUED ──→ CANCEL_FOR_LIVE
+       │                │                    │
+       └──→ CANCEL      └──→ CANCEL_FOR_LIVE └──→ CANCEL_FOR_LIVE
+       └──→ DIFFICULTIES_AROSE ──→ PAID (обычный)
+       └──→ LIVE_TICKET_ISSUED (сразу выдать)
+```
 
 ### Правила смены статуса
 
 - **PAID** — создаёт билеты, генерирует PDF + QR, отправляет email с билетами, рассылает ссылки на анкеты гостям
+- **PAID_FOR_LIVE** — подтверждает оплату живого билета, **НЕ генерирует PDF**, ждёт продавца на месте
 - **CANCEL** — отменяет все билеты заказа, отправляет email об отмене
 - **CANCEL_FOR_LIVE** — отменяет живые билеты, освобождает номера
 - **LIVE_TICKET_ISSUED** — требует массив `liveList` (номера живых билетов), присваивает номера билетам, отправляет анкеты
@@ -317,3 +348,12 @@
 | **Rate Limit API** | 60 запросов/мин на IP/user | `Throttle:api` middleware |
 | **Уникальность Telegram** | Да, на всю таблицу | `QuestionnaireValidationService` |
 | **Уникальность Email пользователя** | Да | `AuthController@register` |
+
+---
+
+## История изменений статусов
+
+| Дата | Что изменено | Файл |
+|------|--------------|------|
+| 2026-04-12 | Разделены матрицы переходов для обычных и живых билетов. `NEW_FOR_LIVE` → `PAID_FOR_LIVE` (не `PAID`) | `Shared/Domain/ValueObject/Status.php` |
+| 2026-04-12 | Добавлен `PAID_FOR_LIVE` в описание правил смены статуса | `.qwen/docs/BUSINESS_RULES.md` |

@@ -170,7 +170,8 @@ export default {
     ]),
     ...mapActions('appOrder', [
       'getOrderListForAdmin',
-      'loading'
+      'loading',
+      'setFilter'
     ]),
     /**
      * Отправить данные для фильтра
@@ -180,7 +181,7 @@ export default {
         let price = this.typeOrder !== null ? this.typeOrder.price : null;
         let typePrice = this.typeOrder !== null ? this.typeOrder.id : null;
         let self = this;
-        this.getOrderListForAdmin({
+        let filterData = {
           'price': price,
           'typePrice': typePrice,
           'email': self.email,
@@ -190,7 +191,11 @@ export default {
           'festivalId': self.festival_id,
           'city': self.city,
           'questionnaire': self.questionnaire,
-        });
+        };
+        // Сохраняем фильтр в state
+        this.setFilter(filterData);
+        // Загружаем список с фильтром
+        this.getOrderListForAdmin(filterData);
         this.getListTypesOfPayment({
           festival_id: self.festival_id,
           is_admin: true,
@@ -206,19 +211,31 @@ export default {
       this.typesOfPayment = null;
       this.typeOrder = null;
       this.city = null;
+      this.questionnaire = '';
       let festivalId = this.festival_id;
-      this.getOrderListForAdmin({
+      let filterData = {
         'festivalId': festivalId,
-      });
+      };
+      // Сохраняем фильтр в state
+      this.setFilter(filterData);
+      // Загружаем список с фильтром
+      this.getOrderListForAdmin(filterData);
     }
   },
   async created() {
     await this.getListFestival();
+    // Инициализируем фильтр по умолчанию
+    let filterData = {
+      'festivalId': this.festival_id,
+    };
+    this.setFilter(filterData);
     await this.getListPriceFor({festival_id: this.festival_id})
     await this.getListTypesOfPayment({
       festival_id: this.festival_id,
       is_admin: true,
     });
+    // Загружаем список заказов с фильтром по умолчанию
+    this.getOrderListForAdmin(filterData);
   },
 }
 </script>

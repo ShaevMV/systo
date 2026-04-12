@@ -348,13 +348,17 @@ class OrderTickets extends Controller
             liveList: $request->get('liveList', [])
         );
 
+        // Получаем обновлённый заказ для возврата полного объекта
+        $updatedOrder = $this->getOrder->getItemById(new Uuid($id));
+
         return response()->json([
             'success' => true,
             'status' => [
                 'name' => $request->get('status'),
                 'humanStatus' => $status->getHumanStatus(),
                 'listCorrectNextStatus' => $status->getListNextStatus(),
-            ]
+            ],
+            'order' => $updatedOrder?->toArray()
         ]);
     }
 

@@ -68,15 +68,17 @@ export const getOrderListForUser = (context) => {
  * @param payload
  */
 export const getOrderListForAdmin = (context, payload) => {
-    console.log(payload);
-    let promise = axios.post(API_ORDER + '/getList', payload);
+    // Если фильтр не передан, используем фильтр из state
+    const filter = payload || context.state.filter || {};
+    console.log(filter);
+    let promise = axios.post(API_ORDER + '/getList', filter);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
         context.commit('setTotalNumber', response.data.totalNumber);
         context.commit('setLoaging', false);
     }).catch(function (error) {
         console.error(error);
-        context.commit('setError', error.response.data.errors);
+        context.commit('setError', error.response?.data?.errors || error.message);
     });
 }
 
@@ -103,24 +105,40 @@ export const loadOrderItem = (context, payload) => {
  * @param payload
  */
 export const sendToChangeStatus = (context, payload) => {
+    context.commit('setLoaging', true);
     let promise = axios.post(API_ORDER + '/toChangeStatus/' + payload.id, {
         'status': payload.status,
         'comment': payload.comment,
         'liveList': payload?.liveList,
     });
     promise.then(function (response) {
-        if(payload.callback !== undefined) {
-            payload.callback()
-        }
         context.commit('chanceStatus', {
             'id': payload.id,
             'humanStatus': response.data.status.humanStatus,
             'status': response.data.status.name,
             'listCorrectNextStatus': response.data.status.listCorrectNextStatus,
         })
+        // Обновляем данные заказа если они есть в ответе
+        if (response.data.order) {
+            context.commit('setOrderItem', response.data.order);
+        }
+        // Перезагружаем список заказов с текущим фильтром
+        if (context.state.filter?.festivalId) {
+            context.dispatch('getOrderListForAdmin', context.state.filter);
+        }
+        // Закрываем модалку ПОСЛЕ всех операций
+        if(payload.callback !== undefined) {
+            payload.callback()
+        }
     }).catch(function (error) {
         console.error(error);
-        context.commit('setError', error.response.data.errors);
+        context.commit('setError', error.response?.data?.errors || error.message);
+        // Даже при ошибтке вызываем callback для закрытия модалки
+        if(payload.callback !== undefined) {
+            payload.callback()
+        }
+    }).finally(function () {
+        context.commit('setLoaging', false);
     });
 }
 
@@ -184,7 +202,15 @@ export const clearError = (context) => {
     context.commit('setError', []);
 };
 
-
+/**
+ * Установить фильтр
+ *
+ * @param context
+ * @param payload
+ */
+export const setFilter = (context, payload) => {
+    context.commit('setFilter', payload);
+};
 
 /**
  * Установить загрузку
