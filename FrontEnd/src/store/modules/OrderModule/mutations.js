@@ -23,6 +23,11 @@ export const chanceStatus = (state, payload) => {
     state.orderList.find(item => item.id === payload.id).humanStatus = payload.humanStatus;
     state.orderList.find(item => item.id === payload.id).status = payload.status;
     state.orderList.find(item => item.id === payload.id).listCorrectNextStatus = payload.listCorrectNextStatus;
+    
+    // Обновляем цену, если она была изменена
+    if (payload.price !== undefined && payload.price !== null) {
+        state.orderList.find(item => item.id === payload.id).price = payload.price;
+    }
 };
 
 export const setMessage = (state, payload) => {

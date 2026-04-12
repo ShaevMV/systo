@@ -124,6 +124,30 @@ export const sendToChangeStatus = (context, payload) => {
     });
 }
 
+/**
+ * Изменить цену заказа (только admin)
+ *
+ * @param context
+ * @param payload
+ */
+export const sendChangePrice = (context, payload) => {
+    let promise = axios.post(API_ORDER + '/changePrice/' + payload.id, {
+        'price': payload.price,
+    });
+    promise.then(function (response) {
+        if(payload.callback !== undefined) {
+            payload.callback()
+        }
+        context.commit('chanceStatus', {
+            'id': payload.id,
+            'price': response.data.price,
+        })
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response.data.errors);
+    });
+}
+
 export const getUrlForPdf = (context, payload) => {
     return new Promise((resolve, reject) => {
     let promise = axios.get(API_ORDER + '/getTicketPdf/' + payload);

@@ -248,6 +248,29 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
     }
 
+    /**
+     * @param Uuid $orderId
+     * @param float $newPrice
+     * @return bool
+     * @throws Throwable
+     */
+    public function changePrice(Uuid $orderId, float $newPrice): bool
+    {
+        DB::beginTransaction();
+        try {
+            $order = $this->model::find($orderId->value());
+            $order->price = $newPrice;
+            $order->discount = 0; // Сбрасываем скидку при ручном изменении цены
+            $order->save();
+            DB::commit();
+
+            return true;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
     public function getItem(Uuid $uuid): ?OrderTicketItemResponse
     {
         $rawData = $this->model::whereId($uuid->value())
