@@ -11,27 +11,34 @@ use Tickets\Reports\Infrastructure\GoogleSheetsClient;
 
 class ExportReportsToGoogle extends Command
 {
-    protected $signature = 'reports:export-to-google';
+    protected $signature = 'reports:export-to-google {--config-id= : ID конкретного конфига}';
+
     protected $description = 'Экспорт активных отчётов в Google Sheets';
 
     public function handle(
         ReportHandlerRegistry $registry,
         GoogleSheetsClient $googleClient
     ): int {
-        $configs = ReportConfig::where('is_active', true)->get();
+        $configId = $this->option('config-id');
+
+        $configs = $configId
+            ? ReportConfig::where('id', $configId)->get()
+            : ReportConfig::where('is_active', true)->get();
 
         if ($configs->isEmpty()) {
-            $this->warn('Нет активных конфигураций для экспорта');
+            $this->warn('Нет конфигураций для экспорта');
+
             return Command::SUCCESS;
         }
 
-        $this->info("Найдено активных отчётов: {$configs->count()}");
+        $this->info("Найдено отчётов для обработки: {$configs->count()}");
 
         foreach ($configs as $config) {
             $handler = $registry->get($config->report_type);
 
-            if (!$handler) {
+            if (! $handler) {
                 $this->error("[{$config->name}] Обработчик для типа '{$config->report_type}' не найден");
+
                 continue;
             }
 
@@ -48,10 +55,13 @@ class ExportReportsToGoogle extends Command
                     $rows[] = $handler->formatRow($row, $index);
                 }
 
-                $range = "{$config->sheet_name}!A{$config->start_row}";
+                $range = "{$config->sheet_name}!A{$config->start_row}:Z";
+                $googleClient->clearRange($config->spreadsheet_id, $range);
+
+                $appendRange = "{$config->sheet_name}!A{$config->start_row}";
                 $googleClient->appendRows(
                     $config->spreadsheet_id,
-                    $range,
+                    $appendRange,
                     $rows
                 );
 

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
 use App\Models\ReportConfig;
+use Google\Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -33,7 +34,7 @@ class ReportExportController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'report_type' => 'nullable|string|max:255',
-            'spreadsheet_id' => 'required|string',
+            'spreadsheet_id' => 'required|string|regex:/^[a-zA-Z0-9_-]+$/',
             'sheet_name' => 'nullable|string|max:255',
             'start_row' => 'nullable|integer|min:1',
             'filters' => 'nullable|array',
@@ -68,7 +69,7 @@ class ReportExportController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'report_type' => 'nullable|string|max:255',
-            'spreadsheet_id' => 'required|string',
+            'spreadsheet_id' => 'required|string|regex:/^[a-zA-Z0-9_-]+$/',
             'sheet_name' => 'nullable|string|max:255',
             'start_row' => 'nullable|integer|min:1',
             'filters' => 'nullable|array',
@@ -116,7 +117,7 @@ class ReportExportController extends Controller
         $config = ReportConfig::findOrFail($validated['config_id']);
         $handler = $this->registry->get($config->report_type);
 
-        if (!$handler) {
+        if (! $handler) {
             return response()->json([
                 'error' => "Обработчик для типа '{$config->report_type}' не найден",
             ], 400);
@@ -144,6 +145,9 @@ class ReportExportController extends Controller
                 $rows[] = $handler->formatRow($row, $index);
             }
 
+            $clearRange = "{$config->sheet_name}!A{$config->start_row}:Z";
+            $this->googleClient->clearRange($config->spreadsheet_id, $clearRange);
+
             $range = "{$config->sheet_name}!A{$config->start_row}";
             $this->googleClient->appendRows(
                 $config->spreadsheet_id,
@@ -160,7 +164,7 @@ class ReportExportController extends Controller
                 'googleSheetUrl' => "https://docs.google.com/spreadsheets/d/{$config->spreadsheet_id}",
             ]);
 
-        } catch (\Google_Exception $e) {
+        } catch (Exception $e) {
             \Log::error('Google Sheets export failed', [
                 'config_id' => $config->id,
                 'error' => $e->getMessage(),

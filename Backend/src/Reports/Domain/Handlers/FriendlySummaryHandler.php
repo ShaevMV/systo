@@ -131,7 +131,7 @@ class FriendlySummaryHandler implements ReportHandlerInterface
             return [];
         }
 
-        $query = DB::connection('baza')
+        $query = DB::connection('mysqlBaza')
             ->table('spisok_tickets')
             ->whereIn('curator', $userNames)
             ->selectRaw('curator, COUNT(*) as list_count')
