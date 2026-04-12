@@ -96,7 +96,7 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-3" v-if="isAdmin">
-              <label for="priceInput">Стоимость (рублей)</label>
+              <label for="priceInput">Стоимость</label>
               <input type="number"
                      id="priceInput"
                      class="form-control"
@@ -105,7 +105,7 @@
                      min="1"
                      step="1">
               <small class="form-text text-muted" v-if="selectItem.price">
-                Текущая цена: {{ selectItem.price }} рублей
+                Текущая цена: {{ selectItem.price }}
               </small>
             </div>
             <textarea class="form-control" v-model="comment"></textarea>
@@ -138,7 +138,7 @@
           </div>
           <div class="modal-body">
             <div class="form-group mb-3" v-if="isAdmin">
-              <label for="priceInputLive">Стоимость (рублей)</label>
+              <label for="priceInputLive">Стоимость</label>
               <input type="number"
                      id="priceInputLive"
                      class="form-control"
@@ -147,7 +147,7 @@
                      min="1"
                      step="1">
               <small class="form-text text-muted" v-if="selectItem.price">
-                Текущая цена: {{ selectItem.price }} рублей
+                Текущая цена: {{ selectItem.price }}
               </small>
             </div>
             <table class="table">
