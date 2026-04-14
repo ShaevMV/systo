@@ -163,18 +163,6 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
-  chromedriver:
-    image: selenium/standalone-chrome:latest
-    container_name: chromedriver-solarSysto
-    ports:
-      - "4444:4444"
-    shm_size: 2gb
-    environment:
-      - SE_NODE_OVERRIDE_MAX_SESSIONS=5
-      - SE_NODE_MAX_SESSIONS=5
-    networks:
-      - backend
-
 networks:
   backend:
     driver: bridge
