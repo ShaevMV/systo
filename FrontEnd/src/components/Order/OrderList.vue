@@ -57,7 +57,7 @@
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td class="mobile">{{ itemOrder.price }} рублей</td>
+              <td class="mobile">{{ itemOrder.price }}</td>
               <td class="mobile">{{ itemOrder.count }}</td>
               <td>{{ itemOrder.dateBuy }}</td>
               <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>

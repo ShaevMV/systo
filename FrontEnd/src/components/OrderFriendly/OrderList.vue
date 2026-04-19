@@ -56,7 +56,7 @@
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td class="mobile">{{ itemOrder.price }} рублей</td>
+              <td class="mobile">{{ itemOrder.price }}</td>
               <td class="mobile">{{ itemOrder.count }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
                 {{ itemOrder.phone }}
