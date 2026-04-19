@@ -20,7 +20,7 @@ export const addCommentByOrderItem = (state, payload) => {
 };
 
 export const setFilter = (state, payload) => {
-    state.filter = { ...state.filter, ...payload };
+    state.filter = {...state.filter, ...payload};
 };
 
 export const chanceStatus = (state, payload) => {
@@ -42,6 +42,12 @@ export const chancePrice = (state, payload) => {
         return;
     }
     orderItem.price = payload.price;
+    var totalAmount = 0;
+    state.orderList.forEach(function (item) {
+        totalAmount += item.price
+    })
+    state.totalNumber.totalAmount = totalAmount;
+
 };
 
 export const setMessage = (state, payload) => {

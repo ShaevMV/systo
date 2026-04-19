@@ -10,11 +10,12 @@
                       text-decoration: underline;
                       cursor: pointer;
                     "> сменить цену </small>
+    <small class="form-text text-muted"> {{ getError('price') }}</small>
   </div>
 </template>
 
 <script>
-import {mapActions} from "vuex";
+import {mapActions, mapGetters} from "vuex";
 
 export default {
   name: "CorrectPrice",
@@ -28,6 +29,9 @@ export default {
     };
   },
   computed: {
+    ...mapGetters('appOrder', [
+      'getError'
+    ]),
     price: {
       get: function () {
         if (this.newPrice === null) {
