@@ -156,7 +156,7 @@ export const sendChangePrice = (context, payload) => {
         if(payload.callback !== undefined) {
             payload.callback()
         }
-        context.commit('chanceStatus', {
+        context.commit('chancePrice', {
             'id': payload.id,
             'price': response.data.price,
         })

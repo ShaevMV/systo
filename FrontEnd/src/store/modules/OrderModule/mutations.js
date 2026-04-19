@@ -35,6 +35,15 @@ export const chanceStatus = (state, payload) => {
     orderItem.listCorrectNextStatus = payload.listCorrectNextStatus;
 };
 
+export const chancePrice = (state, payload) => {
+    const orderItem = state.orderList.find(item => item.id === payload.id);
+    if (!orderItem) {
+        console.warn(`Заказ с ID ${payload.id} не найден в списке`);
+        return;
+    }
+    orderItem.price = payload.price;
+};
+
 export const setMessage = (state, payload) => {
     state.questionnaireItem.message = payload;
 };

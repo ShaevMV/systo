@@ -33,7 +33,8 @@ Route::prefix('v1/order')->group(static function (): void {
 
     // изменить цену заказа (только admin)
     Route::post('/changePrice/{id}', [OrderTickets::class, 'changePrice'])
-        ->middleware('auth:api');
+        ->middleware('auth:api')
+        ->middleware('role:admin');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])

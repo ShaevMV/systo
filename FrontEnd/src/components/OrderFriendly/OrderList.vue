@@ -56,7 +56,16 @@
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td class="mobile">{{ itemOrder.price }}</td>
+              <td class="mobile" >
+                <div v-if="!isAdmin">
+                  {{ itemOrder.price }}
+                </div>
+                <correct-price
+                  v-if="isAdmin"
+                  :id="itemOrder.id"
+                  :oldPrice="itemOrder.price"/>
+              </td>
+
               <td class="mobile">{{ itemOrder.count }}</td>
               <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
                 {{ itemOrder.phone }}
@@ -157,9 +166,11 @@
 
 <script>
 import {mapActions, mapGetters} from 'vuex';
+import CorrectPrice from "@/components/OrderFriendly/CorrectPrice.vue";
 
 export default {
   name: "OrderList",
+  components: {CorrectPrice},
   data() {
     return {
       comment: null,
@@ -186,7 +197,6 @@ export default {
   methods: {
     ...mapActions('appOrder', [
       'sendToChangeStatus',
-      'sendChangePrice'
     ]),
     styleObject: function (status) {
       return {
@@ -245,9 +255,8 @@ export default {
       return text
     },
     /**
-     * Сменить статус
      * @param status
-     * @param id
+     * @param itemOrder
      */
     chanceStatus(status, itemOrder) {
       this.selectId = itemOrder.id;

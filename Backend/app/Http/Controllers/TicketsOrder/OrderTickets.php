@@ -375,15 +375,6 @@ class OrderTickets extends Controller
         Request $request,
     ): JsonResponse
     {
-        // Проверяем что пользователь — admin
-        $user = Auth::user();
-        if (!$user || !$user->is_admin) {
-            return response()->json([
-                'success' => false,
-                'errors' => ['error' => 'Изменять цену может только администратор']
-            ], 403);
-        }
-
         // Валидация
         $rules = [
             'price' => 'required|numeric|gt:0',
