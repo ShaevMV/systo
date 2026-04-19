@@ -15,11 +15,10 @@
               <th scope="col">Email</th>
               <th scope="col">Телефон</th>
               <th scope="col">Telegram</th>
-              <th scope="col">VK</th>
+              <th scope="col">Сколько ты раз был на систо</th>
               <th scope="col" class="mobile">Тип анкеты</th>
               <th scope="col">Статус</th>
-              <th scope="col">В клубе</th>
-              <th scope="col">Отправить повторно</th>
+
             </tr>
             </thead>
             <tbody>
@@ -50,18 +49,9 @@
               <td>{{ item.email || '—' }}</td>
               <td>{{ item.phone || '—' }}</td>
               <td class="mobile">{{ item.telegram || '—' }}</td>
-              <td>{{ item.vk || '—' }}</td>
+              <td>{{ item.howManyTimes || '—' }}</td>
               <td class="mobile">{{ getQuestionnaireTypeName(item.questionnaire_type_id) }}</td>
               <td>{{ getStatusName(item.status) }}</td>
-              <td>{{ item.is_have_in_club ? 'Да' : 'Нет' }}</td>
-              <td>
-                <span
-                    v-show="item.email"
-                    @click="sendNotitification(item.id, item.email)"
-                >
-                  Выслать письмо
-                </span>
-              </td>
             </tr>
 
 
