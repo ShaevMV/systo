@@ -95,22 +95,8 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="form-group mb-3" v-if="isAdmin">
-              <label for="priceInput">Стоимость</label>
-              <input type="number"
-                     id="priceInput"
-                     class="form-control"
-                     v-model="newPrice"
-                     placeholder="Оставьте пустым для сохранения текущей цены"
-                     min="1"
-                     step="1">
-              <small class="form-text text-muted" v-if="selectItem.price">
-                Текущая цена: {{ selectItem.price }}
-              </small>
-            </div>
             <textarea class="form-control" v-model="comment"></textarea>
             <small class="form-text text-muted"> {{ getError('comment') }}</small>
-            <small class="form-text text-danger" v-if="getError('price')"> {{ getError('price') }}</small>
           </div>
           <div class="modal-footer">
             <button type="button"
@@ -137,19 +123,6 @@
             </button>
           </div>
           <div class="modal-body">
-            <div class="form-group mb-3" v-if="isAdmin">
-              <label for="priceInputLive">Стоимость</label>
-              <input type="number"
-                     id="priceInputLive"
-                     class="form-control"
-                     v-model="newPrice"
-                     placeholder="Оставьте пустым для сохранения текущей цены"
-                     min="1"
-                     step="1">
-              <small class="form-text text-muted" v-if="selectItem.price">
-                Текущая цена: {{ selectItem.price }}
-              </small>
-            </div>
             <table class="table">
               <thead>
               <tr>
@@ -170,7 +143,6 @@
               </tbody>
             </table>
             <small class="form-text text-muted">{{ getError('liveNumber') }}</small>
-            <small class="form-text text-danger" v-if="getError('price')"> {{ getError('price') }}</small>
           </div>
           <div class="modal-footer">
             <button type="button" @click="sendLive" class="btn btn-secondary">
@@ -195,7 +167,6 @@ export default {
       selectStatus: null,
       selectItem: {},
       liveNumber: {},
-      newPrice: null,
     }
   },
   computed: {
@@ -282,7 +253,6 @@ export default {
       this.selectId = itemOrder.id;
       this.selectStatus = status;
       this.selectItem = itemOrder;
-      this.newPrice = null; // Сбрасываем цену при открытии
 
       if (['difficulties_arose'].includes(status)) {
         const modalEl = document.getElementById('exampleModal');
@@ -316,103 +286,44 @@ export default {
      * Сменить статус на возникли трудности и отправить сообщение для пользователя
      */
     sendDifficultiesArose() {
-      let self = this;
-      const newPrice = this.newPrice !== null && this.newPrice !== '' ? parseFloat(this.newPrice) : null;
-
-      // Если цена изменена — вызываем отдельный API
-      if (newPrice !== null) {
-        this.sendChangePrice({
-          'id': this.selectId,
-          'price': newPrice,
-          'callback': () => {
-            // После изменения цены — меняем статус
-            this.sendToChangeStatus({
-              'id': self.selectId,
-              'status': self.selectStatus,
-              'comment': self.comment,
-              'callback': function () {
-                const modalEl = document.getElementById('exampleModal');
-                const modal = bootstrap.Modal.getInstance(modalEl);
-                if (modal) modal.hide();
-                self.selectId = null;
-                self.selectStatus = null;
-                self.comment = null;
-                self.newPrice = null;
-              }
-            });
-          }
-        });
-      } else {
-        // Без изменения цены — только смена статуса
-        this.sendToChangeStatus({
-          'id': this.selectId,
-          'status': this.selectStatus,
-          'comment': this.comment,
-          'callback': function () {
-            const modalEl = document.getElementById('exampleModal');
-            const modal = bootstrap.Modal.getInstance(modalEl);
-            if (modal) modal.hide();
-            self.selectId = null;
-            self.selectStatus = null;
-            self.comment = null;
-            self.newPrice = null;
-          }
-        });
-      }
+      this.sendToChangeStatus({
+        'id': this.selectId,
+        'status': this.selectStatus,
+        'comment': this.comment,
+        'callback': function () {
+          let collection = document.getElementsByClassName('close');
+          let array = Array.from(collection);
+          array.forEach(value => {
+            value.click()
+          });
+          self.selectId = null;
+          self.selectStatus = null;
+          self.comment = null;
+        }
+      });
     },
     /**
      * Сменить статус на возникли трудности и отправить сообщение для пользователя
      */
     sendLive() {
       let self = this;
-      const newPrice = this.newPrice !== null && this.newPrice !== '' ? parseFloat(this.newPrice) : null;
-
-      // Если цена изменена — вызываем отдельный API
-      if (newPrice !== null) {
-        this.sendChangePrice({
-          'id': this.selectId,
-          'price': newPrice,
-          'callback': () => {
-            // После изменения цены — меняем статус
-            this.sendToChangeStatus({
-              'id': self.selectId,
-              'status': self.selectStatus,
-              'liveList': self.liveNumber,
-              'callback': function () {
-                const modalElLive = document.getElementById('exampleModalLive');
-                const modalLive = bootstrap.Modal.getInstance(modalElLive);
-                if (modalLive) modalLive.hide();
-                self.selectId = null;
-                self.selectStatus = null;
-                self.comment = null;
-                self.newPrice = null;
-              }
-            });
-          }
-        });
-      } else {
-        // Без изменения цены — только смена статуса
-        this.sendToChangeStatus({
-          'id': this.selectId,
-          'status': this.selectStatus,
-          'liveList': this.liveNumber,
-          'callback': function () {
-            const modalElLive = document.getElementById('exampleModalLive');
-            const modalLive = bootstrap.Modal.getInstance(modalElLive);
-            if (modalLive) modalLive.hide();
-            self.selectId = null;
-            self.selectStatus = null;
-            self.comment = null;
-            self.newPrice = null;
-          }
-        });
-      }
+      // Без изменения цены — только смена статуса
+      this.sendToChangeStatus({
+        'id': this.selectId,
+        'status': this.selectStatus,
+        'liveList': this.liveNumber,
+        'callback': function () {
+          let collection = document.getElementsByClassName('close');
+          let array = Array.from(collection);
+          array.forEach(value => {
+            value.click()
+          });
+          self.selectId = null;
+          self.selectStatus = null;
+          self.comment = null;
+        }
+      });
     }
-
   }
 }
 </script>
-
-<style scoped>
-
-</style>

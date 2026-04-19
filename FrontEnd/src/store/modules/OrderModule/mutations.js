@@ -33,11 +33,6 @@ export const chanceStatus = (state, payload) => {
     orderItem.humanStatus = payload.humanStatus;
     orderItem.status = payload.status;
     orderItem.listCorrectNextStatus = payload.listCorrectNextStatus;
-
-    // Обновляем цену, если она была изменена
-    if (payload.price !== undefined && payload.price !== null) {
-        orderItem.price = payload.price;
-    }
 };
 
 export const setMessage = (state, payload) => {

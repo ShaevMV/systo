@@ -123,9 +123,9 @@ export const sendToChangeStatus = (context, payload) => {
             context.commit('setOrderItem', response.data.order);
         }
         // Перезагружаем список заказов с текущим фильтром
-        if (context.state.filter?.festivalId) {
-            context.dispatch('getOrderListForAdmin', context.state.filter);
-        }
+        // if (context.state.filter?.festivalId) {
+        //    context.dispatch('getOrderListForAdmin', context.state.filter);
+        // }
         // Закрываем модалку ПОСЛЕ всех операций
         if(payload.callback !== undefined) {
             payload.callback()
