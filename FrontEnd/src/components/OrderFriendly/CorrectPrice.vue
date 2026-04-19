@@ -10,7 +10,7 @@
                       text-decoration: underline;
                       cursor: pointer;
                     "> сменить цену </small>
-    <small class="form-text text-muted"> {{ getError('price') }}</small>
+    <small class="form-text text-muted"> {{ error }}</small>
   </div>
 </template>
 
@@ -26,6 +26,7 @@ export default {
   data() {
     return {
       newPrice: null,
+      error: null,
     };
   },
   computed: {
@@ -49,11 +50,13 @@ export default {
       'sendChangePrice'
     ]),
     correctPrice() {
+      let self = this;
+      self.error = null;
       this.sendChangePrice({
         'id': this.id,
         'price': this.price,
-        'callback': function (message) {
-          self.message = message;
+        'callbackError': function (message) {
+          self.error = message;
         }
       });
     },

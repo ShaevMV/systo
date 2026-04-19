@@ -153,16 +153,16 @@ export const sendChangePrice = (context, payload) => {
         'price': payload.price,
     });
     promise.then(function (response) {
-        if(payload.callback !== undefined) {
-            payload.callback()
-        }
+
         context.commit('chancePrice', {
             'id': payload.id,
             'price': response.data.price,
         })
     }).catch(function (error) {
         console.error(error);
-        context.commit('setError', error.response.data.errors);
+        if(payload.callbackError !== undefined) {
+            payload.callbackError(error.response.data.errors?.price?.join())
+        }
     });
 }
 
