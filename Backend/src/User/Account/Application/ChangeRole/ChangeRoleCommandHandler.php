@@ -14,6 +14,6 @@ class ChangeRoleCommandHandler implements \Shared\Domain\Bus\Command\CommandHand
 
     public function __invoke(ChangeRoleCommand $command): void
     {
-        $this->repositories->chanceRole($command->getId(), $command->getRole());
+        $this->repositories->changeRole($command->getId(), $command->getRole());
     }
 }
