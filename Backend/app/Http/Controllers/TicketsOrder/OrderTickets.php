@@ -408,6 +408,48 @@ class OrderTickets extends Controller
         ]);
     }
 
+    public function changeTicket(
+        string $id,
+        Request $request,
+    ): JsonResponse
+    {
+        $rules = [
+            'email' => 'required|array|distinct',
+            'value' => 'required|array|distinct',
+            'email.*' => 'required|email',
+            'value.*' => 'required'
+        ];
+
+        $messages = [
+            // Общие ошибки для полей верхнего уровня
+            'email.required' => 'Поле "email" обязательно.',
+            'value.required' => 'Поле "ФИО" обязательно.',
+            'email.array'    => 'Поле "email" должно быть массивом.',
+            'value.array'    => 'Поле "ФИО" должно быть массивом.',
+            'email.distinct' => 'Email-адреса не должны повторяться.',
+            'value.distinct' => 'ФИО не должны повторяться.',
+
+            // Ошибки для каждого элемента массива email.*
+            'email.*.required' => 'Email не может быть пустым.',
+            'email.*.email'    => 'Введите корректный email адрес.',
+
+            // Ошибки для каждого элемента массива value.*
+            'value.*.required' => 'ФИО не может быть пустым.',
+        ];
+
+        $validator = \Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
     /**
      * Получить список билетов в PDF
      *

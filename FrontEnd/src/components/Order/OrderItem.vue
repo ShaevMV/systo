@@ -20,7 +20,17 @@
                 <tbody>
                 <tr>
                   <td>{{ getName }}</td>
-                  <td v-html="getGuests"></td>
+                  <td>
+                    <div
+                      v-if="!(isAdmin || isPusher)"
+                      v-html="getGuests"
+                    >
+                    </div>
+                    <new-ticket
+                        v-if="(isAdmin || isPusher)"
+                        :oldGuests="getOrderItem.guests"
+                    />
+                  </td>
                   <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
                   <td v-if="!getFriendlyId">{{ getDateBuy }}</td>
                   <td class="text-right" v-if="!getFriendlyId">{{ getDiscount }}</td>
@@ -48,13 +58,18 @@
 <script>
 import {mapGetters} from "vuex";
 import OrderButton from "@/components/Order/OrderButton.vue";
+import NewTicket from "@/components/Order/NewTicket.vue";
 
 export default {
   name: "OrderItem",
-  components: {OrderButton},
+  components: {NewTicket, OrderButton},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
+    ]),
+    ...mapGetters('appUser', [
+      'isAdmin',
+      'isPusher',
     ]),
     /**
      * Вывести названия билета

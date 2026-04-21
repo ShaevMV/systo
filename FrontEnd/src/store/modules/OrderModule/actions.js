@@ -127,14 +127,14 @@ export const sendToChangeStatus = (context, payload) => {
         //    context.dispatch('getOrderListForAdmin', context.state.filter);
         // }
         // Закрываем модалку ПОСЛЕ всех операций
-        if(payload.callback !== undefined) {
+        if (payload.callback !== undefined) {
             payload.callback()
         }
     }).catch(function (error) {
         console.error(error);
         context.commit('setError', error.response?.data?.errors || error.message);
         // Даже при ошибтке вызываем callback для закрытия модалки
-        if(payload.callback !== undefined) {
+        if (payload.callback !== undefined) {
             payload.callback()
         }
     }).finally(function () {
@@ -160,26 +160,48 @@ export const sendChangePrice = (context, payload) => {
         })
     }).catch(function (error) {
         console.error(error);
-        if(payload.callbackError !== undefined) {
+        if (payload.callbackError !== undefined) {
             payload.callbackError(error.response.data.errors?.price?.join())
+        }
+    });
+}
+
+export const sendNewTicket = (context, payload) => {
+    const rawData = JSON.parse(JSON.stringify(payload.email));
+    console.log(rawData);
+
+    let promise = axios.post(API_ORDER + '/changeTicket/' + payload.id, {
+        'value': JSON.parse(JSON.stringify(payload.value)),
+        'email': rawData,
+    });
+    promise.then(function () {
+        if (payload.callback !== undefined) {
+            payload.callback()
+        }
+    }).catch(function (error) {
+        console.error(error.response.data.errors);
+        if (payload.callbackError !== undefined) {
+            payload.callbackError(
+                error.response.data.errors
+            )
         }
     });
 }
 
 export const getUrlForPdf = (context, payload) => {
     return new Promise((resolve, reject) => {
-    let promise = axios.get(API_ORDER + '/getTicketPdf/' + payload);
-    return promise.then(function (response) {
-        //console.log('in promise ', response);
-        response.data.listUrl.forEach(function (item) {
-             resolve(item);
-        })
-        //console.log(response)
-    }).catch(function (error) {
-        //console.error(error);
-        context.commit('setError', error.response.data.errors);
-        reject(error);
-    });
+        let promise = axios.get(API_ORDER + '/getTicketPdf/' + payload);
+        return promise.then(function (response) {
+            //console.log('in promise ', response);
+            response.data.listUrl.forEach(function (item) {
+                resolve(item);
+            })
+            //console.log(response)
+        }).catch(function (error) {
+            //console.error(error);
+            context.commit('setError', error.response.data.errors);
+            reject(error);
+        });
     });
 };
 
