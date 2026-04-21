@@ -59,7 +59,7 @@ export const edit = (context, payload) => {
 
 export const chanceRole = (context, payload) => {
     return new Promise((resolve, reject) => {
-        let promise = axios.post(API + '/chanceRole/' + payload.id, {
+        let promise = axios.post(API + '/changeRole/' + payload.id, {
             'role': payload.role
         });
         return promise.then(function (response) {
