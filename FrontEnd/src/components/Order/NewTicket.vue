@@ -1,36 +1,30 @@
 <template>
   <div>
-    <div v-for="(guest, index) in oldGuests" :key="index">
-      <div class="d-flex flex-wrap">
+    <div v-for="(guest, index) in oldGuests" :key="index" class="mb-3 pb-3 border-bottom">
+      <div class="d-flex flex-wrap gap-3">
         <div class="col-md-4">
-          <label class="form-label">{{ guest.email }}</label>
-          <div class="input-group">
-            <input type="email"
-                   v-model="newEmail[guest.id]"
-                   placeholder="Введите новый email"
-                   class="form-control">
-          </div>
-          <!-- Выводим ошибку для email -->
-          <div class="messager text-danger" v-if="getErrorMessage('email', guest.id)">
+          <label class="form-label text-muted small">Текущий email: <strong>{{ guest.email }}</strong></label>
+          <input type="email"
+                 v-model="newEmail[guest.id]"
+                 placeholder="Введите новый email"
+                 class="form-control">
+          <div class="text-danger small mt-1" v-if="getErrorMessage('email', guest.id)">
             {{ getErrorMessage('email', guest.id) }}
           </div>
         </div>
         <div class="col-md-4">
-          <label class="form-label">{{ guest.value }}</label>
-          <div class="input-group">
-            <input type="text"
-                   v-model="newValue[guest.id]"
-                   placeholder="Введите новый ФИО"
-                   class="form-control">
-          </div>
-          <!-- Выводим ошибку для value -->
-          <div class="messager text-danger" v-if="getErrorMessage('value', guest.id)">
+          <label class="form-label text-muted small">Текущее ФИО: <strong>{{ guest.value }}</strong></label>
+          <input type="text"
+                 v-model="newValue[guest.id]"
+                 placeholder="Введите новое ФИО"
+                 class="form-control">
+          <div class="text-danger small mt-1" v-if="getErrorMessage('value', guest.id)">
             {{ getErrorMessage('value', guest.id) }}
           </div>
         </div>
       </div>
-      <button @click="editTicket">Сменить билеты</button>
     </div>
+    <button class="btn btn-primary mt-2" @click="editTicket">Сменить билеты</button>
   </div>
 </template>
 
@@ -43,26 +37,23 @@ export default {
   props: ['oldGuests'],
   data() {
     return {
-      newEmail: [],   // будет объект { uuid: 'email@example.com' }
-      newValue: [],   // будет объект { uuid: 'ФИО' }
-      errors: null,   // объект ошибок с сервера
+      newEmail: {},
+      newValue: {},
+      errors: null,
     };
   },
   methods: {
     ...mapActions('appOrder', ['sendNewTicket']),
 
-    // Метод для получения текста ошибки по полю и UUID
     getErrorMessage(field, uuid) {
       if (!this.errors) return null;
 
-      // Сначала ищем ошибку для конкретного поля с UUID
       const specificKey = `${field}.${uuid}`;
       if (this.errors[specificKey]) {
         const err = this.errors[specificKey];
         return Array.isArray(err) ? err[0] : err;
       }
 
-      // Если нет, ищем общую ошибку для поля (например, 'value' или 'email')
       if (this.errors[field]) {
         const err = this.errors[field];
         return Array.isArray(err) ? err[0] : err;
@@ -72,18 +63,16 @@ export default {
     },
 
     editTicket() {
-      const rawEmail = toRaw(this.newEmail);
-      const rawValue = toRaw(this.newValue);
-      const email = Object.fromEntries(Object.entries(rawEmail));
-      const value = Object.fromEntries(Object.entries(rawValue));
+      this.errors = null;
+      const email = Object.fromEntries(Object.entries(toRaw(this.newEmail)));
+      const value = Object.fromEntries(Object.entries(toRaw(this.newValue)));
 
       this.sendNewTicket({
         id: this.$route.params.id,
-        value: value,
-        email: email,
+        value,
+        email,
         callbackError: (errorObject) => {
-          console.log('Ошибки с сервера:', errorObject);
-          this.errors = errorObject; // сохраняем объект ошибок
+          this.errors = errorObject;
         }
       });
     }
