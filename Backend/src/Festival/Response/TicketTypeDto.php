@@ -22,6 +22,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
      * @param int $sort
      * @param bool $isLiveTicket
      * @param string|null $description
+     * @param Uuid|null $questionnaireTypeId
      */
     public function __construct(
         protected Uuid   $id,
@@ -33,6 +34,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
         protected int    $sort = 0,
         protected bool   $isLiveTicket = false,
         protected ?string $description = null,
+        protected ?Uuid  $questionnaireTypeId = null,
     )
     {
     }
@@ -70,6 +72,7 @@ final class TicketTypeDto extends AbstractionEntity implements Response
             $data['sort'],
             (bool)$data['is_live_ticket'],
             $data['description'] ?? null,
+            empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
         );
     }
 
@@ -103,5 +106,15 @@ final class TicketTypeDto extends AbstractionEntity implements Response
     public function isLiveTicket(): bool
     {
         return $this->isLiveTicket;
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
+    }
+
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaireTypeId;
     }
 }

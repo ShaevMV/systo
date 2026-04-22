@@ -1,10 +1,17 @@
 <template>
   <div id="left-logo">
     <a :href="getLinkHome">
-    <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
+      <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
     </a>
   </div>
   <ul class="sidebar-nav" id="sidebar-nav">
+    <li class="nav-item" v-if="!isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{ name: 'QuestionnaireNewUser' }">Заявка на вступление в клуб
+      </router-link>
+    </li>
     <li class="nav-item" v-if="isAuth">
       <router-link
           class="nav-link"
@@ -14,9 +21,16 @@
     </li>
     <li class="nav-item">
       <router-link
-          class="nav-link" v-if="isAuth"
+          class="nav-link" v-if="isAuth && !isPusher"
           active-class="active"
           :to="getLinkHome">Регистрация оргвзноса
+      </router-link>
+    </li>
+    <li class="nav-item">
+      <router-link
+          class="nav-link" v-if="isAuth && isPusher"
+          active-class="active"
+          :to="{ name: 'frendlyOrder' }">Регистрация дружеского оргвзноса
       </router-link>
     </li>
     <li class="nav-item" v-if="isAuth">
@@ -33,7 +47,7 @@
           :to="{ name: 'Conditions' }">Правила участия
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAuth">
+    <li class="nav-item" v-if="isAuth && !isSeller">
       <router-link
           class="nav-link"
           active-class="active"
@@ -47,21 +61,56 @@
           :to="{ name: 'Profile' }">Мой аккаунт
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
+    <li class="nav-item" v-if="(isAdmin || isSeller) && isAuth ">
       <router-link
           class="nav-link"
           active-class="active"
           :to="{name: 'AllOrders'}">Все оргвзносы
       </router-link>
     </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
+    <li class="nav-item" v-if="(isAdmin || isPusher) && isAuth ">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'AllOrdersFriendly'}">Все френдли оргвзносы
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="(isAdmin || isManager) && isAuth">
       <router-link
           class="nav-link"
           active-class="active"
           :to="{name: 'QuestionnaireList'}">Все анкеты
       </router-link>
     </li>
-    <li class="nav-item" v-if="(isAdmin && isAuth) && (false === isManager)">
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'TicketTypeListView'}">Все Типы билетов
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'QuestionnaireTypeListView'}">Все Типы анкет
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'TypesOfPaymentListView'}">Все Типы оплат
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="isAdmin && isAuth">
+      <router-link
+          class="nav-link"
+          active-class="active"
+          :to="{name: 'AccountListView'}">Все пользователи
+      </router-link>
+    </li>
+    <li class="nav-item" v-if="(isAdmin && isAuth)">
       <router-link
           class="nav-link"
           active-class="active"
@@ -83,13 +132,14 @@
   <div id="left-sub">
     <p>Если у вас возникли трудности <br>с внесением оргвзноса напишите нам:</p>
     <ul>
-      <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank" >FAQ (Вопрос-Ответ)</a></li>
+      <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank">FAQ (Вопрос-Ответ)</a></li>
       <li><a href="tg://resolve?domain=systo_club" class="telegram" target="_blank">@systo_club</a></li>
     </ul>
 
   </div>
 
-  <div id="prana"><span>Система разработана веб-студией</span> <a href="https://pranaweb.ru" target="_blank">PRANA</a></div>
+  <div id="prana"><span>Система разработана веб-студией</span> <a href="https://pranaweb.ru" target="_blank">PRANA</a>
+  </div>
 
 </template>
 
@@ -108,7 +158,9 @@ export default {
     ...mapGetters('appUser', [
       'isAuth',
       'isAdmin',
-      'isManager'
+      'isSeller',
+      'isManager',
+      'isPusher',
     ]),
     getLinkHome: function () {
       return this.isAuth ? '/hfjlsd65t4732' : '/';
@@ -116,8 +168,8 @@ export default {
   },
   methods: {
     ...mapActions('appUser', [
-          'logOut'
-        ]),
+      'logOut'
+    ]),
   },
 }
 </script>

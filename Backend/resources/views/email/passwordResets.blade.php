@@ -40,7 +40,7 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Для сменны пароля пожалуйста перейдите по
-                            <a href="{{$link}}" style="font-family: Tahoma, sans-serif; font-size: 18px; color: black">ссылке</a>.</p>
+                            <a href="{{$link}}" style="font-family: Tahoma, sans-serif; font-size: 18px; color: #0000EE; text-decoration: underline;">ссылке</a>.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если Вы получили это письмо ошибочно, проигнорируйте данное письмо!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>

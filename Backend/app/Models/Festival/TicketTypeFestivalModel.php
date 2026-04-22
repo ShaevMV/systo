@@ -34,4 +34,14 @@ final class TicketTypeFestivalModel  extends Model
 {
     public const TABLE = 'ticket_type_festival';
     protected $table = self::TABLE;
+
+    protected $fillable = [
+        'id',
+        'festival_id',
+        'ticket_type_id',
+        'created_at',
+        'updated_at',
+        'pdf',
+        'email',
+    ];
 }

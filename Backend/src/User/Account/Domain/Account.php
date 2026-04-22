@@ -12,18 +12,19 @@ use Tickets\User\Account\Dto\AccountDto;
 class Account extends AggregateRoot
 {
     public function __construct(
-        private Uuid $id,
-        private string $email,
-        private string $phone,
-        private string $city,
+        private Uuid    $id,
+        private string  $email,
+        private string  $phone,
+        private string  $city,
         private ?string $name = null,
+        public string   $role = '',
     ) {
     }
 
     public static function creatingNewAccount(
         Uuid $uuid,
         AccountDto $accountDto,
-        string $password,
+        string $password
     ): self {
         $self = new self(
             $uuid,
@@ -31,6 +32,7 @@ class Account extends AggregateRoot
             $accountDto->getPhone(),
             $accountDto->getCity(),
             $accountDto->getName(),
+            $accountDto->getRole(),
         );
 
 
@@ -66,5 +68,10 @@ class Account extends AggregateRoot
     public function getCity(): string
     {
         return $this->city;
+    }
+
+    public function getRole(): string
+    {
+        return $this->role;
     }
 }

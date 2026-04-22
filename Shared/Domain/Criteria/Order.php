@@ -15,6 +15,16 @@ final class Order
         return new self($orderBy, OrderType::desc());
     }
 
+    public static function fromState(array $data): Order
+    {
+        if(empty($data)) {
+            return self::none();
+        }
+        $orderByValue = array_key_first($data);
+
+        return new Order(new OrderBy($orderByValue), new OrderType($data[$orderByValue]));
+    }
+
     public static function fromValues(?string $orderBy, ?string $order): Order
     {
         return null === $orderBy ? self::none() : new Order(new OrderBy($orderBy), new OrderType($order));

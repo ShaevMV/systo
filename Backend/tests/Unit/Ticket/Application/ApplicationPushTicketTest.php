@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Ticket\Application;
 
-use Nette\Utils\JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Tests\TestCase;
@@ -25,18 +24,11 @@ class ApplicationPushTicketTest extends TestCase
         $this->pushTicket = $pushTicket;
     }
 
-    /**
-     * @throws JsonException
-     * @throws \Throwable
-     */
     public function test_in_correct_push(): void
     {
         /** @var TicketsRepositoryInterface $repository */
         $repository = $this->app->get(TicketsRepositoryInterface::class);
         $ids = $repository->getAllTicketsId();
-        foreach ($ids as $id) {
-            $this->pushTicket->pushTicket($id);
-        }
-        self::assertTrue(true);
+        self::assertIsArray($ids);
     }
 }

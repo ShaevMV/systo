@@ -14,6 +14,7 @@ final class GuestsDto implements EntityDataInterface
     public function __construct(
         protected string $value,
         protected ?string $email,
+        protected ?int $number = null,
         protected Uuid   $id,
         protected ?Uuid   $festivalId,
     )
@@ -27,6 +28,7 @@ final class GuestsDto implements EntityDataInterface
         return new self(
             $data['value'],
             $data['email'] ?? null,
+            $data['number'] ?? null,
             $id,
             $festivalUuid
         );
@@ -35,6 +37,16 @@ final class GuestsDto implements EntityDataInterface
     public function updateId(): void
     {
         $this->id = Uuid::random();
+    }
+
+    public function updateValue(string $value): void
+    {
+        $this->value = $value;
+    }
+
+    public function updateEmail(?string $email): void
+    {
+        $this->email = $email;
     }
 
     public function __toString(): string
@@ -50,6 +62,7 @@ final class GuestsDto implements EntityDataInterface
         return Json::encode([
             'value' => $this->value,
             'id' => $this->id->value(),
+            'number' => $this->number ?? null,
             'email' => $this->email ?? null,
             'festival_id' => $this->festivalId->value(),
         ]);
@@ -73,5 +86,21 @@ final class GuestsDto implements EntityDataInterface
     public function getEmail(): ?string
     {
         return $this->email ?? null;
+    }
+
+    public function getNumber(): ?int
+    {
+        return $this->number;
+    }
+
+    public function toArray():array
+    {
+        return [
+            'value' => $this->value,
+            'id' => $this->id->value(),
+            'number' => $this->number ?? null,
+            'email' => $this->email ?? null,
+            'festival_id' => $this->festivalId->value(),
+        ];
     }
 }

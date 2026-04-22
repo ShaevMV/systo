@@ -12,6 +12,7 @@ final class ListTicketTypeQuery implements Query
     public function __construct(
         private Uuid $festivalId,
         private bool $isAllPrice = false,
+        private bool $isPusher = false,
     )
     {
     }
@@ -24,5 +25,10 @@ final class ListTicketTypeQuery implements Query
     public function isAllPrice(): bool
     {
         return $this->isAllPrice;
+    }
+
+    public function isPusher(): bool
+    {
+        return $this->isPusher;
     }
 }

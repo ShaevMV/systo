@@ -10,6 +10,10 @@ interface EntityInterface
      */
     public function toArray(): ?array;
 
+    public function toArrayForEdit(): ?array;
+
+    public function toArrayForCreate(): ?array;
+
     /**
      * @param string $name
      *
@@ -21,4 +25,6 @@ interface EntityInterface
      * Вывести объект в виде json
      */
     public function toJson(): string;
+
+    public function isNotEmpty(): bool;
 }

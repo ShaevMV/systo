@@ -5,14 +5,11 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Invite\InviteModel;
-use App\Models\Ordering\InviteLinkModel;
 use App\Models\Ordering\OrderTicketModel;
 use Illuminate\Support\Facades\DB;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\InviteLink\Domain\InviteLink;
-use Tickets\InviteLink\Responses\InviteLinkResponse;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderStatusListDto;
 
 class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
@@ -27,9 +24,9 @@ class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
     public function isPaidOrderByUserId(Uuid $userId): bool
     {
         return $this->orderTicketModel::where([
-            'user_id' => $userId->value(),
-            'status' => Status::PAID,
-        ])->exists();
+            'user_id' => $userId->value()])
+            ->whereIn('status', [Status::PAID, Status::PAID_FOR_LIVE, Status::LIVE_TICKET_ISSUED])
+            ->exists();
     }
 
     /**
@@ -43,9 +40,9 @@ class InMemoryInviteLinkRepository implements InviteLinkRepositoryInterface
             $orderList = json_decode($orderList, true);
         }
         $orderList[] = $orderId->value();
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+
             $rawModel = $this->model::whereId($id->value());
             if (!$rawModel->exists()) {
                 $this->model::create([

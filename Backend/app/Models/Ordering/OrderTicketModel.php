@@ -7,7 +7,7 @@ namespace App\Models\Ordering;
 use App\Models\Festival\TicketTypesModel;
 use App\Models\Festival\TypesOfPaymentModel;
 use App\Models\Tickets\TicketModel;
-use App\Models\User\User;
+use App\Models\User;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -65,6 +65,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|OrderTicketModel whereUpdatedAt($value)
  * @method static Builder|OrderTicketModel whereUserId($value)
  * @mixin Eloquent
+ * @property string $type
+ * @method static Builder|OrderTicketModel whereType($value)
+ * @property string|null $friendly_id
+ * @method static Builder|OrderTicketModel whereFriendlyId($value)
  */
 final class OrderTicketModel extends Model
 {

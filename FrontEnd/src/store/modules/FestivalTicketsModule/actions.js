@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API_FESTIVAL = '/api/v1/festival'
-const API_PROMOCODE = '/api/v1/promocode'
+const API_PROMOCODE = '/api/v1/promoCode'
+
 /**
  * Загрузить список способов оплаты и типов билета
  *
@@ -19,6 +20,15 @@ export const loadDataForOrderingTickets = (context, payload) => {
         context.commit('setSelectTypesOfPayment', response.data.typesOfPayment[0]);
         context.commit('setTicketType', response.data.ticketType);
         context.commit('setSelectTicketType', response.data.ticketType[0]);
+    })
+};
+
+export const loadTypesOfPayment = (context, payload) => {
+    let promise = axios.get(API_FESTIVAL + '/loadByTicketType/' + payload.ticket_type_id);
+
+    promise.then(function (response) {
+        context.commit('setTypesOfPayment', response.data.typesOfPaymentDto);
+        context.commit('setSelectTypesOfPayment', response.data.typesOfPaymentDto[0]);
     })
 };
 

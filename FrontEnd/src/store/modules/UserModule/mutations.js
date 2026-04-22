@@ -32,8 +32,11 @@ export const setUserInfo = async (state, payload) => {
     state.userInfo = payload;
     await localStorage.setItem('user.email', payload.email);
     await localStorage.setItem('user.id', payload.id);
-    await localStorage.setItem('user.isAdmin', payload.admin);
-    await localStorage.setItem('user.isManager', payload.manager);
+    await localStorage.setItem('user.isAdmin', payload.role == 'admin');
+    await localStorage.setItem('user.isManager', payload.role == 'manager');
+    await localStorage.setItem('user.isSaller', payload.role == 'saller');
+    await localStorage.setItem('user.isPusher', payload.role == 'pusher');
+    await localStorage.setItem('user.role', payload.role);
 };
 
 export const setUserData = (state, payload) => {

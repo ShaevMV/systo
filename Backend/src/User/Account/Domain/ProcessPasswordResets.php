@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tickets\User\Account\Domain;
 
 use App\Mail\UserPasswordResets;
-use App\Models\User\PasswordResets;
-use App\Models\User\User;
+use App\Models\PasswordResets;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

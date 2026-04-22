@@ -65,3 +65,13 @@ export const getTotalNumber = state => {
 export const getMessageForQuestionnaire = state => {
     return state.questionnaireItem.message;
 };
+
+/**
+ * Получить текущий фильтр
+ *
+ * @param state
+ * @returns {Object}
+ */
+export const getFilter = state => {
+    return state.filter;
+};

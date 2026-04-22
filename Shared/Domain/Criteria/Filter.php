@@ -9,7 +9,7 @@ final class Filter
     public function __construct(
         private FilterField $field,
         private FilterOperator $operator,
-        private FilterValue $value
+        private FilterValue|FilterBoolValue $value
     ) {
     }
 
@@ -18,7 +18,7 @@ final class Filter
         return new self(
             new FilterField($values['field']),
             new FilterOperator($values['operator']),
-            new FilterValue($values['value'])
+            is_bool($values['value']) ? new FilterBoolValue($values['value']) : new FilterValue((string) $values['value'])
         );
     }
 
@@ -32,7 +32,7 @@ final class Filter
         return $this->operator;
     }
 
-    public function value(): FilterValue
+    public function value(): FilterValue|FilterBoolValue
     {
         return $this->value;
     }

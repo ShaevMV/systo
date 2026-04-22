@@ -40,7 +40,7 @@
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Поздравляем тебя с зарегистрированным членством в нашем приватном клубе.</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Теперь тебе доступна возможность подержать нас финансево $$$
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Теперь тебе доступна возможность поддержать нас финансово
 
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;"><a href="{{ $link }}" target="_blank"> Ссылка на оплату оргвзноса </a>  </p>
 

@@ -14,16 +14,16 @@
             <tr>
               <th scope="col" class="mobile">№ заказа</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
-              <th scope="col" v-if="isAdmin">Email</th>
-              <th scope="col" v-if="isAdmin">Гости</th>
+              <th scope="col" v-if="isAdmin" class="mobile">Email</th>
+              <th scope="col" v-if="isAdmin" class="mobile">Гости</th>
               <th scope="col">Тип оргвзноса</th>
-              <th scope="col">Стоимость</th>
-              <th scope="col">Кол-во</th>
+              <th scope="col" class="mobile">Стоимость</th>
+              <th scope="col" class="mobile">Кол-во</th>
               <th scope="col">Дата <span>внесения средств</span></th>
               <th scope="col" v-if="isAdmin">Промо код</th>
               <th scope="col">Метод <span>перевода</span></th>
               <th scope="col" v-if="isAdmin">Информация о платеже</th>
-              <th scope="col" class="mobile">Телефон</th>
+              <th scope="col">Телефон</th>
               <th scope="col" v-if="isAdmin">Город</th>
               <th scope="col" v-if="isAdmin">Комментарий</th>
               <th scope="col" v-if="isAdmin" class="mobile"></th>
@@ -45,26 +45,26 @@
                     ...
                   </button>
                   <div class="dropdown-menu">
-                <span class="dropdown-item btn-link"
-                      role="button"
-                      v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
-                      @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+                  <span class="dropdown-item btn-link"
+                        role="button"
+                        v-for="(statusItem, key) in itemOrder.listCorrectNextStatus" v-bind:key="key"
+                        @click="changeStatus(key,itemOrder)">{{ statusItem }}</span>
                   </div>
                 </div>
               </td>
-              <td v-if="isAdmin">{{ itemOrder.email }}</td>
-              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) ">
+              <td v-if="isAdmin" class="mobile">{{ itemOrder.email }}</td>
+              <td v-if="isAdmin" :title="getListQuests(itemOrder.guests, true) " class="mobile">
                 {{ getListQuests(itemOrder.guests, false) }}
               </td>
               <td>{{ itemOrder.name }}</td>
-              <td>{{ itemOrder.price }} рублей</td>
-              <td>{{ itemOrder.count }}</td>
+              <td class="mobile">{{ itemOrder.price }}</td>
+              <td class="mobile">{{ itemOrder.count }}</td>
               <td>{{ itemOrder.dateBuy }}</td>
               <td v-if="isAdmin">{{ itemOrder.promoCode }}</td>
 
               <td>{{ itemOrder.typeOfPaymentName }}</td>
               <td v-if="isAdmin">{{ itemOrder.idBuy }}</td>
-              <td :style="styleObject(itemOrder.status)" class="mobile" style="text-align: left;">
+              <td :style="styleObject(itemOrder.status)" style="text-align: left;">
                 {{ itemOrder.phone }}
               </td>
               <td v-if="isAdmin">
@@ -88,10 +88,7 @@
         </div>
       </div>
     </div>
-    <button type="button" class="btn btn-primary" v-show="false" data-toggle="modal" id="modalOpenBtn"
-            data-target="#exampleModal">
-      Launch demo modal
-    </button>
+
 
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
@@ -99,12 +96,13 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Номер живого билета или комментарий для пользователя</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Комментарий для пользователя</h5>
             <button type="button" class="close"
                     data-dismiss="modal"
                     id="closeModal"
                     aria-label="Close">
               <span aria-hidden="true">
+                Х
               </span>
             </button>
           </div>
@@ -116,6 +114,51 @@
             <button type="button"
                     @click="sendDifficultiesArose"
                     class="btn btn-secondary">Сменить статус
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="modal fade" id="exampleModalLive" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabelLive"
+         aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Введите номера билетов для каждого гостя</h5>
+            <button type="button" class="close"
+                    data-dismiss="modal"
+                    id="closeModalLive"
+                    aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <table class="table">
+              <thead>
+              <tr>
+                <th>Имя</th>
+                <th>Номер билета</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="guest in getListGuest" :key="guest.id">
+                <td>{{ guest.value }}</td>
+                <td>
+                  <input type="text"
+                         v-model="liveNumber[guest.id]"
+                         class="form-control"
+                         placeholder="Введите номер билета">
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <small class="form-text text-muted">{{ getError('liveList') }}</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" @click="sendLive" class="btn btn-secondary">
+              Сменить статус
             </button>
           </div>
         </div>
@@ -134,6 +177,9 @@ export default {
       comment: null,
       selectId: null,
       selectStatus: null,
+      selectItem: {},
+      liveNumber: {},
+      isChangingStatus: false,
     }
   },
   props: {
@@ -145,13 +191,26 @@ export default {
   computed: {
     ...mapGetters('appOrder', [
       'getOrderList',
-      'getError'
+      'getError',
+      'getIsLoading'
     ]),
+    getListGuest: function () {
+      return this.selectItem?.guests ?? [];
+    },
+
+  },
+  watch: {
+    getIsLoading(newValue) {
+      // Сбрасываем флаг блокировки при завершении загрузки
+      if (!newValue) {
+        this.isChangingStatus = false;
+      }
+    }
   },
   // #1e871c - зеленый, #86201c - красный, #d0ba27 - желтый
   methods: {
     ...mapActions('appOrder', [
-      'sendToChanceStatus'
+      'sendToChangeStatus'
     ]),
     styleObject: function (status) {
       return {
@@ -210,15 +269,35 @@ export default {
      * @param status
      * @param id
      */
-    chanceStatus(status, id) {
-      this.selectId = id;
+    changeStatus(status, itemOrder) {
+      this.selectId = itemOrder.id;
       this.selectStatus = status;
 
-      if (['difficulties_arose', 'live_ticket_issued'].includes(status)) {
-        document.getElementById('modalOpenBtn').click();
+      if (['difficulties_arose'].includes(status)) {
+        // Открытие модалки через jQuery (Bootstrap 4)
+        if (typeof $ !== 'undefined') {
+          $('#exampleModal').modal('show');
+        }
+      } else if (['live_ticket_issued'].includes(status)) {
+        this.selectItem = itemOrder;
+
+        // Инициализируем объект liveNumber для всех гостей
+        const guests = itemOrder.guests || [];
+        this.liveNumber = {};
+        guests.forEach(guest => {
+          this.liveNumber[guest.id] = '';
+        });
+
+        // Ждем, пока Vue обновит DOM, и только потом открываем модалку
+        this.$nextTick(() => {
+          if (typeof $ !== 'undefined') {
+            $('#exampleModalLive').modal('show');
+          }
+        });
       } else {
-        this.sendToChanceStatus({
-          'id': id,
+        this.isChangingStatus = true;
+        this.sendToChangeStatus({
+          'id': itemOrder.id,
           'status': status,
           'comment': null
         });
@@ -229,18 +308,56 @@ export default {
      */
     sendDifficultiesArose() {
       let self = this;
-      this.sendToChanceStatus({
+      this.isChangingStatus = true;
+      this.sendToChangeStatus({
         'id': this.selectId,
         'status': this.selectStatus,
         'comment': this.comment,
         'callback': function () {
-          document.getElementById('closeModal').click();
+          // Убираем фокус с кнопки перед закрытием (accessibility fix)
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
+          
+          // Закрытие модалки через jQuery (Bootstrap 4)
+          if (typeof $ !== 'undefined') {
+            $('#exampleModal').modal('hide');
+          }
+          
+          self.selectId = null;
+          self.selectStatus = null;
+          self.comment = null;
+        }
+      });
+    },
+    /**
+     * Сменить статус на возникли трудности и отправить сообщение для пользователя
+     */
+    sendLive() {
+      let self = this;
+      this.isChangingStatus = true;
+      this.sendToChangeStatus({
+        'id': this.selectId,
+        'status': this.selectStatus,
+        'liveList': this.liveNumber,
+        'callback': function () {
+          // Убираем фокус с кнопки перед закрытием (accessibility fix)
+          if (document.activeElement) {
+            document.activeElement.blur();
+          }
+          
+          // Закрытие модалки через jQuery (Bootstrap 4)
+          if (typeof $ !== 'undefined') {
+            $('#exampleModalLive').modal('hide');
+          }
+          
           self.selectId = null;
           self.selectStatus = null;
           self.comment = null;
         }
       });
     }
+
   }
 }
 </script>

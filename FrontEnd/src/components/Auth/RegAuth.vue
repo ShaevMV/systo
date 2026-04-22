@@ -9,6 +9,11 @@
           <div class="card mt-2 mx-auto">
             <p class="pp1 text-center">Чтобы зарегистрировать свой аккаунт в системе заполни все поля данной формы:</p>
             <div class="card-body">
+              <div class="col-12 mb-3">
+                <label for="yourEmail" class="form-label hidder">Phone</label>
+                <input type="text" name="email" class="form-control" id="yourPhone" required="" v-model="name" placeholder="ФИО:">
+                <div class="invalid-feedback" style="display: block">{{ getError('name') }}</div>
+              </div>
 
               <div class="col-12 mb-3">
                 <label for="yourUsername" class="form-label hidder">Your Email</label>

@@ -2196,7 +2196,7 @@
                     /**
          * Determine if the current user is authenticated. If not, throw an exception.
          *
-         * @return \App\Models\User\User 
+         * @return \App\Models\User 
          * @throws \Illuminate\Auth\AuthenticationException
          * @static 
          */ 

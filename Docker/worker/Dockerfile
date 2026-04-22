@@ -1,4 +1,4 @@
-FROM php:8.0-fpm
+FROM php:8.2-fpm-bookworm
 
 WORKDIR /var/www/html
 
@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y \
         && docker-php-ext-install soap \
         && docker-php-ext-install sockets \
         && docker-php-source delete \
+        && rm -rf /var/lib/apt/lists/*
 
 #ENV HOME /var/www/html
 #ENV DOCKER_PHP ${HOME}/docker/php
@@ -39,11 +40,11 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 #    && docker-php-ext-enable xdebug
 
 #
-RUN adduser --disabled-password --gecos "" user
+RUN useradd -m user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 
 # supervisor
-RUN apt-get install supervisor -y supervisor
+RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists/*
 
 

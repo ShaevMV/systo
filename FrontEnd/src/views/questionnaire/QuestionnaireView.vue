@@ -31,7 +31,7 @@
               <span aria-hidden="true">х</span>
             </button>
           </div>
-          <div class="modal-body" v-html="getMessageForQuestionnaire"></div>
+          <div class="modal-body">Спасибо большое, ваши анкетные данные зарегистрированы, ждем Вас на Систо</div>
           <div class="modal-footer">
             <button
                 type="button"
@@ -51,11 +51,23 @@
       <div class="col-10 col-md-12 col mx-auto">
         <div class="card">
           <div class="card-body pt-3">
+            <a class="nav-item"
+                 v-if="isAdmin || isManager"
+                 @click="goList"
+            >
+              Все анкеты
+            </a>
+
             <questionnaire-ticket
-                :questionnaire="questionnaire"
+                :questionnaire="currentQuestionnaire"
+                :questionnaire-type="questionnaireType"
+                :is-disabled="isAdmin || isManager"
                 @update-questionnaire="updateQuestionnaire"
             />
-            <div class="form-check" id="check-check">
+            <div class="form-check"
+                 id="check-check"
+                 v-show="!isAdmin || !isManager"
+            >
               <input
                   class="form-check-input"
                   type="checkbox"
@@ -64,12 +76,12 @@
                   id="defaultCheck1"
               />
               <label class="form-check-label" for="defaultCheck1">
-                Регистрируя добровольный оргвзнос, ты соглашаешься с
+                Отправляя заявку на вступление в клуб, ты соглашаешься с
                 &nbsp;<a href="/conditions" target="_blank"><b>условиями туристического слёта</b></a>
                 и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
               </label>
             </div>
-            <div class="col-12">
+            <div class="col-12" v-show="!isAdmin || !isManager">
               <button
                   type="button"
                   @click="send"
@@ -105,32 +117,87 @@ export default {
   },
   data() {
     return {
-      questionnaire: {
-        name: null,    // Добавил дату для имени и фамилии
-        agy: null,
-        telegram: null,
-        vk: null,
-        phone: null,
-        howManyTimes: null,
-        musicStyles: null,
-        questionForSysto: null,
-        creationOfSisto: null,
-        activeOfEvent: null,
-        whereSysto: null  // Добавил дату для вопроса Откуда узнал о Систо?
-      },
+      questionnaire: {},
       confirm: false,
+      isLoaded: false,
     }
   },
   computed: {
-    ...mapGetters('appOrder', [
-      'getMessageForQuestionnaire',
+    ...mapGetters('appUser', [
+      'isAdmin',
+      'isManager'
     ]),
+    ...mapGetters('appQuestionnaire', [
+      'getQuestionnaireItem'
+    ]),
+    ...mapGetters('appQuestionnaireType', [
+      'getItem'
+    ]),
+    questionnaireType() {
+      return this.getItem || null;
+    },
+    // Единый источник данных анкеты
+    currentQuestionnaire() {
+      if (this.isAdmin || this.isManager) {
+        return this.getQuestionnaireItem || {};
+      }
+      return this.questionnaire;
+    },
     isCorrect() {
-      return this.questionnaire.agy !== null &&
-          this.questionnaire.howManyTimes !== null &&
-          this.questionnaire.questionForSysto !== null &&
-          this.questionnaire.phone !== null &&
-          this.confirm;
+      if (!this.questionnaireType || !this.questionnaireType.questions) return false;
+
+      let questions = this.questionnaireType.questions;
+      if (typeof questions === 'string') {
+        questions = JSON.parse(questions);
+      }
+
+      for (let q of questions) {
+        if (q.required && (this.currentQuestionnaire[q.name] === null || this.currentQuestionnaire[q.name] === undefined || this.currentQuestionnaire[q.name] === '')) {
+          return false;
+        }
+      }
+
+      return this.confirm;
+    }
+  },
+  watch: {
+    // Копируем данные анкеты из Vuex в локальный state (для админа)
+    getQuestionnaireItem: {
+      handler(item) {
+        if (item && Object.keys(item).length > 0) {
+          this.questionnaire = { ...item };
+        }
+      },
+      immediate: true,
+    },
+    // Инициализируем поля вопросов
+    questionnaireType: {
+      immediate: true,
+      handler(type) {
+        if (type && type.questions) {
+          let questions = type.questions;
+          if (typeof questions === 'string') {
+            try { questions = JSON.parse(questions); } catch (e) { questions = []; }
+          }
+          const q = {};
+          questions.forEach(question => {
+            // Если значение уже есть — сохраняем, если нет — null
+            const existingValue = this.questionnaire[question.name];
+            q[question.name] = existingValue !== undefined && existingValue !== null
+              ? existingValue
+              : null;
+          });
+          this.questionnaire = { ...this.questionnaire, ...q };
+          // Удаляем поля которых нет в новых вопросах (кроме стандартных)
+          const standardFields = ['id', 'status', 'link', 'message', 'user_id', 'order_id', 'ticket_id', 'questionnaire_type_id'];
+          Object.keys(this.questionnaire).forEach(key => {
+            if (!questions.find(q => q.name === key) && !standardFields.includes(key)) {
+              delete this.questionnaire[key];
+            }
+          });
+          this.isLoaded = true;
+        }
+      }
     }
   },
   methods: {
@@ -138,33 +205,28 @@ export default {
       'sendQuestionnaire',
       'editQuestionnaire'
     ]),
+    goList() {
+      this.$router.push({name: 'QuestionnaireList'});
+    },
     send() {
       let self = this;
       if (this.order_id && this.ticket_id) {
         this.sendQuestionnaire({
-          questionnaire: this.questionnaire,
+          questionnaire: this.currentQuestionnaire,
           orderId: this.order_id,
           ticketId: this.ticket_id,
           callback: function () {
             document.getElementById('modalOpenBtn').click();
-            self.questionnaire = {
-              agy: null,
-              telegram: null,
-              vk: null,
-              phone: null,
-              howManyTimes: null,
-              musicStyles: null,
-              questionForSysto: null,
-              creationOfSisto: null,
-              activeOfEvent: null,
-            };
+            // Сбросить значения
+            Object.keys(self.questionnaire).forEach(key => { self.questionnaire[key] = null; });
+            self.confirm = false;
           },
         })
       }
 
       if (this.id) {
         this.editQuestionnaire({
-          questionnaire: this.questionnaire,
+          questionnaire: this.currentQuestionnaire,
           id: this.id,
           callback: function () {
             document.getElementById('modalOpenBtn').click();
@@ -174,11 +236,67 @@ export default {
 
     },
     updateQuestionnaire(updatedQuestionnaire) {
-      this.questionnaire = updatedQuestionnaire;
+      if (this.isAdmin || this.isManager) {
+        // Для админа обновляем Vuex store
+        this.$store.commit('appQuestionnaire/setQuestionnaireItem', updatedQuestionnaire);
+      } else {
+        this.questionnaire = updatedQuestionnaire;
+      }
     }
   },
   created() {
     document.title = "Анкета участника Solar Systo Togathering"
+  },
+  beforeRouteEnter: (to, from, next) => {
+    // Если есть order_id и ticket_id, загружаем анкету + тип анкеты
+    if (to.params.order_id && to.params.ticket_id) {
+      // Сначала загружаем существующую анкету для предзаполнения
+      window.store.dispatch('appQuestionnaire/loadQuestionnaireByOrderTicket', {
+        orderId: to.params.order_id,
+        ticketId: to.params.ticket_id,
+      }).catch(() => {
+        // Игнорируем ошибку — форма загрузится пустой
+      }).finally(() => {
+        // Затем загружаем тип анкеты (вопросы)
+        window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByOrderTicket', {
+          orderId: to.params.order_id,
+          ticketId: to.params.ticket_id,
+        }).catch(() => {
+          // Игнорируем ошибку, страница всё равно загрузится
+        }).finally(() => {
+          next();
+        });
+      });
+    } else if (to.params.id) {
+      // Режим редактирования анкеты — сначала анкета, потом тип
+      window.store.dispatch('appQuestionnaire/getQuestionnaire', {
+        id: to.params.id,
+      }).then((questionnaire) => {
+        if (questionnaire && questionnaire.questionnaire_type_id) {
+          // Возвращаем промис — ждём загрузки типа перед рендером
+          return window.store.dispatch('appQuestionnaireType/loadItem', {
+            id: questionnaire.questionnaire_type_id,
+          });
+        }
+        // Fallback: если questionnaire_type_id нет, пробуем загрузить гостевую
+        return window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByCode', {
+          code: 'guest',
+        });
+      }).catch(() => {
+        // Игнорируем ошибку
+      }).finally(() => {
+        next();
+      });
+    } else {
+      // Фоллбэк: загружаем гостевую анкету по коду
+      window.store.dispatch('appQuestionnaireType/loadQuestionnaireTypeByCode', {
+        code: 'guest',
+      }).catch(() => {
+        // Игнорируем ошибку
+      }).finally(() => {
+        next();
+      });
+    }
   },
 }
 </script>

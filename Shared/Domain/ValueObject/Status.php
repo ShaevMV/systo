@@ -11,20 +11,18 @@ final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
     public const NEW_FOR_LIVE = 'new_for_live';
-    public const QUESTIONNAIRE_NOT_FULL = 'questionnaire_not_full';
-    public const QUESTIONNAIRE_FULL = 'questionnaire_full';
     public const PAID = 'paid';
     public const PAID_FOR_LIVE = 'paid_for_live';
     public const CANCEL = 'cancel';
+    public const CANCEL_FOR_LIVE = 'cancel_for_live';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
     public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
 
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
         self::NEW_FOR_LIVE => 'Ожидает проверки',
-        self::QUESTIONNAIRE_NOT_FULL => 'Анкета не до заполнена',
-        self::QUESTIONNAIRE_FULL => 'Анкета заполнена',
         self::CANCEL => 'Отменён',
+        self::CANCEL_FOR_LIVE => 'Отменён',
         self::PAID => 'Подверждён',
         self::PAID_FOR_LIVE => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
@@ -34,20 +32,32 @@ final class Status implements EntityDataInterface
     private function getRoleChanceStatus(string $status): array
     {
         return match ($status) {
-            self::NEW, self::NEW_FOR_LIVE, self::QUESTIONNAIRE_NOT_FULL, self::QUESTIONNAIRE_FULL => [
+            self::NEW => [
                 self::CANCEL,
                 self::PAID,
                 self::DIFFICULTIES_AROSE,
-                ],
-            self::PAID, self::PAID_FOR_LIVE => [
+            ],
+            self::NEW_FOR_LIVE => [
+                self::CANCEL,
+                self::PAID_FOR_LIVE,
                 self::DIFFICULTIES_AROSE,
+                self::LIVE_TICKET_ISSUED
+            ],
+            self::PAID => [
+                self::DIFFICULTIES_AROSE,
+            ],
+            self::PAID_FOR_LIVE => [
                 self::LIVE_TICKET_ISSUED,
+                self::CANCEL_FOR_LIVE,
             ],
             self::DIFFICULTIES_AROSE => [
                 self::CANCEL,
                 self::PAID,
             ],
-            self::CANCEL => [],
+            self::LIVE_TICKET_ISSUED => [
+                self::CANCEL_FOR_LIVE,
+            ],
+            self::CANCEL,self::CANCEL_FOR_LIVE => []
         };
     }
 
@@ -110,7 +120,7 @@ final class Status implements EntityDataInterface
         return $this->name === self::CANCEL;
     }
 
-    public function isdDifficultiesArose(): bool
+    public function isDifficultiesArose(): bool
     {
         return $this->name === self::DIFFICULTIES_AROSE;
     }
@@ -128,5 +138,15 @@ final class Status implements EntityDataInterface
     public function isPaidForLive(): bool
     {
         return $this->name === self::PAID_FOR_LIVE;
+    }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function equals(Status $other): bool
+    {
+        return $this->name === $other->name;
     }
 }

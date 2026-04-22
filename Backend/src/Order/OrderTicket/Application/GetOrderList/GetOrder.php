@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tickets\Order\OrderTicket\Application\GetOrderList;
 
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterForFriendlyQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderListFilterQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderListFilterQueryHandler as OrderFilterForFriendlyQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHandler;
@@ -24,11 +26,13 @@ class GetOrder
         OrderListQueryHandler $handler,
         OrderItemQueryHandler $itemQueryHandler,
         OrderListFilterQueryHandler $filterQueryHandler,
+        OrderFilterForFriendlyQueryHandler $orderListFilterQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             UserIdQuery::class => $handler,
             OrderIdQuery::class => $itemQueryHandler,
             OrderFilterQuery::class => $filterQueryHandler,
+            OrderFilterForFriendlyQuery::class => $orderListFilterQueryHandler,
         ]);
     }
 
@@ -55,6 +59,21 @@ class GetOrder
     public function listByFilter(OrderFilterQuery $filterQuery): ?ListResponse
     {
         /** @var null|ListResponse $listItem */
+        $listItem = $this->queryBus->ask($filterQuery);
+
+        return $listItem;
+    }
+
+
+    /**
+     * Вывести список заказов по фильтру
+     *
+     * @param  OrderFilterForFriendlyQuery  $filterQuery
+     * @return ListResponse|null
+     */
+    public function listByFilterForFriendly(OrderFilterForFriendlyQuery $filterQuery): ?ListResponse
+    {
+                /** @var null|ListResponse $listItem */
         $listItem = $this->queryBus->ask($filterQuery);
 
         return $listItem;

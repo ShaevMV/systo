@@ -34,6 +34,7 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
      * @param string|null $promoCode
      * @param int $discount
      * @param string|null $city
+     * @param Uuid|null $friendly_id
      */
     public function __construct(
         protected Uuid    $id,
@@ -48,12 +49,14 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
         protected array   $listCorrectNextStatus,
         protected string  $idBuy,
         protected float   $priceWithoutDiscount,
+        protected Uuid    $userId,
         protected ?string $lastComment = null,
         protected ?string $promoCode = null,
         protected int     $discount = 0,
         protected ?string $city = null,
         protected ?string $phone = null,
         protected int     $questionnaireCount = 0,
+        protected ?Uuid   $friendly_id = null,
     )
     {
         $this->count = self::getGuestsCount($guests);
@@ -90,12 +93,14 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
             $status->getListNextStatus(),
             $data['id_buy'],
             (int)$data['price'],
+            new Uuid($data['user_id']),
             $data['last_comment'] ?? null,
             $data['promo_code'] ?? null,
             (int)$data['discount'],
             $data['city'],
             $data['phone'],
             (int)$data['questionnaire_count'] ?? 0,
+            isset($data['friendly_id']) ? new Uuid($data['friendly_id']) : null,
         );
     }
 
@@ -164,5 +169,30 @@ class OrderTicketItemForListResponse extends AbstractionEntity implements Respon
     public function getQuestionnaireCount(): int
     {
         return $this->questionnaireCount;
+    }
+
+    public function getFriendlyId(): ?Uuid
+    {
+        return $this->friendly_id;
+    }
+
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function getCity(): ?string
+    {
+        return $this->city;
+    }
+
+    public function getUserId(): Uuid
+    {
+        return $this->userId;
     }
 }

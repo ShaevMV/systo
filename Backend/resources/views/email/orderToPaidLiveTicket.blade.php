@@ -39,7 +39,7 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой оргвзнос на {{$festivalName}} потдверждён</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой заказ №{{$kilter}} подтверждён.  </p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой вклад в создании общего праздника!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ты можете получить свой "живой билет" в виде подарочной карты со стикером в пространстве "Лесистое" в Санкт-Петербурге по адресу: м.Петроградская, Большой Проспект П.С., 79 (цокольный этаж возле вывески Maze, левая дверь)<br>
                             Пространство открыто с 14.00 до 22.00. <br>Телефон +7 (906) 274-27-98. <br>https://vk.com/lesystoe</p>

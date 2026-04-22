@@ -1,6 +1,9 @@
 /Docker/redis/data
 .idea/*
 .env
+.env.production
+.env.testing
+.env.local
 /Backend/phpunit.xml.dist
 /List/*
 /Docker/mysqlFriendly/db/
@@ -9,3 +12,14 @@
 /Friendly/bootstrap/cache/
 /Backend/bootstrap/cache/
 /Baza/bootstrap/cache/
+/FrontEnd/src/main.js
+*.sql
+.qwen/*
+!.qwen/agents/
+!.qwen/PROJECT_MEMORY.md
+!.qwen/docs/
+!.qwen/BOARD.md
+
+# Тестовые артефакты
+Backend/tests/**/QR/*.png
+Backend/storage/app/public/tickets/*.pdf

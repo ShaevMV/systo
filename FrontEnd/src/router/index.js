@@ -1,11 +1,13 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import FriendlyView from '../views/FriendlyView.vue'
 import StubView from '../views/StubView.vue'
 import LoginView from "../views/auth/LoginView";
 import OrderView from "../views/order/OrderView";
 import AdminDashboard from "../views/admin/AdminDashboard";
 import OrderItemView from "@/views/order/OrderItemView";
 import OrderListForAdmin from "@/views/order/OrderListForAdmin.vue";
+import OrderListForFriendly from "@/views/order/OrderListForFriendly.vue";
 import Error404 from "@/views/error/Error404.vue";
 import ForgotPasswordView from "@/views/auth/ForgotPasswordView.vue";
 import ResetPassword from "@/components/Auth/ResetPassword.vue";
@@ -20,7 +22,21 @@ import PromoCodeView from "@/views/promoCode/PromoCodeView.vue";
 import PromoCodeItemView from "@/views/promoCode/PromoCodeItemView.vue";
 import InviteLinkView from "@/views/auth/InviteLinkView.vue";
 import QuestionnaireListView from "@/views/questionnaire/QuestionnaireListView.vue";
-import QuestionnaireItemView from "@/views/questionnaire/QuestionnaireItemView.vue"
+import QuestionnaireRegView from "@/views/questionnaire/QuestionnaireRegView.vue";
+import LiveTicketView from "@/views/ticket/LiveTicketView.vue";
+
+import TicketTypeListView from "@/views/ticketType/TicketTypeListView.vue";
+import TicketTypeItemView from "@/views/ticketType/TicketTypeItemView.vue";
+
+import TypesOfPaymentListView from "@/views/typesOfPayment/TypesOfPaymentListView.vue";
+import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemView.vue";
+
+import QuestionnaireTypeListView from "@/views/questionnaireType/QuestionnaireTypeListView.vue";
+import QuestionnaireTypeItemView from "@/views/questionnaireType/QuestionnaireTypeItemView.vue";
+
+import AccountListView from "@/views/account/AccountListView.vue";
+
+import RegView from "@/views/auth/RegView.vue";
 
 const routes = [
     {
@@ -28,7 +44,16 @@ const routes = [
         name: 'stub',
         component: StubView
     },
-
+    // инвайт при старте покупка билета
+    {
+        path: '/frendlyOrder',
+        name: 'frendlyOrder',
+        component: FriendlyView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'pusher'],
+        }
+    },
     // инвайт при старте покупка билета
     {
         path: '/hfjlsd65t4732',
@@ -44,7 +69,7 @@ const routes = [
     // инвайт на первый раз
     {
         path: '/invite/newUser/:userId',
-        name: 'homeInvite',
+        name: 'homeInviteNewUser',
         component: HomeView,
     },
     // авторизация
@@ -52,6 +77,14 @@ const routes = [
         path: '/login',
         name: 'login',
         component: LoginView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/regGydhf',
+        name: 'registration',
+        component: RegView,
         meta: {
             'guest': true
         }
@@ -122,23 +155,42 @@ const routes = [
         component: OrderListForAdmin,
         meta: {
             'requiresAuth': true,
-            'role': ['admin'],
+            'role': ['admin', 'seller'],
         }
     },
-
+    // список всех закаов (АДМИН ПАНЕЛЬ)
+    {
+        path: '/ordersFriendly',
+        name: 'AllOrdersFriendly',
+        component: OrderListForFriendly,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'pusher'],
+        }
+    },
 
     // анктеты
     // Анкета нового пользователя
     {
         path: '/questionnaire/newUser',
+        name: 'QuestionnaireNewUser',
+        props: true,
+        component: QuestionnaireRegView,
+        meta: {
+            'requiresAuth': false
+        }
+    },
+    // Анкета от заказа
+    {
+        path: '/questionnaire/guest/:order_id/:ticket_id',
         name: 'Questionnaire',
         props: true,
         component: QuestionnaireView,
     },
     // Анкета от заказа
     {
-        path: '/questionnaire/quest/:order_id/:ticket_id',
-        name: 'Questionnaire',
+        path: '/questionnaire/:order_id/:ticket_id',
+        name: 'QuestionnaireOld',
         props: true,
         component: QuestionnaireView,
     },
@@ -146,8 +198,11 @@ const routes = [
     {
         path: '/questionnaire/edit/:id',
         name: 'QuestionnaireEdit',
-        props: true,
         component: QuestionnaireView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+        }
     },
 
     // список всех анкет (АДМИН ПАНЕЛЬ)
@@ -157,17 +212,7 @@ const routes = [
         component: QuestionnaireListView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin']
-        }
-    },
-    // определённая анкет (АДМИН ПАНЕЛЬ)
-    {
-        path: '/questionnaire/get/:id',
-        name: 'QuestionnaireItemView',
-        component: QuestionnaireItemView,
-        meta: {
-            'requiresAuth': true,
-            'role': ['admin']
+            'role': ['admin', 'manager']
         }
     },
     // статические ссылки
@@ -191,9 +236,6 @@ const routes = [
         name: 'Private',
         component: PrivateView,
     },
-
-
-
     {
         path: '/admin',
         name: 'adminDashboard',
@@ -203,8 +245,6 @@ const routes = [
             'role': ['admin']
         }
     },
-
-
     {
         path: '/promo-codes',
         name: 'PromoCodes',
@@ -214,11 +254,94 @@ const routes = [
             'role': ['admin']
         }
     },
-
     {
         path: '/promoCode/:id?',
         name: 'promoCodeItem',
         component: PromoCodeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/ticket/live/:id?',
+        name: 'liveTicketView',
+        component: LiveTicketView,
+        props: true,
+    },
+
+    // Типы билтетов
+    {
+        path: '/ticketType/list',
+        name: 'TicketTypeListView',
+        component: TicketTypeListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/ticketType/:id?',
+        name: 'TicketTypeItemView',
+        component: TicketTypeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Типы анкет
+    {
+        path: '/questionnaireType/list',
+        name: 'QuestionnaireTypeListView',
+        component: QuestionnaireTypeListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/questionnaireType/:id?',
+        name: 'QuestionnaireTypeItemView',
+        component: QuestionnaireTypeItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Типы оплат
+    {
+        path: '/typesOfPayment/list',
+        name: 'TypesOfPaymentListView',
+        component: TypesOfPaymentListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/typesOfPayment/:id?',
+        name: 'TypesOfPaymentItemView',
+        component: TypesOfPaymentItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Акаунтды пользователей
+    {
+        path: '/account/list',
+        name: 'AccountListView',
+        component: AccountListView,
         props: true,
         meta: {
             'requiresAuth': true,

@@ -49,14 +49,19 @@ class QuestionnaireGetListQueryHandler implements QueryHandler
                 'value' => $filterQuery->getTelegram(),
             ],
             [
-                'field' => QuestionnaireModel::TABLE . '.vk',
+                'field' => 'data->vk',
                 'operator' => FilterOperator::LIKE,
                 'value' => $filterQuery->getVk(),
             ],
             [
-                'field' => QuestionnaireModel::TABLE . '.is_have_in_club',
+                'field' => 'data->is_have_in_club',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getIsHaveInClub(),
+            ],
+            [
+                'field' => QuestionnaireModel::TABLE . '.questionnaire_type_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getQuestionnaireTypeId(),
             ],
         ];
     }

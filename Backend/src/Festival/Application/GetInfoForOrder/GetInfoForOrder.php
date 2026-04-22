@@ -25,10 +25,10 @@ final class GetInfoForOrder
         ]);
     }
 
-    public function getInfoForOrderingDto(Uuid $festivalId, bool $isAdmin = false): InfoForOrderingDto
+    public function getInfoForOrderingDto(Uuid $festivalId, bool $isAdmin = false, bool $isPusher = false): InfoForOrderingDto
     {
         /** @var ListTicketTypeDto $listTicketTypeDto */
-        $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId));
+        $listTicketTypeDto = $this->queryBus->ask(new ListTicketTypeQuery($festivalId, isPusher:$isPusher));
 
         /** @var ListTypesOfPaymentDto $listTypesOfPaymentDto */
         $listTypesOfPaymentDto = $this->queryBus->ask(new TypesOfPaymentQuery($isAdmin));
@@ -37,6 +37,14 @@ final class GetInfoForOrder
             $listTicketTypeDto,
             $listTypesOfPaymentDto
         );
+    }
+
+    public function getListTypesOfPaymentDto(Uuid $ticketTypeId): ListTypesOfPaymentDto
+    {
+        /** @var ListTypesOfPaymentDto $listTypesOfPaymentDto */
+        $listTypesOfPaymentDto = $this->queryBus->ask(new TypesOfPaymentQuery(ticketTypeId:$ticketTypeId));
+
+        return $listTypesOfPaymentDto;
     }
 
     public function getListTicketTypeDto(Uuid $festivalId): ListTicketTypeDto

@@ -10,6 +10,9 @@ Route::prefix('v1/festival')->group(static function (): void {
     Route::get('/load',
         [FestivalController::class, 'getInfoForOrder']);
 
+    Route::get('/loadByTicketType/{ticketTypeId}',
+        [FestivalController::class, 'loadByTicketType']);
+
     // получить данные о стоимости
     Route::get('/getListPrice',
         [FestivalController::class, 'getPriceList']);

@@ -5,6 +5,8 @@ use Tickets\Shared\Domain\ValueObject\Uuid;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
+use Illuminate\Support\Facades\Log;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

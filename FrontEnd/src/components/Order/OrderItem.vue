@@ -10,9 +10,9 @@
                 <tr>
                   <th scope="col">Название</th>
                   <th scope="col">Гости</th>
-                  <th scope="col">Тип оплаты</th>
-                  <th scope="col">Дата оплаты</th>
-                  <th scope="col">Скидка</th>
+                  <th scope="col" v-if="!getFriendlyId">Тип оплаты</th>
+                  <th scope="col" v-if="!getFriendlyId">Дата оплаты</th>
+                  <th scope="col" v-if="!getFriendlyId">Скидка</th>
                   <th scope="col">Стоимость</th>
                   <th scope="col">Статус</th>
                 </tr>
@@ -20,10 +20,20 @@
                 <tbody>
                 <tr>
                   <td>{{ getName }}</td>
-                  <td v-html="getGuests"></td>
-                  <td>{{ getTypeOfPayment }}</td>
-                  <td>{{ getDateBuy }}</td>
-                  <td class="text-right">{{ getDiscount }}</td>
+                  <td>
+                    <div
+                      v-if="!(isAdmin || isPusher)"
+                      v-html="getGuests"
+                    >
+                    </div>
+                    <new-ticket
+                        v-if="(isAdmin || isPusher)"
+                        :oldGuests="getOrderItem.guests"
+                    />
+                  </td>
+                  <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
+                  <td v-if="!getFriendlyId">{{ getDateBuy }}</td>
+                  <td class="text-right" v-if="!getFriendlyId">{{ getDiscount }}</td>
                   <td class="text-right">{{ getTotalPrice }}</td>
                   <td>{{ getHumanStatus }}</td>
                 </tr>
@@ -48,13 +58,18 @@
 <script>
 import {mapGetters} from "vuex";
 import OrderButton from "@/components/Order/OrderButton.vue";
+import NewTicket from "@/components/Order/NewTicket.vue";
 
 export default {
   name: "OrderItem",
-  components: {OrderButton},
+  components: {NewTicket, OrderButton},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
+    ]),
+    ...mapGetters('appUser', [
+      'isAdmin',
+      'isPusher',
     ]),
     /**
      * Вывести названия билета
@@ -112,6 +127,9 @@ export default {
     },
     getId: function () {
       return this.getOrderItem.id;
+    },
+    getFriendlyId: function () {
+      return this.getOrderItem.friendly_id;
     }
   },
   methods: {

@@ -28,6 +28,10 @@ export const isAdmin = state => {
     return state.userInfo.admin;
 };
 
+export const isSeller = state => {
+    return state.userInfo.seller;
+};
+
 /**
  * Проверить авторизацию
  *
@@ -36,6 +40,16 @@ export const isAdmin = state => {
  */
 export const isManager = state => {
     return state.userInfo.manager;
+};
+
+/**
+ * Проверить авторизацию
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const isPusher = state => {
+    return state.userInfo.pusher;
 };
 
 /**
@@ -67,4 +81,8 @@ export const getUserData = state => type => {
         return state.userData[type];
     }
     return null;
+}
+
+export const getUserInfo = state => {
+    return state.userInfo;
 }

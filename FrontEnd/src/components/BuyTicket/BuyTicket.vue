@@ -73,7 +73,6 @@
                           placeholder="Email: *"
                           required="required"
                           v-model="email"
-                          v-bind:readonly="isAuth"
                           data-error="Valid email is required."
                       />
                       <small class="form-text text-muted">
@@ -92,7 +91,6 @@
                           class="form-control"
                           placeholder="Телефон:*"
                           required="required"
-                          v-bind:readonly="getUserData('phone') !== null"
                           v-model="phone"
                           data-error="Valid phone is required."
                       />
@@ -111,7 +109,6 @@
                           class="form-control"
                           placeholder="Город:*"
                           required="required"
-                          v-bind:readonly="getUserData('city') !== null"
                           v-model="city"
                           data-error="Valid phone is required."
                       />
@@ -122,30 +119,21 @@
                   </div>
 
                 </div>
-                <div class="pp2 row">Введи свои Имя и Фамилию, если вносишь оргвзнос за себя</div>
+                <div class="pp2 row">Введи свои Имя и Фамилию или Имя и Фамилию ребёнка, если вносишь оргвзнос за ребёнка</div>
                 <div class="quest-item row" id="first-item-row">
-                  <label for="name" style="display: none">Твои Имя и Фамилия: *</label>
+                  <label for="name" style="display: none">Твои Имя и Фамилия или Имя и Фамилия ребёнка: *</label>
 
                   <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
                     <input
                         type="text"
                         id="name"
                         class="form-control"
-                        placeholder="Твои Имя и Фамилия"
-                        aria-label="Твои Имя и Фамилия"
+                        placeholder="Твои Имя и Фамилия или Имя и Фамилия ребёнка"
+                        aria-label="Твои Имя и Фамилия или Имя и Фамилия ребёнка"
                         v-model="masterName"
                         aria-describedby="basic-addon1"
                     />
                   </div>
-
-                  <label id="my-own">
-                    <input
-                        type="checkbox"
-                        class="form-check-input"
-                        v-model="isNotNeedQuestionnaire"
-                    >
-                    <span>Я хочу внести оргвзнос только за своих друзей</span>
-                  </label>
                 </div>
                 <div class="row mt-3 mb-3" id="enter-guests">
                   <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
@@ -236,7 +224,7 @@
                   каждого гостя, за которого будешь вносить средства:
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" id="org-type">
                   <div class="col-3">
                     <label for="form_need">Тип оргвзноса: *</label>
                   </div>
@@ -259,6 +247,7 @@
                                 v-model="selectTypeTicket"
                                 v-bind:value="typeTickets.id"
                                 v-bind:id="typeTickets.id"
+                                @change="sendTicketType()"
                             />
                             <span class="intckt">
                             <p>
@@ -313,7 +302,7 @@
 
 
 
-                <div class="row itog-row mb-4" v-show="totalPrice !== null">
+                <div class="row itog-row mb-4" v-show="totalPrice !== null && !Number.isNaN(totalPrice)">
                   <div class="col-12">
                     <h4 class="my-lg-2 font-weight-normal">
                       Итого к внесению:
@@ -633,8 +622,8 @@ export default {
     selectTypesOfPaymentIsBilling: function () {
       let typesOfPaymentList = this.getTypesOfPayment;
       if(this.selectTypesOfPayment !== null ) {
-        let select = typesOfPaymentList.find(user => user.id == this.selectTypesOfPayment);
-        return select.is_billing ?? false;
+        let select = typesOfPaymentList?.find(user => user.id == this.selectTypesOfPayment);
+        return select?.is_billing ?? false;
       }
       return false;
     },
@@ -739,6 +728,7 @@ export default {
       'setSelectTicketType',
       'checkPromoCode',
       'clearPromoCode',
+      'loadTypesOfPayment',
     ]),
     ...mapActions('appOrder', ['goToCreateOrderTicket', 'clearError']),
     ...mapActions('appUser', ['loadUserData']),
@@ -749,6 +739,12 @@ export default {
       area.select();
       document.execCommand('copy');
       document.body.removeChild(area);
+    },
+    sendTicketType: function () {
+        let select = this.selectTypeTicket;
+        this.loadTypesOfPayment({
+          ticket_type_id: select
+        })
     },
     /**
      * Отправить промо код
@@ -809,7 +805,7 @@ export default {
             self.clearData();
           }
           if (link !== null) {
-            window.location.href = link;
+          //  window.location.href = link;
           } else {
             self.message = message;
             document.getElementById('modalOpenBtn').click();

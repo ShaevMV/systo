@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Unit\Order\InfoForOrder\Application\GetTicketType;
 
-use Database\Seeders\TypeTicketsSeeder;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
+use Database\Seeders\TypeTicketsSeeder;
 
 class GetTicketTypeTest extends TestCase
 {
@@ -22,8 +22,6 @@ class GetTicketTypeTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-
         /** @var GetTicketType $getTicketType */
         $getTicketType = $this->app->get(GetTicketType::class);
         $this->getTicketType = $getTicketType;

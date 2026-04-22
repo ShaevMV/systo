@@ -10,8 +10,10 @@ export default {
         userInfo: {
             'id': localStorage.getItem('user.id') || null,
             'email': localStorage.getItem('user.email') || null,
-            'admin': localStorage.getItem('user.isAdmin') === 'true' || false,
-            'manager': localStorage.getItem('user.isManager') === 'true' || false,
+            'admin': localStorage.getItem('user.isAdmin') == 'true' || localStorage.getItem('user.role') == 'admin' || false,
+            'manager': localStorage.getItem('user.isManager') == 'true' || localStorage.getItem('user.role') == 'manager' || false,
+            'seller': localStorage.getItem('user.role') == 'seller' || localStorage.getItem('user.role') == 'seller' || false,
+            'pusher': localStorage.getItem('user.role') == 'pusher' || localStorage.getItem('user.role') == 'pusher' || false,
         },
         userData: {
             'city': null,

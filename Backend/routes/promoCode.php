@@ -16,7 +16,7 @@ Route::prefix('v1/promoCode')->group(static function (): void {
     Route::post('/savePromoCode/{idPromoCode?}',
         [PromoCodeController::class, 'savePromoCode']);
 
-    Route::post('/findPromoCode/{promoCode?}',
+    Route::post('/find/{promoCode?}',
         [PromoCodeController::class, 'findPromoCode']);
 
     Route::post('/savePromoCodeForBot/{idPromoCode?}',

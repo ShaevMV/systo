@@ -5,7 +5,6 @@ namespace Tests\Unit\Order\OrderTicket\Application\Create;
 
 use Database\Seeders\TypeTicketsSeeder;
 use Database\Seeders\UserSeeder;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Psr\Container\ContainerExceptionInterface;
@@ -23,7 +22,6 @@ use Tickets\Order\OrderTicket\Service\TicketService;
 
 class CreateOrderTest extends TestCase
 {
-    use DatabaseTransactions;
 
     private CreateOrder $createOrder;
     private InMemoryMySqlOrderTicketRepository $orderRepository;

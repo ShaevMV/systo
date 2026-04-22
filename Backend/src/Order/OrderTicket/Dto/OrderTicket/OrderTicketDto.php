@@ -28,6 +28,8 @@ class OrderTicketDto
      * @param string|null $promo_code
      * @param bool $is_live_ticket
      * @param Uuid|null $id
+     * @param Uuid|null $inviteLink
+     * @param Uuid|null $friendly_id
      */
     private function __construct(
         protected Uuid     $festival_id,
@@ -43,8 +45,10 @@ class OrderTicketDto
         protected ?Status  $status,
         protected ?string  $promo_code = null,
         protected bool     $is_live_ticket = false,
+        protected ?Uuid    $questionnaire_type_id = null,
         ?Uuid              $id = null,
         protected ?Uuid    $inviteLink = null,
+        protected ?Uuid    $friendly_id = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -58,10 +62,12 @@ class OrderTicketDto
         Uuid     $userId,
         PriceDto $priceDto,
         bool     $isLiveTicket = false,
+        ?Uuid    $pusherId = null,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
-        $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::NEW_FOR_LIVE);
+
+        $status = $data['status'] ?? (!$isLiveTicket ? Status::NEW : Status::PAID_FOR_LIVE);
         $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
         $tickets = [];
         foreach ($guests as $guest) {
@@ -82,7 +88,9 @@ class OrderTicketDto
             new Status($status),
             $data['promo_code'],
             $isLiveTicket,
+            empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $id,
+            friendly_id: $pusherId
         );
     }
 
@@ -96,6 +104,7 @@ class OrderTicketDto
             $tickets[] = [
                 'value' => $item->getValue(),
                 'email' => $item->getEmail(),
+                'number' => $item->getNumber(),
                 'id' => $item->getId()->value(),
                 'festival_id' => $item->getFestivalId()->value(),
             ];
@@ -115,6 +124,7 @@ class OrderTicketDto
             'date' => (string)$this->datePay,
             'promo_code' => $this->promo_code,
             'id_buy' => $this->id_buy,
+            'friendly_id' => $this->friendly_id?->value(),
         ];
     }
 
@@ -180,6 +190,11 @@ class OrderTicketDto
         return $this->ticket_type_id;
     }
 
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaire_type_id;
+    }
+
     public function isIsLiveTicket(): bool
     {
         return $this->is_live_ticket;
@@ -198,5 +213,12 @@ class OrderTicketDto
     public function setInviteLink(?Uuid $inviteLink): void
     {
         $this->inviteLink = $inviteLink;
+    }
+
+    public function setStatus(?Status $status): self
+    {
+        $this->status = $status;
+
+        return $this;
     }
 }

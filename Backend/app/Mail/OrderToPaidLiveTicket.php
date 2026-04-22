@@ -5,8 +5,10 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Service\FestivalService;
+use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 
 class OrderToPaidLiveTicket extends Mailable
 {
@@ -14,6 +16,8 @@ class OrderToPaidLiveTicket extends Mailable
 
     public function __construct(
         private Uuid $ticketTypeId,
+        private Uuid $typesOfPaymentId,
+        private int  $kilter,
     )
     {
 
@@ -25,15 +29,19 @@ class OrderToPaidLiveTicket extends Mailable
      * @return $this
      */
     public function build(
-        FestivalService $festivalService,
+        FestivalService                   $festivalService,
+        TypesOfPaymentRepositoryInterface $typesOfPaymentRepository,
     ): static
     {
         ini_set('memory_limit', '-1');
         $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
-
+        $typesOfPaymentDto = $typesOfPaymentRepository->getItem($this->typesOfPaymentId);
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
-        $mail = $this->view('email.orderToPaidLiveTicket',[
-            'festivalName' => $festivalName
+        $template = empty(trim($typesOfPaymentDto->getEmail() ?? '')) ? 'orderToPaidLiveTicket' : $typesOfPaymentDto->getEmail();
+        Log::info('Шаблон письма ' . 'email.' .$template);
+        $mail = $this->view('email.'.$template, [
+            'festivalName' => $festivalName,
+            'kilter' => $this->kilter,
         ]);
 
         return $mail;

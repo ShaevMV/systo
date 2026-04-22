@@ -58,13 +58,25 @@
             </div>
             <!--  Хочет в ступить в клуб -->
             <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Хочет в ступить в клуб</label>
+              <label for="validationDefault01" class="form-label">Хочет вступить в клуб</label>
               <select class="form-select"
                       v-model="filter.is_have_in_club"
                       id="validationDefault01">
                 <option value="">Выберите статус</option>
                 <option value="true">Хочет</option>
                 <option value="false">Не хочет</option>
+              </select>
+            </div>
+            <!--  Тип анкеты -->
+            <div class="col-md-4">
+              <label for="validationDefaultQuestionnaireType" class="form-label">Тип анкеты</label>
+              <select class="form-select"
+                      v-model="filter.questionnaire_type_id"
+                      id="validationDefaultQuestionnaireType">
+                <option value="">Все типы</option>
+                <option v-for="type in getQuestionnaireTypeList" :key="type.id" :value="type.id">
+                  {{ type.name }}
+                </option>
               </select>
             </div>
 
@@ -74,9 +86,9 @@
                     type="submit"><span v-if="getIsLoading">Загрузка...</span>
               <span v-else>Отправить</span>
             </button>
-            <button class="btn btn-primary"
+            <button class="btn btn-secondary"
                     @click="clearFilter"
-                    type="submit">Сбросить фильтр
+                    type="button">Сбросить фильтр
             </button>
           </div>
         </div>
@@ -87,7 +99,7 @@
 </template>
 
 <script>
-import {mapActions} from 'vuex';
+import {mapActions, mapGetters} from 'vuex';
 
 export default {
   name: "QuestionnaireFilter",
@@ -99,19 +111,44 @@ export default {
         status: '',
         is_have_in_club: '',
         telegram: null,
+        questionnaire_type_id: '',
       }
     }
+  },
+  computed: {
+    ...mapGetters('appTicketType', [
+      'getQuestionnaireTypeList'
+    ])
   },
   methods: {
     ...mapActions('appQuestionnaire',[
         'loadQuestionnaire'
     ]),
+    ...mapActions('appTicketType', [
+      'loadQuestionnaireTypeList'
+    ]),
     sendFilter: function () {
       this.loadQuestionnaire({
         filter: this.filter,
       })
+    },
+    clearFilter: function () {
+      this.filter = {
+        email: null,
+        vk: null,
+        status: '',
+        is_have_in_club: '',
+        telegram: null,
+        questionnaire_type_id: '',
+      };
+      this.loadQuestionnaire({
+        filter: {},
+      });
     }
   },
+  async created() {
+    await this.loadQuestionnaireTypeList();
+  }
 }
 </script>
 

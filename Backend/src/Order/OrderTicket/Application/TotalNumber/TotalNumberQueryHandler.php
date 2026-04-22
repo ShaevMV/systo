@@ -23,7 +23,7 @@ class TotalNumberQueryHandler implements QueryHandler
                 $totalCountToPaid++;
                 $totalAmount += $itemForListResponse->getPrice();
                 $totalCountTickets+= $itemForListResponse->getCount();
-                $totalDiscount += $itemForListResponse->getDiscount();
+                $totalDiscount += ($itemForListResponse->getDiscount() ?? 0);
             }
         }
 

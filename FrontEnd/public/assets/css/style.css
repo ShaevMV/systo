@@ -1473,6 +1473,10 @@ label.required::after {
     resize: none;
 }
 
+.quest-item textarea.form-control{
+    height: 120px;
+}
+
 .form-select {
     border: none;
     box-sizing: border-box;
@@ -1670,6 +1674,14 @@ select.form-select::after {
     margin-top: 0;
 }
 
+.menu-span{
+    position: absolute;
+    right: 89px;
+    text-transform: uppercase;
+    top: 20px;
+    display: none;
+}
+
 .in-choice > div.payment-choice:first-of-type label > span {
     background-image: url('../img/icon-sber.png');
     background-size: 25px;
@@ -1803,6 +1815,20 @@ select.form-select::after {
     top: 15px;
 }
 
+#stub{
+    text-align: center;
+}
+
+#stub h2{
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 2vw;
+}
+
+#stub .blue-btn{
+    margin-bottom: 3vw;
+}
+
 /*#contact-form #quest {*/
 /*    margin-bottom: 2vw;*/
 /*}*/
@@ -1811,15 +1837,33 @@ select.form-select::after {
     opacity: 1;
 }
 
-#defaultCheck1 {
+#main-quest #check-check{
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+#defaultCheck1, #defaultCheck2 {
     border-radius: 0;
-    width: 30px;
-    height: 30px;
+    /*width: 30px;*/
+    /*height: 30px;*/
     cursor: pointer;
     box-sizing: border-box;
     border: 2px solid rgba(197, 198, 206, 0.7);
     position: relative;
     top: 4px;
+}
+
+#defaultCheck1{
+    position: relative;
+    top: 4px;
+}
+
+#defaultCheck2{
+    top: -4px;
+    margin-right: 10px;
 }
 
 .strongest{
@@ -1901,6 +1945,19 @@ input[readonly] {
     margin-bottom: 0;
 }
 
+
+.ticket{
+    text-align: center;
+    padding-top: 3vw;
+}
+
+.ticket img{
+    display: block;
+    width: 30%;
+    margin: 3vw auto;
+}
+
+
 #total-numberz span {
     font-weight: bold;
     color: var(--c-red);
@@ -1965,76 +2022,31 @@ input[readonly] {
     margin-top: 2vw;
 }
 
-#intro {
-    text-align: center;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    flex-direction: column;
-    padding: 30px 10%;
-    color: white;
-    font-family: 'Arial';
-}
-
-
-#intro span {
-    display: block;
-    margin-bottom: 30px;
-}
-
-
-#intro h2 {
-    font-weight: bold;
-    margin-bottom: 3vw;
-    font-size: 36px;
-    line-height: 1.5;
-}
-
-#intro h3 {
-    font-size: 24px;
-    margin-top: 0;
-    font-weight: normal;
-    line-height: 1.5;
-}
-
-#intro h3 a {
-    font-weight: bold;
-    text-decoration: underline;
-    color: white;
-}
-
-#intro h3 a:hover {
-    text-decoration: none;
-}
-
 #tg-intro-btn {
-    background: url(../img/tg-main-icon.png) 55px center no-repeat;
+    background: url(../img/tg-main-icon.png) 240px center no-repeat;
+    background-size: 35px;
     background-color: #c5eeff;
     text-decoration: none;
-    font-size: 24px;
-    width: 400px;
+    font-size: 21px;
+    width: 700px;
     color: #000;
     text-align: center;
     font-weight: bold;
-    margin-top: 3vw;
     height: 70px;
-    padding-top: 14px;
+    padding-top: 17px;
     padding-left: 40px;
     border-radius: 10px;
     border: 2px solid #c5eeff;
     box-sizing: border-box;
+    display: block;
+    margin: 2vw auto 0 auto;
 }
 
 
 #tg-intro-btn:hover {
     background-color: #0164df;
     border-color: white;
+    color: #fff;
 }
 
 #quest {
@@ -2061,10 +2073,6 @@ input[readonly] {
     width: 25%;
 }
 
-#main-quest #questionnaire_musicStyles {
-    height: 50px !important;
-}
-
 .mt-7 {
     margin-top: 2vw !important;
 }
@@ -2075,6 +2083,10 @@ input[readonly] {
 
 .hidder {
     display: none !important;
+}
+
+.line-2{
+    min-height: 50px;
 }
 
 .logo img {
@@ -2289,7 +2301,6 @@ input[readonly] {
 .faq-question h2 {
     font-size: 1.1rem;
     font-weight: bold;
-    /*color: var(--c-purple);*/
     margin: 0;
     flex: 1;
     padding-right: 20px;
@@ -2397,10 +2408,62 @@ input[readonly] {
     font-weight: 500;
 }
 
+#org-type .in-choice .ticket-choice:first-of-type .intckt p:first-child::before{
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/pdf-icon.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 3px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(4) .intckt p:first-child::before{
+    content: '';
+    width: 52px;
+    height: 21px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/envelop-plus-elka.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 5px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(3) .intckt p:first-child::before{
+    content: '';
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/envelope-icon.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 4px;
+}
+
+#org-type .in-choice .ticket-choice:nth-of-type(2) .intckt p:first-child::before{
+    content: '';
+    width: 50px;
+    height: 20px;
+    background-color: red;
+    display: inline-block;
+    background: transparent url('../img/pdf-plus-elka.png') center no-repeat;
+    background-size: 100%;
+    margin-right: 7px;
+    position: relative;
+    top: 4px;
+}
+
 @media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
+    /*body {*/
+    /*    padding: 10px;*/
+    /*}*/
 
     .faq-question {
         padding: 20px;
@@ -2442,19 +2505,11 @@ input[readonly] {
         left: -300px;
     }
 
-    #intro h2 {
-        font-size: 30px;
-    }
-
-    #intro span {
-        margin-bottom: 20px;
-    }
-
     .sidebar.active {
         left: 0 !important;
     }
 
-    #header button {
+    #header button, .menu-span {
         display: block;
     }
 
@@ -2476,7 +2531,7 @@ input[readonly] {
         font-size: 26px;
     }
 
-    .blue-btn {
+    .blue-btn, #tg-intro-btn  {
         width: 100%;
         font-size: 17px;
     }
@@ -2484,6 +2539,10 @@ input[readonly] {
     #invite-link span {
         width: auto;
         font-size: 16px;
+    }
+
+    #tg-intro-btn{
+        background-position: 37% center ;
     }
 
     #total-numberz {
@@ -2505,24 +2564,12 @@ input[readonly] {
         font-size: 25px;
     }
 
+    .line-2 {
+        min-height: 75px;
+    }
+
     #invite-content {
         text-align: center;
-    }
-
-    #intro span {
-        margin-bottom: 14px;
-    }
-
-    #intro h2 {
-        font-size: 25px;
-    }
-
-    #intro h3 {
-        font-size: 21px;
-    }
-
-    #intro {
-        padding: 30px 6%;
     }
 
 
@@ -2530,11 +2577,11 @@ input[readonly] {
         font-size: 17px
     }
 
-    #defaultCheck1 {
-        width: 35px;
-        height: 25px;
-        border-width: 1px;
-    }
+    /*#defaultCheck1 {*/
+    /*    width: 35px;*/
+    /*    height: 25px;*/
+    /*    border-width: 1px;*/
+    /*}*/
 
     .form-control {
         font-size: 15px;
@@ -2682,6 +2729,14 @@ input[readonly] {
         font-size: 22px;
     }
 
+    .ticket{
+        padding-top: 8vw;
+    }
+
+    .line-2 {
+        min-height: auto;
+    }
+
     #contact-form #first-item-row #promo-input{
         width: 100%;
         margin-right: 0;
@@ -2716,14 +2771,6 @@ input[readonly] {
         text-align: center;
     }
 
-    #intro h2 {
-        font-size: 22px;
-    }
-
-    #intro h3 {
-        font-size: 17px;
-    }
-
     #tg-intro-btn {
         height: 64px;
         width: 333px;
@@ -2732,10 +2779,6 @@ input[readonly] {
         padding-left: 30px;
         background-size: 34px;
         background-position: 55px center;
-    }
-
-    #intro span {
-        margin-bottom: 14px;
     }
 
     #newEmailGuest[show="false"] {
@@ -2776,7 +2819,7 @@ input[readonly] {
     }
 
     #main {
-        padding: 10px;
+        padding: 0;
     }
 
     .logo {
@@ -2864,6 +2907,28 @@ input[readonly] {
 @media (max-width: 505px) {
     #main h1 {
         font-size: 21px;
+    }
+
+    .menu-span{
+        top: 15px;
+        right: 58px;
+    }
+
+    #stub .blue-btn {
+        margin-bottom: 5vw;
+    }
+
+    #stub .blue-btn:first-of-type {
+        margin-bottom: 7vw;
+    }
+
+    #tg-intro-btn{
+        width: 100%;
+        margin: 6vw auto 0 auto;
+        background-size: 31px;
+        font-size: 19px;
+        height: 57px;
+        padding-top: 11px;
     }
 
     #invite-link .copy-payment {
@@ -2961,18 +3026,13 @@ input[readonly] {
 
 
 @media (max-width: 455px) {
-    #intro h2 {
-        font-size: 19px;
-        line-height: 1.4;
-        margin-bottom: 6vw;
+
+    #main h1 {
+        font-size: 20px;
     }
 
     #invite-link span {
         padding: 10px 7px;
-    }
-
-    #intro h3 {
-        font-size: 16px;
     }
 
     #tg-intro-btn {
@@ -2986,21 +3046,10 @@ input[readonly] {
         font-size: 20px;
     }
 
-
-    #intro h2 {
-        font-size: 18px;
-    }
-
-    #intro h3 {
-        line-height: 1.4;
-        font-size: 16px;
-    }
-
     #tg-intro-btn {
         background-position: 38px center;
         background-size: 27px;
         font-size: 18px;
-        width: 260px;
         margin-top: 5vw;
         height: 58px;
         padding-top: 15px;
@@ -3076,8 +3125,8 @@ input[readonly] {
         font-size: 19px;
     }
 
-    #intro span {
-        margin-bottom: 8px;
+    #tg-intro-btn{
+        background-position: 52px center;
     }
 
     .blue-btn {
@@ -3086,14 +3135,6 @@ input[readonly] {
 
     #invite-link span {
         font-size: 13px;
-    }
-
-    #intro h3 {
-        font-size: 15px;
-    }
-
-    #intro h2 {
-        font-size: 17px;
     }
 
     #contact-form .id-info {
@@ -3191,11 +3232,21 @@ input[readonly] {
     .ticket-choice label .form-check-input {
         left: 0;
     }
+
+    .ticket img{
+        width: 50%;
+        margin-top: 5vw;
+    }
 }
 
 
 @media (max-width: 405px) {
     .ticket-choice label .form-check-input {
         display: none;
+    }
+
+    .ticket img{
+        width: 70%;
+        margin-top: 7vw;
     }
 }

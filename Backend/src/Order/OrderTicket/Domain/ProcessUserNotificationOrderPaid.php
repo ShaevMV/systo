@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Mail;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
@@ -42,12 +43,13 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
         foreach ($this->tickets as $ticket) {
             $result[] = $repository->getTicket($ticket->getId());
         }
-
-        Mail::to($this->email)->send(new OrderToPaid(
+        $resultMail = Mail::to($this->email)->send(new OrderToPaid(
             $result,
             $this->ticketTypeId,
             null,
             $this->promocode,
         ));
+
+        Log::info($resultMail->getDebug());
     }
 }

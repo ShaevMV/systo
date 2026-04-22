@@ -10,13 +10,19 @@ use Throwable;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Tickets\User\Account\Application\ChangeRole\ChangeRoleCommand;
+use Tickets\User\Account\Application\ChangeRole\ChangeRoleCommandHandler;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommand;
 use Tickets\User\Account\Application\Create\CreatingNewAccountCommandHandler;
 use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQuery;
 use Tickets\User\Account\Application\Find\ByEmail\AccountFindByEmailQueryHandler;
+use Tickets\User\Account\Application\GetList\AccountGetListQuery;
+use Tickets\User\Account\Application\GetList\AccountGetListQueryHandler;
 use Tickets\User\Account\Domain\Account;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
+use Tickets\User\Account\Response\AccountGetListResponse;
 
 final class AccountApplication
 {
@@ -25,15 +31,22 @@ final class AccountApplication
 
     public function __construct(
         CreatingNewAccountCommandHandler $accountCommandHandler,
-        AccountFindByEmailQueryHandler $accountFindQueryHandler,
-        private Bus $bus
-    ) {
+        ChangeRoleCommandHandler         $changeRoleCommandHandler,
+
+        AccountFindByEmailQueryHandler   $accountFindQueryHandler,
+        AccountGetListQueryHandler       $accountGetListQueryHandler,
+
+        private Bus                      $bus
+    )
+    {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            CreatingNewAccountCommand::class => $accountCommandHandler
+            CreatingNewAccountCommand::class => $accountCommandHandler,
+            ChangeRoleCommand::class => $changeRoleCommandHandler,
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
-            AccountFindByEmailQuery::class => $accountFindQueryHandler
+            AccountGetListQuery::class => $accountGetListQueryHandler,
+            AccountFindByEmailQuery::class => $accountFindQueryHandler,
         ]);
     }
 
@@ -42,7 +55,8 @@ final class AccountApplication
      */
     public function creatingOrGetAccountId(
         AccountDto $accountDto,
-    ): Uuid {
+    ): Uuid
+    {
         if ($userInfoDto = $this->getUserByEmail($accountDto->getEmail())) {
             return $userInfoDto->getId();
         }
@@ -55,12 +69,15 @@ final class AccountApplication
     }
 
     /**
+     * Создать новый аккаунт
+     *
      * @throws Throwable
      */
     public function createNewAccount(
         AccountDto $accountDto,
-        ?string $password = null
-    ): void {
+        ?string    $password = null
+    ): void
+    {
         $password = $password ?? Str::random(8);
         $account = Account::creatingNewAccount(
             $accountDto->getId(),
@@ -77,11 +94,47 @@ final class AccountApplication
             ->dispatch();
     }
 
+    /**
+     * Найти пользователя по email
+     *
+     * @param string $email
+     * @return UserInfoDto|null
+     */
     public function getUserByEmail(string $email): ?UserInfoDto
     {
         /** @var  UserInfoDto|null $resul */
         $resul = $this->queryBus->ask(new AccountFindByEmailQuery($email));
 
         return $resul;
+    }
+
+
+    /**
+     * Получить список всех пользователей
+     *
+     * @param AccountGetListQuery $accountGetListQuery
+     * @return AccountGetListResponse
+     */
+    public function getList(AccountGetListQuery $accountGetListQuery): AccountGetListResponse
+    {
+        /** @var  AccountGetListResponse $resul */
+        $resul = $this->queryBus->ask($accountGetListQuery);
+
+        return $resul;
+    }
+
+    public function edit(Uuid $id, UserInfoDto $userInfoDto): bool
+    {
+
+        return true;
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function changeRole(Uuid $id, string $role): bool
+    {
+        $this->commandBus->dispatch(new ChangeRoleCommand($id, $role));
+        return true;
     }
 }

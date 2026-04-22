@@ -12,6 +12,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommand;
 use Tickets\Ticket\CreateTickets\Application\PushTicket\PushTicketsCommandHandler;
+use Tickets\Ticket\CreateTickets\Application\PushTicketLive\PushTicketsLiveCommand;
+use Tickets\Ticket\CreateTickets\Application\PushTicketLive\PushTicketsLiveCommandHandler;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 class PushTicket
@@ -20,10 +22,13 @@ class PushTicket
 
     public function __construct(
         PushTicketsCommandHandler $handler,
+        PushTicketsLiveCommandHandler $handlerLive,
         private TicketsRepositoryInterface $ticketsRepository,
+
     ){
         $this->commandBus = new InMemorySymfonyCommandBus([
-            PushTicketsCommand::class => $handler
+            PushTicketsCommand::class => $handler,
+            PushTicketsLiveCommand::class => $handlerLive,
         ]);
     }
 
@@ -36,6 +41,16 @@ class PushTicket
     public function pushTicket(Uuid $id): void
     {
         $this->commandBus->dispatch(new PushTicketsCommand($id));
+    }
+
+    /**
+     * @throws JsonException
+     * @throws DomainException
+     * @throws Throwable
+     */
+    public function pushTicketLive(int $number, ?Uuid $id = null): void
+    {
+        $this->commandBus->dispatch(new PushTicketsLiveCommand($number, $id));
     }
 
     /**

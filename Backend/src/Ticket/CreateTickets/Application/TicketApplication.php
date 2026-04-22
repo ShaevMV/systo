@@ -60,6 +60,7 @@ class TicketApplication
                 $guest->getValue(),
                 $guest->getFestivalId(),
                 $guest->getId() ?? null,
+                email:$guest->getEmail() ?? null,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(
                 $ticketDto
@@ -82,6 +83,14 @@ class TicketApplication
      * @throws Throwable
      */
     public function cancelTicket(Uuid $orderId): void
+    {
+        $this->commandBus->dispatch(new CancelTicketCommand($orderId));
+    }
+
+    /**
+     * @throws Throwable
+     */
+    public function cancelTicketLive(Uuid $orderId): void
     {
         $this->commandBus->dispatch(new CancelTicketCommand($orderId));
     }

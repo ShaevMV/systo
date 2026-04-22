@@ -1,12 +1,13 @@
-FROM nginx
+FROM nginx:stable
 
 ENV TZ=Europe/Moscow
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN adduser --disabled-password --gecos "" user
-
 RUN apt-get update && apt-get install -y \
-    apache2-utils
+    apache2-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN useradd -m user
 
 RUN touch /var/run/nginx.pid \
     && mkdir /socket \

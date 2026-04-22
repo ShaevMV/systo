@@ -12,28 +12,46 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::post('/create',
         [OrderTickets::class, 'create']);
 
+    Route::post('/createFriendly',[OrderTickets::class, 'createFriendly'])
+        ->middleware('auth:api')
+        ->middleware('role:pusher');
+
+
     // список всех заказов для АДМИНА
     Route::post('/getList',[OrderTickets::class, 'getList'])
         ->middleware('auth:api')
-        ->middleware('admin');
-    // сменить статус заказа АДМИН
-    Route::post('/toChanceStatus/{id}', [OrderTickets::class, 'toChanceStatus'])
+        ->middleware('role:seller,admin');
+
+    Route::post('/getListForFriendly',[OrderTickets::class, 'getFriendlyList'])
         ->middleware('auth:api')
-        ->middleware('admin');
+        ->middleware('role:pusher,admin');
+
+    // сменить статус заказа АДМИН
+    Route::post('/toChangeStatus/{id}', [OrderTickets::class, 'toChangeStatus'])
+        ->middleware('auth:api')
+        ->middleware('role:seller,admin,pusher');
+
+    // изменить цену заказа (только admin)
+    Route::post('/changePrice/{id}', [OrderTickets::class, 'changePrice'])
+        ->middleware('auth:api')
+        ->middleware('role:admin');
+
+    // изменить цену заказа (только admin)
+    Route::post('/changeTicket/{id}', [OrderTickets::class, 'changeTicket'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,pusher');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])
         ->middleware('auth:api');
+
     // получить определённые заказ
     Route::get('/getItem/{id}', [OrderTickets::class, 'getOrderItem'])
         ->middleware('auth:api');
 
-
-
     Route::get('/getTicketPdf/{id}',[
         OrderTickets::class, 'getUrlListForPdf'
     ])->middleware('auth:api');
-
 });
 
 

@@ -27,7 +27,6 @@ class CreatingQrCodeService
             ->size(300)
             ->margin(10)
             ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-            ->logoPath(__DIR__ . '/assets/logo.png')
             ->labelText('') //TODO: Автомотизировать
             ->labelFont(new OpenSans(16))
             ->labelAlignment(new LabelAlignmentCenter())

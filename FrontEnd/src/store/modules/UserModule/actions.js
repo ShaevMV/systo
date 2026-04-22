@@ -12,7 +12,7 @@ export const toLogin = (context, payload) => {
         if (response.data.status === 'success') {
             context.commit('setToken', response.data.authorisation);
             context.commit('setUserInfo', response.data.user);
-            payload.callback(response.data.user.admin);
+            payload.callback(response.data.user.role);
         }
     }).catch(function (error) {
         if (error.response.data.errors === undefined) {

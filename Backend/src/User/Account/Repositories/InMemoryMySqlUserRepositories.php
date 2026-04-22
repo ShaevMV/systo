@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace Tickets\User\Account\Repositories;
 
-use App\Models\User\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Exception;
 use Hash;
 use Illuminate\Support\Facades\DB;
+use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\FilterOperator;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Criteria\Order;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\User\Account\Application\GetList\AccountGetListFilter;
 use Tickets\User\Account\Dto\AccountDto;
 use Tickets\User\Account\Dto\UserInfoDto;
 
@@ -18,7 +24,8 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
 {
     public function __construct(
         private User $model
-    ) {
+    )
+    {
     }
 
     /**
@@ -26,19 +33,18 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
      */
     public function create(
         AccountDto $accountDto,
-        string $password
+        string     $password
     ): bool
     {
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
             $this->model::insert(
                 array_merge(
                     $accountDto->toArray(),
                     ['password' => Hash::make($password)],
                     [
-                        'created_at' => (string) (new Carbon()),
-                        'updated_at' => (string) (new Carbon()),
+                        'created_at' => (string)(new Carbon()),
+                        'updated_at' => (string)(new Carbon()),
                     ]
                 )
             );
@@ -70,5 +76,89 @@ final class InMemoryMySqlUserRepositories implements UserRepositoriesInterface
         }
 
         return null;
+    }
+
+    public function getList(AccountGetListFilter $filters, Order $orderBy): array
+    {
+        $filter = Filters::fromValues($this->getFilterValues($filters));
+
+        $builder = FilterBuilder::build($this->model, $filter);
+
+
+        if ($orderBy->orderBy()->value()) {
+            $builder = $builder->orderBy(
+                $orderBy->orderBy()->value(),
+                $orderBy->orderType()->value()
+            );
+        }
+
+        $result = [];
+        foreach ($builder->get()->toArray() as $item) {
+            $result[] = UserInfoDto::fromState($item);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function edit(Uuid $id, UserInfoDto $userInfoDto): bool
+    {
+        if (!$model = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('User not found for edit ' . $id->value());
+        }
+
+        return $model->update($userInfoDto->toArray()) > 0;
+    }
+
+    public function changeRole(Uuid $id, string $role): bool
+    {
+        if (!$model = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException('User not found for edit ' . $id->value());
+        }
+
+        $model->role = $role;
+        return $model->save();
+    }
+
+
+    private function getFilterValues(AccountGetListFilter $filterQuery): array
+    {
+        return [
+            // email
+            [
+                'field' => User::TABLE . '.email',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getEmail(),
+            ],
+            // name
+            [
+                'field' => User::TABLE . '.name',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getName(),
+            ],
+            // types_of_payment_id
+            [
+                'field' => User::TABLE . '.types_of_payment_id',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getCity(),
+            ],
+            [
+                'field' => User::TABLE . '.city',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getCity(),
+            ],
+            [
+                'field' => User::TABLE . '.phone',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getPhone(),
+            ],
+            [
+                'field' => User::TABLE . '.role',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getRole(),
+            ],
+        ];
     }
 }

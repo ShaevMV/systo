@@ -7,10 +7,12 @@ namespace App\Http\Controllers\Festival;
 use App\Http\Controllers\Controller;
 use DomainException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\OrderTicket\Application\GetFestivalList\FestivalApplication;
+use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 class FestivalController extends Controller
 {
@@ -39,12 +41,26 @@ class FestivalController extends Controller
             throw new DomainException('Не задан идентификатор фестиваля');
         }
         $isAdmin = filter_var($request->get('is_admin', false),FILTER_VALIDATE_BOOLEAN);
+        $isPusher = Auth::user()?->role === AccountRoleHelper::pusher;
 
         return $this->allInfoForOrderingTicketsSearcher
             ->getInfoForOrderingDto(
                 new Uuid($request->get('festival_id')),
                 $isAdmin,
+                $isPusher
             )
+            ->toArray();
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function loadByTicketType(
+        string $ticketTypeId,
+    ): array
+    {
+        return $this->allInfoForOrderingTicketsSearcher
+            ->getListTypesOfPaymentDto(new Uuid($ticketTypeId))
             ->toArray();
     }
 

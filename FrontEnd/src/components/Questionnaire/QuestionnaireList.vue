@@ -9,31 +9,27 @@
 
           <table class="table table-hover">
             <thead>
-              <tr>
-                <th scope="col" class="mobile">№ заказа</th>
-                <th scope="col" class="mobile"></th>
-                <th scope="col">Email</th>
-                <th scope="col">Имя</th>
-                <th scope="col">Телефон</th>
-                <th scope="col">Возраст</th>
-                <th scope="col">Telegram-аккаунт:</th>
-                <th scope="col">Профайл Вконтакте</th>
-                <th scope="col">Сколько раз на Систо?</th>
-                <th scope="col">Откуда</th>
-                <th scope="col">Ссылка на анкету</th>
-              </tr>
+            <tr>
+              <th scope="col" class="mobile">№</th>
+              <th scope="col" class="mobile"></th>
+              <th scope="col">Email</th>
+              <th scope="col">Телефон</th>
+              <th scope="col">Telegram</th>
+              <th scope="col">Сколько ты раз был на систо</th>
+              <th scope="col" class="mobile">Тип анкеты</th>
+              <th scope="col">Статус</th>
+
+            </tr>
             </thead>
             <tbody>
             <tr v-for="(item,index) in getQuestionnaireList"
-                v-bind:key="index"
-                @click="goItemOrderForUser(item.id)">
+                v-bind:key="index">
 
-              <th scope="row" class="mobile">
+              <th scope="row" class="mobile" @click="goItemForUser(item.id)">
                 {{ item.id }}
               </th>
-
               <td class="mobile">
-                <div class="btn-group" v-show="item.status !== 'APPRUVE' ">
+                <div class="btn-group" v-show="item.status !== 'APPROVE' ">
                   <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown"
                           aria-haspopup="true"
                           aria-expanded="false">
@@ -43,21 +39,19 @@
                   <span class="dropdown-item btn-link"
                         role="button"
                         v-for="(statusItem, key) in listCorrectNextStatus" v-bind:key="key"
-                        @click="chanceStatus(key,itemOrder.id)">{{ statusItem }}</span>
+                        @click="chanceStatus({
+                          id: item.id,
+                          status: key
+                        })">{{ statusItem }}</span>
                   </div>
                 </div>
               </td>
-
-
-              <td>{{ item.email }}</td>
-
-              <td>{{ item.name }}</td>
-              <td>{{ item.phone }} рублей</td>
-              <td>{{ item.agy }}</td>
-              <td>{{ item.telegram }}</td>
-              <td>{{ item.vk }}</td>
-              <td>{{ item.howManyTimes }}</td>
-              <td>{{ item.whereSysto }}</td>
+              <td>{{ item.email || '—' }}</td>
+              <td>{{ item.phone || '—' }}</td>
+              <td class="mobile">{{ item.telegram || '—' }}</td>
+              <td>{{ item.howManyTimes || '—' }}</td>
+              <td class="mobile">{{ getQuestionnaireTypeName(item.questionnaire_type_id) }}</td>
+              <td>{{ getStatusName(item.status) }}</td>
             </tr>
 
 
@@ -73,25 +67,67 @@
 <script>
 import {mapGetters, mapActions} from 'vuex';
 
+
 export default {
   name: "QuestionnaireList",
   computed: {
     ...mapGetters('appQuestionnaire', [
-       'getQuestionnaireList'
+      'getQuestionnaireList'
+    ]),
+    ...mapGetters('appTicketType', [
+      'getQuestionnaireTypeList'
     ]),
     listCorrectNextStatus: function () {
-      return [{
-        "APPRUVE" : "Подвердить"
-      }]
+      return {
+        approve: "Подтвердить"
+      }
     }
   },
   methods: {
     ...mapActions('appQuestionnaire', [
       'loadQuestionnaire',
+      'sendNotitificationUser',
+      'approve',
     ]),
-    goItemOrderForUser(idOrderItem) {
-      this.$router.push({name: 'orderItems', params: {id: idOrderItem}});
+    goItemForUser(id) {
+      const route = this.$router.resolve({ name: 'QuestionnaireEdit', params: { id: id } });
+      window.open(route.href, '_blank');
     },
+    chanceStatus: function (data) {
+
+      if (data.status === 'approve') {
+        this.approve({
+          id: data.id,
+          callback: function (message) {
+            alert(message)
+          }
+        });
+      }
+    },
+    sendNotitification: function (id, email) {
+      this.sendNotitificationUser({
+        id: id,
+        email: email,
+        callback: function () {
+          alert('На почту отправлено!')
+        }
+      });
+
+    },
+    getQuestionnaireTypeName(questionnaireTypeId) {
+      if (!questionnaireTypeId) {
+        return '—';
+      }
+      const type = this.getQuestionnaireTypeList.find(t => t.id === questionnaireTypeId);
+      return type ? type.name : '—';
+    },
+    getStatusName(status) {
+      const statusMap = {
+        'NEW': 'Новая',
+        'APPROVE': 'Одобрена',
+      };
+      return statusMap[status] || status;
+    }
   },
   async created() {
     await this.loadQuestionnaire({
