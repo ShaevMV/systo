@@ -30,6 +30,4 @@ interface TicketsRepositoryInterface
     public function getAllTicketsId(Uuid $festivalId): array;
 
     public function checkLiveNumber(int $number): bool;
-
-    public function changeTicket(Uuid $orderId, Uuid $ticketId, )
 }

@@ -39,6 +39,16 @@ final class GuestsDto implements EntityDataInterface
         $this->id = Uuid::random();
     }
 
+    public function updateValue(string $value): void
+    {
+        $this->value = $value;
+    }
+
+    public function updateEmail(?string $email): void
+    {
+        $this->email = $email;
+    }
+
     public function __toString(): string
     {
         return $this->value;

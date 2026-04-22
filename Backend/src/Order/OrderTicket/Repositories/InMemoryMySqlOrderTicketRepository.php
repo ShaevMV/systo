@@ -256,6 +256,39 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
     /**
      * @param Uuid $orderId
+     * @param array $guests
+     * @return bool
+     * @throws Throwable
+     */
+    public function updateGuests(Uuid $orderId, array $guests): bool
+    {
+        $arrGuests = [];
+        foreach ($guests as $guest) {
+            $arrGuests[] = [
+                'value' => $guest->getValue(),
+                'id' => $guest->getId()->value(),
+                'email' => $guest->getEmail(),
+                'number' => $guest->getNumber(),
+                'festival_id' => $guest->getFestivalId()?->value(),
+            ];
+        }
+
+        DB::beginTransaction();
+        try {
+            $order = $this->model::find($orderId->value());
+            $order->guests = $arrGuests;
+            $order->save();
+            DB::commit();
+
+            return true;
+        } catch (Throwable $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param Uuid $orderId
      * @param float $newPrice
      * @return bool
      * @throws Throwable

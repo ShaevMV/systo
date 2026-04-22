@@ -18,6 +18,7 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCancelLiveTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
+use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderTicketChanged;
 
 final class OrderTicket extends AggregateRoot
 {
@@ -283,6 +284,84 @@ final class OrderTicket extends AggregateRoot
                 (int)$item,
                 new Uuid($key),
             ));
+        }
+
+        return $result;
+    }
+
+    /**
+     * Смена данных (ФИО/email) одного или нескольких гостей в заказе.
+     *
+     * Алгоритм аналогичен toDifficultiesArose:
+     * 1. Применяем изменения к нужным гостям
+     * 2. Обновляем UUID у всех гостей (старые билеты будут удалены, новые созданы)
+     * 3. Отменяем все старые билеты
+     * 4. Создаём новые билеты с обновлёнными данными
+     * 5. Отправляем письмо и ссылки на анкеты изменённым гостям
+     *
+     * @param array $valueMap [ticketId => newValue] — ФИО для изменения
+     * @param array $emailMap [ticketId => newEmail] — email для изменения
+     */
+    public static function toChangeTicket(
+        OrderTicketDto $orderTicketDto,
+        array          $valueMap,
+        array          $emailMap,
+    ): self {
+        if (empty($valueMap) && empty($emailMap)) {
+            throw new DomainException('Не переданы данные для изменения билета');
+        }
+
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $changes = [];
+        $changedIndexes = [];
+
+        foreach ($result->ticket as $index => $guest) {
+            $ticketId = $guest->getId()->value();
+
+            if (isset($valueMap[$ticketId]) || isset($emailMap[$ticketId])) {
+                $changes[] = [
+                    'oldName' => $guest->getValue(),
+                    'newName' => $valueMap[$ticketId] ?? $guest->getValue(),
+                ];
+                $changedIndexes[] = $index;
+
+                if (isset($valueMap[$ticketId])) {
+                    $guest->updateValue($valueMap[$ticketId]);
+                }
+                if (isset($emailMap[$ticketId])) {
+                    $guest->updateEmail($emailMap[$ticketId]);
+                }
+            }
+        }
+
+        // Обновляем UUID у всех гостей — старые билеты будут удалены, созданы новые
+        $result->updateIdTicket();
+
+        $result->record(new ProcessCancelTicket($result->id));
+
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
+
+        if (!empty($changes)) {
+            $result->record(new ProcessUserNotificationOrderTicketChanged(
+                $orderTicketDto->getEmail(),
+                $changes,
+                $orderTicketDto->getTicketTypeId(),
+            ));
+        }
+
+        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
+            foreach ($changedIndexes as $index) {
+                $guest = $result->ticket[$index];
+                $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $guest->getEmail() ?? $orderTicketDto->getEmail(),
+                    $orderTicketDto->getId()->value(),
+                    $guest->getId()->value(),
+                ));
+            }
         }
 
         return $result;

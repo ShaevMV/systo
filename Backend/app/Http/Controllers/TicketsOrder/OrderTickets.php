@@ -29,6 +29,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
 use Tickets\Order\OrderTicket\Service\PriceService;
+use Tickets\Ticket\CreateTickets\Application\ChangeTicket\ChangeTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\Ticket\Live\Service\CheckLiveTicketService;
 use Tickets\User\Account\Application\AccountApplication;
@@ -48,6 +49,7 @@ class OrderTickets extends Controller
         private ChangeOrderPrice   $changeOrderPrice,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
+        private ChangeTicket       $changeTicket,
        // private Billing            $billing,
     )
     {
@@ -444,8 +446,11 @@ class OrderTickets extends Controller
             ], 422);
         }
 
-
-
+        $this->changeTicket->change(
+            new Uuid($id),
+            $request->input('value', []),
+            $request->input('email', []),
+        );
 
         return response()->json([
             'success' => true

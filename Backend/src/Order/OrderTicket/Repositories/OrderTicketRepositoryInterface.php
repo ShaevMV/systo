@@ -77,6 +77,15 @@ interface OrderTicketRepositoryInterface
     ): bool;
 
     /**
+     * Обновить список гостей без смены статуса
+     *
+     * @param Uuid $orderId
+     * @param array $guests
+     * @return bool
+     */
+    public function updateGuests(Uuid $orderId, array $guests): bool;
+
+    /**
      * Изменить цену заказа (только для admin)
      *
      * @param Uuid $orderId
