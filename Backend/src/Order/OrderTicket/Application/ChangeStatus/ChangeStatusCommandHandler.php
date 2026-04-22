@@ -84,7 +84,7 @@ class ChangeStatusCommandHandler implements CommandHandler
 
         $list = $orderTicket->pullDomainEvents();
 
-        $this->orderTicketRepository->chanceStatus(
+        $this->orderTicketRepository->changeStatus(
             $command->getOrderId(),
             $command->getNextStatus(),
             $orderTicket->getTicket()

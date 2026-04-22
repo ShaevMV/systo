@@ -262,7 +262,7 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `getItem(Uuid): ?OrderTicketItemResponse` | Детали заказа |
 | `getList(Filters): OrderTicketItemForListResponse[]` | Админ-список с фильтрами |
 | `getFriendlyList(Filters): OrderTicketItemForFriendlyListResponse[]` | Friendly-список |
-| `chanceStatus(Uuid, Status, array): bool` | Смена статуса |
+| `changeStatus(Uuid, Status, array): bool` | Смена статуса |
 
 ### TicketsRepositoryInterface
 

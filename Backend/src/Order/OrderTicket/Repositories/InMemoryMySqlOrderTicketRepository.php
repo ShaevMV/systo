@@ -221,7 +221,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
      * @return bool
      * @throws Throwable
      */
-    public function chanceStatus(Uuid $orderId, Status $newStatus, array $guests): bool
+    public function changeStatus(Uuid $orderId, Status $newStatus, array $guests): bool
     {
 
         $arrGuests = [];

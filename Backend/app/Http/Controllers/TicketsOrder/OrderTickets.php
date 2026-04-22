@@ -414,8 +414,8 @@ class OrderTickets extends Controller
     ): JsonResponse
     {
         $rules = [
-            'email' => 'required|array|distinct',
-            'value' => 'required|array|distinct',
+            'email' => 'required|array',
+            'value' => 'required|array',
             'email.*' => 'required|email',
             'value.*' => 'required'
         ];
@@ -426,8 +426,6 @@ class OrderTickets extends Controller
             'value.required' => 'Поле "ФИО" обязательно.',
             'email.array'    => 'Поле "email" должно быть массивом.',
             'value.array'    => 'Поле "ФИО" должно быть массивом.',
-            'email.distinct' => 'Email-адреса не должны повторяться.',
-            'value.distinct' => 'ФИО не должны повторяться.',
 
             // Ошибки для каждого элемента массива email.*
             'email.*.required' => 'Email не может быть пустым.',
@@ -445,6 +443,10 @@ class OrderTickets extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
+
+
+
+
         return response()->json([
             'success' => true
         ]);

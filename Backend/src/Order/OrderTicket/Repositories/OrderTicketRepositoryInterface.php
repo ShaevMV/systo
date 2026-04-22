@@ -70,7 +70,7 @@ interface OrderTicketRepositoryInterface
      * @param array $guests
      * @return bool
      */
-    public function chanceStatus(
+    public function changeStatus(
         Uuid $orderId,
         Status $newStatus,
         array $guests
