@@ -19,9 +19,14 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
 use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderTicketChanged;
+use Tickets\History\Trait\HasHistory;
+use Tickets\History\Domain\Event\OrderStatusChangedEvent;
+use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
+use Tickets\History\Domain\Event\OrderCreatedEvent;
 
 final class OrderTicket extends AggregateRoot
 {
+    use HasHistory;
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
     /**
@@ -69,6 +74,12 @@ final class OrderTicket extends AggregateRoot
             )
         );
 
+        $result->recordHistory(new OrderCreatedEvent(
+            ticketType: $orderTicketDto->getTicketTypeId()->value(),
+            price:      $orderTicketDto->getPriceDto()->getTotalPrice(),
+            kilter:     $kilter,
+        ));
+
         return $result;
     }
 
@@ -100,6 +111,11 @@ final class OrderTicket extends AggregateRoot
                 );
             }
         }
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::PAID_FOR_LIVE,
+        ));
 
         return $result;
     }
@@ -164,6 +180,11 @@ final class OrderTicket extends AggregateRoot
             }
         }
 
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::PAID,
+        ));
+
         return $result;
     }
 
@@ -216,6 +237,11 @@ final class OrderTicket extends AggregateRoot
             }
         }
 
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::PAID,
+        ));
+
         return $result;
     }
 
@@ -233,6 +259,11 @@ final class OrderTicket extends AggregateRoot
             )
         );
 
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::CANCEL,
+        ));
+
         return $result;
     }
 
@@ -249,6 +280,11 @@ final class OrderTicket extends AggregateRoot
         ));
 
         $result->updateIdTicket();
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::CANCEL_FOR_LIVE,
+        ));
 
         return $result;
     }
@@ -285,6 +321,11 @@ final class OrderTicket extends AggregateRoot
                 new Uuid($key),
             ));
         }
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::LIVE_TICKET_ISSUED,
+        ));
 
         return $result;
     }
@@ -364,6 +405,10 @@ final class OrderTicket extends AggregateRoot
             }
         }
 
+        if (!empty($changes)) {
+            $result->recordHistory(new OrderTicketDataChangedEvent($changes));
+        }
+
         return $result;
     }
 
@@ -393,6 +438,12 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getTicketTypeId(),
             )
         );
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::DIFFICULTIES_AROSE,
+            comment:    $comment,
+        ));
 
         return $result;
     }

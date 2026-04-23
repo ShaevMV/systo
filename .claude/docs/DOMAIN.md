@@ -8,6 +8,8 @@
 
 ```php
 class OrderTicket extends AggregateRoot {
+    use HasHistory; // запись истории изменений агрегата
+
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
     Uuid $festival_id;
@@ -32,7 +34,10 @@ class OrderTicket extends AggregateRoot {
 | `toCancelLive(dto)` | CANCEL_FOR_LIVE | `ProcessCancelTicket`, `ProcessCancelLiveTicket` | Отмена live |
 | `toLiveIssued(dto, liveNumber[])` | LIVE_TICKET_ISSUED | `ProcessCreateTicket`, `ProcessGuestNotificationQuestionnaire[]`, `ProcessPushLiveTicket[]` | Выдача живых |
 | `toDifficultiesArose(dto, comment)` | DIFFICULTIES_AROSE | `ProcessCancelTicket`, `ProcessUserNotificationOrderDifficultiesArose` | Трудности |
+| `toChangeTicket(changes[])` | — | — | Изменение данных билета (записывает историю если `!empty($changes)`) |
 | `toProcessGuestNotificationQuestionnaire(dto)` | — | `ProcessGuestNotificationQuestionnaire[]` | Только рассылка гостям |
+
+Все методы (кроме `toProcessGuestNotificationQuestionnaire`) вызывают `recordHistory()` через trait `HasHistory`.
 
 ---
 
@@ -191,6 +196,13 @@ class Questionnaire extends AggregateRoot {
 | **TicketTypeDto** | `Festival/Response/` | `id`, `name`, `price`, `groupLimit`, `festivalList[]`, `priceList[]`, `isLiveTicket` |
 | **TypesOfPaymentDto** | `Festival/Response/` | `id`, `name`, `card`, `is_billing` |
 
+### History Module
+
+| DTO | Файл | Поля |
+|-----|------|------|
+| **SaveHistoryDto** | `History/Dto/` | `aggregateId` (string), `event` (HistoryEventInterface), `actorId` (?string), `actorType` (string) |
+| **DomainHistoryDto** | `History/Dto/` | `aggregateId` (string), `aggregateType` (string), `eventName` (string), `payload` (array), `actorId` (?string), `actorType` (string), `occurredAt` (Carbon) |
+
 ---
 
 ## Domain Events
@@ -321,6 +333,16 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `create(TicketTypeDto): bool` | Создать |
 | `remove(Uuid): bool` | Удалить |
 
+### HistoryRepositoryInterface
+
+**Путь:** `Backend/src/History/Repositories/HistoryRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlHistoryRepository` (таблица `domain_history`)
+
+| Метод | Описание |
+|-------|----------|
+| `save(SaveHistoryDto): void` | Сохранить событие истории |
+| `getByAggregateId(string): DomainHistoryDto[]` | Получить всю историю агрегата по ID |
+
 ---
 
 ## Схема связей агрегатов
@@ -345,6 +367,10 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
      | order_tickets_id
      v
  ExternalPromoCode
+
+ OrderTicket ──── aggregate_id ──── DomainHistory (таблица domain_history)
+ Ticket      ────────────────────── DomainHistory
+ (любой агрегат с trait HasHistory записывает события в общую таблицу истории)
 ```
 
 ---

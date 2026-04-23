@@ -303,6 +303,28 @@
 
 ---
 
+### GET `/api/v1/order/getHistory/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "history": [
+    {
+      "event_name": "order.status.changed",
+      "aggregate_type": "order_ticket",
+      "payload": { "fromStatus": "new", "toStatus": "paid" },
+      "actor_id": "uuid или null",
+      "actor_type": "USER|SYSTEM|ARTISAN",
+      "occurred_at": "ISO8601"
+    }
+  ]
+}
+```
+
+---
+
 ### ANY `/api/v1/order/succes`
 **Middleware:** публичный (webhook платёжной системы)
 
@@ -534,7 +556,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory |
 | **role: seller,admin** | order/getList, order/toChangeStatus |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly, order/toChangeStatus |
 | **role: seller,admin,pusher** | order/toChangeStatus |

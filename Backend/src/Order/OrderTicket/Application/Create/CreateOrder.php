@@ -11,6 +11,9 @@ use Shared\Domain\ValueObject\Status;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Throwable;
+use Tickets\History\Domain\ActorType;
+use Tickets\History\Dto\SaveHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\Order\OrderTicket\Application\AddOrderInInvite\AddOrderInInviteCommand;
 use Tickets\Order\OrderTicket\Application\AddOrderInInvite\AddOrderInInviteCommandHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
@@ -30,6 +33,7 @@ final class CreateOrder
         OrderItemQueryHandler          $itemQueryHandler,
         AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
         private Bus                    $bus,
+        private HistoryRepositoryInterface $historyRepository,
     )
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
@@ -73,8 +77,18 @@ final class CreateOrder
                 $orderTicket = OrderTicket::toPaidInLiveTicket($orderTicketDto, $orderTicketItem->getKilter());
             }
 
-            $this->bus::chain($orderTicket->pullDomainEvents())
-                ->dispatch();
+            $domainEvents = $orderTicket->pullDomainEvents();
+
+            foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
+                $this->historyRepository->save(new SaveHistoryDto(
+                    aggregateId: $orderTicketDto->getId()->value(),
+                    event:       $historyEvent,
+                    actorId:     null,
+                    actorType:   ActorType::SYSTEM,
+                ));
+            }
+
+            $this->bus::chain($domainEvents)->dispatch();
 
             DB::commit();
         } catch (Throwable $throwable) {
@@ -108,8 +122,18 @@ final class CreateOrder
                 $orderTicket = OrderTicket::toLiveIssued($orderTicketDto, $this->getLiveTicketByFriendly($orderTicketDto->getTicket()));
             }
 
-            $this->bus::chain($orderTicket->pullDomainEvents())
-                ->dispatch();
+            $domainEvents = $orderTicket->pullDomainEvents();
+
+            foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
+                $this->historyRepository->save(new SaveHistoryDto(
+                    aggregateId: $orderTicketDto->getId()->value(),
+                    event:       $historyEvent,
+                    actorId:     null,
+                    actorType:   ActorType::SYSTEM,
+                ));
+            }
+
+            $this->bus::chain($domainEvents)->dispatch();
 
             DB::commit();
         } catch (Throwable $throwable) {

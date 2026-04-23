@@ -6,6 +6,7 @@ namespace Tickets\Billing\Application\WebHook;
 
 use Shared\Domain\Bus\Command\CommandHandler;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\History\Domain\ActorType;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Shared\Domain\ValueObject\Status;
 
@@ -36,10 +37,11 @@ class WebHookCommandHandler implements CommandHandler
 
         if($command->getStatus()->isPaymentCompleted()) {
             $this->chanceStatus->change(
-                $command->getOrderId(),
-                $status,
-                new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
-                $comment
+                orderId:   $command->getOrderId(),
+                status:    $status,
+                userId:    new Uuid('b9df62af-252a-4890-afd7-73c2a356c259'),
+                comment:   $comment,
+                actorType: ActorType::SYSTEM,
             );
         }
 

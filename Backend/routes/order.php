@@ -52,6 +52,10 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::get('/getTicketPdf/{id}',[
         OrderTickets::class, 'getUrlListForPdf'
     ])->middleware('auth:api');
+
+    Route::get('/getHistory/{id}', [OrderTickets::class, 'getHistory'])
+        ->middleware('auth:api')
+        ->middleware('admin');
 });
 
 
