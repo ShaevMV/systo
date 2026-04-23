@@ -114,10 +114,6 @@ export default {
       }
       return item.actor_id ?? 'Пользователь';
     },
-  },
-
-  created() {
-    this.$store.dispatch('appOrder/loadOrderHistory', {id: this.orderId});
-  },
+  }
 };
 </script>
