@@ -10,9 +10,10 @@ use Shared\Domain\ValueObject\Uuid;
 class ChangeTicketCommand implements Command
 {
     public function __construct(
-        private Uuid  $orderId,
-        private array $valueMap,
-        private array $emailMap,
+        private Uuid    $orderId,
+        private array   $valueMap,
+        private array   $emailMap,
+        private ?string $actorId = null,
     ) {
     }
 
@@ -31,5 +32,10 @@ class ChangeTicketCommand implements Command
     public function getEmailMap(): array
     {
         return $this->emailMap;
+    }
+
+    public function getActorId(): ?string
+    {
+        return $this->actorId;
     }
 }

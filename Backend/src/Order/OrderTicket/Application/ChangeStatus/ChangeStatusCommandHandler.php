@@ -9,6 +9,9 @@ use DomainException;
 use Illuminate\Validation\ValidationException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\History\Domain\ActorType;
+use Tickets\History\Dto\SaveHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
@@ -25,6 +28,7 @@ class ChangeStatusCommandHandler implements CommandHandler
         private AddComment                     $addComment,
         private PushTicket                     $pushTicket,
         private ExternalPromocode              $externalPromocode,
+        private HistoryRepositoryInterface     $historyRepository,
     )
     {
     }
@@ -83,6 +87,18 @@ class ChangeStatusCommandHandler implements CommandHandler
         }
 
         $list = $orderTicket->pullDomainEvents();
+
+        $actorType = $command->getActorType();
+        $actorId   = $actorType === ActorType::USER ? $command->getUserId()->value() : null;
+
+        foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
+            $this->historyRepository->save(new SaveHistoryDto(
+                aggregateId: $command->getOrderId()->value(),
+                event:       $historyEvent,
+                actorId:     $actorId,
+                actorType:   $actorType,
+            ));
+        }
 
         $this->orderTicketRepository->changeStatus(
             $command->getOrderId(),

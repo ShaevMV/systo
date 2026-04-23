@@ -23,14 +23,16 @@ class ChangeTicket
      * @param array $emailMap [ticketId => newEmail]
      */
     public function change(
-        Uuid  $orderId,
-        array $valueMap,
-        array $emailMap,
+        Uuid    $orderId,
+        array   $valueMap,
+        array   $emailMap,
+        ?string $actorId = null,
     ): void {
         $this->commandBus->dispatch(new ChangeTicketCommand(
             $orderId,
             $valueMap,
             $emailMap,
+            $actorId,
         ));
     }
 }

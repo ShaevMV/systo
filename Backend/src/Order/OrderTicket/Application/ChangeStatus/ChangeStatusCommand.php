@@ -5,17 +5,19 @@ namespace Tickets\Order\OrderTicket\Application\ChangeStatus;
 use Shared\Domain\Bus\Command\Command;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\History\Domain\ActorType;
 
 class ChangeStatusCommand implements Command
 {
     public function __construct(
-        public Uuid $orderId,
-        public Status $nextStatus,
-        public Uuid $userId,
+        public Uuid    $orderId,
+        public Status  $nextStatus,
+        public Uuid    $userId,
         public ?string $comment = null,
-        public bool $now = false,
-        public int $delayMinute = 0,
-        public array $liveNumber = [],
+        public bool    $now = false,
+        public int     $delayMinute = 0,
+        public array   $liveNumber = [],
+        public string  $actorType = ActorType::USER,
     ){
     }
 
@@ -52,5 +54,10 @@ class ChangeStatusCommand implements Command
     public function getLiveNumber(): array
     {
         return $this->liveNumber;
+    }
+
+    public function getActorType(): string
+    {
+        return $this->actorType;
     }
 }

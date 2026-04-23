@@ -48,6 +48,11 @@
               <button type="button"
                       @click="back"
                       class="btn btn-primary x-button">Назад в МОИ ОРГВЗНОСЫ</button>
+
+              <order-history
+                  v-if="isAdmin"
+                  :order-id="getId"
+              />
             </div>
           </div>
         </div>
@@ -59,10 +64,11 @@
 import {mapGetters} from "vuex";
 import OrderButton from "@/components/Order/OrderButton.vue";
 import NewTicket from "@/components/Order/NewTicket.vue";
+import OrderHistory from "@/components/Order/OrderHistory.vue";
 
 export default {
   name: "OrderItem",
-  components: {NewTicket, OrderButton},
+  components: {NewTicket, OrderButton, OrderHistory},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
