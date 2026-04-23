@@ -4,129 +4,198 @@
       <img src="/assets/img/logo-main.jpg" alt="main logo" class="left-logo">
     </a>
   </div>
+
   <ul class="sidebar-nav" id="sidebar-nav">
-    <li class="nav-item" v-if="!isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'QuestionnaireNewUser' }">Заявка на вступление в клуб
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'Orgvznos' }">Типы Оргвзносов
-      </router-link>
-    </li>
-    <li class="nav-item">
-      <router-link
-          class="nav-link" v-if="isAuth && !isPusher"
-          active-class="active"
-          :to="getLinkHome">Регистрация оргвзноса
-      </router-link>
-    </li>
-    <li class="nav-item">
-      <router-link
-          class="nav-link" v-if="isAuth && isPusher"
-          active-class="active"
-          :to="{ name: 'frendlyOrder' }">Регистрация дружеского оргвзноса
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'InviteLink' }">Ссылка-Приглашение
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'Conditions' }">Правила участия
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth && !isSeller">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'Orders' }">Мои оргвзносы
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'Profile' }">Мой аккаунт
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="(isAdmin || isSeller) && isAuth ">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'AllOrders'}">Все оргвзносы
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="(isAdmin || isPusher) && isAuth ">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'AllOrdersFriendly'}">Все френдли оргвзносы
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="(isAdmin || isManager) && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'QuestionnaireList'}">Все анкеты
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'TicketTypeListView'}">Все Типы билетов
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'QuestionnaireTypeListView'}">Все Типы анкет
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'TypesOfPaymentListView'}">Все Типы оплат
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAdmin && isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{name: 'AccountListView'}">Все пользователи
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="(isAdmin && isAuth)">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          :to="{ name: 'PromoCodes' }">Промокоды
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="!isAuth">
-      <router-link
-          class="nav-link"
-          active-class="active"
-          to="/login">Авторизоваться
-      </router-link>
-    </li>
-    <li class="nav-item" v-if="isAuth">
+
+    <!-- Не авторизован -->
+    <template v-if="!isAuth">
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireNewUser' }">
+          Заявка на вступление в клуб
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" to="/login">
+          Авторизоваться
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Продавец живых билетов (seller) -->
+    <template v-if="isAuth && isSeller && !isAdmin">
+      <li class="nav-heading">Работа</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+          Все оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Продавец дружеских билетов (pusher) -->
+    <template v-if="isAuth && isPusher && !isAdmin">
+      <li class="nav-heading">Работа</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'frendlyOrder' }">
+          Регистрация дружеского оргвзноса
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersFriendly' }">
+          Все дружеские оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Менеджер анкет (manager) -->
+    <template v-if="isAuth && isManager && !isAdmin">
+      <li class="nav-heading">Работа</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireList' }">
+          Все анкеты
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Обычный участник (guest авторизован) -->
+    <template v-if="isAuth && !isAdmin && !isSeller && !isPusher && !isManager">
+      <li class="nav-heading">Участие</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Orgvznos' }">
+          Типы оргвзносов
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="getLinkHome">
+          Регистрация оргвзноса
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'InviteLink' }">
+          Ссылка-Приглашение
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Conditions' }">
+          Правила участия
+        </router-link>
+      </li>
+      <li class="nav-heading">Мои данные</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Orders' }">
+          Мои оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Администратор (полный доступ) -->
+    <template v-if="isAuth && isAdmin">
+      <li class="nav-heading">Участие</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Orgvznos' }">
+          Типы оргвзносов
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="getLinkHome">
+          Регистрация оргвзноса
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'InviteLink' }">
+          Ссылка-Приглашение
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Conditions' }">
+          Правила участия
+        </router-link>
+      </li>
+
+      <li class="nav-heading">Мои данные</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Orders' }">
+          Мои оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+
+      <li class="nav-heading">Управление</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+          Все оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersFriendly' }">
+          Все дружеские оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireList' }">
+          Все анкеты
+        </router-link>
+      </li>
+
+      <li class="nav-heading">Настройки</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'TicketTypeListView' }">
+          Типы билетов
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireTypeListView' }">
+          Типы анкет
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'TypesOfPaymentListView' }">
+          Типы оплат
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AccountListView' }">
+          Все пользователи
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'PromoCodes' }">
+          Промокоды
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Выход (все авторизованные) -->
+    <li class="nav-item nav-item--exit" v-if="isAuth">
       <a class="exit-link" @click="logOut" href="javascript:void(0);">Выйти из аккаунта</a>
     </li>
+
   </ul>
 
   <div id="left-sub">
@@ -135,12 +204,12 @@
       <li v-if="isAuth"><a href="/faq" class="mailer" target="_blank">FAQ (Вопрос-Ответ)</a></li>
       <li><a href="tg://resolve?domain=systo_club" class="telegram" target="_blank">@systo_club</a></li>
     </ul>
-
   </div>
 
-  <div id="prana"><span>Система разработана веб-студией</span> <a href="https://pranaweb.ru" target="_blank">PRANA</a>
+  <div id="prana">
+    <span>Система разработана веб-студией</span>
+    <a href="https://pranaweb.ru" target="_blank">PRANA</a>
   </div>
-
 </template>
 
 <script>
@@ -162,18 +231,18 @@ export default {
       'isManager',
       'isPusher',
     ]),
-    getLinkHome: function () {
+    getLinkHome() {
       return this.isAuth ? '/hfjlsd65t4732' : '/';
-    }
+    },
   },
   methods: {
-    ...mapActions('appUser', [
-      'logOut'
-    ]),
+    ...mapActions('appUser', ['logOut']),
   },
 }
 </script>
 
 <style scoped>
-
+.nav-item--exit {
+  margin-top: 10px;
+}
 </style>
