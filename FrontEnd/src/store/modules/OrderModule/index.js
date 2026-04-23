@@ -35,6 +35,7 @@ export default {
             festivalId: '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
         },
         isLoading: false,
+        orderHistory: [],
     },
     getters,
     actions,

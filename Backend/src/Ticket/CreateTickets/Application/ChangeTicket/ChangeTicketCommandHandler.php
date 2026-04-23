@@ -7,6 +7,9 @@ namespace Tickets\Ticket\CreateTickets\Application\ChangeTicket;
 use Bus;
 use DomainException;
 use Shared\Domain\Bus\Command\CommandHandler;
+use Tickets\History\Domain\ActorType;
+use Tickets\History\Dto\SaveHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 
@@ -15,6 +18,7 @@ class ChangeTicketCommandHandler implements CommandHandler
     public function __construct(
         private OrderTicketRepositoryInterface $orderTicketRepository,
         private Bus                            $bus,
+        private HistoryRepositoryInterface     $historyRepository,
     ) {
     }
 
@@ -33,6 +37,15 @@ class ChangeTicketCommandHandler implements CommandHandler
         );
 
         $list = $orderTicket->pullDomainEvents();
+
+        foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
+            $this->historyRepository->save(new SaveHistoryDto(
+                aggregateId: $command->getOrderId()->value(),
+                event:       $historyEvent,
+                actorId:     $command->getActorId(),
+                actorType:   ActorType::USER,
+            ));
+        }
 
         $this->orderTicketRepository->updateGuests(
             $command->getOrderId(),

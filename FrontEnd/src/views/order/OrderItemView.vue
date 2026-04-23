@@ -27,6 +27,9 @@ export default {
     window.store.dispatch('appOrder/loadOrderItem', {
       id: to.params.id
     });
+    window.store.dispatch('appOrder/loadOrderHistory', {id: to.params.id});
+
+
     next();
   },
 }

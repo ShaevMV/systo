@@ -242,3 +242,12 @@ export const setFilter = (context, payload) => {
 export const loading = (context) => {
     context.commit('setLoaging', true);
 };
+
+export const loadOrderHistory = (context, payload) => {
+    let promise = axios.get(API_ORDER + '/getHistory/' + payload.id);
+    promise.then(function (response) {
+        context.commit('setOrderHistory', response.data.history);
+    }).catch(function (error) {
+        console.error(error);
+    });
+};

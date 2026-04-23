@@ -63,3 +63,7 @@ export const setMessage = (state, payload) => {
 export const setLoaging = (state, payload) => {
     state.isLoading = payload;
 };
+
+export const setOrderHistory = (state, payload) => {
+    state.orderHistory = payload;
+};

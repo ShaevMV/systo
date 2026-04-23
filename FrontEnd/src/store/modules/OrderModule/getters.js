@@ -75,3 +75,7 @@ export const getMessageForQuestionnaire = state => {
 export const getFilter = state => {
     return state.filter;
 };
+
+export const getOrderHistory = state => {
+    return state.orderHistory;
+};

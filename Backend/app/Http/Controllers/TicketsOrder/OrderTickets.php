@@ -17,6 +17,7 @@ use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
+use Tickets\History\Application\GetHistory\GetOrderHistory;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
@@ -50,6 +51,7 @@ class OrderTickets extends Controller
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
         private ChangeTicket       $changeTicket,
+        private GetOrderHistory    $getOrderHistory,
        // private Billing            $billing,
     )
     {
@@ -450,10 +452,31 @@ class OrderTickets extends Controller
             new Uuid($id),
             $request->input('value', []),
             $request->input('email', []),
+            Auth::id(),
         );
 
         return response()->json([
             'success' => true
+        ]);
+    }
+
+    /**
+     * История изменений заказа (только для администратора)
+     */
+    public function getHistory(string $id): JsonResponse
+    {
+        $history = $this->getOrderHistory->getByOrderId($id);
+
+        return response()->json([
+            'success' => true,
+            'history' => array_map(fn($item) => [
+                'event_name'     => $item->eventName,
+                'aggregate_type' => $item->aggregateType,
+                'payload'        => $item->payload,
+                'actor_id'       => $item->actorId,
+                'actor_type'     => $item->actorType,
+                'occurred_at'    => $item->occurredAt->toIso8601String(),
+            ], $history),
         ]);
     }
 
