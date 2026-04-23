@@ -71,6 +71,9 @@ export default {
         id: this.$route.params.id,
         value,
         email,
+        callback: () => {
+          window.location.reload();
+        },
         callbackError: (errorObject) => {
           this.errors = errorObject;
         }

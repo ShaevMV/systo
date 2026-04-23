@@ -34,7 +34,7 @@ final class InMemoryMySqlHistoryRepository implements HistoryRepositoryInterface
                 aggregateId:   $row->aggregate_id,
                 aggregateType: $row->aggregate_type,
                 eventName:     $row->event_name,
-                payload:       json_decode($row->payload, true) ?? [],
+                payload:       is_array($row->payload) ? $row->payload : (json_decode($row->payload, true) ?? []),
                 actorId:       $row->actor_id,
                 actorType:     $row->actor_type,
                 occurredAt:    $row->occurred_at,
