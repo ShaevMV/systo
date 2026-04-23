@@ -11,7 +11,7 @@ class TelegramSendService
 {
     public static function send($username)
     {
-        $response = Http::withHeaders([
+        /*$response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->post(
             'http://170.168.91.249:8000',
@@ -25,6 +25,6 @@ class TelegramSendService
             throw new \DomainException('не отправлен ' . $username . ' ответ ' . $response->getBody()->getContents() , $response->getStatusCode());
         }
 
-        Log::info($response->getBody()->getContents());
+        Log::info($response->getBody()->getContents());*/
     }
 }
