@@ -82,7 +82,6 @@ class AuthController extends Controller
             $request->password
         );
         $credentials = $request->only('email', 'password');
-        $token = auth()->attempt($credentials, true);
         if (!$token = auth()->attempt($credentials, true)) {
             return response()->json(['message' => 'Логин и пароль указан не верно'], 401);
         }

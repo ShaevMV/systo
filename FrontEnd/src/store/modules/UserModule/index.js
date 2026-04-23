@@ -8,12 +8,12 @@ export default {
         userToken: localStorage.getItem('user.token') || null,
         userTimeLifeForToken: localStorage.getItem('user.token.lifetime') || null,
         userInfo: {
-            'id': localStorage.getItem('user.id') || null,
-            'email': localStorage.getItem('user.email') || null,
-            'admin': localStorage.getItem('user.isAdmin') == 'true' || localStorage.getItem('user.role') == 'admin' || false,
-            'manager': localStorage.getItem('user.isManager') == 'true' || localStorage.getItem('user.role') == 'manager' || false,
-            'seller': localStorage.getItem('user.role') == 'seller' || localStorage.getItem('user.role') == 'seller' || false,
-            'pusher': localStorage.getItem('user.role') == 'pusher' || localStorage.getItem('user.role') == 'pusher' || false,
+            'id':      localStorage.getItem('user.id') || null,
+            'email':   localStorage.getItem('user.email') || null,
+            'admin':   localStorage.getItem('user.isAdmin') === 'true' || localStorage.getItem('user.role') === 'admin',
+            'manager': localStorage.getItem('user.isManager') === 'true' || localStorage.getItem('user.role') === 'manager',
+            'seller':  localStorage.getItem('user.isSeller') === 'true' || localStorage.getItem('user.role') === 'seller',
+            'pusher':  localStorage.getItem('user.isPusher') === 'true' || localStorage.getItem('user.role') === 'pusher',
         },
         userData: {
             'city': null,

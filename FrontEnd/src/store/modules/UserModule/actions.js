@@ -99,23 +99,20 @@ export const loadUserData = (context, payload) => {
 }
 
 /**
- * Пересобрать токен
+ * Пересобрать токен — возвращает Promise с новым токеном для Axios interceptor
  *
  * @param context
+ * @returns {Promise<string>}
  */
 export const tokenRefresh = (context) => {
-    let promise = axios.post('/api/refresh');
-    promise.then(async function (response) {
+    return axios.post('/api/refresh').then(function (response) {
         if (response.data.status === 'success') {
             context.commit('setToken', response.data.authorisation);
             context.commit('setUserInfo', response.data.user);
+            return response.data.authorisation.type + ' ' + response.data.authorisation.token;
         }
-    }).catch(function (error) {
-        if (error.response.status === 401) {
-            context.dispatch('logOut').then(r => console.log(r));
-        }
-        console.error(error);
-    })
+        return Promise.reject(new Error('Refresh failed'));
+    });
 };
 
 /**

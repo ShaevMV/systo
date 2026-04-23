@@ -36,7 +36,7 @@ class ProcessPasswordResets implements ShouldQueue, DomainEvent
      */
     public function handle(): void
     {
-        $token = urlencode(md5($this->user->email));
+        $token = urlencode(bin2hex(random_bytes(32)));
 
         $activationLink = "https://org.spaceofjoy.ru/resetPassword/".$token;
 

@@ -364,22 +364,19 @@ const router = createRouter({
  */
 router.beforeEach((to, from, next) => {
         store.commit('HIDE_MENU');
-        let token = (localStorage['user.token'] !== undefined && localStorage['user.token'] !== '' && localStorage['user.token'] !== null);
+        const rawToken = localStorage['user.token'];
+        const lifetime = localStorage['user.token.lifetime'];
+        const token = rawToken && rawToken !== 'null' && lifetime
+            && Math.trunc(Date.now() / 1000) < +lifetime;
+
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {
-                next({
-                    path: '/login',
-                    query: {
-                        nextUrl: to.fullPath,
-                    }
-                });
+                next({ path: '/login', query: { nextUrl: to.fullPath } });
             } else {
-                if(to.matched.some(record => record.meta.role)) {
-                    window.store.dispatch('appUser/isCorrectRole',{
-                        'role':to.meta.role
-                    }).then(function (){
-                        next();
-                    })
+                if (to.matched.some(record => record.meta.role)) {
+                    window.store.dispatch('appUser/isCorrectRole', { 'role': to.meta.role })
+                        .then(() => next())
+                        .catch(() => next({ path: '/login' }));
                 } else {
                     next();
                 }
@@ -388,7 +385,7 @@ router.beforeEach((to, from, next) => {
             if (!token) {
                 next();
             } else {
-                next({path: '/'});
+                next({ path: '/' });
             }
         } else {
             next();
