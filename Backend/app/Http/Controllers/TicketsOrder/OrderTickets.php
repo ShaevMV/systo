@@ -243,6 +243,26 @@ class OrderTickets extends Controller
                 0
             );
 
+            // Создаём или получаем пользователей для каждого участника (как в обычном заказе)
+            foreach ($guests as &$guest) {
+                if (!empty($guest['email'])) {
+                    try {
+                        $guestUser = $this->accountApplication->creatingOrGetAccountId(
+                            AccountDto::fromState([
+                                'email' => $guest['email'],
+                                'name'  => $guest['value'] ?? '',
+                                'phone' => '',
+                                'city'  => '',
+                            ])
+                        );
+                        $guest['user_id'] = $guestUser->value();
+                    } catch (Throwable) {
+                        // Не блокируем создание заказа если пользователь не создался
+                    }
+                }
+            }
+            unset($guest);
+
             $data = $request->toArray();
             $data['guests'] = $guests;
             $data['ticket_type_id'] = $ticketType->getId()->value();

@@ -71,12 +71,13 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
     public function create(LocationDto $data): bool
     {
         $this->model::create([
-            'id'          => $data->getId()->value(),
-            'festival_id' => $data->getFestivalId()->value(),
-            'name'        => $data->getName(),
-            'description' => $data->getDescription(),
-            'active'      => $data->isActive(),
-            'sort'        => $data->getSort(),
+            'id'                    => $data->getId()->value(),
+            'festival_id'           => $data->getFestivalId()->value(),
+            'name'                  => $data->getName(),
+            'description'           => $data->getDescription(),
+            'questionnaire_type_id' => $data->getQuestionnaireTypeId()?->value(),
+            'active'                => $data->isActive(),
+            'sort'                  => $data->getSort(),
         ]);
 
         return true;

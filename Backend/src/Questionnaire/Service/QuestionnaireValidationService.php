@@ -72,6 +72,12 @@ class QuestionnaireValidationService
             $fieldRules = [];
             $isRequired = !empty($question['required']);
 
+            // Поле типа file — фото загружается отдельно через uploadPhoto и хранится как URL-строка
+            if (($question['type'] ?? '') === 'file') {
+                $rules[$fieldName] = $isRequired ? ['required', 'string'] : ['nullable', 'string'];
+                continue;
+            }
+
             // Required / Nullable
             if ($isRequired) {
                 $fieldRules[] = 'required';

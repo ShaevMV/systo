@@ -483,6 +483,7 @@ Location/
 ```sql
 id UUID PRIMARY KEY, festival_id UUID, name VARCHAR(255),
 active BOOLEAN DEFAULT TRUE, sort INT DEFAULT 0,
+questionnaire_type_id UUID NULL,  -- тип анкеты для участников этой локации
 created_at TIMESTAMP, updated_at TIMESTAMP
 ```
 
@@ -561,7 +562,7 @@ pending_curator → [paid, cancel, difficulties_arose]
 
 UUID: `e5f6a7b8-c9d0-1234-ef01-567890123456`, код: `curator_participant`.
 
-Привязывается к типам билетов с `is_list_ticket=true` через `ticket_type.questionnaire_type_id`.
+Тип анкеты определяется по `location.questionnaire_type_id`, а не по `ticket_type.questionnaire_type_id`.
 
 **Поля:**
 

@@ -74,8 +74,24 @@
       </li>
     </template>
 
+    <!-- Куратор (curator/curator_pusher) -->
+    <template v-if="isAuth && isCurator && !isAdmin">
+      <li class="nav-heading">Работа</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+          Мои заказы-списки
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
     <!-- Обычный участник (guest авторизован) -->
-    <template v-if="isAuth && !isAdmin && !isSeller && !isPusher && !isManager">
+    <template v-if="isAuth && !isAdmin && !isSeller && !isPusher && !isManager && !isCurator">
       <li class="nav-heading">Участие</li>
       <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'Orgvznos' }">
@@ -158,6 +174,11 @@
         </router-link>
       </li>
       <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+          Все заказы кураторов
+        </router-link>
+      </li>
+      <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireList' }">
           Все анкеты
         </router-link>
@@ -172,6 +193,11 @@
       <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireTypeListView' }">
           Типы анкет
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'LocationListView' }">
+          Локации
         </router-link>
       </li>
       <li class="nav-item">
@@ -230,6 +256,7 @@ export default {
       'isSeller',
       'isManager',
       'isPusher',
+      'isCurator',
     ]),
     getLinkHome() {
       return this.isAuth ? '/hfjlsd65t4732' : '/';

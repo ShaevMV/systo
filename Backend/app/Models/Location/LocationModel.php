@@ -18,6 +18,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property string $festival_id
  * @property string $name
  * @property string|null $description
+ * @property string|null $questionnaire_type_id
  * @property bool $active
  * @property int $sort
  * @property Carbon|null $created_at
@@ -47,6 +48,7 @@ final class LocationModel extends Model
         'festival_id',
         'name',
         'description',
+        'questionnaire_type_id',
         'active',
         'sort',
     ];

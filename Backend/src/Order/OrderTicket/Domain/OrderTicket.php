@@ -29,6 +29,12 @@ final class OrderTicket extends AggregateRoot
     use HasHistory;
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
+    /** Шаблон PDF-билета для участника списочного (кураторского) заказа */
+    public const CURATOR_LIST_TICKET_PDF = 'curator_list';
+
+    /** Код email-шаблона для уведомления участника списочного заказа */
+    public const CURATOR_LIST_EMAIL_CODE = 'curator_list';
+
     /**
      * @param GuestsDto[] $ticket
      */

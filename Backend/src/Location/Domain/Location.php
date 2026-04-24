@@ -20,6 +20,7 @@ final class Location extends AggregateRoot
         private ?string $description,
         private bool    $active,
         private int     $sort,
+        private ?Uuid   $questionnaireTypeId = null,
     ) {
     }
 
@@ -35,6 +36,7 @@ final class Location extends AggregateRoot
             $dto->getDescription(),
             $dto->isActive(),
             $dto->getSort(),
+            $dto->getQuestionnaireTypeId(),
         );
     }
 
@@ -50,6 +52,7 @@ final class Location extends AggregateRoot
             $dto->getDescription(),
             $dto->isActive(),
             $dto->getSort(),
+            $dto->getQuestionnaireTypeId(),
         );
     }
 
@@ -81,5 +84,10 @@ final class Location extends AggregateRoot
     public function getSort(): int
     {
         return $this->sort;
+    }
+
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaireTypeId;
     }
 }

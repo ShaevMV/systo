@@ -18,6 +18,7 @@ class LocationDto extends AbstractionEntity implements Response
         protected bool    $active,
         protected int     $sort,
         protected ?string $description = null,
+        protected ?Uuid   $questionnaire_type_id = null,
         protected ?Carbon $created_at = null,
         protected ?Carbon $updated_at = null,
     ) {
@@ -32,6 +33,7 @@ class LocationDto extends AbstractionEntity implements Response
             (bool)($data['active'] ?? true),
             (int)($data['sort'] ?? 0),
             $data['description'] ?? null,
+            empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
         );
@@ -65,5 +67,10 @@ class LocationDto extends AbstractionEntity implements Response
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getQuestionnaireTypeId(): ?Uuid
+    {
+        return $this->questionnaire_type_id;
     }
 }

@@ -42,6 +42,31 @@
                   <small class="form-text text-muted"> {{ getError('sort') }}</small>
                 </div>
                 <div class="row mb-3">
+                  <label for="location-description" class="col-4 col-form-label">Описание:</label>
+                  <div class="col-8">
+                    <textarea name="location-description"
+                              class="form-control"
+                              v-model="description"
+                              id="location-description"
+                              rows="3"></textarea>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('description') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="location-questionnaire-type" class="col-4 col-form-label">Тип анкеты участника:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="questionnaire_type_id"
+                            id="location-questionnaire-type">
+                      <option :value="null">Не выбрано</option>
+                      <option v-for="type in questionnaireTypeList" :key="type.id" :value="type.id">
+                        {{ type.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('questionnaire_type_id') }}</small>
+                </div>
+                <div class="row mb-3">
                   <label for="location-active" class="col-4 col-form-label">Активность:</label>
                   <div class="col-8">
                     <select class="form-select"
@@ -77,6 +102,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import {mapActions, mapGetters} from "vuex";
 
 export default {
@@ -93,7 +119,13 @@ export default {
       newFestivalId: null,
       newSort: null,
       newActive: null,
+      newDescription: null,
+      newQuestionnaireTypeId: undefined,
+      questionnaireTypeList: [],
     }
+  },
+  created() {
+    this.loadQuestionnaireTypes();
   },
   computed: {
     ...mapGetters('appLocation', [
@@ -145,6 +177,28 @@ export default {
         this.newActive = newValue;
       },
     },
+    description: {
+      get: function () {
+        if (this.newDescription === null) {
+          return this.getItem.description ?? null;
+        }
+        return this.newDescription;
+      },
+      set: function (newValue) {
+        this.newDescription = newValue;
+      },
+    },
+    questionnaire_type_id: {
+      get: function () {
+        if (this.newQuestionnaireTypeId === undefined) {
+          return this.getItem.questionnaire_type_id ?? null;
+        }
+        return this.newQuestionnaireTypeId;
+      },
+      set: function (newValue) {
+        this.newQuestionnaireTypeId = newValue;
+      },
+    },
   },
   methods: {
     ...mapActions('appLocation', [
@@ -152,6 +206,13 @@ export default {
       'edit',
       'create',
     ]),
+    loadQuestionnaireTypes() {
+      axios.post('/api/v1/questionnaireType/getList', {})
+        .then(response => {
+          this.questionnaireTypeList = response.data.list || [];
+        })
+        .catch(() => {});
+    },
     back: function () {
       this.$router.push({name: 'LocationListView'});
     },
@@ -161,6 +222,8 @@ export default {
         'festival_id': this.festival_id,
         'sort': this.sort,
         'active': this.active,
+        'description': this.description,
+        'questionnaire_type_id': this.questionnaire_type_id,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {
