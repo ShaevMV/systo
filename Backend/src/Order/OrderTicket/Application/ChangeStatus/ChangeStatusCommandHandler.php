@@ -67,10 +67,20 @@ class ChangeStatusCommandHandler implements CommandHandler
             Status::CANCEL_FOR_LIVE => OrderTicket::toCancelLive($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto, $command->getLiveNumber()),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),
+            Status::PENDING_CURATOR => OrderTicket::toPendingCurator($orderTicketDto),
+            Status::DIFFICULTIES_AROSE_CURATOR => OrderTicket::toDifficultiesAroseCurator($orderTicketDto, $command->getComment()),
             default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),
         };
 
         if ($command->getNextStatus()->isDifficultiesArose()) {
+            $this->addComment->send(
+                $command->getOrderId(),
+                $command->getUserId(),
+                $command->getComment(),
+            );
+        }
+
+        if ($command->getNextStatus()->isDifficultiesAroseCurator()) {
             $this->addComment->send(
                 $command->getOrderId(),
                 $command->getUserId(),

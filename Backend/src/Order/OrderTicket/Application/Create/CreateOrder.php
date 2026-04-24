@@ -29,20 +29,24 @@ final class CreateOrder
     private InMemorySymfonyQueryBus $queryBus;
 
     public function __construct(
-        CreatingOrderCommandHandler    $creatingOrderCommandHandler,
-        OrderItemQueryHandler          $itemQueryHandler,
-        AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
-        private Bus                    $bus,
-        private HistoryRepositoryInterface $historyRepository,
-    )
+        private CreatingOrderCommandHandler    $creatingOrderCommandHandler,
+        private OrderItemQueryHandler          $orderItemQueryHandler,
+        private AddOrderInInviteCommandHandler $addOrderInInviteCommandHandler,
+        private Bus                            $bus,
+        private HistoryRepositoryInterface     $historyRepository,
+    ) {
+        $this->initBuses();
+    }
+
+    private function initBuses(): void
     {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            CreatingOrderCommand::class => $creatingOrderCommandHandler,
-            AddOrderInInviteCommand::class => $addOrderInInviteCommandHandler,
+            CreatingOrderCommand::class    => $this->creatingOrderCommandHandler,
+            AddOrderInInviteCommand::class => $this->addOrderInInviteCommandHandler,
         ]);
 
         $this->queryBus = new InMemorySymfonyQueryBus([
-            OrderIdQuery::class => $itemQueryHandler,
+            OrderIdQuery::class => $this->orderItemQueryHandler,
         ]);
     }
 

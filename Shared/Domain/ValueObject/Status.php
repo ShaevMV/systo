@@ -17,6 +17,7 @@ final class Status implements EntityDataInterface
     public const CANCEL = 'cancel';
     public const CANCEL_FOR_LIVE = 'cancel_for_live';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
+    public const DIFFICULTIES_AROSE_CURATOR = 'difficulties_arose_curator';
     public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
     public const PENDING_CURATOR = 'pending_curator';
 
@@ -29,6 +30,7 @@ final class Status implements EntityDataInterface
         self::PAID => 'Подверждён',
         self::PAID_FOR_LIVE => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
+        self::DIFFICULTIES_AROSE_CURATOR => 'Трудности куратора',
         self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
         self::PENDING_CURATOR => 'Ожидает модерации',
     ];
@@ -66,9 +68,11 @@ final class Status implements EntityDataInterface
                 self::CANCEL,
             ],
             self::PENDING_CURATOR => [
-                self::PAID,
+                self::DIFFICULTIES_AROSE_CURATOR,
                 self::CANCEL,
-                self::DIFFICULTIES_AROSE,
+            ],
+            self::DIFFICULTIES_AROSE_CURATOR => [
+                self::PENDING_CURATOR,
             ],
             self::CANCEL, self::CANCEL_FOR_LIVE => []
         };
@@ -161,6 +165,11 @@ final class Status implements EntityDataInterface
     public function isPendingCurator(): bool
     {
         return $this->name === self::PENDING_CURATOR;
+    }
+
+    public function isDifficultiesAroseCurator(): bool
+    {
+        return $this->name === self::DIFFICULTIES_AROSE_CURATOR;
     }
 
     public function getName(): string

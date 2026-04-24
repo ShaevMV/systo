@@ -18,6 +18,9 @@ use Tickets\Location\Dto\LocationDto;
 
 class LocationController extends Controller
 {
+    /**
+     * Получить список локаций с фильтрацией.
+     */
     public function getList(
         Request             $request,
         LocationApplication $application,
@@ -33,6 +36,9 @@ class LocationController extends Controller
         ]);
     }
 
+    /**
+     * Получить локацию по ID.
+     */
     public function getItem(
         string              $id,
         LocationApplication $application,
@@ -51,6 +57,8 @@ class LocationController extends Controller
     }
 
     /**
+     * Создать новую локацию.
+     *
      * @throws Throwable
      */
     public function create(
@@ -67,6 +75,8 @@ class LocationController extends Controller
     }
 
     /**
+     * Редактировать локацию.
+     *
      * @throws Throwable
      */
     public function edit(
@@ -92,6 +102,8 @@ class LocationController extends Controller
     }
 
     /**
+     * Удалить локацию.
+     *
      * @throws Throwable
      */
     public function delete(

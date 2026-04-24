@@ -16,7 +16,7 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:pusher');
 
-    Route::post('/createCurator', [OrderTickets::class, 'createCurator'])
+    Route::post('/createList', [OrderTickets::class, 'createList'])
         ->middleware('auth:api')
         ->middleware('role:curator,curator_pusher');
 

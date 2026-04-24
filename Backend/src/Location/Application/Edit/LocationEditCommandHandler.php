@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Location\Application\Edit;
 
 use Shared\Domain\Bus\Command\CommandHandler;
+use Tickets\Location\Domain\Location;
 use Tickets\Location\Repository\LocationRepositoryInterface;
 
 class LocationEditCommandHandler implements CommandHandler
@@ -16,6 +17,8 @@ class LocationEditCommandHandler implements CommandHandler
 
     public function __invoke(LocationEditCommand $command): void
     {
+        // Создаём доменный объект — он гарантирует корректность данных
+        Location::edit($command->getData());
         $this->repository->editItem($command->getId(), $command->getData());
     }
 }

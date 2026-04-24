@@ -41,7 +41,7 @@
 
         <!-- Файл (фото для бейджа) -->
         <template v-else-if="question.type === 'file'">
-          <div class="input-group">
+          <div class="input-group" v-if="!getFieldValue(question.name) || editingPhoto === question.name">
             <input
                 type="file"
                 :id="'questionnaire_' + question.name"
@@ -52,9 +52,27 @@
                 @change="handleFileUpload(question.name, $event)"
             />
           </div>
-          <div v-if="uploadingPhoto" class="text-muted small mt-1">Загрузка фото...</div>
-          <div v-if="getFieldValue(question.name)" class="mt-2">
-            <img :src="getFieldValue(question.name)" alt="Фото" style="max-width:120px;max-height:120px;object-fit:cover;border-radius:4px;" />
+          <div v-if="uploadingPhoto && uploadingField === question.name" class="text-muted small mt-1">
+            <span class="spinner-border spinner-border-sm mr-1" role="status"></span>
+            Загрузка фото...
+          </div>
+          <div v-if="getFieldValue(question.name) && editingPhoto !== question.name" class="mt-2 d-flex align-items-start">
+            <div class="photo-preview-wrap mr-3">
+              <img
+                  :src="getFieldValue(question.name)"
+                  alt="Фото"
+                  class="photo-preview"
+                  style="max-width:120px;max-height:120px;object-fit:cover;border-radius:4px;cursor:zoom-in;"
+                  @click="viewPhoto(question.name)"
+              />
+            </div>
+            <div v-if="!isDisabled" class="d-flex flex-column">
+              <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary mb-1"
+                  @click="startEditPhoto(question.name)"
+              >Изменить фото</button>
+            </div>
           </div>
         </template>
 
@@ -120,6 +138,8 @@ export default {
   data() {
     return {
       uploadingPhoto: false,
+      uploadingField: null,
+      editingPhoto: null,
     };
   },
   computed: {
@@ -168,26 +188,58 @@ export default {
       if (!file) return;
 
       if (!this.orderId || !this.ticketId) {
-        console.warn('QuestionnaireTicket: orderId и ticketId обязательны для загрузки фото');
+        console.warn('orderId и ticketId обязательны для загрузки фото');
         return;
       }
 
       this.uploadingPhoto = true;
+      this.uploadingField = fieldName;
+      this.editingPhoto = null;
+
       this.uploadPhoto({
         file,
         orderId: this.orderId,
         ticketId: this.ticketId,
         callback: (photoUrl) => {
           this.uploadingPhoto = false;
+          this.uploadingField = null;
           this.updateField(fieldName, photoUrl);
         },
       }).catch(() => {
         this.uploadingPhoto = false;
+        this.uploadingField = null;
       });
+    },
+    startEditPhoto(fieldName) {
+      this.editingPhoto = fieldName;
+    },
+    viewPhoto(fieldName) {
+      const photoUrl = this.getFieldValue(fieldName);
+      if (!photoUrl) return;
+
+      const overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+
+      const img = document.createElement('img');
+      img.src = photoUrl;
+      img.style.cssText = 'max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px;box-shadow:0 4px 32px rgba(0,0,0,0.5);';
+
+      overlay.appendChild(img);
+      overlay.addEventListener('click', () => document.body.removeChild(overlay));
+      document.body.appendChild(overlay);
     },
   }
 }
 </script>
 
 <style scoped>
+.photo-preview {
+  transition: opacity 0.2s;
+}
+.photo-preview:hover {
+  opacity: 0.85;
+}
+.photo-preview-wrap {
+  display: inline-block;
+}
 </style>

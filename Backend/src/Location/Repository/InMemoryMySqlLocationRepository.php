@@ -74,6 +74,7 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
             'id'          => $data->getId()->value(),
             'festival_id' => $data->getFestivalId()->value(),
             'name'        => $data->getName(),
+            'description' => $data->getDescription(),
             'active'      => $data->isActive(),
             'sort'        => $data->getSort(),
         ]);
@@ -86,6 +87,7 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
         $this->model::where('id', $id->value())->update([
             'festival_id' => $data->getFestivalId()->value(),
             'name'        => $data->getName(),
+            'description' => $data->getDescription(),
             'active'      => $data->isActive(),
             'sort'        => $data->getSort(),
         ]);

@@ -206,9 +206,9 @@ class OrderTickets extends Controller
 
 
     /**
-     * Создать заказ куратора — статус new_for_list, ожидает модерации администратора
+     * Создать заказ-список куратора — статус new_for_list, ожидает модерации администратора
      */
-    public function createCurator(Request $request): JsonResponse
+    public function createList(Request $request): JsonResponse
     {
         try {
             $curatorId = new Uuid(Auth::id());

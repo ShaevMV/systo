@@ -435,6 +435,57 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    /**
+     * Одобрение заказа куратора — генерация билетов и рассылка анкет участникам.
+     */
+    public static function toPendingCurator(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
+
+        foreach ($orderTicketDto->getTicket() as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                $item->getEmail() ?? $orderTicketDto->getEmail(),
+                $orderTicketDto->getId()->value(),
+                $item->getId()->value(),
+            ));
+        }
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::PENDING_CURATOR,
+        ));
+
+        return $result;
+    }
+
+    /**
+     * Возникли трудности по заказу куратора — отмена билетов с комментарием.
+     * Email пользователю не отправляется (внутренний процесс куратора).
+     */
+    public static function toDifficultiesAroseCurator(OrderTicketDto $orderTicketDto, ?string $comment): self
+    {
+        if (is_null($comment)) {
+            throw new DomainException('Комментарий обязателен для статуса "Трудности куратора"');
+        }
+
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+        $result->record(new ProcessCancelTicket($result->id));
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus:   Status::DIFFICULTIES_AROSE_CURATOR,
+            comment:    $comment,
+        ));
+
+        return $result;
+    }
+
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
         if (is_null($comment)) {
