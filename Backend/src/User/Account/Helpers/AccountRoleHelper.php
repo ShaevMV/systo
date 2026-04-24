@@ -9,8 +9,10 @@ class AccountRoleHelper
     public const guest = 'guest'; // ГОСТь фестиваля
     public const admin = 'admin'; // Админ
     public const seller = 'seller'; // реализатор живых билетов
-    public const pusher = 'pusher'; // раелизатор френдли билетов
-    public const manager = 'manager'; // раелизатор френдли билетов
+    public const pusher = 'pusher'; // реализатор friendly билетов
+    public const manager = 'manager'; // менеджер анкет
+    public const curator = 'curator'; // куратор — создаёт списочные билеты для участников
+    public const curator_pusher = 'curator_pusher'; // куратор + права pusher
 
     public static function isValid(string $role): bool
     {
@@ -20,6 +22,8 @@ class AccountRoleHelper
             self::admin,
             self::guest,
             self::manager,
+            self::curator,
+            self::curator_pusher,
         ]);
     }
 }

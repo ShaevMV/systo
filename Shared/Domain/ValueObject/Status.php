@@ -11,22 +11,26 @@ final class Status implements EntityDataInterface
 {
     public const NEW = 'new';
     public const NEW_FOR_LIVE = 'new_for_live';
+    public const NEW_FOR_LIST = 'new_for_list';
     public const PAID = 'paid';
     public const PAID_FOR_LIVE = 'paid_for_live';
     public const CANCEL = 'cancel';
     public const CANCEL_FOR_LIVE = 'cancel_for_live';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
     public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
+    public const PENDING_CURATOR = 'pending_curator';
 
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
         self::NEW_FOR_LIVE => 'Ожидает проверки',
+        self::NEW_FOR_LIST => 'Список куратора',
         self::CANCEL => 'Отменён',
         self::CANCEL_FOR_LIVE => 'Отменён',
         self::PAID => 'Подверждён',
         self::PAID_FOR_LIVE => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
         self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
+        self::PENDING_CURATOR => 'Ожидает модерации',
     ];
 
     private function getRoleChanceStatus(string $status): array
@@ -57,7 +61,16 @@ final class Status implements EntityDataInterface
             self::LIVE_TICKET_ISSUED => [
                 self::CANCEL_FOR_LIVE,
             ],
-            self::CANCEL,self::CANCEL_FOR_LIVE => []
+            self::NEW_FOR_LIST => [
+                self::PENDING_CURATOR,
+                self::CANCEL,
+            ],
+            self::PENDING_CURATOR => [
+                self::PAID,
+                self::CANCEL,
+                self::DIFFICULTIES_AROSE,
+            ],
+            self::CANCEL, self::CANCEL_FOR_LIVE => []
         };
     }
 
@@ -138,6 +151,16 @@ final class Status implements EntityDataInterface
     public function isPaidForLive(): bool
     {
         return $this->name === self::PAID_FOR_LIVE;
+    }
+
+    public function isNewForList(): bool
+    {
+        return $this->name === self::NEW_FOR_LIST;
+    }
+
+    public function isPendingCurator(): bool
+    {
+        return $this->name === self::PENDING_CURATOR;
     }
 
     public function getName(): string

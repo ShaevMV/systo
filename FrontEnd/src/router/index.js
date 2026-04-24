@@ -36,6 +36,9 @@ import QuestionnaireTypeItemView from "@/views/questionnaireType/QuestionnaireTy
 
 import AccountListView from "@/views/account/AccountListView.vue";
 
+import LocationListView from "@/views/location/LocationListView.vue";
+import LocationItemView from "@/views/location/LocationItemView.vue";
+
 import RegView from "@/views/auth/RegView.vue";
 
 const routes = [
@@ -330,6 +333,28 @@ const routes = [
         path: '/typesOfPayment/:id?',
         name: 'TypesOfPaymentItemView',
         component: TypesOfPaymentItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Локации
+    {
+        path: '/location/list',
+        name: 'LocationListView',
+        component: LocationListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/location/:id?',
+        name: 'LocationItemView',
+        component: LocationItemView,
         props: true,
         meta: {
             'requiresAuth': true,

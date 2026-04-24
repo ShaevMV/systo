@@ -49,6 +49,8 @@ class OrderTicketDto
         ?Uuid              $id = null,
         protected ?Uuid    $inviteLink = null,
         protected ?Uuid    $friendly_id = null,
+        protected ?Uuid    $curator_id = null,
+        protected ?Uuid    $location_id = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -63,6 +65,8 @@ class OrderTicketDto
         PriceDto $priceDto,
         bool     $isLiveTicket = false,
         ?Uuid    $pusherId = null,
+        ?Uuid    $curatorId = null,
+        ?Uuid    $locationId = null,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
@@ -90,7 +94,9 @@ class OrderTicketDto
             $isLiveTicket,
             empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $id,
-            friendly_id: $pusherId
+            friendly_id: $pusherId,
+            curator_id: $curatorId,
+            location_id: $locationId,
         );
     }
 
@@ -125,6 +131,8 @@ class OrderTicketDto
             'promo_code' => $this->promo_code,
             'id_buy' => $this->id_buy,
             'friendly_id' => $this->friendly_id?->value(),
+            'curator_id' => $this->curator_id?->value(),
+            'location_id' => $this->location_id?->value(),
         ];
     }
 
@@ -220,5 +228,20 @@ class OrderTicketDto
         $this->status = $status;
 
         return $this;
+    }
+
+    public function getCuratorId(): ?Uuid
+    {
+        return $this->curator_id;
+    }
+
+    public function getLocationId(): ?Uuid
+    {
+        return $this->location_id;
+    }
+
+    public function getFriendlyId(): ?Uuid
+    {
+        return $this->friendly_id;
     }
 }

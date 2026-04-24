@@ -60,6 +60,7 @@ class TicketTypesModel extends Model
         'sort',
         'active',
         'is_live_ticket',
+        'is_list_ticket',
         'groupLimit',
         'questionnaire_type_id',
     ];

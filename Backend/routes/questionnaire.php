@@ -18,6 +18,7 @@ Route::prefix('v1/questionnaire')->group(static function (): void {
 Route::prefix('v1/questionnaire')->group(static function (): void {
     Route::post('/send/{orderId}/{ticketId}', [QuestionnaireController::class, 'setQuestionnaire']);
     Route::post('/sendNewUser', [QuestionnaireController::class, 'setNewUserQuestionnaire']);
+    Route::post('/uploadPhoto/{orderId}/{ticketId}', [QuestionnaireController::class, 'uploadPhoto']);
     Route::get('/getQuestionnaireTypeByOrderTicket/{orderId}/{ticketId}', [QuestionnaireController::class, 'getQuestionnaireTypeByOrderTicket']);
     Route::get('/getByOrderTicket/{orderId}/{ticketId}', [QuestionnaireController::class, 'getByOrderTicket']);
 });

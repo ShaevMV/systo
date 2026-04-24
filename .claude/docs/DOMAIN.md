@@ -462,3 +462,95 @@ if (!empty($filter->value()->value())) { ... }
 - Unit: `tests/Unit/Questionnaire/Dto/QuestionnaireTicketDtoTest.php` (4 теста)
 - Feature: `tests/Feature/Questionnaire/QuestionnaireDataFieldsApiTest.php` (2 теста)
 - Сидер: `QuestionnaireTestDataSeeder` — создаёт 3 тестовые анкеты с данными только в JSON `data`
+
+---
+
+## Модуль Location (Локации) — ветка feat/curator-list-tickets (2026-04-23)
+
+### Новый агрегат / модуль Location
+
+**Путь:** `Backend/src/Location/`
+
+```
+Location/
+├── Application/ (GetList, GetItem, Create, Edit, Delete + LocationApplication)
+├── Dto/LocationDto.php
+├── Repository/LocationRepositoryInterface.php + InMemoryMySqlLocationRepository.php
+└── Response/LocationGetListResponse.php
+```
+
+**Таблица `locations`:**
+```sql
+id UUID PRIMARY KEY, festival_id UUID, name VARCHAR(255),
+active BOOLEAN DEFAULT TRUE, sort INT DEFAULT 0,
+created_at TIMESTAMP, updated_at TIMESTAMP
+```
+
+**API:** `POST /api/v1/location/getList|create|edit/{id}`, `GET /api/v1/location/getItem/{id}`, `DELETE /api/v1/location/delete/{id}` — только `admin`
+
+**Frontend:** `FrontEnd/src/store/modules/LocationModule/`, `FrontEnd/src/components/Location/`, `FrontEnd/src/views/location/`
+
+---
+
+## Роли куратора (2026-04-23)
+
+Добавлены в `AccountRoleHelper`:
+
+| Роль | Константа | Описание |
+|------|-----------|---------|
+| `curator` | `AccountRoleHelper::curator` | Куратор — создаёт списочные билеты для участников |
+| `curator_pusher` | `AccountRoleHelper::curator_pusher` | Куратор + права pusher |
+
+---
+
+## Статусы заказов куратора (2026-04-23)
+
+Добавлены в `Shared/Domain/ValueObject/Status.php`:
+
+| Константа | Значение | Описание |
+|-----------|---------|---------|
+| `NEW_FOR_LIST` | `new_for_list` | Куратор создал заказ, ожидает модерации |
+| `PENDING_CURATOR` | `pending_curator` | Заказ на модерации у администратора |
+
+**Матрица переходов:**
+```
+new_for_list → [pending_curator, cancel]
+pending_curator → [paid, cancel, difficulties_arose]
+```
+
+---
+
+## Тип билета "Список" — is_list_ticket (2026-04-23)
+
+Добавлен флаг `is_list_ticket` (boolean, default false) в таблицу `ticket_type`.
+
+- Обновлён `TicketTypesModel.$fillable`
+- Обновлён `TicketTypeDto` — конструктор, `fromState()`, геттер `isListTicket()`
+- Обновлён `TicketTypeGetListFilter` — поддержка фильтрации по `is_list_ticket`
+- Обновлён `InMemoryTicketTypeRepository` — фильтрация по `is_list_ticket`
+- Frontend: чекбокс в `TicketTypeItem.vue`
+
+---
+
+## Заказ куратора — order_tickets (2026-04-23)
+
+Добавлены nullable поля в таблицу `order_tickets`:
+- `curator_id UUID NULL` — UUID пользователя-куратора
+- `location_id UUID NULL` — UUID локации
+
+Обновлён `OrderTicketDto` — nullable поля `curator_id`, `location_id`, геттеры `getCuratorId()`, `getLocationId()`.
+
+**API:** `POST /api/v1/order/createCurator` — middleware `auth:api, role:curator,curator_pusher`
+
+**Тело запроса:**
+```json
+{
+  "festival_id": "UUID",
+  "location_id": "UUID",
+  "guests": [{"value": "Имя", "email": "email@example.com"}],
+  "price": 0,
+  "comment": "string?"
+}
+```
+
+**Логика:** тип билета с `is_list_ticket=true` находится автоматически по `festival_id`. Создаётся заказ со статусом `new_for_list`. Билеты не генерируются до одобрения администратором.

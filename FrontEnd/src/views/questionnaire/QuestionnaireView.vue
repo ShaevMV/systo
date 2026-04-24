@@ -62,6 +62,8 @@
                 :questionnaire="currentQuestionnaire"
                 :questionnaire-type="questionnaireType"
                 :is-disabled="isAdmin || isManager"
+                :order-id="order_id"
+                :ticket-id="ticket_id"
                 @update-questionnaire="updateQuestionnaire"
             />
             <div class="form-check"

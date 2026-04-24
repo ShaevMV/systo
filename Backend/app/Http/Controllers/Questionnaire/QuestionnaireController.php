@@ -7,6 +7,8 @@ namespace App\Http\Controllers\Questionnaire;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
@@ -272,6 +274,56 @@ class QuestionnaireController extends Controller
                 'questionnaire' => $questionnaire?->toArray(),
             ]);
         } catch (\Throwable $throwable) {
+            return response()->json([
+                'success' => false,
+                'message' => $throwable->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Загрузить фото участника для бейджа.
+     * Фото сохраняется в storage/app/public/badges/{festival_id}/{ticketId}.ext
+     */
+    public function uploadPhoto(
+        Request $request,
+        OrderTicketRepositoryInterface $orderTicketRepository,
+        string $orderId,
+        string $ticketId,
+    ): JsonResponse {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
+        ]);
+
+        try {
+            $order = $orderTicketRepository->findOrder(new Uuid($orderId));
+
+            if ($order === null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Заказ не найден',
+                ], 404);
+            }
+
+            $festivalId = $order->getFestivalId()->value();
+            $extension  = $request->file('photo')->getClientOriginalExtension();
+            $filename   = $ticketId . '.' . $extension;
+            $path       = 'badges/' . $festivalId . '/' . $filename;
+
+            Storage::disk('public')->putFileAs(
+                'badges/' . $festivalId,
+                $request->file('photo'),
+                $filename,
+            );
+
+            $host     = \App::isLocal() ? 'http://org.tickets.loc' : 'https://org.spaceofjoy.ru';
+            $photoUrl = $host . '/storage/' . $path;
+
+            return response()->json([
+                'success'   => true,
+                'photo_url' => $photoUrl,
+            ]);
+        } catch (Throwable $throwable) {
             return response()->json([
                 'success' => false,
                 'message' => $throwable->getMessage(),

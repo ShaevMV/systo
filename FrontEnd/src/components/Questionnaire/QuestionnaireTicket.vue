@@ -39,6 +39,25 @@
           </div>
         </template>
 
+        <!-- Файл (фото для бейджа) -->
+        <template v-else-if="question.type === 'file'">
+          <div class="input-group">
+            <input
+                type="file"
+                :id="'questionnaire_' + question.name"
+                class="form-control"
+                :class="{'is-invalid': getError(question.name)}"
+                accept="image/jpeg,image/png,image/webp"
+                :disabled="isDisabled || uploadingPhoto"
+                @change="handleFileUpload(question.name, $event)"
+            />
+          </div>
+          <div v-if="uploadingPhoto" class="text-muted small mt-1">Загрузка фото...</div>
+          <div v-if="getFieldValue(question.name)" class="mt-2">
+            <img :src="getFieldValue(question.name)" alt="Фото" style="max-width:120px;max-height:120px;object-fit:cover;border-radius:4px;" />
+          </div>
+        </template>
+
         <!-- Строка -->
         <template v-else>
           <div class="input-group" id="promo-input">
@@ -89,6 +108,19 @@ export default {
       type: Boolean,
       default: false
     },
+    orderId: {
+      type: String,
+      default: null,
+    },
+    ticketId: {
+      type: String,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      uploadingPhoto: false,
+    };
   },
   computed: {
     ...mapGetters('appQuestionnaire', ['getError', 'getQuestionnaireItem']),
@@ -112,7 +144,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions('appQuestionnaire', ['approve', 'getQuestionnaire']),
+    ...mapActions('appQuestionnaire', ['approve', 'getQuestionnaire', 'uploadPhoto']),
     handleApprove() {
       if (!this.questionnaire || !this.questionnaire.id) return;
       this.approve({
@@ -130,7 +162,29 @@ export default {
     updateField(fieldName, value) {
       const updated = { ...this.questionnaire, [fieldName]: value };
       this.$emit('update-questionnaire', updated);
-    }
+    },
+    handleFileUpload(fieldName, event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      if (!this.orderId || !this.ticketId) {
+        console.warn('QuestionnaireTicket: orderId и ticketId обязательны для загрузки фото');
+        return;
+      }
+
+      this.uploadingPhoto = true;
+      this.uploadPhoto({
+        file,
+        orderId: this.orderId,
+        ticketId: this.ticketId,
+        callback: (photoUrl) => {
+          this.uploadingPhoto = false;
+          this.updateField(fieldName, photoUrl);
+        },
+      }).catch(() => {
+        this.uploadingPhoto = false;
+      });
+    },
   }
 }
 </script>

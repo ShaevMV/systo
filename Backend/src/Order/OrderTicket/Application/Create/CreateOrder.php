@@ -145,6 +145,34 @@ final class CreateOrder
     }
 
 
+    public function createAndSaveForCurator(
+        OrderTicketDto $orderTicketDto,
+    ): bool
+    {
+        DB::beginTransaction();
+        try {
+            $this->commandBus->dispatch(new CreatingOrderCommand($orderTicketDto));
+
+            $orderTicket = OrderTicket::toCreateForCurator($orderTicketDto);
+
+            foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
+                $this->historyRepository->save(new SaveHistoryDto(
+                    aggregateId: $orderTicketDto->getId()->value(),
+                    event:       $historyEvent,
+                    actorId:     $orderTicketDto->getCuratorId()?->value(),
+                    actorType:   ActorType::USER,
+                ));
+            }
+
+            DB::commit();
+        } catch (Throwable $throwable) {
+            DB::rollBack();
+            throw $throwable;
+        }
+
+        return true;
+    }
+
     /**
      * @param GuestsDto[] $ticket
      * @return array

@@ -419,6 +419,22 @@ final class OrderTicket extends AggregateRoot
         }
     }
 
+    /**
+     * Создание заказа куратора — статус new_for_list, ожидает модерации администратора.
+     * Билеты и уведомления НЕ генерируются до подтверждения.
+     */
+    public static function toCreateForCurator(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: Status::NEW_FOR_LIST,
+            toStatus:   Status::NEW_FOR_LIST,
+        ));
+
+        return $result;
+    }
+
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
     {
         if (is_null($comment)) {

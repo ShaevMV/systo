@@ -88,6 +88,11 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
                 'value' => $filterQuery->getIsLiveTicket(),
             ],
             [
+                'field' => TicketTypesModel::TABLE . '.is_list_ticket',
+                'operator' => FilterOperator::EQUAL,
+                'value' => $filterQuery->getIsListTicket(),
+            ],
+            [
                 'field' => TicketTypeFestivalModel::TABLE . '.festival_id',
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getFestivalId()?->value(),

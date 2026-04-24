@@ -112,6 +112,19 @@
                   <small class="form-text text-muted"> {{ getError('is_live_ticket') }}</small>
                 </div>
                 <div class="row mb-3">
+                  <label for="validationIsListTicket" class="col-4 col-form-label">Билет-список:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="isListTicket"
+                            id="validationIsListTicket">
+                      <option value=null>Выберите</option>
+                      <option value="false">Нет</option>
+                      <option value="true">Да</option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('is_list_ticket') }}</small>
+                </div>
+                <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Активность:</label>
                   <div class="col-8">
                     <select class="form-select"
@@ -197,6 +210,7 @@ export default {
       newSort: null,
       newActive: null,
       newIsLiveTicket: null,
+      newIsListTicket: null,
       newFestivalId: null,
       newDescription: null,
       newEmail: null,
@@ -328,6 +342,17 @@ export default {
         this.newIsLiveTicket = newValue;
       },
     },
+    isListTicket: {
+      get: function () {
+        if (this.newIsListTicket === null) {
+          return this.getItem.is_list_ticket;
+        }
+        return this.newIsListTicket;
+      },
+      set: function (newValue) {
+        this.newIsListTicket = newValue;
+      },
+    },
     questionnaire_type_id: {
       get: function () {
         if (this.newQuestionnaireTypeId === null) {
@@ -358,6 +383,7 @@ export default {
         'sort': this.sortItem,
         'active': this.active,
         'is_live_ticket': this.isLiveTicket,
+        'is_list_ticket': this.isListTicket,
         'festival_id': this.festival_id,
         'festival_pdf': this.festival_pdf,
         'festival_email': this.festival_email,

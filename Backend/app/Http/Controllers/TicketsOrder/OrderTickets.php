@@ -16,8 +16,12 @@ use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Shared\Domain\Criteria\Order;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\History\Application\GetHistory\GetOrderHistory;
+use Tickets\TicketType\Application\GetList\TicketTypeGetListFilter;
+use Tickets\TicketType\Application\GetList\TicketTypeGetListQuery;
+use Tickets\TicketType\Application\TicketTypeApplication;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
@@ -40,18 +44,19 @@ use Tickets\User\Account\Helpers\AccountRoleHelper;
 class OrderTickets extends Controller
 {
     public function __construct(
-        private CreateOrder        $createOrder,
-        private GetTicketType      $getTicketType,
-        private AccountApplication $accountApplication,
-        private PriceService       $priceService,
-        private GetOrder           $getOrder,
-        private TotalNumber        $totalNumber,
-        private ChangeStatus       $chanceStatus,
-        private ChangeOrderPrice   $changeOrderPrice,
-        private TicketApplication  $ticketApplication,
-        private AddComment         $addComment,
-        private ChangeTicket       $changeTicket,
-        private GetOrderHistory    $getOrderHistory,
+        private CreateOrder           $createOrder,
+        private GetTicketType         $getTicketType,
+        private AccountApplication    $accountApplication,
+        private PriceService          $priceService,
+        private GetOrder              $getOrder,
+        private TotalNumber           $totalNumber,
+        private ChangeStatus          $chanceStatus,
+        private ChangeOrderPrice      $changeOrderPrice,
+        private TicketApplication     $ticketApplication,
+        private AddComment            $addComment,
+        private ChangeTicket          $changeTicket,
+        private GetOrderHistory       $getOrderHistory,
+        private TicketTypeApplication $ticketTypeApplication,
        // private Billing            $billing,
     )
     {
@@ -199,6 +204,83 @@ class OrderTickets extends Controller
         }
     }
 
+
+    /**
+     * Создать заказ куратора — статус new_for_list, ожидает модерации администратора
+     */
+    public function createCurator(Request $request): JsonResponse
+    {
+        try {
+            $curatorId = new Uuid(Auth::id());
+            $festivalId = $request->festival_id;
+            $locationId = new Uuid($request->location_id);
+            $guests = $request->guests;
+
+            // Автоматически находим тип билета "Список" для данного фестиваля
+            $listTypes = $this->ticketTypeApplication->getList(
+                new TicketTypeGetListQuery(
+                    TicketTypeGetListFilter::fromState([
+                        'is_list_ticket' => 'true',
+                        'festival_id'    => $festivalId,
+                    ]),
+                    Order::fromState([]),
+                )
+            )->getCollection();
+
+            if ($listTypes->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Тип билета "Список" не настроен для данного фестиваля',
+                ], 422);
+            }
+
+            /** @var \Tickets\TicketType\Dto\TicketTypeDto $ticketType */
+            $ticketType = $listTypes->first();
+
+            $priceDto = new PriceDto(
+                (int)($request->price ?? 0),
+                count($guests),
+                0
+            );
+
+            $data = $request->toArray();
+            $data['guests'] = $guests;
+            $data['ticket_type_id'] = $ticketType->getId()->value();
+            $data['types_of_payment_id'] = '613d6bb9-a3a0-480e-ade8-05625fc19544';
+            $data['status'] = Status::NEW_FOR_LIST;
+
+            $orderTicketDto = OrderTicketDto::fromState(
+                $data,
+                $curatorId,
+                $priceDto,
+                curatorId: $curatorId,
+                locationId: $locationId,
+            );
+
+            $this->createOrder->createAndSaveForCurator($orderTicketDto);
+
+            if ($request->comment) {
+                $this->addComment->send(
+                    $orderTicketDto->getId(),
+                    $curatorId,
+                    $request->comment
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Заказ куратора создан и ожидает модерации администратора',
+            ]);
+
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'link'    => $exception->getLine(),
+                'file'    => $exception->getFile(),
+            ]);
+        }
+    }
 
     /**
      * Получить список заказов от пользователя
