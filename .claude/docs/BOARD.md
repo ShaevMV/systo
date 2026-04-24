@@ -11,20 +11,13 @@
 | **Обновление Laravel 11** <br>*(ЗАБЛОКИРОВАНО до 1 ИЮНЯ)* <br>👤 *Tech Lead* | **Настройка CI/CD (GitHub Actions)** <br>*(Автотесты и деплой)* <br>👤 *DevOps* | **Исправление опечаток** <br>*(Friendly, ChangeStatus/Role)* |
 | | **Рефакторинг Shared в Baza** <br>*(Бардак в коде приложения)* <br>👤 *Tech Lead* | **Создание Project Memory** <br>*(Контекст и предпочтения)* |
 | | **Логирование действий админов** <br>*(Безопасность)* <br>👤 *DevOps* | **Создание Project Board** <br>*(Визуализация задач)* |
-| **🎭 Этап 2: Анкета участника с фото** <br>*(questionnaire_type `curator_participant`, загрузка фото для бейджа)* <br>👤 *Backend + Frontend* | **📧 Friendly email при смене статуса** <br>*(ChangeStatusCommandHandler → friendly email)* <br>👤 *Business Analyst* | **История заказов** <br>*(модуль History, Event Sourcing, UI для admin)* |
+| | **📧 Friendly email при смене статуса** <br>*(ChangeStatusCommandHandler → friendly email)* <br>👤 *Business Analyst* | **История заказов** <br>*(модуль History, Event Sourcing, UI для admin)* |
 | | | **Этап 1: Локации + Куратор** <br>*(Location CRUD, роли curator/curator_pusher, статусы new_for_list/pending_curator, is_list_ticket, createCurator API)* |
+| | | **Этап 2: Анкета участника с фото** <br>*(questionnaire_type `curator_participant`, uploadPhoto endpoint, 10 тестов)* |
 
 ---
 
 ### 📝 Статус
-- **Всего задач в бэклоге:** 7
-- **В работе:** 1 (Этап 2: Анкета участника с фото)
+- **Всего задач в бэклоге:** 6
+- **В работе:** 0
 - **Критичных проблем:** 2 (Тесты, Воркер)
-
-### 🚀 Этап 2 (следующий)
-**Задача:** Тип анкеты `curator_participant` с загрузкой фото для бейджа.
-**Компоненты:**
-1. Новый `QuestionnaireType` с кодом `curator_participant` — поля: имя, контакт, фото.
-2. Эндпоинт загрузки фото: `POST /api/v1/questionnaire/uploadPhoto` — сохраняет в `storage/app/public/badges/`.
-3. Связь `ticket_type.questionnaire_type_id` → `curator_participant` для типов `is_list_ticket=true`.
-4. Frontend: форма анкеты с input[type=file] для фото.

@@ -435,6 +435,24 @@
 
 ---
 
+### POST `/api/v1/questionnaire/uploadPhoto/{orderId}/{ticketId}`
+**Middleware:** публичный
+
+**Request:** `multipart/form-data`
+- `photo`: image (jpeg/jpg/png/webp), max 5MB (required)
+
+**Response 200:**
+```json
+{ "success": true, "photo_url": "https://org.spaceofjoy.ru/storage/badges/{festival_id}/{ticketId}.jpg" }
+```
+
+**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
+**Response 422:** `{ "success": false, "errors": { "photo": [...] } }`
+
+**Описание:** Загрузка фото участника для бейджа. Фото сохраняется в `storage/app/public/badges/{festival_id}/{ticketId}.ext`. Вернувшийся `photo_url` передаётся в поле `photo` при отправке анкеты через `/send/{orderId}/{ticketId}`.
+
+---
+
 ## 6. Типы анкет
 
 Префикс: **`/api/v1/questionnaireType`**
@@ -554,7 +572,7 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, questionnaire/uploadPhoto |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
 | **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory |
 | **role: seller,admin** | order/getList, order/toChangeStatus |

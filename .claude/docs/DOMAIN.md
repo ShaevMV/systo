@@ -554,3 +554,21 @@ pending_curator → [paid, cancel, difficulties_arose]
 ```
 
 **Логика:** тип билета с `is_list_ticket=true` находится автоматически по `festival_id`. Создаётся заказ со статусом `new_for_list`. Билеты не генерируются до одобрения администратором.
+
+---
+
+## Тип анкеты curator_participant (2026-04-23)
+
+UUID: `e5f6a7b8-c9d0-1234-ef01-567890123456`, код: `curator_participant`.
+
+Привязывается к типам билетов с `is_list_ticket=true` через `ticket_type.questionnaire_type_id`.
+
+**Поля:**
+
+| Name | Тип | Required | Описание |
+|------|-----|----------|----------|
+| `participantName` | string | ✅ | Имя участника |
+| `contact` | string | ✅ | Контакт |
+| `photo` | file | ❌ | Фото для бейджа (загружается отдельно через `uploadPhoto`) |
+
+**Загрузка фото:** `POST /api/v1/questionnaire/uploadPhoto/{orderId}/{ticketId}` (публичный). Файл сохраняется в `storage/app/public/badges/{festival_id}/{ticketId}.ext`, возвращает `photo_url`, который затем передаётся полем `photo` в `/send/{orderId}/{ticketId}`.
