@@ -194,6 +194,39 @@ export const getQuestionnaire = (context, payload) => {
 };
 
 /**
+ * Загрузить фото участника для бейджа
+ *
+ * @param context
+ * @param payload {{ file: File, orderId: string, ticketId: string, callback: function }}
+ * @returns {Promise<unknown>}
+ */
+export const uploadPhoto = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append('photo', payload.file);
+
+        axios.post(API + '/uploadPhoto/' + payload.orderId + '/' + payload.ticketId, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        })
+            .then(response => {
+                const photoUrl = response.data.photo_url;
+                if (payload.callback) {
+                    payload.callback(photoUrl);
+                }
+                resolve(photoUrl);
+            })
+            .catch(error => {
+                if (error.response && error.response.data && error.response.data.errors) {
+                    context.commit('setError', error.response.data.errors);
+                } else {
+                    context.commit('setError', {});
+                }
+                reject(error);
+            });
+    });
+};
+
+/**
  * Загрузить анкету по orderId и ticketId для предзаполнения
  *
  * @param context
