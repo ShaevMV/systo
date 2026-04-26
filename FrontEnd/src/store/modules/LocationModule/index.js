@@ -10,7 +10,7 @@ export default {
         filter: {},
         orderBy: {},
         isLoading: false,
-        dataError: [],
+        dataError: {},
         message: null,
     },
     getters,

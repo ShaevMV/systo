@@ -27,6 +27,7 @@ use Throwable;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForCuratorListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
@@ -364,6 +365,39 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         foreach ($rawData as $datum) {
             $result[] = OrderTicketItemForFriendlyListResponse::fromState($datum);
+        }
+
+        return $result;
+    }
+
+    public function getCuratorList(Filters $filters): array
+    {
+        /** @var Builder $builder */
+        $builder = $this->model
+            ->leftJoin(TicketTypesModel::TABLE, $this->model::TABLE . '.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE . '.id')
+            ->leftJoin(User::TABLE, $this->model::TABLE . '.curator_id',
+                '=',
+                User::TABLE . '.id')
+            ->select([
+                $this->model::TABLE . '.*',
+                TicketTypesModel::TABLE . '.name',
+                User::TABLE . '.name as pusher_name',
+                User::TABLE . '.email as pusher_email',
+            ])
+            ->whereNotNull($this->model::TABLE . '.curator_id')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
+            ->orderBy($this->model::TABLE . '.kilter', 'DESC');
+
+        $rawData = FilterBuilder::build($builder, $filters)
+            ->get()
+            ->toArray();
+
+        $result = [];
+
+        foreach ($rawData as $datum) {
+            $result[] = OrderTicketItemForCuratorListResponse::fromState($datum);
         }
 
         return $result;

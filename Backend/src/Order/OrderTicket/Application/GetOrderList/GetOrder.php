@@ -6,8 +6,10 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList;
 
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterForFriendlyQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForCurator\OrderFilterQuery as OrderFilterForCuratorQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderListFilterQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderListFilterQueryHandler as OrderFilterForFriendlyQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForCurator\OrderListFilterQueryHandler as OrderFilterForCuratorQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHandler;
@@ -27,12 +29,14 @@ class GetOrder
         OrderItemQueryHandler $itemQueryHandler,
         OrderListFilterQueryHandler $filterQueryHandler,
         OrderFilterForFriendlyQueryHandler $orderListFilterQueryHandler,
+        OrderFilterForCuratorQueryHandler $orderFilterForCuratorQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             UserIdQuery::class => $handler,
             OrderIdQuery::class => $itemQueryHandler,
             OrderFilterQuery::class => $filterQueryHandler,
             OrderFilterForFriendlyQuery::class => $orderListFilterQueryHandler,
+            OrderFilterForCuratorQuery::class => $orderFilterForCuratorQueryHandler,
         ]);
     }
 
@@ -74,6 +78,20 @@ class GetOrder
     public function listByFilterForFriendly(OrderFilterForFriendlyQuery $filterQuery): ?ListResponse
     {
                 /** @var null|ListResponse $listItem */
+        $listItem = $this->queryBus->ask($filterQuery);
+
+        return $listItem;
+    }
+
+    /**
+     * Вывести список заказов куратора по фильтру
+     *
+     * @param  OrderFilterForCuratorQuery  $filterQuery
+     * @return ListResponse|null
+     */
+    public function listByFilterForCurator(OrderFilterForCuratorQuery $filterQuery): ?ListResponse
+    {
+        /** @var null|ListResponse $listItem */
         $listItem = $this->queryBus->ask($filterQuery);
 
         return $listItem;

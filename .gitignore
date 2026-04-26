@@ -22,4 +22,4 @@
 
 # Тестовые артефакты
 Backend/tests/**/QR/*.png
-Backend/storage/app/public/tickets/*.pdf
+Backend/storage/app/public/tickets/*.pdf.claude/worktrees/

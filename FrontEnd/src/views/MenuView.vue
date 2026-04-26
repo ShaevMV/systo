@@ -78,8 +78,13 @@
     <template v-if="isAuth && isCurator && !isAdmin">
       <li class="nav-heading">Работа</li>
       <li class="nav-item">
-        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersCurator' }">
           Мои заказы-списки
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'OrderCreateForCurator' }">
+          Создать заказ
         </router-link>
       </li>
       <li class="nav-heading">Аккаунт</li>
@@ -174,7 +179,7 @@
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrders' }">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersCurator' }">
           Все заказы кураторов
         </router-link>
       </li>

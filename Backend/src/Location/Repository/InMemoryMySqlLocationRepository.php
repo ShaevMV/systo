@@ -49,8 +49,8 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
             }
         }
 
-        if ($orderBy->hasOrder()) {
-            $build->orderBy($orderBy->orderBy(), $orderBy->order());
+        if (!$orderBy->isNone()) {
+            $build->orderBy($orderBy->orderBy()->value(), $orderBy->orderType()->value());
         } else {
             $build->orderBy(LocationModel::TABLE . '.sort', 'asc');
         }
@@ -76,6 +76,8 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
             'name'                  => $data->getName(),
             'description'           => $data->getDescription(),
             'questionnaire_type_id' => $data->getQuestionnaireTypeId()?->value(),
+            'email_template'        => $data->getEmailTemplate(),
+            'pdf_template'          => $data->getPdfTemplate(),
             'active'                => $data->isActive(),
             'sort'                  => $data->getSort(),
         ]);
@@ -86,11 +88,14 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
     public function editItem(Uuid $id, LocationDto $data): bool
     {
         $this->model::where('id', $id->value())->update([
-            'festival_id' => $data->getFestivalId()->value(),
-            'name'        => $data->getName(),
-            'description' => $data->getDescription(),
-            'active'      => $data->isActive(),
-            'sort'        => $data->getSort(),
+            'festival_id'           => $data->getFestivalId()->value(),
+            'name'                  => $data->getName(),
+            'description'           => $data->getDescription(),
+            'questionnaire_type_id' => $data->getQuestionnaireTypeId()?->value(),
+            'email_template'        => $data->getEmailTemplate(),
+            'pdf_template'          => $data->getPdfTemplate(),
+            'active'                => $data->isActive(),
+            'sort'                  => $data->getSort(),
         ]);
 
         return true;

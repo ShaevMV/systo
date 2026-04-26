@@ -15,6 +15,9 @@ export default {
     }
   },
   beforeRouteEnter: (to, from, next) => {
+    window.store.dispatch('appFestivalTickets/getListFestival');
+    window.store.dispatch('appTicketType/loadTemplate');
+    window.store.dispatch('appLocation/clearItem');
     if (to.params.id) {
       window.store.dispatch('appLocation/loadItem', {
         id: to.params.id,

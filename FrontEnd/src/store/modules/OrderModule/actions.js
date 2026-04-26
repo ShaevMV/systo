@@ -20,6 +20,18 @@ export const goToCreateOrderTicket = (context, payload) => {
 }
 
 
+export const goToCreateCuratorOrderTicket = (context, payload) => {
+    let promise = axios.post(API_ORDER + '/createList', payload);
+    promise.then(function (response) {
+        if (payload.callback) payload.callback(response.data.success, response.data.message);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response?.data?.errors || error.message);
+        if (payload.callbackError) payload.callbackError(error.response?.data?.message);
+    });
+}
+
+
 export const goToCreateFrendlyOrderTicket = (context, payload) => {
     let promise = axios.post(API_ORDER + '/createFriendly', payload);
     promise.then(function (response) {
@@ -72,6 +84,19 @@ export const getOrderListForAdmin = (context, payload) => {
     const filter = payload || context.state.filter || {};
     console.log(filter);
     let promise = axios.post(API_ORDER + '/getList', filter);
+    promise.then(function (response) {
+        context.commit('setOrderUserList', response.data.list);
+        context.commit('setTotalNumber', response.data.totalNumber);
+        context.commit('setLoaging', false);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response?.data?.errors || error.message);
+    });
+}
+
+export const getOrderListForCurator = (context, payload) => {
+    const filter = payload || context.state.filter || {};
+    let promise = axios.post(API_ORDER + '/getListForCurator', filter);
     promise.then(function (response) {
         context.commit('setOrderUserList', response.data.list);
         context.commit('setTotalNumber', response.data.totalNumber);

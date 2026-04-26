@@ -4,7 +4,9 @@ FROM php:8.2-fpm-bookworm
 ENV HOME ${WORKING_DIR}
 
 
-RUN apt-get update && apt-get install -y \
+RUN rm -rf /var/lib/apt/lists/* \
+        && apt-get update --fix-missing \
+        && apt-get install -y --no-install-recommends \
         libpng-dev \
         zlib1g-dev \
         libxml2-dev \
@@ -18,7 +20,6 @@ RUN apt-get update && apt-get install -y \
         unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng-dev \
         && docker-php-ext-configure gd --with-freetype --with-jpeg \
         && docker-php-ext-install -j$(nproc) gd \
         && docker-php-ext-install pdo_mysql \
@@ -29,7 +30,6 @@ RUN apt-get update && apt-get install -y \
         && docker-php-source delete \
         && rm -rf /var/lib/apt/lists/*
 
-COPY vhost.conf /etc/apache2/sites-available/000-default.conf
 COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
 
 #composer

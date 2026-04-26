@@ -51,6 +51,7 @@ class OrderTicketDto
         protected ?Uuid    $friendly_id = null,
         protected ?Uuid    $curator_id = null,
         protected ?Uuid    $location_id = null,
+        protected ?string  $project = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -97,6 +98,7 @@ class OrderTicketDto
             friendly_id: $pusherId,
             curator_id: $curatorId,
             location_id: $locationId,
+            project: $data['project'] ?? null,
         );
     }
 
@@ -133,6 +135,7 @@ class OrderTicketDto
             'friendly_id' => $this->friendly_id?->value(),
             'curator_id' => $this->curator_id?->value(),
             'location_id' => $this->location_id?->value(),
+            'project' => $this->project,
         ];
     }
 
@@ -243,5 +246,10 @@ class OrderTicketDto
     public function getFriendlyId(): ?Uuid
     {
         return $this->friendly_id;
+    }
+
+    public function getProject(): ?string
+    {
+        return $this->project;
     }
 }

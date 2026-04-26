@@ -27,7 +27,7 @@
                     >
                     </div>
                     <new-ticket
-                        v-if="(isAdmin || isPusher)"
+                        v-if="(isAdmin || isPusher || isCurator)"
                         :oldGuests="getOrderItem.guests"
                     />
                   </td>
@@ -50,7 +50,7 @@
                       class="btn btn-primary x-button">Назад в МОИ ОРГВЗНОСЫ</button>
 
               <order-history
-                  v-if="isAdmin"
+                  v-if="isAdmin || isCurator"
                   :order-id="getId"
               />
             </div>
@@ -76,6 +76,7 @@ export default {
     ...mapGetters('appUser', [
       'isAdmin',
       'isPusher',
+      'isCurator',
     ]),
     /**
      * Вывести названия билета

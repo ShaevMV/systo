@@ -58,9 +58,12 @@
                       id="validationDefault01">
                 <option value=null>Выберите</option>
                 <option value="admin">Админ</option>
-                <option value="seller">реализатор живых билетов</option>
-                <option value="pusher">раелизатор френдли билетов</option>
-                <option value="guest">ГОСТь фестиваля</option>
+                <option value="seller">Продавец живых билетов</option>
+                <option value="pusher">Продавец Friendly билетов</option>
+                <option value="guest">Гость фестиваля</option>
+                <option value="manager">Менеджер</option>
+                <option value="curator">Куратор</option>
+                <option value="curator_pusher">Куратор + Пушер</option>
               </select>
             </div>
             <div class="row b-row mt-2">

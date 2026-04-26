@@ -63,6 +63,14 @@ interface OrderTicketRepositoryInterface
     public function getFriendlyList(Filters $filters): array;
 
     /**
+     * Получить список заказов-списков кураторов по фильтру
+     *
+     * @param  Filters  $filters
+     * @return \Tickets\Order\OrderTicket\Responses\OrderTicketItemForCuratorListResponse[]
+     */
+    public function getCuratorList(Filters $filters): array;
+
+    /**
      * Сменить статус заказа
      *
      * @param Uuid $orderId

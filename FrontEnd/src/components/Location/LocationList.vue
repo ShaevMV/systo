@@ -2,6 +2,12 @@
   <div class="title-block text-center">
     <h1 class="card-title"> Локации </h1>
   </div>
+  <filter-location/>
+  <div class="row mb-3">
+    <div class="col-lg-12 mx-auto">
+      <button class="btn btn-primary" @click="goToCreate">Создать локацию</button>
+    </div>
+  </div>
   <div class="row">
     <div class="col-lg-12 mx-auto" id="filter-results">
       <div class="card">
@@ -54,10 +60,11 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
 import DateFormat from "@/components/Utilite/DateFormat.vue";
+import FilterLocation from "@/components/Location/FilterLocation.vue";
 
 export default {
   name: "LocationList",
-  components: {DateFormat},
+  components: {DateFormat, FilterLocation},
   computed: {
     ...mapGetters('appLocation', [
         'getList',
@@ -84,8 +91,10 @@ export default {
       });
     },
     goToItem(id) {
-      const route = this.$router.resolve({ name: 'LocationItemView', params: { id: id } });
-      window.open(route.href, '_blank');
+      this.$router.push({ name: 'LocationItemView', params: { id: id } });
+    },
+    goToCreate() {
+      this.$router.push({ name: 'LocationItemView' });
     },
   },
   async created() {

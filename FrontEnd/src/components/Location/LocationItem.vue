@@ -20,15 +20,53 @@
                   <small class="form-text text-muted"> {{ getError('name') }}</small>
                 </div>
                 <div class="row mb-3">
-                  <label for="location-festival-id" class="col-4 col-form-label">Фестиваль ID:</label>
+                  <label for="location-festival-id" class="col-4 col-form-label">Фестиваль:</label>
                   <div class="col-8">
-                    <input name="location-festival-id"
-                           type="text"
-                           class="form-control"
-                           v-model="festival_id"
-                           id="location-festival-id">
+                    <select class="form-select"
+                            v-model="festival_id"
+                            id="location-festival-id">
+                      <option v-for="festivalItem in getFestivalList"
+                              v-bind:key="festivalItem.id"
+                              :selected="festivalItem.id == festival_id"
+                              v-bind:value="festivalItem.id">{{ festivalItem.name }} {{ festivalItem.year }}
+                      </option>
+                    </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('festival_id') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="location-pdf-template" class="col-4 col-form-label">Имя файла для шаблона билета
+                    (Backend/resources/views):</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="pdf_template"
+                            id="location-pdf-template">
+                      <option value=null>Выберите</option>
+                      <option v-for="item in getTemplatePdf"
+                              v-bind:key="item"
+                              :selected="item == pdf_template"
+                              v-bind:value="item">{{ item }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('pdf_template') }}</small>
+                </div>
+                <div class="row mb-3">
+                  <label for="location-email-template" class="col-4 col-form-label">Шаблон письма
+                    (Backend/resources/views/email):</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="email_template"
+                            id="location-email-template">
+                      <option value=null>Выберите</option>
+                      <option v-for="item in getTemplateEmail"
+                              v-bind:key="item"
+                              :selected="item == email_template"
+                              v-bind:value="item">{{ item }}
+                      </option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('email_template') }}</small>
                 </div>
                 <div class="row mb-3">
                   <label for="location-sort" class="col-4 col-form-label">Сортировка:</label>
@@ -121,6 +159,8 @@ export default {
       newActive: null,
       newDescription: null,
       newQuestionnaireTypeId: undefined,
+      newEmailTemplate: undefined,
+      newPdfTemplate: undefined,
       questionnaireTypeList: [],
     }
   },
@@ -132,6 +172,13 @@ export default {
       'getError',
       'getItem',
       'getMessage',
+    ]),
+    ...mapGetters('appFestivalTickets', [
+      'getFestivalList',
+    ]),
+    ...mapGetters('appTicketType', [
+      'getTemplateEmail',
+      'getTemplatePdf',
     ]),
     name: {
       get: function () {
@@ -155,10 +202,33 @@ export default {
         this.newFestivalId = newValue;
       },
     },
+    pdf_template: {
+      get: function () {
+        if (this.newPdfTemplate === undefined) {
+          return this.getItem.pdf_template ?? null;
+        }
+        return this.newPdfTemplate;
+      },
+      set: function (newValue) {
+        this.newPdfTemplate = newValue;
+      },
+    },
+    email_template: {
+      get: function () {
+        if (this.newEmailTemplate === undefined) {
+          return this.getItem.email_template ?? null;
+        }
+        return this.newEmailTemplate;
+      },
+      set: function (newValue) {
+        this.newEmailTemplate = newValue;
+      },
+    },
     sort: {
       get: function () {
         if (this.newSort === null) {
-          return this.getItem.sort;
+          const val = this.getItem?.sort;
+          return typeof val === 'number' ? val : 0;
         }
         return this.newSort;
       },
@@ -224,6 +294,8 @@ export default {
         'active': this.active,
         'description': this.description,
         'questionnaire_type_id': this.questionnaire_type_id,
+        'email_template': this.email_template,
+        'pdf_template': this.pdf_template,
       };
 
       if (this.id !== null && this.id !== undefined && this.id !== '') {

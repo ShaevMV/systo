@@ -7,7 +7,7 @@ export const setList = (state, payload) => {
 };
 
 export const setItem = (state, payload) => {
-    state.item = payload;
+    state.item = (payload && typeof payload === 'object' && !Array.isArray(payload)) ? payload : {};
 };
 
 export const setMessage = (state, payload) => {

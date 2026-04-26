@@ -94,9 +94,11 @@ export default {
       return {
         admin: 'Админ',
         seller: 'Продовец живых билетов',
-        pusher: 'Френдли Продовец ',
+        pusher: 'Френдли Продовец',
         guest: 'Гость',
         manager: 'Менеджер',
+        curator: 'Куратор',
+        curator_pusher: 'Куратор + Пушер',
       };
     },
   },

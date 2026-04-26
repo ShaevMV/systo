@@ -6,35 +6,17 @@ namespace Tickets\Order\OrderTicket\Responses;
 
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 
-class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implements Response
+class OrderTicketItemForCuratorListResponse extends AbstractionEntity implements Response
 {
     protected int $count;
     protected string $humanStatus;
 
-    /**
-     * @param Uuid $id
-     * @param int $kilter
-     * @param string $email
-     * @param string $name
-     * @param int $price
-     * @param GuestsDto[] $guests
-     * @param string $typeOfPaymentName
-     * @param Status $status
-     * @param string $dateBuy
-     * @param array $listCorrectNextStatus
-     * @param string $idBuy
-     * @param float $priceWithoutDiscount
-     * @param string|null $lastComment
-     * @param string|null $promoCode
-     * @param int $discount
-     * @param string|null $city
-     */
     public function __construct(
         protected Uuid    $id,
         protected int     $kilter,
@@ -47,16 +29,12 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         protected ?string $phone = null,
         protected ?string $pusher_name = null,
         protected ?string $pusher_email = null,
-        protected ?Uuid $userId = null,
+        protected ?Uuid   $userId = null,
+        protected ?string $project = null,
     )
     {
-        $this->count = self::getGuestsCount($guests);
+        $this->count = count($guests);
         $this->humanStatus = $this->status->getHumanStatus();
-    }
-
-    private static function getGuestsCount(array $guests): int
-    {
-        return count($guests);
     }
 
     /**
@@ -71,6 +49,7 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         }
         $status = new Status($data['status']);
         $userId = empty($data['user_id']) ? null : new Uuid($data['user_id']);
+
         return new self(
             new Uuid($data['id']),
             $data['kilter'],
@@ -84,6 +63,7 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
             $data['pusher_name'] ?? null,
             $data['pusher_email'] ?? null,
             $userId,
+            $data['project'] ?? null,
         );
     }
 
@@ -92,14 +72,19 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         return $this->status;
     }
 
-    public function getPrice(): int
+    public function getId(): Uuid
     {
-        return $this->price;
+        return $this->id;
     }
 
-    public function getCount(): int
+    public function getKilter(): int
     {
-        return $this->count;
+        return $this->kilter;
+    }
+
+    public function getDiscount(): int
+    {
+        return 0;
     }
 
     /**
@@ -122,21 +107,6 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
         return $result;
     }
 
-    public function getId(): Uuid
-    {
-        return $this->id;
-    }
-
-    public function getKilter(): int
-    {
-        return $this->kilter;
-    }
-
-    public function getDiscount(): int
-    {
-        return 0;
-    }
-
     public function setGuests(array $guests): self
     {
         $this->guests = $guests;
@@ -147,5 +117,10 @@ class OrderTicketItemForFriendlyListResponse extends AbstractionEntity implement
     public function getUserId(): ?Uuid
     {
         return $this->userId;
+    }
+
+    public function getProject(): ?string
+    {
+        return $this->project;
     }
 }

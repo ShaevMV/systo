@@ -28,6 +28,7 @@ use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForCurator\OrderFilterQuery as OrderFilterQueryForCurator;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
@@ -358,6 +359,25 @@ class OrderTickets extends Controller
             ]);
     }
 
+
+    public function getListForCurator(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $listResponse = $this->getOrder->listByFilterForCurator(
+            OrderFilterQueryForCurator::fromState(
+                $filterForTicketOrder->toArray(),
+                $user->role === AccountRoleHelper::admin ? null : new Uuid(Auth::id()),
+            )
+        ) ?? new ListResponse();
+
+        return response()->json(
+            [
+                'list' => $listResponse->toArray(),
+                'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray()
+            ]);
+    }
 
     /**
      * Получить определённый заказ

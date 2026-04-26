@@ -2,7 +2,9 @@ FROM php:8.2-fpm-bookworm
 
 WORKDIR /var/www/html
 
-RUN apt-get update && apt-get install -y \
+RUN rm -rf /var/lib/apt/lists/* \
+        && apt-get update --fix-missing \
+        && apt-get install -y --no-install-recommends \
         libpng-dev \
         zlib1g-dev \
         libxml2-dev \
@@ -16,7 +18,6 @@ RUN apt-get update && apt-get install -y \
         unzip \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
-        libpng-dev \
         && docker-php-ext-configure gd --with-freetype --with-jpeg \
         && docker-php-ext-install -j$(nproc) gd \
         && docker-php-ext-install pdo_mysql \
@@ -27,24 +28,13 @@ RUN apt-get update && apt-get install -y \
         && docker-php-source delete \
         && rm -rf /var/lib/apt/lists/*
 
-#ENV HOME /var/www/html
-#ENV DOCKER_PHP ${HOME}/docker/php
-
-#COPY docker/php/www.conf /usr/local/etc/php-fpm.d/www.conf
-COPY vhost.conf /etc/apache2/sites-available/000-default.conf
-#COPY custom.ini /usr/local/etc/php/conf.d/custom.ini
-
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-#RUN pecl install xdebug \#
-#    && docker-php-ext-enable xdebug
-
-#
 RUN useradd -m user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 
 # supervisor
-RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists/*
-
-
+RUN apt-get update --fix-missing \
+    && apt-get install -y --no-install-recommends supervisor \
+    && rm -rf /var/lib/apt/lists/*

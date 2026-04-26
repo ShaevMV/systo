@@ -19,6 +19,8 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property string $name
  * @property string|null $description
  * @property string|null $questionnaire_type_id
+ * @property string|null $email_template
+ * @property string|null $pdf_template
  * @property bool $active
  * @property int $sort
  * @property Carbon|null $created_at
@@ -49,6 +51,8 @@ final class LocationModel extends Model
         'name',
         'description',
         'questionnaire_type_id',
+        'email_template',
+        'pdf_template',
         'active',
         'sort',
     ];

@@ -30,10 +30,14 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:pusher,admin');
 
+    Route::post('/getListForCurator',[OrderTickets::class, 'getListForCurator'])
+        ->middleware('auth:api')
+        ->middleware('role:curator,curator_pusher,admin');
+
     // сменить статус заказа АДМИН
     Route::post('/toChangeStatus/{id}', [OrderTickets::class, 'toChangeStatus'])
         ->middleware('auth:api')
-        ->middleware('role:seller,admin,pusher');
+        ->middleware('role:seller,admin,pusher,curator,curator_pusher');
 
     // изменить цену заказа (только admin)
     Route::post('/changePrice/{id}', [OrderTickets::class, 'changePrice'])
@@ -43,7 +47,7 @@ Route::prefix('v1/order')->group(static function (): void {
     // изменить цену заказа (только admin)
     Route::post('/changeTicket/{id}', [OrderTickets::class, 'changeTicket'])
         ->middleware('auth:api')
-        ->middleware('role:admin,pusher');
+        ->middleware('role:admin,pusher,curator,curator_pusher');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])
@@ -59,7 +63,7 @@ Route::prefix('v1/order')->group(static function (): void {
 
     Route::get('/getHistory/{id}', [OrderTickets::class, 'getHistory'])
         ->middleware('auth:api')
-        ->middleware('admin');
+        ->middleware('role:admin,curator,curator_pusher');
 });
 
 

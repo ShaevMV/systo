@@ -1,6 +1,6 @@
-FROM redis:latest
+FROM redis:7.2-alpine
 
-LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
+LABEL maintainer="Systo DevOps"
 
 ## For security settings uncomment, make the dir, copy conf, and also start with the conf, to use it
 #RUN mkdir -p /usr/local/etc/redis

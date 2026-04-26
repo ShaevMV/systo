@@ -69,7 +69,11 @@ export const remove = (context, payload) => {
 };
 
 export const clearError = (context) => {
-    context.commit('setError', []);
+    context.commit('setError', {});
+};
+
+export const clearItem = (context) => {
+    context.commit('setItem', {});
 };
 
 export const setFilter = (context, payload) => {
