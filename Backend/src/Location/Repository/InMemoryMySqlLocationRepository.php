@@ -55,9 +55,8 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
             $build->orderBy(LocationModel::TABLE . '.sort', 'asc');
         }
 
-        return $build->get()->map(
-            fn(LocationModel $model) => LocationDto::fromState($model->toArray())
-        );
+        return $build->get()
+            ->each(fn(LocationModel $model) => LocationDto::fromState($model->toArray()));
     }
 
     public function getItem(Uuid $id): LocationDto

@@ -121,6 +121,25 @@ src/ModuleName/
 4. **Repository** — интерфейс в Domain, реализация в Repositories/
 5. **DTO** — наследуют `AbstractionEntity`, сериализуются автоматически
 
+### ⚠️ Сериализация коллекций в репозиториях (ОБЯЗАТЕЛЬНО)
+
+**Проблема:** `Collection::toArray()` вызывает `toArray()` только на объектах, реализующих `Arrayable`. `AbstractionEntity` не реализует `Arrayable` — при `json_encode` DTO-объекты сериализуются как `{}`.
+
+**Правило:** В методах `getList()` репозитория использовать `each()`, а не `map()`:
+
+```php
+// ✅ ПРАВИЛЬНО — коллекция содержит Eloquent-модели, которые реализуют Arrayable
+return $build->get()
+    ->each(fn(LocationModel $model) => LocationDto::fromState($model->toArray()));
+
+// ❌ НЕПРАВИЛЬНО — коллекция содержит DTO без Arrayable → json_encode выдаёт {}
+return $build->get()->map(
+    fn(LocationModel $model) => LocationDto::fromState($model->toArray())
+);
+```
+
+**Эталонная реализация:** `InMemoryTicketTypeRepository::getList()`
+
 ### Регистрация в DI (TicketsProvider)
 
 ```php
