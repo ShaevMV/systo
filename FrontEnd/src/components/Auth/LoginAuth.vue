@@ -97,8 +97,10 @@ export default {
           } else {
             if (role === 'admin') {
               location.href = '/orders';
-            } else if(role === 'pusher') {
+            } else if (role === 'pusher') {
               location.href = '/frendlyOrder';
+            } else if (role === 'curator' || role === 'curator_pusher') {
+              location.href = '/ordersCurator/create';
             } else {
               location.href = '/hfjlsd65t4732';
             }

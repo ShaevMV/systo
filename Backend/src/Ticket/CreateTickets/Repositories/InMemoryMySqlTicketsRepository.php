@@ -207,6 +207,83 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         }
     }
 
+    public function setInBazaSpisokTicket(Uuid $ticketId): bool
+    {
+        try {
+            $row = $this->model::withTrashed()
+                ->where($this->model::TABLE . '.id', $ticketId->value())
+                ->join(
+                    OrderTicketModel::TABLE,
+                    $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id'
+                )
+                ->leftJoin(
+                    User::TABLE . ' as curator_user',
+                    OrderTicketModel::TABLE . '.curator_id', '=', 'curator_user.id'
+                )
+                ->whereNotNull(OrderTicketModel::TABLE . '.curator_id')
+                ->select([
+                    $this->model::TABLE . '.kilter',
+                    $this->model::TABLE . '.name',
+                    $this->model::TABLE . '.email as ticket_email',
+                    $this->model::TABLE . '.festival_id',
+                    OrderTicketModel::TABLE . '.status',
+                    OrderTicketModel::TABLE . '.project',
+                    OrderTicketModel::TABLE . '.created_at as date_order',
+                    'curator_user.name as curator_name',
+                    'curator_user.email as curator_email',
+                ])
+                ->selectSub(
+                    CommentOrderTicketModel::select('comment')
+                        ->whereColumn('order_tickets_id', $this->model::TABLE . '.order_ticket_id')
+                        ->latest()
+                        ->limit(1)
+                        ->getQuery(),
+                    'last_comment'
+                )
+                ->first()?->toArray();
+
+            if (is_null($row)) {
+                return true; // не куратор-заказ, пропускаем
+            }
+
+            $curator = trim(($row['curator_name'] ?? '') . ' ' . ($row['curator_email'] ?? ''));
+            $email   = $row['ticket_email'] ?? '';
+
+            DB::connection('mysqlBaza')->getPdo();
+
+            if (!DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('uuid', $ticketId->value())->exists()
+            ) {
+                DB::connection('mysqlBaza')->table('spisok_tickets')->insert([
+                    'uuid'        => $ticketId->value(),
+                    'kilter'      => $row['kilter'],
+                    'project'     => $row['project'],
+                    'curator'     => $curator,
+                    'email'       => $email,
+                    'name'        => $row['name'],
+                    'date_order'  => $row['date_order'],
+                    'comment'     => $row['last_comment'],
+                    'status'      => $row['status'],
+                    'festival_id' => $row['festival_id'],
+                ]);
+            } else {
+                DB::connection('mysqlBaza')->table('spisok_tickets')
+                    ->where('uuid', $ticketId->value())
+                    ->update([
+                        'name'    => $row['name'],
+                        'email'   => $email,
+                        'comment' => $row['last_comment'],
+                        'status'  => $row['status'],
+                    ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('setInBazaSpisokTicket error: ' . $e->getMessage(), ['ticketId' => $ticketId->value()]);
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * @throws \Nette\Utils\JsonException
      */

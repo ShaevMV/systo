@@ -213,6 +213,17 @@ class OrderTickets extends Controller
     {
         try {
             $curatorId = new Uuid(Auth::id());
+
+            // Создаём или получаем пользователя по email основного гостя (как в обычном заказе)
+            $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
+                AccountDto::fromState([
+                    'email' => $request->email,
+                    'name'  => $request->name ?? '',
+                    'phone' => $request->phone ?? '',
+                    'city'  => '',
+                ])
+            )->value());
+
             $festivalId = $request->festival_id;
             $locationId = new Uuid($request->location_id);
             $guests = $request->guests;
@@ -272,7 +283,7 @@ class OrderTickets extends Controller
 
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
-                $curatorId,
+                $userId,
                 $priceDto,
                 curatorId: $curatorId,
                 locationId: $locationId,

@@ -22,6 +22,8 @@ interface TicketsRepositoryInterface
 
     public function setInBaza(TicketResponse $ticketsDto): bool;
 
+    public function setInBazaSpisokTicket(Uuid $ticketId): bool;
+
     public function setInBazaLive(int $number, ?Uuid $ticketId = null): bool;
 
     /**

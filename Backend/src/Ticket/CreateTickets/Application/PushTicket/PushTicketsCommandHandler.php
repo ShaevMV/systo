@@ -22,6 +22,8 @@ class PushTicketsCommandHandler implements CommandHandler
 
         if (!$this->ticketsRepository->setInBaza($pushTicketsDto)) {
             throw new DomainException('При записи произошла ошибка '. $command->getId()->value());
-        };
+        }
+
+        $this->ticketsRepository->setInBazaSpisokTicket($command->getId());
     }
 }

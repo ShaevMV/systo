@@ -45,7 +45,7 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
 
         foreach ($filterValues as $filter) {
             if (!empty($filter['value']) || $filter['value'] === false) {
-                $build->where($filter['field'], $filter['operator']->value, $filter['value']);
+                $build->where($filter['field'], $filter['operator'], $filter['value']);
             }
         }
 

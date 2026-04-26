@@ -59,11 +59,12 @@ const routes = [
             'role': ['admin', 'pusher'],
         }
     },
-    // инвайт при старте покупка билета
+    // инвайт при старте покупка билета (недоступно для кураторов)
     {
         path: '/hfjlsd65t4732',
         name: 'home',
-        component: HomeView
+        component: HomeView,
+        meta: { 'forbidCurator': true }
     },
     // инвайт от пользователя
     {
@@ -415,6 +416,14 @@ router.beforeEach((to, from, next) => {
         const lifetime = localStorage['user.token.lifetime'];
         const token = rawToken && rawToken !== 'null' && lifetime
             && Math.trunc(Date.now() / 1000) < +lifetime;
+
+        if (to.matched.some(record => record.meta.forbidCurator)) {
+            const role = localStorage['user.role'] || '';
+            if (token && (role === 'curator' || role === 'curator_pusher')) {
+                next({ path: '/ordersCurator/create' });
+                return;
+            }
+        }
 
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {

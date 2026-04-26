@@ -1,112 +1,198 @@
 <template>
   <div class="container-fluid">
-    <div class="title-block text-center">
-      <h1 class="card-title">Создать заказ куратора</h1>
+    <button
+        type="button"
+        class="btn btn-primary"
+        v-show="false"
+        data-toggle="modal"
+        id="curatorModalOpenBtn"
+        data-target="#curatorSuccessModal"
+    >open
+    </button>
+
+    <div class="modal fade" id="curatorSuccessModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{{ isSuccess ? 'Успех' : 'Ошибка' }}</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">х</span>
+            </button>
+          </div>
+          <div class="modal-body" v-html="message"></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="card">
+
+    <div class="text-center title-block">
+      <h1>Форма регистрации участников от куратора</h1>
+      <small class="form-text text-muted">Solar Systo Togathering 2026</small>
+    </div>
+
+    <div class="row" id="main-form">
+      <div class="col-md-10 mx-auto">
+        <div class="card mt-2 mx-auto">
           <div class="card-body">
+            <div id="contact-form" role="form">
+              <div class="controls">
 
-            <div class="row mb-3">
-              <label class="col-4 col-form-label">Фестиваль:</label>
-              <div class="col-8">
-                <select class="form-select" v-model="festival_id" @change="onFestivalChange">
-                  <option :value="null">Выберите фестиваль</option>
-                  <option v-for="f in getFestivalList" :key="f.id" :value="f.id">
-                    {{ f.name }} {{ f.year }}
-                  </option>
-                </select>
-                <small class="form-text text-danger">{{ getOrderError('festival_id') }}</small>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <label class="col-4 col-form-label">Локация:</label>
-              <div class="col-8">
-                <select class="form-select" v-model="location_id" :disabled="!festival_id">
-                  <option :value="null">Выберите локацию</option>
-                  <option v-for="loc in locationList" :key="loc.id" :value="loc.id">
-                    {{ loc.name }}
-                  </option>
-                </select>
-                <div v-if="selectedLocation && selectedLocation.description" class="mt-1 text-muted small">
-                  {{ selectedLocation.description }}
+                <div class="pp1 row">
+                  <span>ШАГ 1.</span> Введи данные куратора и название проекта:
                 </div>
-                <small class="form-text text-danger">{{ getOrderError('location_id') }}</small>
+                <div class="row y-row">
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="curator_email" class="hidder">Email основного гостя *</label>
+                      <input id="curator_email"
+                             type="email"
+                             class="form-control"
+                             placeholder="Email основного гостя: *"
+                             required
+                             v-model="email"/>
+                      <small class="form-text text-muted">{{ getError('email') }}</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="curator_phone" class="hidder">Телефон основного гостя *</label>
+                      <input id="curator_phone"
+                             type="text"
+                             class="form-control"
+                             placeholder="Телефон основного гостя: *"
+                             required
+                             v-model="phone"/>
+                      <small class="form-text text-muted">{{ getError('phone') }}</small>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label for="curator_project" class="hidder">Название проекта</label>
+                      <input id="curator_project"
+                             type="text"
+                             class="form-control"
+                             placeholder="Название проекта"
+                             v-model="project"/>
+                      <small class="form-text text-muted">{{ getError('project') }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pp1 row">
+                  <span>ШАГ 2.</span> Выбери локацию:
+                </div>
+
+                <div class="mb-3" id="location-type">
+                  <div class="mt-1 col-12">
+                    <div class="in-choice">
+                      <div v-if="locationList.length === 0" class="text-muted">
+                        Загрузка локаций...
+                      </div>
+                      <div class="ticket-choice"
+                           v-for="loc in locationList"
+                           :key="loc.id">
+                        <div class="form-check">
+                          <label class="form-check-label" :for="'loc-' + loc.id">
+                            <input type="radio"
+                                   class="form-check-input"
+                                   v-model="location_id"
+                                   :value="loc.id"
+                                   :id="'loc-' + loc.id"/>
+                            <span class="intckt">
+                              <p>{{ loc.name }}</p>
+                              <small v-if="loc.description" class="text-muted">{{ loc.description }}</small>
+                            </span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                    <small class="form-text text-muted">{{ getError('location_id') }}</small>
+                  </div>
+                </div>
+
+                <div class="row mt-3 mb-3" id="enter-guests">
+                  <div class="pp2">Введи данные всех участников:</div>
+                  <div class="not-first-guest input-group mb-3">
+                    <input type="text"
+                           id="newGuest"
+                           class="form-control"
+                           placeholder="Имя и фамилия участника"
+                           v-model="newGuest"/>
+                    <input type="email"
+                           id="newGuestEmail"
+                           class="form-control"
+                           placeholder="Email участника (необязательно)"
+                           v-model="newGuestEmail"/>
+                    <div class="input-group-prepend">
+                      <span class="input-group-text btn" @click="addGuest()" id="basic-addon1">
+                        Добавить
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row x-row" v-show="guests.length > 0" id="adding-guests">
+                  <div class="col-12">
+                    <div class="form-group">
+                      <div class="input-group mb-3"
+                           v-for="(itemGuest, index) in guests"
+                           :key="index">
+                        <input type="text"
+                               class="form-control"
+                               readonly
+                               :value="itemGuest.value"/>
+                        <input type="email"
+                               class="form-control"
+                               readonly
+                               :value="itemGuest.email"/>
+                        <div class="input-group-prepend">
+                          <span class="input-group-text btn" @click="delGuest(index)">
+                            <i class="fa fa-trash"></i>
+                          </span>
+                        </div>
+                      </div>
+                      <small class="form-text text-muted">{{ getError('guests') }}</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row col-12">
+                  <h4 class="font-weight-normal" id="count-label">
+                    Общее количество участников: <span>{{ guests.length }}</span>
+                  </h4>
+                </div>
+
+                <div class="row mb-3">
+                  <div class="col-12">
+                    <label for="curator_comment">Комментарий</label>
+                    <textarea id="curator_comment"
+                              class="form-control"
+                              rows="2"
+                              v-model="comment"
+                              placeholder="Дополнительный комментарий"></textarea>
+                  </div>
+                </div>
+
+                <div class="row" style="justify-content: center">
+                  <div class="col-12">
+                    <button type="button"
+                            :disabled="!isFormValid || isLoading"
+                            @click="submit"
+                            class="btn btn-lg btn-block btn-outline-primary reg-btn">
+                      <span v-if="isLoading">Отправка...</span>
+                      <span v-else>Зарегистрировать участников</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="row justify-content-center" v-if="!isFormValid" style="text-align: center">
+                  Если кнопка не активна — проверь, заполнены ли все обязательные поля!
+                </div>
+
               </div>
             </div>
-
-            <div class="row mb-3">
-              <label class="col-4 col-form-label">Проект:</label>
-              <div class="col-8">
-                <input type="text"
-                       class="form-control"
-                       v-model="project"
-                       placeholder="Название проекта">
-                <small class="form-text text-danger">{{ getOrderError('project') }}</small>
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <label class="col-4 col-form-label">Комментарий:</label>
-              <div class="col-8">
-                <textarea class="form-control" v-model="comment" rows="2"></textarea>
-              </div>
-            </div>
-
-            <hr>
-
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <strong>Участники:</strong>
-              <button type="button" class="btn btn-sm btn-outline-primary" @click="addGuest">
-                + Добавить участника
-              </button>
-            </div>
-
-            <div v-for="(guest, index) in guests" :key="index" class="row mb-2 align-items-center">
-              <div class="col-5">
-                <input type="text"
-                       class="form-control"
-                       v-model="guest.value"
-                       :placeholder="'Имя участника ' + (index + 1)">
-              </div>
-              <div class="col-5">
-                <input type="email"
-                       class="form-control"
-                       v-model="guest.email"
-                       placeholder="Email (необязательно)">
-              </div>
-              <div class="col-2">
-                <button type="button"
-                        class="btn btn-sm btn-outline-danger"
-                        @click="removeGuest(index)"
-                        :disabled="guests.length <= 1">
-                  ✕
-                </button>
-              </div>
-            </div>
-            <small class="form-text text-danger">{{ getOrderError('guests') }}</small>
-
-            <div v-if="message" class="alert mt-3" :class="isSuccess ? 'alert-success' : 'alert-danger'">
-              {{ message }}
-            </div>
-
-            <div class="row b-row mt-3">
-              <button type="button"
-                      class="btn btn-primary"
-                      @click="submit"
-                      :disabled="isLoading">
-                <span v-if="isLoading">Отправка...</span>
-                <span v-else>Создать заказ</span>
-              </button>
-              <button type="button"
-                      class="btn btn-secondary"
-                      @click="$router.push({ name: 'AllOrdersCurator' })">
-                Отмена
-              </button>
-            </div>
-
           </div>
         </div>
       </div>
@@ -118,93 +204,114 @@
 import axios from 'axios';
 import {mapActions, mapGetters} from 'vuex';
 
+const FESTIVAL_ID = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
+
 export default {
   name: "CreateOrderCurator",
   data() {
     return {
-      festival_id: null,
-      location_id: null,
+      email: '',
+      phone: '',
       project: '',
       comment: '',
-      guests: [{value: '', email: ''}],
+      location_id: null,
       locationList: [],
+      guests: [],
+      newGuest: '',
+      newGuestEmail: '',
       isLoading: false,
       message: null,
       isSuccess: false,
     };
   },
   computed: {
-    ...mapGetters('appFestivalTickets', ['getFestivalList']),
     ...mapGetters('appOrder', ['getError']),
-    getOrderError() {
-      return (field) => this.getError(field);
-    },
-    selectedLocation() {
-      if (!this.location_id) return null;
-      return this.locationList.find(loc => loc.id === this.location_id) || null;
+    isFormValid() {
+      return this.email.length > 0
+          && this.phone.length > 0
+          && this.location_id !== null
+          && this.guests.length > 0;
     },
   },
   methods: {
-    ...mapActions('appFestivalTickets', ['getListFestival']),
     ...mapActions('appOrder', ['goToCreateCuratorOrderTicket', 'clearError']),
-    onFestivalChange() {
-      this.location_id = null;
-      this.locationList = [];
-      if (!this.festival_id) return;
-      axios.post('/api/v1/location/getListForCurator', {filter: {festival_id: this.festival_id, active: true}})
-        .then(response => {
-          this.locationList = response.data.list || [];
-        })
-        .catch(() => {});
-    },
     addGuest() {
-      this.guests.push({value: '', email: ''});
-    },
-    removeGuest(index) {
-      if (this.guests.length > 1) {
-        this.guests.splice(index, 1);
+      if (this.newGuest.trim().length > 0) {
+        this.guests.push({
+          value: this.newGuest.trim(),
+          email: this.newGuestEmail.trim(),
+        });
+        this.newGuest = '';
+        this.newGuestEmail = '';
       }
+    },
+    delGuest(index) {
+      this.guests.splice(index, 1);
     },
     submit() {
       this.clearError();
-      this.message = null;
       this.isLoading = true;
 
       this.goToCreateCuratorOrderTicket({
-        festival_id: this.festival_id,
+        festival_id: FESTIVAL_ID,
         location_id: this.location_id,
         project: this.project || null,
         comment: this.comment || null,
-        guests: this.guests.filter(g => g.value.trim()),
+        guests: this.guests,
         price: 0,
-        email: '',
-        phone: '',
+        email: this.email,
+        phone: this.phone,
         callback: (success, msg) => {
           this.isLoading = false;
           this.isSuccess = success;
           this.message = msg;
+          document.getElementById('curatorModalOpenBtn').click();
           if (success) {
-            this.resetForm();
+            this.clearData();
           }
         },
         callbackError: (msg) => {
           this.isLoading = false;
           this.isSuccess = false;
           this.message = msg || 'Ошибка при создании заказа';
+          document.getElementById('curatorModalOpenBtn').click();
         },
       });
     },
-    resetForm() {
-      this.festival_id = null;
-      this.location_id = null;
+    clearData() {
+      this.email = '';
+      this.phone = '';
       this.project = '';
       this.comment = '';
-      this.guests = [{value: '', email: ''}];
-      this.locationList = [];
+      this.location_id = null;
+      this.guests = [];
+      this.newGuest = '';
+      this.newGuestEmail = '';
     },
   },
-  created() {
-    this.getListFestival();
+  async created() {
+    await this.clearError();
+    axios.post('/api/v1/location/getListForCurator', {
+      filter: {festival_id: FESTIVAL_ID, active: true}
+    }).then(response => {
+      this.locationList = response.data.list || [];
+    }).catch(() => {});
   },
 };
 </script>
+
+<style scoped>
+.intckt p {
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.intckt small {
+  display: block;
+  color: #6c757d;
+}
+
+.ticket-choice {
+  margin-bottom: 8px;
+}
+</style>
