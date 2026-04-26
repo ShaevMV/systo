@@ -175,6 +175,20 @@
                   </div>
                 </div>
 
+                <div class="row mb-3">
+                  <div class="col-12">
+                    <div class="form-check">
+                      <input class="form-check-input"
+                             type="checkbox"
+                             id="curatorAgree"
+                             v-model="agreed"/>
+                      <label class="form-check-label" for="curatorAgree">
+                        Регистрируя добровольный оргвзнос, ты соглашаешься с Правилами и условиями участия в туристическом слёте и Политикой обработки персональных данных.
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
                 <div class="row" style="justify-content: center">
                   <div class="col-12">
                     <button type="button"
@@ -222,6 +236,7 @@ export default {
       isLoading: false,
       message: null,
       isSuccess: false,
+      agreed: false,
     };
   },
   computed: {
@@ -230,7 +245,8 @@ export default {
       return this.email.length > 0
           && this.phone.length > 0
           && this.location_id !== null
-          && this.guests.length > 0;
+          && this.guests.length > 0
+          && this.agreed;
     },
   },
   methods: {

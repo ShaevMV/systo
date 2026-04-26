@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tickets\Location\Repository;
 
+use App\Models\Festival\FestivalModel;
 use App\Models\Location\LocationModel;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Shared\Domain\Criteria\FilterOperator;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\Filter\FilterBuilder;
@@ -23,7 +25,12 @@ class InMemoryMySqlLocationRepository implements LocationRepositoryInterface
 
     public function getList(LocationGetListFilter $filters, Order $orderBy): Collection
     {
-        $build = $this->model::query();
+        $build = $this->model::query()
+            ->leftJoin(FestivalModel::TABLE, LocationModel::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
+            ->select([
+                LocationModel::TABLE . '.*',
+                DB::raw("CONCAT_WS(' ', " . FestivalModel::TABLE . ".name, " . FestivalModel::TABLE . ".year) as festival_name"),
+            ]);
 
         $filterValues = [
             [

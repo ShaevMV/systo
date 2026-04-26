@@ -21,6 +21,7 @@ class LocationDto extends AbstractionEntity implements Response
         protected ?Uuid   $questionnaire_type_id = null,
         protected ?string $email_template = null,
         protected ?string $pdf_template = null,
+        protected ?string $festival_name = null,
         protected ?Carbon $created_at = null,
         protected ?Carbon $updated_at = null,
     ) {
@@ -38,6 +39,7 @@ class LocationDto extends AbstractionEntity implements Response
             empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $data['email_template'] ?? null,
             $data['pdf_template'] ?? null,
+            $data['festival_name'] ?? null,
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
         );
@@ -86,5 +88,10 @@ class LocationDto extends AbstractionEntity implements Response
     public function getPdfTemplate(): ?string
     {
         return $this->pdf_template;
+    }
+
+    public function getFestivalName(): ?string
+    {
+        return $this->festival_name;
     }
 }
