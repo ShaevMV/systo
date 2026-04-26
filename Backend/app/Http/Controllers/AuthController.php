@@ -30,6 +30,7 @@ class AuthController extends Controller
             'except' => [
                 'login',
                 'register',
+                'registerCurator',
                 'forgotPassword',
                 'resetPassword'
             ]
@@ -81,6 +82,36 @@ class AuthController extends Controller
             $accountDto->setRole(AccountRoleHelper::pusher),
             $request->password
         );
+        $credentials = $request->only('email', 'password');
+        if (!$token = auth()->attempt($credentials, true)) {
+            return response()->json(['message' => 'Логин и пароль указан не верно'], 401);
+        }
+
+        return $this->respondWithToken($token);
+    }
+
+    public function registerCurator(Request $request): JsonResponse
+    {
+        $request->validate([
+            'city'     => 'required|string|max:255',
+            'phone'    => 'required|string|max:255',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|confirmed|string|min:6',
+        ], [
+            '*.required'  => 'Поле обязательно для ввода',
+            '*.email'     => 'Поле должно быть email',
+            '*.unique'    => 'Такой пользователь уже зарегистрирован в системе',
+            '*.confirmed' => 'Пароль не совпадает',
+            '*.min'       => 'Минимальное количество символов 6-ть',
+        ]);
+
+        $accountDto = AccountDto::fromState($request->toArray());
+        $this->accountApplication->createNewAccount(
+            $accountDto->setRole(AccountRoleHelper::curator),
+            $request->password
+        );
+
         $credentials = $request->only('email', 'password');
         if (!$token = auth()->attempt($credentials, true)) {
             return response()->json(['message' => 'Логин и пароль указан не верно'], 401);

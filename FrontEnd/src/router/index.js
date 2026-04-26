@@ -42,6 +42,7 @@ import LocationListView from "@/views/location/LocationListView.vue";
 import LocationItemView from "@/views/location/LocationItemView.vue";
 
 import RegView from "@/views/auth/RegView.vue";
+import RegCuratorView from "@/views/auth/RegCuratorView.vue";
 
 const routes = [
     {
@@ -91,6 +92,14 @@ const routes = [
         path: '/regGydhf',
         name: 'registration',
         component: RegView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/regCurator',
+        name: 'registrationCurator',
+        component: RegCuratorView,
         meta: {
             'guest': true
         }
