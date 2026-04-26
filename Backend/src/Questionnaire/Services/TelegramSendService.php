@@ -14,7 +14,7 @@ class TelegramSendService
         $response = Http::withHeaders([
             'Content-Type' => 'application/json',
         ])->post(
-            'http://77.222.60.58:8000',
+            'http://170.168.91.249:8000',
             [
                 'username' => $username,
                 'token' => 'sy-HShs-0d7a-psdM-19Bw',
