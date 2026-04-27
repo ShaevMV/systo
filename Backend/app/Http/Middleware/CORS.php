@@ -59,6 +59,7 @@ class CORS
             'http://org.spaceofjoy.ru',
             'https://org.spaceofjoy.ru/',
             'https://org.spaceofjoy.ru',
+            'https://api.spaceofjoy.ru/',
             'http://api.spaceofjoy.ru',
             'https://api.spaceofjoy.ru',
         ];
