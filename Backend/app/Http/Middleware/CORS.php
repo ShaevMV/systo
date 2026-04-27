@@ -74,10 +74,11 @@ class CORS
     {
         if (
             !empty($this->allowOrigins)
-            && $request->hasHeader('origin')
-            && !in_array($request->header('origin'), $this->allowOrigins, true)
+            && ($request->hasHeader('origin') || $request->hasHeader('referer'))
+            && (!in_array($request->header('origin'), $this->allowOrigins, true) ||
+                !in_array($request->header('referer'), $this->allowOrigins, true))
         ) {
-            return new JsonResponse("origin: {$request->header('origin')} not allowed");
+            return new JsonResponse("origin|referer: {$request->header('origin')} not allowed");
         }
         if ($request->hasHeader('origin')
             && $request->isMethod(Request::METHOD_OPTIONS)) {
@@ -90,7 +91,7 @@ class CORS
                 $response->header($value, $request->header($key));
             }
         }
-        //$response->header('Access-Control-Max-Age', $this->maxAge);
+        $response->header('Access-Control-Max-Age', $this->maxAge);
         $response->header('Access-Control-Allow-Credentials', 'true');
         $response->header('Access-Control-Expose-Headers', implode(', ', $this->exposeHeaders));
         return $response;
