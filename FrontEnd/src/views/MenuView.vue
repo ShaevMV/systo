@@ -232,7 +232,11 @@ export default {
       'isPusher',
     ]),
     getLinkHome() {
-      return this.isAuth ? '/hfjlsd65t4732' : '/';
+      if (!this.isAuth) return '/';
+      if (this.isAdmin) return '/orders';
+      if (this.isPusher) return '/frendlyOrder';
+      if (this.isManager) return '/questionnaires/';
+      return '/hfjlsd65t4732';
     },
   },
   methods: {

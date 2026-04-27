@@ -56,6 +56,7 @@ class CORS
             'http://193.106.175.59',
 
             'http://org.spaceofjoy.ru',
+            'https://org.spaceofjoy.ru/',
             'https://org.spaceofjoy.ru',
             'http://api.spaceofjoy.ru',
             'https://api.spaceofjoy.ru',
