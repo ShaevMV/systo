@@ -27,6 +27,7 @@ class CORS
      */
     private array $headers = [
         'origin' => 'Access-Control-Allow-Origin',
+        'referer' => 'Access-Control-Allow-Origin',
         'Access-Control-Request-Headers' => 'Access-Control-Allow-Headers',
         'Access-Control-Request-Method' => 'Access-Control-Allow-Methods'
     ];
