@@ -20,6 +20,41 @@
 | Low | Единый Response Interceptor для Axios | Frontend Helper | 2026-04-04 | — |
 | Low | Тёмная тема (хотят пользователи) | UX/UI Designer | 2026-04-04 | — |
 | Low | TypeScript для фронтенда (отложено) | Tech Lead | 2026-04-04 | Когда-нибудь |
+| Medium | **Абстракция шаблонов писем и PDF-билетов через типы заказов** — см. детали ниже | shaevmv | 2026-05-01 | Финальный этап order-abstraction |
+
+---
+
+---
+
+## TODO: Абстракция шаблонов писем и PDF-билетов через типы заказов
+
+**Текущее состояние (проблема):**
+- Логика выбора шаблона письма сейчас разрознена:
+  - `OrderToPaid` Mailable: проверяет `$ticket->getEmailView()` (из `TicketResponse`)
+  - `ProcessCreatingQRCode`: проверяет `$ticket->getFestivalView()` (null = без PDF)
+  - Специальный кейс детского билета (`CHILD_TICKET_TYPE_ID`) — проверяется в каждом типе заказа отдельно
+  - Какой шаблон → определяется типом билета + типом оплаты, но это **не декларируется явно**
+
+**Предлагаемое решение:**
+Вынести декларацию шаблонов в абстрактный тип заказа. Добавить в `BaseOrder`:
+
+```php
+// Какой email-шаблон отправлять при оплате (view из resources/views/email/)
+abstract public function getEmailTemplate(): string;
+
+// Какой PDF-шаблон использовать для генерации билета (null = без PDF)
+abstract public function getPdfTemplate(): ?string;
+
+// Нужно ли отправлять анкеты гостям (false = детский/parking)
+abstract public function shouldSendQuestionnaire(): bool;
+```
+
+**Что даёт:**
+- Единое место решения: «гостевой заказ использует шаблон `orderToPaid`, live — без PDF»
+- Убирает хардкод `CHILD_TICKET_TYPE_ID` из проверок `isChildTicket()` — заменяется на `shouldSendQuestionnaire()`
+- Возможность менять шаблоны без поиска по всему коду
+
+**Заблокировано:** Требует рефакторинга `ProcessUserNotificationOrderPaid` и всех Mailable-классов. Делать после стабилизации Application слоя новых типов заказов.
 
 ---
 
