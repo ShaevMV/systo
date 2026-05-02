@@ -34,6 +34,12 @@ use Tickets\TypesOfPayment\Repositories\InMemoryMySqlTypesOfPaymentRepository;
 use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\History\Repositories\InMemoryMySqlHistoryRepository;
+use Tickets\Orders\Friendly\Repository\FriendlyOrderRepositoryInterface;
+use Tickets\Orders\Friendly\Repository\InMemoryMySqlFriendlyOrderRepository;
+use Tickets\Orders\Guest\Repository\GuestOrderRepositoryInterface;
+use Tickets\Orders\Guest\Repository\InMemoryMySqlGuestOrderRepository;
+use Tickets\Orders\Live\Repository\InMemoryMySqlLiveOrderRepository;
+use Tickets\Orders\Live\Repository\LiveOrderRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
@@ -62,5 +68,8 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(QuestionnaireTypeRepositoryInterface::class, InMemoryMySqlQuestionnaireTypeRepository::class);
         $this->app->singleton(QuestionnaireValidationService::class, QuestionnaireValidationService::class);
         $this->app->bind(HistoryRepositoryInterface::class, InMemoryMySqlHistoryRepository::class);
+        $this->app->bind(GuestOrderRepositoryInterface::class, InMemoryMySqlGuestOrderRepository::class);
+        $this->app->bind(FriendlyOrderRepositoryInterface::class, InMemoryMySqlFriendlyOrderRepository::class);
+        $this->app->bind(LiveOrderRepositoryInterface::class, InMemoryMySqlLiveOrderRepository::class);
     }
 }
