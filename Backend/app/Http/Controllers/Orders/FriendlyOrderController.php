@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Orders\Friendly\Dto\FriendlyOrderDto;
@@ -28,8 +27,7 @@ use Tickets\Orders\Shared\Facade\OrderFacade;
 final class FriendlyOrderController extends Controller
 {
     public function __construct(
-        private readonly OrderFacade   $facade,
-        private readonly GetTicketType $getTicketType,
+        private readonly OrderFacade $facade,
     ) {}
 
     /**
@@ -85,11 +83,20 @@ final class FriendlyOrderController extends Controller
     /** Детали одного дружеского заказа. */
     public function getItem(string $id): JsonResponse
     {
-        $item = $this->facade->getFriendlyItem(new Uuid($id));
+        $order = $this->facade->findFriendly(new Uuid($id));
 
-        if ($item === null) {
+        if ($order === null) {
             return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
         }
+
+        $currentUserId = new Uuid(Auth::id());
+        $role          = Auth::user()->role ?? 'guest';
+
+        if (!$order->canViewItem($role, $currentUserId)) {
+            return response()->json(['success' => false, 'message' => 'Доступ запрещён'], 403);
+        }
+
+        $item = $this->facade->getFriendlyItem(new Uuid($id));
 
         return response()->json(['success' => true, 'order' => $item->toArray()]);
     }
@@ -134,13 +141,25 @@ final class FriendlyOrderController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
+        $newStatus = new Status($request->get('status'));
+        $role      = Auth::user()->role ?? 'guest';
+
+        $order = $this->facade->findFriendly(new Uuid($id));
+        if ($order === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        if (!$order->canChangeStatus($role, $newStatus)) {
+            return response()->json(['success' => false, 'message' => 'Недостаточно прав для смены статуса'], 403);
+        }
+
         try {
             $actorId    = new Uuid(Auth::id());
             $actorEmail = Auth::user()?->email ?? '';
 
             $order = $this->facade->changeFriendlyStatus(
                 orderId:   new Uuid($id),
-                newStatus: new Status($request->get('status')),
+                newStatus: $newStatus,
                 params:    ['email' => $actorEmail],
                 actorId:   $actorId,
             );

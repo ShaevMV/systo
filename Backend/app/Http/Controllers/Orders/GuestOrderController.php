@@ -102,11 +102,20 @@ final class GuestOrderController extends Controller
     /** Детали одного гостевого заказа. */
     public function getItem(string $id): JsonResponse
     {
-        $item = $this->facade->getGuestItem(new Uuid($id));
+        $order = $this->facade->findGuest(new Uuid($id));
 
-        if ($item === null) {
+        if ($order === null) {
             return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
         }
+
+        $currentUserId = new Uuid(Auth::id());
+        $role          = Auth::user()->role ?? 'guest';
+
+        if (!$order->canViewItem($role, $currentUserId)) {
+            return response()->json(['success' => false, 'message' => 'Доступ запрещён'], 403);
+        }
+
+        $item = $this->facade->getGuestItem(new Uuid($id));
 
         return response()->json(['success' => true, 'order' => $item->toArray()]);
     }
@@ -143,7 +152,9 @@ final class GuestOrderController extends Controller
      */
     public function changeStatus(string $id, Request $request): JsonResponse
     {
-        $rules = [];
+        $rules = [
+            'status' => 'required|string',
+        ];
         if ($request->get('status') === Status::DIFFICULTIES_AROSE) {
             $rules['comment'] = 'required|string';
         }
@@ -156,13 +167,25 @@ final class GuestOrderController extends Controller
             return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
         }
 
+        $newStatus = new Status($request->get('status'));
+        $role      = Auth::user()->role ?? 'guest';
+
+        $order = $this->facade->findGuest(new Uuid($id));
+        if ($order === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        if (!$order->canChangeStatus($role, $newStatus)) {
+            return response()->json(['success' => false, 'message' => 'Недостаточно прав для смены статуса'], 403);
+        }
+
         try {
-            $actorId   = new Uuid(Auth::id());
+            $actorId    = new Uuid(Auth::id());
             $actorEmail = Auth::user()?->email ?? '';
 
             $order = $this->facade->changeGuestStatus(
                 orderId:   new Uuid($id),
-                newStatus: new Status($request->get('status')),
+                newStatus: $newStatus,
                 params:    [
                     'email'   => $actorEmail,
                     'comment' => $request->get('comment'),
