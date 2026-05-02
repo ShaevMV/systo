@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Auth;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Orders\Guest\Dto\GuestOrderDto;
 use Tickets\Orders\Shared\Facade\OrderFacade;
-use Tickets\Ticket\Live\Service\CheckLiveTicketService;
 use Tickets\User\Account\Application\AccountApplication;
 use Tickets\User\Account\Dto\AccountDto;
 
@@ -33,7 +31,6 @@ final class GuestOrderController extends Controller
     public function __construct(
         private readonly OrderFacade        $facade,
         private readonly AccountApplication $accountApplication,
-        private readonly GetTicketType      $getTicketType,
         private readonly PriceService       $priceService,
     ) {}
 
@@ -102,16 +99,50 @@ final class GuestOrderController extends Controller
         }
     }
 
+    /** Детали одного гостевого заказа. */
+    public function getItem(string $id): JsonResponse
+    {
+        $item = $this->facade->getGuestItem(new Uuid($id));
+
+        if ($item === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        return response()->json(['success' => true, 'order' => $item->toArray()]);
+    }
+
+    /** Список гостевых заказов текущего пользователя. */
+    public function getUserList(): JsonResponse
+    {
+        $list = $this->facade->getGuestUserList(new Uuid(Auth::id()));
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
+    /** Список всех гостевых заказов (admin/seller). */
+    public function getList(Request $request): JsonResponse
+    {
+        $list = $this->facade->getGuestList(
+            status:     $request->get('status'),
+            festivalId: $request->get('festival_id') ? new Uuid($request->get('festival_id')) : null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
     /**
      * Сменить статус гостевого заказа.
      *
      * @throws Throwable
      */
-    public function changeStatus(
-        string                 $id,
-        Request                $request,
-        CheckLiveTicketService $checkLiveTicketService,
-    ): JsonResponse {
+    public function changeStatus(string $id, Request $request): JsonResponse
+    {
         $rules = [];
         if ($request->get('status') === Status::DIFFICULTIES_AROSE) {
             $rules['comment'] = 'required|string';

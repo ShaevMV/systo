@@ -82,6 +82,43 @@ final class FriendlyOrderController extends Controller
         }
     }
 
+    /** Детали одного дружеского заказа. */
+    public function getItem(string $id): JsonResponse
+    {
+        $item = $this->facade->getFriendlyItem(new Uuid($id));
+
+        if ($item === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        return response()->json(['success' => true, 'order' => $item->toArray()]);
+    }
+
+    /** Список дружеских заказов текущего пользователя (пушера). */
+    public function getUserList(): JsonResponse
+    {
+        $list = $this->facade->getFriendlyUserList(new Uuid(Auth::id()));
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
+    /** Список всех дружеских заказов (admin/pusher). */
+    public function getList(Request $request): JsonResponse
+    {
+        $list = $this->facade->getFriendlyList(
+            status:     $request->get('status'),
+            festivalId: $request->get('festival_id') ? new Uuid($request->get('festival_id')) : null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
     /**
      * Сменить статус дружеского заказа.
      *

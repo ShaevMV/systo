@@ -23,6 +23,8 @@ use Tickets\Orders\Live\Domain\LiveOrder;
 use Tickets\Orders\Live\Dto\LiveOrderDto;
 use Tickets\Orders\Live\Repository\LiveOrderRepositoryInterface;
 use Tickets\Orders\Shared\Domain\BaseOrder;
+use Tickets\Orders\Shared\Response\OrderItemResponse;
+use Tickets\Orders\Shared\Response\OrderListItemResponse;
 
 /**
  * Единая точка входа для работы со всеми типами заказов.
@@ -220,6 +222,69 @@ final class OrderFacade
     public function findLive(Uuid $id): ?LiveOrder
     {
         return $this->liveRepository->findById($id);
+    }
+
+    // ----------------------------------------------------------------
+    // Чтение — guest
+    // ----------------------------------------------------------------
+
+    public function getGuestItem(Uuid $id): ?OrderItemResponse
+    {
+        return $this->guestRepository->getItem($id);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getGuestUserList(Uuid $userId): array
+    {
+        return $this->guestRepository->getUserList($userId);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getGuestList(?string $status = null, ?Uuid $festivalId = null): array
+    {
+        return $this->guestRepository->getList($status, $festivalId);
+    }
+
+    // ----------------------------------------------------------------
+    // Чтение — friendly
+    // ----------------------------------------------------------------
+
+    public function getFriendlyItem(Uuid $id): ?OrderItemResponse
+    {
+        return $this->friendlyRepository->getItem($id);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getFriendlyUserList(Uuid $userId): array
+    {
+        return $this->friendlyRepository->getUserList($userId);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getFriendlyList(?string $status = null, ?Uuid $festivalId = null): array
+    {
+        return $this->friendlyRepository->getList($status, $festivalId);
+    }
+
+    // ----------------------------------------------------------------
+    // Чтение — live
+    // ----------------------------------------------------------------
+
+    public function getLiveItem(Uuid $id): ?OrderItemResponse
+    {
+        return $this->liveRepository->getItem($id);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getLiveUserList(Uuid $userId): array
+    {
+        return $this->liveRepository->getUserList($userId);
+    }
+
+    /** @return OrderListItemResponse[] */
+    public function getLiveList(?string $status = null, ?Uuid $festivalId = null): array
+    {
+        return $this->liveRepository->getList($status, $festivalId);
     }
 
     // ----------------------------------------------------------------

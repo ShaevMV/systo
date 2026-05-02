@@ -21,34 +21,49 @@ Route::prefix('v2/orders')->group(static function (): void {
     Route::prefix('guest')->group(static function (): void {
         Route::post('/create', [GuestOrderController::class, 'create']);
 
-        Route::post('/changeStatus/{id}', [GuestOrderController::class, 'changeStatus'])
-            ->middleware('auth:api')
-            ->middleware('role:seller,admin');
+        Route::middleware('auth:api')->group(static function (): void {
+            Route::get('/item/{id}',   [GuestOrderController::class, 'getItem']);
+            Route::get('/user-list',   [GuestOrderController::class, 'getUserList']);
+
+            Route::middleware('role:seller,admin')->group(static function (): void {
+                Route::get('/list',               [GuestOrderController::class, 'getList']);
+                Route::post('/changeStatus/{id}', [GuestOrderController::class, 'changeStatus']);
+            });
+        });
     });
 
     // ----------------------------------------------------------------
     // Дружеские заказы — создаются пушером
     // ----------------------------------------------------------------
     Route::prefix('friendly')->group(static function (): void {
-        Route::post('/create', [FriendlyOrderController::class, 'create'])
-            ->middleware('auth:api')
-            ->middleware('role:pusher');
+        Route::middleware('auth:api')->group(static function (): void {
+            Route::get('/item/{id}',  [FriendlyOrderController::class, 'getItem']);
+            Route::get('/user-list',  [FriendlyOrderController::class, 'getUserList']);
 
-        Route::post('/changeStatus/{id}', [FriendlyOrderController::class, 'changeStatus'])
-            ->middleware('auth:api')
-            ->middleware('role:pusher,admin');
+            Route::middleware('role:pusher')->group(static function (): void {
+                Route::post('/create', [FriendlyOrderController::class, 'create']);
+            });
+
+            Route::middleware('role:pusher,admin')->group(static function (): void {
+                Route::get('/list',               [FriendlyOrderController::class, 'getList']);
+                Route::post('/changeStatus/{id}', [FriendlyOrderController::class, 'changeStatus']);
+            });
+        });
     });
 
     // ----------------------------------------------------------------
     // Живые заказы — карточки live-билетов
     // ----------------------------------------------------------------
     Route::prefix('live')->group(static function (): void {
-        Route::post('/create', [LiveOrderController::class, 'create'])
-            ->middleware('auth:api')
-            ->middleware('role:seller,admin');
+        Route::middleware('auth:api')->group(static function (): void {
+            Route::get('/item/{id}',  [LiveOrderController::class, 'getItem']);
+            Route::get('/user-list',  [LiveOrderController::class, 'getUserList']);
 
-        Route::post('/changeStatus/{id}', [LiveOrderController::class, 'changeStatus'])
-            ->middleware('auth:api')
-            ->middleware('role:seller,admin');
+            Route::middleware('role:seller,admin')->group(static function (): void {
+                Route::get('/list',               [LiveOrderController::class, 'getList']);
+                Route::post('/create',            [LiveOrderController::class, 'create']);
+                Route::post('/changeStatus/{id}', [LiveOrderController::class, 'changeStatus']);
+            });
+        });
     });
 });

@@ -85,6 +85,43 @@ final class LiveOrderController extends Controller
         }
     }
 
+    /** Детали одного живого заказа. */
+    public function getItem(string $id): JsonResponse
+    {
+        $item = $this->facade->getLiveItem(new Uuid($id));
+
+        if ($item === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        return response()->json(['success' => true, 'order' => $item->toArray()]);
+    }
+
+    /** Список живых заказов текущего пользователя. */
+    public function getUserList(): JsonResponse
+    {
+        $list = $this->facade->getLiveUserList(new Uuid(Auth::id()));
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
+    /** Список всех живых заказов (admin/seller). */
+    public function getList(Request $request): JsonResponse
+    {
+        $list = $this->facade->getLiveList(
+            status:     $request->get('status'),
+            festivalId: $request->get('festival_id') ? new Uuid($request->get('festival_id')) : null,
+        );
+
+        return response()->json([
+            'success' => true,
+            'list'    => array_map(fn($item) => $item->toArray(), $list),
+        ]);
+    }
+
     /**
      * Сменить статус живого заказа.
      *

@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace Tickets\Orders\Friendly\Repository;
 
+use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\FriendlyOrderModel;
+use App\Models\User;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Orders\Friendly\Domain\FriendlyOrder;
 use Tickets\Orders\Friendly\Dto\FriendlyOrderDto;
+use Tickets\Orders\Shared\Response\OrderItemResponse;
+use Tickets\Orders\Shared\Response\OrderListItemResponse;
 
 final class InMemoryMySqlFriendlyOrderRepository implements FriendlyOrderRepositoryInterface
 {
@@ -47,6 +51,98 @@ final class InMemoryMySqlFriendlyOrderRepository implements FriendlyOrderReposit
             'status' => (string)$order->getStatus(),
             'ticket' => array_map(fn(GuestsDto $g) => $g->toArray(), $order->getTickets()),
         ]);
+    }
+
+    public function getItem(Uuid $id): ?OrderItemResponse
+    {
+        $row = $this->model::where(FriendlyOrderModel::TABLE . '.id', $id->value())
+            ->leftJoin(
+                TicketTypesModel::TABLE,
+                FriendlyOrderModel::TABLE . '.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE . '.id',
+            )
+            ->leftJoin(
+                User::TABLE,
+                FriendlyOrderModel::TABLE . '.user_id',
+                '=',
+                User::TABLE . '.id',
+            )
+            ->select([
+                FriendlyOrderModel::TABLE . '.*',
+                TicketTypesModel::TABLE . '.name as ticket_type_name',
+                User::TABLE . '.email as user_email',
+            ])
+            ->first();
+
+        if ($row === null) {
+            return null;
+        }
+
+        return OrderItemResponse::fromRow($row->toArray(), 'friendly');
+    }
+
+    public function getUserList(Uuid $userId): array
+    {
+        $rows = $this->model::where(FriendlyOrderModel::TABLE . '.user_id', $userId->value())
+            ->leftJoin(
+                TicketTypesModel::TABLE,
+                FriendlyOrderModel::TABLE . '.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE . '.id',
+            )
+            ->leftJoin(
+                User::TABLE,
+                FriendlyOrderModel::TABLE . '.user_id',
+                '=',
+                User::TABLE . '.id',
+            )
+            ->select([
+                FriendlyOrderModel::TABLE . '.*',
+                TicketTypesModel::TABLE . '.name as ticket_type_name',
+                User::TABLE . '.email as user_email',
+            ])
+            ->orderBy(FriendlyOrderModel::TABLE . '.kilter', 'desc')
+            ->get();
+
+        return $rows
+            ->map(fn($row) => OrderListItemResponse::fromRow($row->toArray(), 'friendly'))
+            ->all();
+    }
+
+    public function getList(?string $status = null, ?Uuid $festivalId = null): array
+    {
+        $query = $this->model::leftJoin(
+                TicketTypesModel::TABLE,
+                FriendlyOrderModel::TABLE . '.ticket_type_id',
+                '=',
+                TicketTypesModel::TABLE . '.id',
+            )
+            ->leftJoin(
+                User::TABLE,
+                FriendlyOrderModel::TABLE . '.user_id',
+                '=',
+                User::TABLE . '.id',
+            )
+            ->select([
+                FriendlyOrderModel::TABLE . '.*',
+                TicketTypesModel::TABLE . '.name as ticket_type_name',
+                User::TABLE . '.email as user_email',
+            ])
+            ->orderBy(FriendlyOrderModel::TABLE . '.kilter', 'desc');
+
+        if ($status !== null) {
+            $query->where(FriendlyOrderModel::TABLE . '.status', $status);
+        }
+
+        if ($festivalId !== null) {
+            $query->where(FriendlyOrderModel::TABLE . '.festival_id', $festivalId->value());
+        }
+
+        return $query
+            ->get()
+            ->map(fn($row) => OrderListItemResponse::fromRow($row->toArray(), 'friendly'))
+            ->all();
     }
 
     private function hydrate(FriendlyOrderModel $row): FriendlyOrder
