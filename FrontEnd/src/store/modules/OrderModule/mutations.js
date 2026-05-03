@@ -37,17 +37,18 @@ export const chanceStatus = (state, payload) => {
 
 export const chancePrice = (state, payload) => {
     const orderItem = state.orderList.find(item => item.id === payload.id);
-    if (!orderItem) {
-        console.warn(`Заказ с ID ${payload.id} не найден в списке`);
-        return;
+    if (orderItem) {
+        orderItem.price = payload.price;
+        var totalAmount = 0;
+        state.orderList.forEach(function (item) {
+            totalAmount += item.price
+        })
+        state.totalNumber.totalAmount = totalAmount;
     }
-    orderItem.price = payload.price;
-    var totalAmount = 0;
-    state.orderList.forEach(function (item) {
-        totalAmount += item.price
-    })
-    state.totalNumber.totalAmount = totalAmount;
 
+    if (state.orderItem && state.orderItem.id === payload.id) {
+        state.orderItem.totalPrice = payload.price;
+    }
 };
 
 export const setMessage = (state, payload) => {

@@ -13,7 +13,7 @@
                   <th scope="col" v-if="!getFriendlyId">Тип оплаты</th>
                   <th scope="col" v-if="!getFriendlyId">Дата оплаты</th>
                   <th scope="col" v-if="!getFriendlyId">Скидка</th>
-                  <th scope="col">Стоимость</th>
+                  <th scope="col">Стоимость{{ (isAdmin && getFriendlyId) ? ' (ред.)' : '' }}</th>
                   <th scope="col">Статус</th>
                 </tr>
                 </thead>
@@ -34,7 +34,16 @@
                   <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
                   <td v-if="!getFriendlyId">{{ getDateBuy }}</td>
                   <td class="text-right" v-if="!getFriendlyId">{{ getDiscount }}</td>
-                  <td class="text-right">{{ getTotalPrice }}</td>
+                  <td class="text-right" v-if="getFriendlyId">
+                    <span v-if="!isAdmin">{{ getTotalPrice }}</span>
+                    <correct-price
+                        v-if="isAdmin"
+                        :id="getId"
+                        :oldPrice="getTotalPrice"/>
+                  </td>
+                  <td class="text-right" v-if="!getFriendlyId">{{ getTotalPrice }}</td>
+
+
                   <td>{{ getHumanStatus }}</td>
                 </tr>
                 </tbody>
@@ -65,10 +74,11 @@ import {mapGetters} from "vuex";
 import OrderButton from "@/components/Order/OrderButton.vue";
 import NewTicket from "@/components/Order/NewTicket.vue";
 import OrderHistory from "@/components/Order/OrderHistory.vue";
+import CorrectPrice from "@/components/OrderFriendly/CorrectPrice.vue";
 
 export default {
   name: "OrderItem",
-  components: {NewTicket, OrderButton, OrderHistory},
+  components: {NewTicket, OrderButton, OrderHistory, CorrectPrice},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
