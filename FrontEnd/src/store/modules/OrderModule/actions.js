@@ -31,6 +31,56 @@ export const goToCreateFrendlyOrderTicket = (context, payload) => {
     });
 }
 
+/**
+ * Создать заказ-список (только куратор)
+ */
+export const goToCreateListOrder = (context, payload) => {
+    let promise = axios.post(API_ORDER + '/createList', payload);
+    promise.then(function (response) {
+        if (payload.callback) {
+            payload.callback(response.data.success, response.data.message);
+        }
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response?.data?.errors || error.message);
+        if (payload.callback) {
+            payload.callback(false, error.response?.data?.message || 'Ошибка создания заказа-списка');
+        }
+    });
+}
+
+/**
+ * Список заказов-списков для admin/manager
+ */
+export const getOrderListsList = (context, payload) => {
+    const filter = payload || context.state.filter || {};
+    let promise = axios.post(API_ORDER + '/getListsList', filter);
+    promise.then(function (response) {
+        context.commit('setOrderUserList', response.data.list);
+        context.commit('setTotalNumber', response.data.totalNumber);
+        context.commit('setLoaging', false);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response?.data?.errors || error.message);
+    });
+}
+
+/**
+ * Список заказов-списков для куратора (свои; админ видит все)
+ */
+export const getOrderListForCurator = (context, payload) => {
+    const filter = payload || context.state.filter || {};
+    let promise = axios.post(API_ORDER + '/getCuratorList', filter);
+    promise.then(function (response) {
+        context.commit('setOrderUserList', response.data.list);
+        context.commit('setTotalNumber', response.data.totalNumber);
+        context.commit('setLoaging', false);
+    }).catch(function (error) {
+        console.error(error);
+        context.commit('setError', error.response?.data?.errors || error.message);
+    });
+}
+
 
 export const getOrderListForFrendly = (context, payload) => {
     console.log(payload);

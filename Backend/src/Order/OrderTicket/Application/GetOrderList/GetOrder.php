@@ -6,8 +6,10 @@ namespace Tickets\Order\OrderTicket\Application\GetOrderList;
 
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterForFriendlyQuery;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderFilterQuery as OrderFilterForListsQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderListFilterQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderListFilterQueryHandler as OrderFilterForFriendlyQueryHandler;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderListFilterQueryHandler as OrderFilterForListsQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderListQueryHandler;
@@ -27,12 +29,14 @@ class GetOrder
         OrderItemQueryHandler $itemQueryHandler,
         OrderListFilterQueryHandler $filterQueryHandler,
         OrderFilterForFriendlyQueryHandler $orderListFilterQueryHandler,
+        OrderFilterForListsQueryHandler $orderListsFilterQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             UserIdQuery::class => $handler,
             OrderIdQuery::class => $itemQueryHandler,
             OrderFilterQuery::class => $filterQueryHandler,
             OrderFilterForFriendlyQuery::class => $orderListFilterQueryHandler,
+            OrderFilterForListsQuery::class => $orderListsFilterQueryHandler,
         ]);
     }
 
@@ -74,6 +78,17 @@ class GetOrder
     public function listByFilterForFriendly(OrderFilterForFriendlyQuery $filterQuery): ?ListResponse
     {
                 /** @var null|ListResponse $listItem */
+        $listItem = $this->queryBus->ask($filterQuery);
+
+        return $listItem;
+    }
+
+    /**
+     * Список заказов-списков (для admin/manager или куратора).
+     */
+    public function listByFilterForLists(OrderFilterForListsQuery $filterQuery): ?ListResponse
+    {
+        /** @var null|ListResponse $listItem */
         $listItem = $this->queryBus->ask($filterQuery);
 
         return $listItem;

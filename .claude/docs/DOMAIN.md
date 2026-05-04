@@ -12,14 +12,16 @@ class OrderTicket extends AggregateRoot {
 
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
-    Uuid $festival_id;
-    Uuid $user_id;
-    Uuid $types_of_payment_id;
+    Uuid  $festival_id;
+    Uuid  $user_id;          // получатель билетов
+    ?Uuid $types_of_payment_id;  // null для заказов-списков
     PriceDto $price;          // priceItem, count, discount, totalPrice
     Status $status;            // из Shared/Domain/ValueObject/Status
     array $ticket;             // GuestsDto[]
     Uuid $id;
     ?string $promo_code;
+    ?Uuid $location_id;       // только для заказов-списков
+    ?Uuid $curator_id;        // только для заказов-списков
 }
 ```
 
@@ -27,8 +29,9 @@ class OrderTicket extends AggregateRoot {
 
 | Метод | Статус | Domain Events | Описание |
 |-------|--------|---------------|----------|
-| `create(dto, kilter)` | NEW | `ProcessUserNotificationNewOrderTicket` | Создание заказа |
+| `create(dto, kilter)` | NEW | `ProcessUserNotificationNewOrderTicket` | Создание обычного заказа |
 | `toPaid(dto, comment?, externalPromoCode?)` | PAID | `ProcessCreateTicket`, `ProcessUserNotificationOrderPaid`, `ProcessGuestNotificationQuestionnaire[]`, `ProcessTelegramByQuestionnaireSend` | Подтверждение |
+| `toPaidFriendly(dto, comment?, externalPromoCode?)` | PAID | `ProcessCreateTicket`, `ProcessUserNotificationOrderPaidFriendly`, `ProcessGuestNotificationQuestionnaire[]`, `ProcessTelegramByQuestionnaireSend` | Подтверждение Friendly |
 | `toPaidInLiveTicket(dto, kilter)` | PAID_FOR_LIVE | `ProcessCreateTicket`, `ProcessUserNotificationOrderPaidLiveTicket`, `ProcessGuestNotificationQuestionnaire[]` | Подтверждение live |
 | `toCancel(dto)` | CANCEL | `ProcessCancelTicket`, `ProcessUserNotificationOrderCancel` | Отмена |
 | `toCancelLive(dto)` | CANCEL_FOR_LIVE | `ProcessCancelTicket`, `ProcessCancelLiveTicket` | Отмена live |
@@ -36,6 +39,14 @@ class OrderTicket extends AggregateRoot {
 | `toDifficultiesArose(dto, comment)` | DIFFICULTIES_AROSE | `ProcessCancelTicket`, `ProcessUserNotificationOrderDifficultiesArose` | Трудности |
 | `toChangeTicket(changes[])` | — | — | Изменение данных билета (записывает историю если `!empty($changes)`) |
 | `toProcessGuestNotificationQuestionnaire(dto)` | — | `ProcessGuestNotificationQuestionnaire[]` | Только рассылка гостям |
+| **`createList(dto, kilter)`** | **NEW_LIST** | — (только история, никаких писем) | Создание заказа-списка куратором |
+| **`toApproveList(dto)`** | **APPROVE_LIST** | `ProcessCreateTicket`, `ProcessUserNotificationListApproved`, `ProcessGuestNotificationQuestionnaire[]` | Одобрение списка → PDF получателю + анкеты гостям |
+| **`toCancelList(dto)`** | **CANCEL_LIST** | `ProcessCancelTicket`, `ProcessUserNotificationListCancel` | Отмена списка |
+| **`toDifficultiesAroseList(dto, comment)`** | **DIFFICULTIES_AROSE_LIST** | `ProcessCancelTicket`, `ProcessUserNotificationListDifficultiesArose` | Трудности по списку (комментарий обязателен) |
+
+`OrderTicketDto` имеет два фабричных метода:
+- `fromState($data, $userId, $priceDto, $isLiveTicket, ?$pusherId)` — обычный/Friendly заказ
+- `fromStateForList($data, $userId, $curatorId, $locationId)` — заказ-список (без `ticket_type_id`/`types_of_payment_id`/цены)
 
 Все методы (кроме `toProcessGuestNotificationQuestionnaire`) вызывают `recordHistory()` через trait `HasHistory`.
 
@@ -100,6 +111,34 @@ class PromoCode extends AggregateRoot {
 ```
 
 **Пассивный агрегат** — нет фабричных методов и Domain Events. Используется только для чтения/валидации.
+
+---
+
+### Location
+
+**Путь:** `Backend/src/Location/` (модуль без AggregateRoot — пассивная сущность, как PromoCode)
+
+```php
+class LocationDto extends AbstractionEntity {
+    Uuid    $id;
+    string  $name;
+    ?string $description;
+    ?Uuid   $questionnaire_type_id;  // FK → questionnaire_type
+    Uuid    $festival_id;             // FK → festivals
+    ?string $email_template;          // имя blade-шаблона письма (по умолчанию orderListApproved)
+    ?string $pdf_template;            // имя blade-шаблона PDF
+    bool    $active;
+}
+```
+
+**Application API (`LocationApplication`):**
+- `getList(LocationGetListQuery)` — фильтрация по name/festival_id/active
+- `getItem(Uuid)` — один
+- `create(LocationDto)`, `edit(Uuid, LocationDto)`, `delete(Uuid)` — CRUD
+
+**Repository:** `LocationRepositoryInterface` → `InMemoryMySqlLocationRepository`. Bind в `TicketsProvider`.
+
+**Используется в:** `OrderTicket` (поле `location_id`), `OrderListApproved` Mailable (берёт `email_template` для письма-одобрения списка).
 
 ---
 
@@ -215,10 +254,14 @@ class Questionnaire extends AggregateRoot {
 |-------|--------|-----------|
 | **ProcessUserNotificationNewOrderTicket** | `email`, `kilter`, `ticketTypeId`, `festival` | Email "заказ создан" |
 | **ProcessUserNotificationOrderPaid** | `email`, `tickets[]`, `ticketTypeId`, `comment?`, `promocode?` | Email с PDF билетами |
+| **ProcessUserNotificationOrderPaidFriendly** | `email`, `tickets[]`, `ticketTypeId`, `comment?`, `promocode?` | Email Friendly (без ссылки `/myOrders`) |
 | **ProcessUserNotificationOrderPaidLiveTicket** | `email`, `ticketTypeId`, `typeOrPaymentId`, `kilter` | Email для live |
 | **ProcessUserNotificationOrderCancel** | `email`, `ticketTypeId` | Email об отмене |
 | **ProcessUserNotificationOrderDifficultiesArose** | `orderId`, `email`, `comment`, `ticketTypeId` | Email о трудностях |
 | **ProcessUserNotificationOrderLiveTicketIssued** | `email`, `ticketTypeId` | Email о выдаче live |
+| **ProcessUserNotificationListApproved** | `email`, `tickets[]`, `festivalId`, `?locationId` | Email при одобрении заказа-списка → `OrderListApproved` (использует `Location.email_template`) |
+| **ProcessUserNotificationListCancel** | `email`, `festivalId` | Email об отмене заказа-списка → `OrderListCancel` |
+| **ProcessUserNotificationListDifficultiesArose** | `email`, `comment`, `festivalId` | Email о трудностях по списку → `OrderListDifficultiesArose` |
 
 ### Ticket операции
 
@@ -272,9 +315,13 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `getUserList(Uuid): OrderTicketItemForListResponse[]` | Заказы пользователя |
 | `findOrder(Uuid): ?OrderTicketDto` | Поиск по ID |
 | `getItem(Uuid): ?OrderTicketItemResponse` | Детали заказа |
-| `getList(Filters): OrderTicketItemForListResponse[]` | Админ-список с фильтрами |
-| `getFriendlyList(Filters): OrderTicketItemForFriendlyListResponse[]` | Friendly-список |
+| `getList(Filters): OrderTicketItemForListResponse[]` | Админ-список с фильтрами (`WHERE friendly_id IS NULL AND curator_id IS NULL`) |
+| `getFriendlyList(Filters): OrderTicketItemForFriendlyListResponse[]` | Friendly-список (`WHERE friendly_id IS NOT NULL AND curator_id IS NULL`) |
+| `getListsList(Filters): OrderTicketItemForListsResponse[]` | Заказы-списки (`WHERE curator_id IS NOT NULL`) — для admin/manager |
+| `getCuratorList(Filters): OrderTicketItemForListsResponse[]` | Заказы-списки куратора (фильтр `curator_id` идёт через `Filters`) |
 | `changeStatus(Uuid, Status, array): bool` | Смена статуса |
+| `updateGuests(Uuid, array): bool` | Обновить список гостей |
+| `changePrice(Uuid, float): bool` | Изменить цену (admin) |
 
 ### TicketsRepositoryInterface
 
@@ -333,6 +380,19 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `create(TicketTypeDto): bool` | Создать |
 | `remove(Uuid): bool` | Удалить |
 
+### LocationRepositoryInterface
+
+**Путь:** `Backend/src/Location/Repositories/LocationRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlLocationRepository`
+
+| Метод | Описание |
+|-------|----------|
+| `getList(Filters, Order): Collection` | Список локаций с фильтрами |
+| `getItem(Uuid): LocationDto` | По ID |
+| `create(LocationDto): bool` | Создать |
+| `editItem(Uuid, LocationDto): bool` | Редактировать |
+| `remove(Uuid): bool` | Удалить |
+
 ### HistoryRepositoryInterface
 
 **Путь:** `Backend/src/History/Repositories/HistoryRepositoryInterface.php`
@@ -352,8 +412,9 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
      |
      | festival_id
      v
- Account ←── user_id ── OrderTicket ←── friendly_id ── Account (referrer)
-     |                    |
+ Account ←── user_id ── OrderTicket ←── friendly_id ── Account (pusher)
+     |                    |       ↖── curator_id ────── Account (curator)
+     |                    |       ↖── location_id ───── Location (для списков)
      |                    | order_ticket_id
      |                    v
      |               Ticket

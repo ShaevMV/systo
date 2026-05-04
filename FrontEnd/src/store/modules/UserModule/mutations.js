@@ -19,11 +19,11 @@ export const setToken = (state, payload) => {
 export const removeToken = (state) => {
     state.userToken = null;
     state.userTimeLifeForToken = null;
-    state.userInfo = { id: null, email: null, admin: false, manager: false, seller: false, pusher: false };
+    state.userInfo = { id: null, email: null, admin: false, manager: false, seller: false, pusher: false, curator: false };
 
     // Удаляем только ключи пользователя, не трогая остальной localStorage
     ['user.token', 'user.token.lifetime', 'user.email', 'user.id',
-     'user.isAdmin', 'user.isManager', 'user.isSeller', 'user.isPusher', 'user.role']
+     'user.isAdmin', 'user.isManager', 'user.isSeller', 'user.isPusher', 'user.isCurator', 'user.role']
         .forEach(key => localStorage.removeItem(key));
 };
 
@@ -44,6 +44,7 @@ export const setUserInfo = (state, payload) => {
         manager: role === 'manager',
         seller:  role === 'seller',
         pusher:  role === 'pusher',
+        curator: role === 'curator',
     };
 
     localStorage.setItem('user.email',     payload.email);
@@ -52,6 +53,7 @@ export const setUserInfo = (state, payload) => {
     localStorage.setItem('user.isManager', String(state.userInfo.manager));
     localStorage.setItem('user.isSeller',  String(state.userInfo.seller));
     localStorage.setItem('user.isPusher',  String(state.userInfo.pusher));
+    localStorage.setItem('user.isCurator', String(state.userInfo.curator));
     localStorage.setItem('user.role',      role);
 };
 

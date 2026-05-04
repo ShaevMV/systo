@@ -16,6 +16,11 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:pusher');
 
+    // создать заказ-список (только куратор)
+    Route::post('/createList', [OrderTickets::class, 'createList'])
+        ->middleware('auth:api')
+        ->middleware('role:curator');
+
 
     // список всех заказов для АДМИНА
     Route::post('/getList',[OrderTickets::class, 'getList'])
@@ -26,10 +31,20 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:pusher,admin');
 
-    // сменить статус заказа АДМИН
+    // список заказов-списков для admin/manager
+    Route::post('/getListsList', [OrderTickets::class, 'getListsList'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,manager');
+
+    // список заказов-списков для куратора (свои; admin видит все)
+    Route::post('/getCuratorList', [OrderTickets::class, 'getCuratorList'])
+        ->middleware('auth:api')
+        ->middleware('role:curator,admin');
+
+    // сменить статус заказа (admin/seller/pusher для обычных и live, admin/manager для list-статусов — проверка внутри метода)
     Route::post('/toChangeStatus/{id}', [OrderTickets::class, 'toChangeStatus'])
         ->middleware('auth:api')
-        ->middleware('role:seller,admin,pusher');
+        ->middleware('role:seller,admin,pusher,manager');
 
     // изменить цену заказа (только admin)
     Route::post('/changePrice/{id}', [OrderTickets::class, 'changePrice'])

@@ -11,6 +11,7 @@ class AccountRoleHelper
     public const seller = 'seller'; // реализатор живых билетов
     public const pusher = 'pusher'; // раелизатор френдли билетов
     public const manager = 'manager'; // раелизатор френдли билетов
+    public const curator = 'curator'; // куратор — создаёт заказы-списки на локации/сцены
 
     public static function isValid(string $role): bool
     {
@@ -20,6 +21,7 @@ class AccountRoleHelper
             self::admin,
             self::guest,
             self::manager,
+            self::curator,
         ]);
     }
 }

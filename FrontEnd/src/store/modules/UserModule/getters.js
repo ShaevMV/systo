@@ -53,6 +53,16 @@ export const isPusher = state => {
 };
 
 /**
+ * Проверить роль куратора
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const isCurator = state => {
+    return state.userInfo.curator;
+};
+
+/**
  * Вывести email
  *
  * @param state

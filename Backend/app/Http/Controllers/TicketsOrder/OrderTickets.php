@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\TicketsOrder;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateListOrderRequest;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use App\Models\User;
@@ -22,8 +23,10 @@ use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
+use Tickets\Order\OrderTicket\Application\CreateList\CreateListOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderFilterQuery as OrderFilterQueryForLists;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
@@ -41,6 +44,7 @@ class OrderTickets extends Controller
 {
     public function __construct(
         private CreateOrder        $createOrder,
+        private CreateListOrder    $createListOrder,
         private GetTicketType      $getTicketType,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
@@ -237,6 +241,107 @@ class OrderTickets extends Controller
             ]);
     }
 
+    /**
+     * Создать заказ-список (только куратор).
+     *
+     * @throws Throwable
+     */
+    public function createList(CreateListOrderRequest $request): JsonResponse
+    {
+        try {
+            $curatorId = new Uuid(Auth::id());
+
+            // Создание или получение пользователя-получателя билетов по email
+            $userId = new Uuid(
+                $this->accountApplication->creatingOrGetAccountId(
+                    AccountDto::fromState($request->toArray())
+                )->value()
+            );
+
+            $guests = $request->guests;
+            if ($request->name) {
+                array_unshift($guests, [
+                    'value' => $request->name,
+                    'email' => $request->email,
+                ]);
+            }
+
+            $locationId = new Uuid($request->location_id);
+
+            $data = $request->toArray();
+            $data['guests'] = $guests;
+
+            $orderTicketDto = OrderTicketDto::fromStateForList(
+                $data,
+                $userId,
+                $curatorId,
+                $locationId,
+            );
+
+            $this->createListOrder->createAndSave($orderTicketDto);
+
+            if ($request->comment) {
+                $this->addComment->send(
+                    $orderTicketDto->getId(),
+                    $curatorId,
+                    $request->comment
+                );
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Список зарегистрирован. После проверки администратор/менеджер одобрит его и получатель получит билеты.',
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'link' => $exception->getLine(),
+                'file' => $exception->getFile(),
+            ]);
+        }
+    }
+
+    /**
+     * Список заказов-списков для admin / manager.
+     */
+    public function getListsList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        $listResponse = $this->getOrder->listByFilterForLists(
+            OrderFilterQueryForLists::fromState(
+                $filterForTicketOrder->toArray(),
+                null
+            )
+        ) ?? new ListResponse();
+
+        return response()->json([
+            'list' => $listResponse->toArray(),
+            'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray(),
+        ]);
+    }
+
+    /**
+     * Список заказов-списков для конкретного куратора (Auth::id).
+     * Если запрашивает админ — фильтр по куратору не применяется (видит все).
+     */
+    public function getCuratorList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $listResponse = $this->getOrder->listByFilterForLists(
+            OrderFilterQueryForLists::fromState(
+                $filterForTicketOrder->toArray(),
+                $user->role === AccountRoleHelper::admin ? null : new Uuid(Auth::id()),
+            )
+        ) ?? new ListResponse();
+
+        return response()->json([
+            'list' => $listResponse->toArray(),
+            'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray(),
+        ]);
+    }
+
     public function getFriendlyList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
         /** @var User $user */
@@ -302,8 +407,25 @@ class OrderTickets extends Controller
         // Добавляем правила в зависимости от статуса
         if (in_array($request->get('status'), [
             Status::DIFFICULTIES_AROSE,
+            Status::DIFFICULTIES_AROSE_LIST,
         ])) {
             $rules['comment'] = 'required|string';
+        }
+
+        // Смена list-статусов разрешена только admin / manager
+        if (in_array($request->get('status'), [
+            Status::APPROVE_LIST,
+            Status::CANCEL_LIST,
+            Status::DIFFICULTIES_AROSE_LIST,
+        ])) {
+            /** @var User $authUser */
+            $authUser = Auth::user();
+            if (! in_array($authUser->role, [AccountRoleHelper::admin, AccountRoleHelper::manager], true)) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['role' => 'Смена статуса списка доступна только администратору или менеджеру'],
+                ], 403);
+            }
         }
 
         if (in_array($request->get('status'), [

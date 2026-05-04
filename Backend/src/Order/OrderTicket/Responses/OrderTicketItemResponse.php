@@ -38,20 +38,23 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
         protected Uuid $id,
         protected Uuid $userId,
         protected int $kilter,
-        protected string $name,
-        protected float $price,
-        protected float $discount,
+        protected ?string $name,
+        protected ?float $price,
+        protected ?float $discount,
         protected array $guests,
         protected Status $status,
         protected string $dateBuy,
         protected Carbon $dateCreate,
-        protected string $typeOfPayment,
+        protected ?string $typeOfPayment,
         protected string $email,
         protected array $tickets,
         protected ?string $promoCode = null,
         protected ?string $friendly_id = null,
+        protected ?string $location_id = null,
+        protected ?string $curator_id = null,
+        protected ?string $location_name = null,
     ) {
-        $this->totalPrice = $price - $discount;
+        $this->totalPrice = (float) ($price ?? 0) - (float) ($discount ?? 0);
         $this->count = count($this->guests);
         $this->humanStatus = $this->status->getHumanStatus();
     }
@@ -68,18 +71,21 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
             new Uuid($data['id']),
             new Uuid($data['user_id']),
             $data['kilter'],
-            $data['ticket_type']['name'],
-            $data['price'],
-            $data['discount'],
+            $data['ticket_type']['name'] ?? ($data['location']['name'] ?? null),
+            $data['price'] ?? null,
+            $data['discount'] ?? null,
             $guests,
             new Status($data['status']),
-            $data['date'],
+            $data['date'] ?? '',
             new Carbon($data['created_at']),
-            $data['type_of_payment']['name'],
-            $data['users']['email'],
+            $data['type_of_payment']['name'] ?? null,
+            $data['users']['email'] ?? '',
             $tickets,
-            $data['promo_code'],
-            $data['friendly_id'] ?? null
+            $data['promo_code'] ?? null,
+            $data['friendly_id'] ?? null,
+            $data['location_id'] ?? null,
+            $data['curator_id'] ?? null,
+            $data['location']['name'] ?? null,
         );
     }
 

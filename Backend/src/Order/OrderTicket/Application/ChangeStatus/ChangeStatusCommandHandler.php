@@ -58,7 +58,8 @@ class ChangeStatusCommandHandler implements CommandHandler
             Status::PAID => OrderTicket::toPaid(
                 $orderTicketDto,
                 $command->getComment(),
-                $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
+                $orderTicketDto->getTicketTypeId() !== null
+                && $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
                     $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()) :
                     null,
             ),
@@ -67,10 +68,15 @@ class ChangeStatusCommandHandler implements CommandHandler
             Status::CANCEL_FOR_LIVE => OrderTicket::toCancelLive($orderTicketDto),
             Status::LIVE_TICKET_ISSUED => OrderTicket::toLiveIssued($orderTicketDto, $command->getLiveNumber()),
             Status::DIFFICULTIES_AROSE => OrderTicket::toDifficultiesArose($orderTicketDto, $command->getComment()),
+            Status::APPROVE_LIST => OrderTicket::toApproveList($orderTicketDto),
+            Status::CANCEL_LIST  => OrderTicket::toCancelList($orderTicketDto),
+            Status::DIFFICULTIES_AROSE_LIST => OrderTicket::toDifficultiesAroseList($orderTicketDto, $command->getComment()),
             default => throw new DomainException('Некорректный статус ' . $command->getNextStatus()),
         };
 
-        if ($command->getNextStatus()->isDifficultiesArose()) {
+        if ($command->getNextStatus()->isDifficultiesArose()
+            || $command->getNextStatus()->isDifficultiesAroseList()
+        ) {
             $this->addComment->send(
                 $command->getOrderId(),
                 $command->getUserId(),

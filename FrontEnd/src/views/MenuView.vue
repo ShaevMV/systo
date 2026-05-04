@@ -66,6 +66,32 @@
           Все анкеты
         </router-link>
       </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersLists' }">
+          Заказы-списки
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
+    <!-- Куратор (curator) -->
+    <template v-if="isAuth && isCurator && !isAdmin">
+      <li class="nav-heading">Работа</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'CreateListOrder' }">
+          Создать список
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'CuratorOrders' }">
+          Мои списки
+        </router-link>
+      </li>
       <li class="nav-heading">Аккаунт</li>
       <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
@@ -158,6 +184,11 @@
         </router-link>
       </li>
       <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersLists' }">
+          Заказы-списки
+        </router-link>
+      </li>
+      <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireList' }">
           Все анкеты
         </router-link>
@@ -172,6 +203,11 @@
       <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireTypeListView' }">
           Типы анкет
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'LocationListView' }">
+          Локации (списки)
         </router-link>
       </li>
       <li class="nav-item">
@@ -230,12 +266,14 @@ export default {
       'isSeller',
       'isManager',
       'isPusher',
+      'isCurator',
     ]),
     getLinkHome() {
       if (!this.isAuth) return '/';
       if (this.isAdmin) return '/orders';
       if (this.isPusher) return '/frendlyOrder';
       if (this.isManager) return '/questionnaires/';
+      if (this.isCurator) return '/curatorOrders/create';
       return '/hfjlsd65t4732';
     },
   },

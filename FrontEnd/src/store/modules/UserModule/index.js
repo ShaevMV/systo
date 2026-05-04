@@ -14,6 +14,7 @@ export default {
             'manager': localStorage.getItem('user.isManager') === 'true' || localStorage.getItem('user.role') === 'manager',
             'seller':  localStorage.getItem('user.isSeller') === 'true' || localStorage.getItem('user.role') === 'seller',
             'pusher':  localStorage.getItem('user.isPusher') === 'true' || localStorage.getItem('user.role') === 'pusher',
+            'curator': localStorage.getItem('user.isCurator') === 'true' || localStorage.getItem('user.role') === 'curator',
         },
         userData: {
             'city': null,
