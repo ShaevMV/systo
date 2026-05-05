@@ -17,6 +17,7 @@ use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Shared\Domain\Bus\Command\CommandHandler;
 use Shared\Domain\ValueObject\Status;
+use Tickets\Auto\Application\AutoApplication;
 use Tickets\PromoCode\Application\ExternalPromocode\ExternalPromocode;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 
@@ -29,6 +30,7 @@ class ChangeStatusCommandHandler implements CommandHandler
         private PushTicket                     $pushTicket,
         private ExternalPromocode              $externalPromocode,
         private HistoryRepositoryInterface     $historyRepository,
+        private AutoApplication                $autoApplication,
     )
     {
     }
@@ -127,5 +129,13 @@ class ChangeStatusCommandHandler implements CommandHandler
         }
 
         $this->pushTicket->pushByOrderId($command->getOrderId());
+
+        // Синхронизация авто с Baza только для заказов-списков
+        $nextStatus = (string) $command->getNextStatus();
+        if ($nextStatus === Status::APPROVE_LIST) {
+            $this->autoApplication->pushAllToBasaByOrder($command->getOrderId());
+        } elseif (in_array($nextStatus, [Status::CANCEL_LIST, Status::DIFFICULTIES_AROSE_LIST], true)) {
+            $this->autoApplication->removeAllFromBasaByOrder($command->getOrderId());
+        }
     }
 }

@@ -44,7 +44,7 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
-                  <label for="form_phone">Телефон (опционально)</label>
+                  <label for="form_phone">Телефон</label>
                   <input id="form_phone" type="text" class="form-control" placeholder="Телефон" v-model="phone" />
                 </div>
               </div>
@@ -64,10 +64,10 @@
             </div>
 
             <div class="pp1 row mt-3">
-              <span>ШАГ 2.1.</span> Проект (опционально, для группировки и фильтрации):
+              <span>ШАГ 2.1.</span> Проект *
             </div>
             <div class="mb-3">
-              <input type="text" class="form-control" v-model="project" placeholder="Например: Москва-весна, Команда волонтёров #4" maxlength="255" />
+              <input type="text" class="form-control" v-model="project" placeholder="Например: Москва-весна, Команда волонтёров #4" maxlength="255" required />
               <small class="form-text text-muted">{{ getError('project') }}</small>
             </div>
 
@@ -77,7 +77,7 @@
             <div class="row mt-3 mb-3" id="enter-guests">
               <div class="not-first-guest input-group mb-3">
                 <input type="text" class="form-control" placeholder="Имя и фамилия гостя" v-model="newGuest" />
-                <input type="email" class="form-control" placeholder="Email гостя (опционально)" v-model="newGuestEmail" />
+                <input type="email" class="form-control" placeholder="Email гостя *" v-model="newGuestEmail" />
                 <div class="input-group-prepend">
                   <span class="input-group-text btn" @click="addGuest()">Добавить</span>
                 </div>
@@ -156,7 +156,7 @@
                 </button>
               </div>
               <div class="row justify-content-center" v-if="!isValid" style="text-align: center">
-                Если кнопка не активна — заполните email, выберите локацию и добавьте хотя бы одного гостя.
+                Если кнопка не активна — заполните email, выберите локацию, введите проект и добавьте хотя бы одного гостя с email.
               </div>
             </div>
           </div>
@@ -195,17 +195,17 @@ export default {
       return (this.locationList || []).filter((l) => l.active && l.festival_id === FESTIVAL_ID);
     },
     isValid() {
-      return !!this.email && !!this.selectedLocationId && this.guests.length > 0;
+      return !!this.email && !!this.selectedLocationId && !!this.project && this.guests.length > 0;
     },
   },
   methods: {
     ...mapActions('appLocation', { loadLocations: 'loadList' }),
     ...mapActions('appOrder', ['goToCreateListOrder', 'clearError']),
     addGuest() {
-      if (this.newGuest.length === 0) return;
+      if (this.newGuest.length === 0 || this.newGuestEmail.length === 0) return;
       this.guests.push({
         value: this.newGuest,
-        email: this.newGuestEmail || null,
+        email: this.newGuestEmail,
       });
       this.newGuest = '';
       this.newGuestEmail = '';

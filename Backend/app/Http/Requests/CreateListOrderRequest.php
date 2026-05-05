@@ -28,7 +28,7 @@ class CreateListOrderRequest extends FormRequest
             'location_id' => 'required|exists:App\Models\Location\LocationModel,id',
             'guests' => 'required|array|min:1',
             'guests.*.value' => 'required|string',
-            'project' => 'nullable|string|max:255',
+            'project' => 'required|string|max:255',
             'autos' => 'nullable|array',
             'autos.*' => 'nullable|string|max:255',
         ];

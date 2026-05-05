@@ -19,14 +19,12 @@ interface AutoRepositoryInterface
     public function getByOrderId(Uuid $orderTicketId): array;
 
     /**
-     * Запись авто в таблицу `auto` базы Baza.
-     * Поля curator/project передаются строкой; festival_id — UUID.
+     * Запись авто в таблицу `auto` базы Baza. Включает order_id для связи.
      */
-    public function setInBazaAuto(AutoDto $auto, string $curator, string $project, ?Uuid $festivalId): bool;
+    public function setInBazaAuto(AutoDto $auto, ?Uuid $festivalId): bool;
 
     /**
-     * Удаление одной записи авто из таблицы `auto` базы Baza
-     * по сигнатуре (festival_id, curator, project, auto). LIMIT 1.
+     * Удалить из Baza все авто конкретного заказа (по order_id).
      */
-    public function removeFromBazaAuto(AutoDto $auto, string $curator, string $project, ?Uuid $festivalId): bool;
+    public function removeAllFromBazaByOrderId(Uuid $orderId): bool;
 }

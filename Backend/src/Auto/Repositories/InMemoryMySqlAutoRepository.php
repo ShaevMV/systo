@@ -46,15 +46,16 @@ final class InMemoryMySqlAutoRepository implements AutoRepositoryInterface
             ->all();
     }
 
-    public function setInBazaAuto(AutoDto $auto, string $curator, string $project, ?Uuid $festivalId): bool
+    public function setInBazaAuto(AutoDto $auto, ?Uuid $festivalId): bool
     {
         try {
             DB::connection('mysqlBaza')->getPdo();
             DB::connection('mysqlBaza')
                 ->table('auto')
                 ->insert([
-                    'curator'     => $curator,
-                    'project'     => $project,
+                    'order_id'    => $auto->orderTicketId->value(),
+                    'curator'     => (string) ($auto->curator ?? ''),
+                    'project'     => (string) ($auto->project ?? ''),
                     'auto'        => $auto->number,
                     'festival_id' => $festivalId?->value(),
                     'created_at'  => now(),
@@ -68,29 +69,16 @@ final class InMemoryMySqlAutoRepository implements AutoRepositoryInterface
         }
     }
 
-    public function removeFromBazaAuto(AutoDto $auto, string $curator, string $project, ?Uuid $festivalId): bool
+    public function removeAllFromBazaByOrderId(Uuid $orderId): bool
     {
         try {
             DB::connection('mysqlBaza')->getPdo();
-
-            // Дубли допускаются, удаляем одну запись по сигнатуре.
-            $row = DB::connection('mysqlBaza')
+            DB::connection('mysqlBaza')
                 ->table('auto')
-                ->where('festival_id', '=', $festivalId?->value())
-                ->where('curator', '=', $curator)
-                ->where('project', '=', $project)
-                ->where('auto', '=', $auto->number)
-                ->orderByDesc('created_at')
-                ->first();
-
-            if ($row !== null) {
-                DB::connection('mysqlBaza')
-                    ->table('auto')
-                    ->where('id', '=', $row->id)
-                    ->delete();
-            }
+                ->where('order_id', '=', $orderId->value())
+                ->delete();
         } catch (\Exception $e) {
-            Log::error('removeFromBazaAuto: ' . $e->getMessage(), ['auto_id' => $auto->id->value()]);
+            Log::error('removeAllFromBazaByOrderId: ' . $e->getMessage(), ['order_id' => $orderId->value()]);
             return false;
         } finally {
             return true;

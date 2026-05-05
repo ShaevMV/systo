@@ -13,10 +13,12 @@ use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
 /**
- * Сервис для управления авто, привязанными к заказу-списку.
+ * Сервис для управления авто заказа-списка.
  *
- * Доступ управляется на уровне контроллера; здесь — только бизнес-логика.
- * Все изменения дублируются в таблицу `auto` базы Baza.
+ * Правило синхронизации с Baza:
+ * - add() / addMany() — только локальная БД. Baza НЕ трогается.
+ * - pushAllToBasaByOrder() — вызывается при APPROVE_LIST: все авто заказа → Baza.
+ * - removeAllFromBasaByOrder() — вызывается при CANCEL_LIST / DIFFICULTIES_AROSE_LIST: удалить из Baza по order_id.
  */
 final class AutoApplication
 {
@@ -28,7 +30,7 @@ final class AutoApplication
     }
 
     /**
-     * Добавить авто к заказу-списку. Возвращает созданный AutoDto.
+     * Добавить авто к заказу-списку. Baza не затрагивается — push произойдёт при APPROVE_LIST.
      */
     public function add(Uuid $orderId, string $number): AutoDto
     {
@@ -37,28 +39,18 @@ final class AutoApplication
             throw new DomainException('Номер авто не может быть пустым');
         }
 
-        $order = $this->loadListOrder($orderId);
-
-        // Денормализуем project/curator в саму запись авто — фиксируем значения
-        // на момент добавления, чтобы потом не зависеть от изменений в заказе.
+        $order   = $this->loadListOrder($orderId);
         $project = (string) ($order->getProject() ?? '');
         $curator = $this->buildCurator($order);
 
         $auto = AutoDto::create($orderId, $number, $project, $curator);
         $this->autoRepository->create($auto);
 
-        $this->autoRepository->setInBazaAuto(
-            $auto,
-            $curator,
-            $project,
-            $order->getFestivalId(),
-        );
-
         return $auto;
     }
 
     /**
-     * Создать сразу пачку авто (используется при createList).
+     * Создать пачку авто (используется при createList).
      *
      * @param string[] $numbers
      * @return AutoDto[]
@@ -76,7 +68,7 @@ final class AutoApplication
     }
 
     /**
-     * Удалить авто из заказа.
+     * Удалить авто из локальной БД. Baza не затрагивается — она очистится при CANCEL_LIST.
      */
     public function remove(Uuid $orderId, Uuid $autoId): void
     {
@@ -85,18 +77,9 @@ final class AutoApplication
             throw new DomainException('Авто не найдено в заказе');
         }
 
-        $order = $this->loadListOrder($orderId);
+        $this->loadListOrder($orderId); // проверяем что это list-заказ
 
         $this->autoRepository->delete($autoId);
-
-        // Используем сохранённые в DTO project/curator (зафиксированы на момент создания),
-        // чтобы найти точно ту же запись в Baza, которую туда вставляли.
-        $this->autoRepository->removeFromBazaAuto(
-            $auto,
-            (string) ($auto->curator ?? $this->buildCurator($order)),
-            (string) ($auto->project ?? ($order->getProject() ?? '')),
-            $order->getFestivalId(),
-        );
     }
 
     /**
@@ -107,6 +90,30 @@ final class AutoApplication
     public function getByOrder(Uuid $orderId): array
     {
         return $this->autoRepository->getByOrderId($orderId);
+    }
+
+    /**
+     * Синхронизировать все авто заказа в Baza. Вызывать при APPROVE_LIST.
+     * Сначала удаляет старые (повторный approve после difficulties), затем вставляет актуальные.
+     */
+    public function pushAllToBasaByOrder(Uuid $orderId): void
+    {
+        $order = $this->loadListOrder($orderId);
+
+        // Очищаем старые записи этого заказа в Baza (идемпотентность при повторном approve).
+        $this->autoRepository->removeAllFromBazaByOrderId($orderId);
+
+        foreach ($this->autoRepository->getByOrderId($orderId) as $auto) {
+            $this->autoRepository->setInBazaAuto($auto, $order->getFestivalId());
+        }
+    }
+
+    /**
+     * Удалить все авто заказа из Baza. Вызывать при CANCEL_LIST / DIFFICULTIES_AROSE_LIST.
+     */
+    public function removeAllFromBasaByOrder(Uuid $orderId): void
+    {
+        $this->autoRepository->removeAllFromBazaByOrderId($orderId);
     }
 
     private function loadListOrder(Uuid $orderId): OrderTicketDto
