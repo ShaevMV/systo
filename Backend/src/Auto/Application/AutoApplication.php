@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\Auto\Application;
 
 use DomainException;
+use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Auto\Dto\AutoDto;
 use Tickets\Auto\Repositories\AutoRepositoryInterface;
@@ -30,7 +31,8 @@ final class AutoApplication
     }
 
     /**
-     * Добавить авто к заказу-списку. Baza не затрагивается — push произойдёт при APPROVE_LIST.
+     * Добавить авто к заказу-списку.
+     * Если заказ уже одобрен (APPROVE_LIST) — авто сразу пишется в Baza.
      */
     public function add(Uuid $orderId, string $number): AutoDto
     {
@@ -45,6 +47,10 @@ final class AutoApplication
 
         $auto = AutoDto::create($orderId, $number, $project, $curator);
         $this->autoRepository->create($auto);
+
+        if ($order->getStatus()->equals(new Status(Status::APPROVE_LIST))) {
+            $this->autoRepository->setInBazaAuto($auto, $order->getFestivalId());
+        }
 
         return $auto;
     }
@@ -68,7 +74,9 @@ final class AutoApplication
     }
 
     /**
-     * Удалить авто из локальной БД. Baza не затрагивается — она очистится при CANCEL_LIST.
+     * Удалить авто из заказа.
+     * Если заказ одобрен (APPROVE_LIST) — пересинхронизируем Baza:
+     * удаляем все записи этого заказа и вставляем оставшиеся авто заново.
      */
     public function remove(Uuid $orderId, Uuid $autoId): void
     {
@@ -77,9 +85,14 @@ final class AutoApplication
             throw new DomainException('Авто не найдено в заказе');
         }
 
-        $this->loadListOrder($orderId); // проверяем что это list-заказ
+        $order = $this->loadListOrder($orderId);
 
         $this->autoRepository->delete($autoId);
+
+        if ($order->getStatus()->equals(new Status(Status::APPROVE_LIST))) {
+            // Baza не поддерживает удаление по UUID авто — делаем полную пересинхронизацию
+            $this->pushAllToBasaByOrder($orderId);
+        }
     }
 
     /**
