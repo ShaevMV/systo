@@ -104,6 +104,7 @@ export default {
             } else if (role === 'curator') {
               location.href = '/curatorOrders/create';
             } else {
+              // pusher_curator и обычный гость — на главную
               location.href = '/hfjlsd65t4732';
             }
           }

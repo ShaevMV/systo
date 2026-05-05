@@ -98,6 +98,7 @@ export default {
         guest: 'Гость',
         manager: 'Менеджер',
         curator: 'Куратор (списки)',
+        pusher_curator: 'Френдли + Куратор',
       };
     },
   },

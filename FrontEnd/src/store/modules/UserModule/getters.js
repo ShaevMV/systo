@@ -63,6 +63,16 @@ export const isCurator = state => {
 };
 
 /**
+ * Проверить мульти-роль pusher + curator
+ *
+ * @param state
+ * @returns {boolean}
+ */
+export const isPusherCurator = state => {
+    return state.userInfo.pusherCurator;
+};
+
+/**
  * Вывести email
  *
  * @param state

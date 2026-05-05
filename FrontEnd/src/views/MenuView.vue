@@ -100,8 +100,40 @@
       </li>
     </template>
 
+    <!-- Мульти-роль: френдли продавец + куратор -->
+    <template v-if="isAuth && isPusherCurator && !isAdmin">
+      <li class="nav-heading">Работа — френдли</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'frendlyOrder' }">
+          Регистрация дружеского оргвзноса
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AllOrdersFriendly' }">
+          Все дружеские оргвзносы
+        </router-link>
+      </li>
+      <li class="nav-heading">Работа — списки</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'CreateListOrder' }">
+          Создать список
+        </router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'CuratorOrders' }">
+          Мои списки
+        </router-link>
+      </li>
+      <li class="nav-heading">Аккаунт</li>
+      <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'Profile' }">
+          Мой аккаунт
+        </router-link>
+      </li>
+    </template>
+
     <!-- Обычный участник (guest авторизован) -->
-    <template v-if="isAuth && !isAdmin && !isSeller && !isPusher && !isManager">
+    <template v-if="isAuth && !isAdmin && !isSeller && !isPusher && !isManager && !isCurator && !isPusherCurator">
       <li class="nav-heading">Участие</li>
       <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'Orgvznos' }">
@@ -267,6 +299,7 @@ export default {
       'isManager',
       'isPusher',
       'isCurator',
+      'isPusherCurator',
     ]),
     getLinkHome() {
       if (!this.isAuth) return '/';

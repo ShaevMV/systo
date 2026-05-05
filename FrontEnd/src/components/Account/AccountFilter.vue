@@ -62,6 +62,7 @@
                 <option value="pusher">раелизатор френдли билетов</option>
                 <option value="manager">менеджер</option>
                 <option value="curator">куратор (списки)</option>
+                <option value="pusher_curator">Френдли + Куратор</option>
                 <option value="guest">ГОСТь фестиваля</option>
               </select>
             </div>

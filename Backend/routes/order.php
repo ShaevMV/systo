@@ -14,12 +14,12 @@ Route::prefix('v1/order')->group(static function (): void {
 
     Route::post('/createFriendly',[OrderTickets::class, 'createFriendly'])
         ->middleware('auth:api')
-        ->middleware('role:pusher');
+        ->middleware('role:pusher,pusher_curator');
 
-    // создать заказ-список (только куратор)
+    // создать заказ-список (куратор и мульти-роль pusher_curator)
     Route::post('/createList', [OrderTickets::class, 'createList'])
         ->middleware('auth:api')
-        ->middleware('role:curator');
+        ->middleware('role:curator,pusher_curator');
 
 
     // список всех заказов для АДМИНА
@@ -29,7 +29,7 @@ Route::prefix('v1/order')->group(static function (): void {
 
     Route::post('/getListForFriendly',[OrderTickets::class, 'getFriendlyList'])
         ->middleware('auth:api')
-        ->middleware('role:pusher,admin');
+        ->middleware('role:pusher,admin,pusher_curator');
 
     // список заказов-списков для admin/manager
     Route::post('/getListsList', [OrderTickets::class, 'getListsList'])
@@ -39,12 +39,12 @@ Route::prefix('v1/order')->group(static function (): void {
     // список заказов-списков для куратора (свои; admin видит все)
     Route::post('/getCuratorList', [OrderTickets::class, 'getCuratorList'])
         ->middleware('auth:api')
-        ->middleware('role:curator,admin');
+        ->middleware('role:curator,admin,pusher_curator');
 
     // сменить статус заказа (admin/seller/pusher для обычных и live, admin/manager для list-статусов — проверка внутри метода)
     Route::post('/toChangeStatus/{id}', [OrderTickets::class, 'toChangeStatus'])
         ->middleware('auth:api')
-        ->middleware('role:seller,admin,pusher,manager');
+        ->middleware('role:seller,admin,pusher,manager,pusher_curator');
 
     // изменить цену заказа (только admin)
     Route::post('/changePrice/{id}', [OrderTickets::class, 'changePrice'])
@@ -54,7 +54,7 @@ Route::prefix('v1/order')->group(static function (): void {
     // изменить цену заказа (только admin)
     Route::post('/changeTicket/{id}', [OrderTickets::class, 'changeTicket'])
         ->middleware('auth:api')
-        ->middleware('role:admin,pusher');
+        ->middleware('role:admin,pusher,pusher_curator');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])

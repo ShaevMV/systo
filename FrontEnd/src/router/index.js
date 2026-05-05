@@ -56,7 +56,7 @@ const routes = [
         component: FriendlyView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'pusher'],
+            'role': ['admin', 'pusher', 'pusher_curator'],
         }
     },
     // инвайт при старте покупка билета
@@ -170,7 +170,7 @@ const routes = [
         component: OrderListForFriendly,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'pusher'],
+            'role': ['admin', 'pusher', 'pusher_curator'],
         }
     },
 
@@ -191,7 +191,7 @@ const routes = [
         component: OrderListForCurator,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'curator'],
+            'role': ['admin', 'curator', 'pusher_curator'],
         }
     },
     // Форма создания заказа-списка (куратор)
@@ -201,7 +201,7 @@ const routes = [
         component: CreateListOrderView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'curator'],
+            'role': ['admin', 'curator', 'pusher_curator'],
         }
     },
 
@@ -427,10 +427,11 @@ router.beforeEach((to, from, next) => {
         const token = rawToken && rawToken !== 'null' && lifetime
             && Math.trunc(Date.now() / 1000) < +lifetime;
 
-        // Куратор не должен попадать на форму обычного заказа — кидаем на свою
-        const isCurator = localStorage['user.isCurator'] === 'true' || localStorage['user.role'] === 'curator';
-        const isAdmin   = localStorage['user.isAdmin']   === 'true' || localStorage['user.role'] === 'admin';
-        if (token && isCurator && !isAdmin && to.path === '/hfjlsd65t4732') {
+        // Чистый куратор не должен попадать на форму обычного заказа — кидаем на свою.
+        // Мульти-роль pusher_curator остаётся на главной, поэтому редирект не срабатывает.
+        const isPureCurator = localStorage['user.role'] === 'curator';
+        const isAdmin       = localStorage['user.isAdmin'] === 'true' || localStorage['user.role'] === 'admin';
+        if (token && isPureCurator && !isAdmin && to.path === '/hfjlsd65t4732') {
             return next({ path: '/curatorOrders/create' });
         }
 
