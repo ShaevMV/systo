@@ -97,6 +97,7 @@ export default {
         pusher: 'Френдли Продовец ',
         guest: 'Гость',
         manager: 'Менеджер',
+        curator: 'Куратор (списки)',
       };
     },
   },

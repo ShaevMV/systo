@@ -12,6 +12,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string|null $city
  * @property string|null $name
  * @property string|null $comment
+ * @property string|null $project
  * @property string $festival_id
  * @property string $location_id
  * @property array $guests
@@ -26,6 +27,7 @@ class CreateListOrderRequest extends FormRequest
             'location_id' => 'required|exists:App\Models\Location\LocationModel,id',
             'guests' => 'required|array|min:1',
             'guests.*.value' => 'required|string',
+            'project' => 'nullable|string|max:255',
         ];
     }
 

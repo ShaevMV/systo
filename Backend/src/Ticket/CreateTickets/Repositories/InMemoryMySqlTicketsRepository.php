@@ -157,17 +157,17 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['kilter'],
             new Uuid($result['id']),
             $result['status'],
-            empty($result['email']) ? $result['email_user'] : $result['email'],
-            $result['phone'],
-            $result['city'],
+            empty($result['email']) ? ($result['email_user'] ?? '') : $result['email'],
+            $result['phone'] ?? '',
+            $result['city'] ?? '',
             $result['last_comment'],
             Carbon::parse($result['created_at']),
             empty($result['pdf']) ? null : $result['pdf'],
             $result['emailPayView'] ?? $result['emailView'],
             new Uuid($result['festival_id']),
-            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
-            new Uuid($result['ticket_type_id']),
-            $result['name_type'],
+            in_array($result['ticket_type_id'], (array) ['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
+            empty($result['ticket_type_id']) ? null : new Uuid($result['ticket_type_id']),
+            $result['name_type'] ?? null,
             isset($result['order_id']) ? new Uuid($result['order_id']) : null
         );
     }

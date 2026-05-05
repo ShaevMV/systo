@@ -15,6 +15,7 @@ use Tickets\History\Dto\SaveHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\Order\OrderTicket\Application\Create\CreatingOrderCommand;
 use Tickets\Order\OrderTicket\Application\Create\CreatingOrderCommandHandler;
+use Tickets\Location\Application\LocationApplication;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
@@ -39,6 +40,7 @@ final class CreateListOrder
         OrderItemQueryHandler              $itemQueryHandler,
         private Bus                        $bus,
         private HistoryRepositoryInterface $historyRepository,
+        private LocationApplication        $locationApplication,
     ) {
         $this->commandBus = new InMemorySymfonyCommandBus([
             CreatingOrderCommand::class => $creatingOrderCommandHandler,
@@ -64,7 +66,22 @@ final class CreateListOrder
                 throw new DomainException('Не получены данные о заказе ' . $orderTicketDto->getId()->value());
             }
 
-            $orderTicket = OrderTicket::createList($orderTicketDto, $orderTicketItem->getKilter());
+            $locationName = null;
+            if ($orderTicketDto->getLocationId() !== null) {
+                try {
+                    $locationName = $this->locationApplication
+                        ->getItem($orderTicketDto->getLocationId())
+                        ->getName();
+                } catch (\Throwable) {
+                    $locationName = null;
+                }
+            }
+
+            $orderTicket = OrderTicket::createList(
+                $orderTicketDto,
+                $orderTicketItem->getKilter(),
+                $locationName,
+            );
 
             foreach ($orderTicket->pullHistoryEvents() as $historyEvent) {
                 $this->historyRepository->save(new SaveHistoryDto(

@@ -23,6 +23,7 @@ use Tickets\History\Trait\HasHistory;
 use Tickets\History\Domain\Event\OrderStatusChangedEvent;
 use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
 use Tickets\History\Domain\Event\OrderCreatedEvent;
+use Tickets\History\Domain\Event\OrderListCreatedEvent;
 
 final class OrderTicket extends AggregateRoot
 {
@@ -395,6 +396,7 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getEmail(),
                 $changes,
                 $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->getFestivalId(),
             ));
         }
 
@@ -465,23 +467,28 @@ final class OrderTicket extends AggregateRoot
         return $this->ticket;
     }
 
-    private static function isChildTicket(Uuid $ticketTypeId): bool
+    private static function isChildTicket(?Uuid $ticketTypeId): bool
     {
-        return $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
+        return $ticketTypeId !== null
+            && $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
     }
 
     /**
      * Создать заказ-список (статус NEW_LIST). Куратор писем не получает,
      * пользователь-получатель тоже не получает на этом этапе — письмо придёт при APPROVE_LIST.
      */
-    public static function createList(OrderTicketDto $orderTicketDto, int $kilter): self
-    {
+    public static function createList(
+        OrderTicketDto $orderTicketDto,
+        int            $kilter,
+        ?string        $locationName = null,
+    ): self {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
-        $result->recordHistory(new OrderCreatedEvent(
-            ticketType: '',
-            price:      0,
-            kilter:     $kilter,
+        $result->recordHistory(new OrderListCreatedEvent(
+            locationId:   $orderTicketDto->getLocationId()?->value() ?? '',
+            locationName: $locationName,
+            project:      $orderTicketDto->getProject(),
+            kilter:       $kilter,
         ));
 
         return $result;

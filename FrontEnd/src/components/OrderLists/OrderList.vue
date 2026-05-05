@@ -17,6 +17,7 @@
               <th scope="col">ФИО куратора</th>
               <th scope="col">Email получателя</th>
               <th scope="col">Локация</th>
+              <th scope="col">Проект</th>
               <th scope="col">Гости</th>
               <th scope="col">Кол-во</th>
               <th scope="col">Статус</th>
@@ -45,6 +46,7 @@
               <td>{{ itemOrder.curator_name }}</td>
               <td>{{ itemOrder.email }}</td>
               <td>{{ itemOrder.location_name }}</td>
+              <td>{{ itemOrder.project }}</td>
               <td :title="getListGuestsTitle(itemOrder.guests)">
                 {{ getListGuestsShort(itemOrder.guests) }}
               </td>

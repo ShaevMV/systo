@@ -427,6 +427,13 @@ router.beforeEach((to, from, next) => {
         const token = rawToken && rawToken !== 'null' && lifetime
             && Math.trunc(Date.now() / 1000) < +lifetime;
 
+        // Куратор не должен попадать на форму обычного заказа — кидаем на свою
+        const isCurator = localStorage['user.isCurator'] === 'true' || localStorage['user.role'] === 'curator';
+        const isAdmin   = localStorage['user.isAdmin']   === 'true' || localStorage['user.role'] === 'admin';
+        if (token && isCurator && !isAdmin && to.path === '/hfjlsd65t4732') {
+            return next({ path: '/curatorOrders/create' });
+        }
+
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {
                 next({ path: '/login', query: { nextUrl: to.fullPath } });

@@ -36,6 +36,7 @@ class OrderTicketDto
         protected ?Uuid    $friendly_id = null,
         protected ?Uuid    $location_id = null,
         protected ?Uuid    $curator_id = null,
+        protected ?string  $project = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -80,6 +81,7 @@ class OrderTicketDto
             friendly_id: $pusherId,
             location_id: empty($data['location_id']) ? null : new Uuid($data['location_id']),
             curator_id:  empty($data['curator_id'])  ? null : new Uuid($data['curator_id']),
+            project:     $data['project'] ?? null,
         );
     }
 
@@ -94,10 +96,11 @@ class OrderTicketDto
      * @throws JsonException
      */
     public static function fromStateForList(
-        array $data,
-        Uuid  $userId,      // получатель билетов
-        Uuid  $curatorId,   // куратор-создатель
-        Uuid  $locationId,
+        array   $data,
+        Uuid    $userId,      // получатель билетов
+        Uuid    $curatorId,   // куратор-создатель
+        Uuid    $locationId,
+        ?string $project = null,
     ): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : null;
@@ -129,6 +132,7 @@ class OrderTicketDto
             friendly_id:           null,
             location_id:           $locationId,
             curator_id:            $curatorId,
+            project:               $project ?? ($data['project'] ?? null),
         );
     }
 
@@ -165,6 +169,7 @@ class OrderTicketDto
             'friendly_id' => $this->friendly_id?->value(),
             'location_id' => $this->location_id?->value(),
             'curator_id'  => $this->curator_id?->value(),
+            'project'     => $this->project,
         ];
     }
 
@@ -269,5 +274,10 @@ class OrderTicketDto
     public function isList(): bool
     {
         return $this->curator_id !== null;
+    }
+
+    public function getProject(): ?string
+    {
+        return $this->project;
     }
 }

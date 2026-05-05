@@ -60,10 +60,8 @@ class OrderListApproved extends Mailable
             'locationName' => $locationName,
         ]);
 
+        // У заказа-списка нет ticket_type → нет festivalView; createPdf фолбэчит на дефолтный шаблон 'pdf'
         foreach ($this->tickets as $ticket) {
-            if ($ticket->getFestivalView() === null) {
-                continue;
-            }
             $contents = $qrCodeService->createPdf($ticket);
             $mail->attachData($contents->output(), 'Билет ' . $ticket->getName() . '.pdf');
         }

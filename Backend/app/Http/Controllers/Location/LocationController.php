@@ -22,15 +22,18 @@ class LocationController extends Controller
         Request $request,
         LocationApplication $application,
     ): JsonResponse {
+        $collection = $application->getList(
+            new LocationGetListQuery(
+                $request->toArray()['filter'] ?? [],
+                Order::fromState($request->toArray()['orderBy'] ?? [])
+            ),
+        )->getCollection();
+
+        // Collection->toArray() не дёргает toArray() на DTO, т.к. AbstractionEntity
+        // не реализует Arrayable — сериализуем явно
         return response()->json([
             'success' => true,
-            'list' => $application->getList(
-                new LocationGetListQuery(
-                    $request->toArray()['filter'] ?? [],
-                    Order::fromState($request->toArray()['orderBy'] ?? [])
-                ),
-            )->getCollection()
-                ->toArray(),
+            'list' => $collection->map(fn (LocationDto $dto) => $dto->toArray())->values()->all(),
         ]);
     }
 

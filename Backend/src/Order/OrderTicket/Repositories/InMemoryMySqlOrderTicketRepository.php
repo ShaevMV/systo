@@ -142,7 +142,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         $rawData = $this->model::whereId($uuid->value())
             ->with([
                 'users',
-                'ticketType'
+                'ticketType',
+                'location',
             ])
             ->first();
 
@@ -152,17 +153,29 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $rawDataArr = $rawData->toArray();
         $rawDataArr['email'] = $rawDataArr['users']['email'] ?? '';
+
+        // Заказ-список: нет ticket_type/types_of_payment/price, есть location/curator
+        if (!empty($rawDataArr['curator_id'])) {
+            return OrderTicketDto::fromStateForList(
+                $rawDataArr,
+                new Uuid($rawData['users']['id']),
+                new Uuid($rawDataArr['curator_id']),
+                new Uuid($rawDataArr['location_id']),
+                $rawDataArr['project'] ?? null,
+            );
+        }
+
         $rawDataArr['questionnaire_type_id'] = $rawData->ticketType->questionnaire_type_id ?? null;
-        $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
+        $guests = json_decode($rawDataArr['guests'], true) ?? [0 => ''];
         return OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
             new PriceDto(
-                (int)($rawData['price'] / count($guests)),
+                (int) ((float) $rawData['price'] / max(count($guests), 1)),
                 count($guests),
-                $rawData['discount']
+                (float) $rawData['discount'],
             ),
-            (bool)$rawData['ticketType']['is_live_ticket'] ?? false,
+            (bool) ($rawData['ticketType']['is_live_ticket'] ?? false),
         );
     }
 

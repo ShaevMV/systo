@@ -57,7 +57,7 @@ export default {
     ...mapActions('appFestivalTickets', ['getListFestival']),
     festivalName(id) {
       const f = (this.getFestivalList || []).find((x) => x.id === id);
-      return f ? f.name : id;
+      return f ? `${f.name} ${f.year ?? ''}`.trim() : id;
     },
     localRemove(id) {
       if (!confirm('Удалить локацию?')) return;

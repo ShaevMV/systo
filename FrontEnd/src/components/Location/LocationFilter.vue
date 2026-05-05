@@ -18,7 +18,9 @@
                 <label>Фестиваль</label>
                 <select class="form-control" v-model="filter.festival_id">
                   <option value="">Все</option>
-                  <option v-for="f in getFestivalList" :key="f.id" :value="f.id">{{ f.name }}</option>
+                  <option v-for="f in getFestivalList" :key="f.id" :value="f.id">
+                    {{ f.name }} {{ f.year }}
+                  </option>
                 </select>
               </div>
             </div>

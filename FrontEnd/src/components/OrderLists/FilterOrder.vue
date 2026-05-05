@@ -38,6 +38,10 @@
                 </option>
               </select>
             </div>
+            <div class="col-md-4">
+              <label class="form-label">Проект</label>
+              <input type="text" class="form-control" v-model="project" placeholder="Часть названия проекта">
+            </div>
           </div>
           <div class="row b-row mt-2">
             <button class="btn btn-primary me-2" @click="sendFilter" :disabled="getIsLoading" type="button">
@@ -69,6 +73,7 @@ export default {
       name: null,
       status: '',
       locationId: null,
+      project: null,
       selectFestivalId: null,
     };
   },
@@ -101,6 +106,7 @@ export default {
         name: this.name,
         status: this.status,
         locationId: this.locationId,
+        project: this.project,
       });
     },
     clearFilter() {
@@ -108,6 +114,7 @@ export default {
       this.name = null;
       this.status = '';
       this.locationId = null;
+      this.project = null;
       this.dispatchFilter({ festivalId: this.festival_id });
     },
   },

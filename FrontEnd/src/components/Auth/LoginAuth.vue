@@ -101,6 +101,8 @@ export default {
               location.href = '/frendlyOrder';
             } else if (role === 'manager') {
               location.href = '/questionnaires/';
+            } else if (role === 'curator') {
+              location.href = '/curatorOrders/create';
             } else {
               location.href = '/hfjlsd65t4732';
             }

@@ -27,7 +27,9 @@
               <div class="col-8">
                 <select class="form-control" v-model="festivalId">
                   <option value="" disabled>— выберите фестиваль —</option>
-                  <option v-for="f in getFestivalList" :key="f.id" :value="f.id">{{ f.name }}</option>
+                  <option v-for="f in getFestivalList" :key="f.id" :value="f.id">
+                    {{ f.name }} {{ f.year }}
+                  </option>
                 </select>
               </div>
             </div>

@@ -62,6 +62,11 @@ class OrderListFilterQueryHandler implements QueryHandler
                 'operator' => FilterOperator::EQUAL,
                 'value' => $filterQuery->getStatus(),
             ],
+            [
+                'field' => OrderTicketModel::TABLE . '.project',
+                'operator' => FilterOperator::LIKE,
+                'value' => $filterQuery->getProject(),
+            ],
         ];
 
         if ($filterQuery->getCuratorId() !== null) {

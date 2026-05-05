@@ -17,13 +17,22 @@ class OrderToChangeTicket extends Mailable
      */
     public function __construct(
         private array $changes,
-        private Uuid  $ticketTypeId,
+        private ?Uuid $ticketTypeId,
+        private ?Uuid $festivalId = null,
     ) {
     }
 
     public function build(FestivalService $festivalService): static
     {
-        $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
+        if ($this->ticketTypeId !== null) {
+            $festivalName = $festivalService->getFestivalNameByTicketType($this->ticketTypeId);
+        } elseif ($this->festivalId !== null) {
+            $festivalName = \App\Models\Festival\FestivalModel::query()
+                ->whereId($this->festivalId->value())
+                ->value('name') ?? '';
+        } else {
+            $festivalName = '';
+        }
 
         $this->subject('Изменены данные вашего заказа на ' . $festivalName);
 

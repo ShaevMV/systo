@@ -64,6 +64,14 @@
             </div>
 
             <div class="pp1 row mt-3">
+              <span>ШАГ 2.1.</span> Проект (опционально, для группировки и фильтрации):
+            </div>
+            <div class="mb-3">
+              <input type="text" class="form-control" v-model="project" placeholder="Например: Москва-весна, Команда волонтёров #4" maxlength="255" />
+              <small class="form-text text-muted">{{ getError('project') }}</small>
+            </div>
+
+            <div class="pp1 row mt-3">
               <span>ШАГ 3.</span> Добавь гостей в список:
             </div>
             <div class="row mt-3 mb-3" id="enter-guests">
@@ -141,6 +149,7 @@ export default {
       newGuestEmail: '',
       guests: [],
       selectedLocationId: null,
+      project: null,
       comment: null,
       message: null,
     };
@@ -177,6 +186,7 @@ export default {
         phone: this.phone,
         festival_id: FESTIVAL_ID,
         location_id: this.selectedLocationId,
+        project: this.project,
         guests: this.guests,
         comment: this.comment,
         callback(success, message) {
@@ -194,6 +204,7 @@ export default {
       this.phone = null;
       this.guests = [];
       this.selectedLocationId = null;
+      this.project = null;
       this.comment = null;
       this.newGuest = '';
       this.newGuestEmail = '';

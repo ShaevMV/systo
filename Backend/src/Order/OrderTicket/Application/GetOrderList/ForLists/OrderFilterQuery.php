@@ -22,6 +22,7 @@ class OrderFilterQuery implements Query
         private ?Uuid   $locationId = null,
         private ?Uuid   $curatorId = null,
         private ?string $status = null,
+        private ?string $project = null,
     ) {
     }
 
@@ -38,6 +39,7 @@ class OrderFilterQuery implements Query
             empty($data['locationId']) ? null : new Uuid($data['locationId']),
             $curatorId,
             $data['status'] ?? null,
+            $data['project'] ?? null,
         );
     }
 
@@ -69,5 +71,10 @@ class OrderFilterQuery implements Query
     public function getStatus(): ?string
     {
         return $this->status;
+    }
+
+    public function getProject(): ?string
+    {
+        return $this->project;
     }
 }

@@ -276,6 +276,7 @@ class OrderTickets extends Controller
                 $userId,
                 $curatorId,
                 $locationId,
+                $request->project ?: null,
             );
 
             $this->createListOrder->createAndSave($orderTicketDto);
@@ -589,16 +590,55 @@ class OrderTickets extends Controller
     {
         $history = $this->getOrderHistory->getByOrderId($id);
 
+        // Определяем, заказ-список ли это — для них чистим
+        // унаследованный payload от полей про деньги, переименовываем event для UI
+        // и подменяем актёра события создания на реального куратора
+        $orderRow = \App\Models\Ordering\OrderTicketModel::query()
+            ->whereId($id)
+            ->first(['curator_id']);
+
+        $isList    = $orderRow && $orderRow->curator_id !== null;
+        $curator   = null;
+        if ($isList) {
+            $curator = User::query()
+                ->whereId($orderRow->curator_id)
+                ->first(['id', 'name', 'email']);
+        }
+
         return response()->json([
             'success' => true,
-            'history' => array_map(fn($item) => [
-                'event_name'     => $item->eventName,
-                'aggregate_type' => $item->aggregateType,
-                'payload'        => $item->payload,
-                'actor_id'       => $item->actorId,
-                'actor_type'     => $item->actorType,
-                'occurred_at'    => $item->occurredAt->toIso8601String(),
-            ], $history),
+            'history' => array_map(function ($item) use ($isList, $curator) {
+                $payload     = $item->payload;
+                $eventName   = $item->eventName;
+                $actorId     = $item->actorId;
+                $actorName   = $item->actorName;
+                $actorEmail  = $item->actorEmail;
+
+                if ($isList && $eventName === 'order_created') {
+                    unset($payload['price'], $payload['ticket_type']);
+                    $eventName = 'order_list_created';
+
+                    // Для устаревших записей подменяем актёра на куратора
+                    if ($curator !== null) {
+                        $actorName  = $curator->name;
+                        $actorEmail = $curator->email;
+                        $actorId    = $curator->email
+                            ? ($curator->email . '|' . ($curator->name ?? ''))
+                            : $curator->id;
+                    }
+                }
+
+                return [
+                    'event_name'     => $eventName,
+                    'aggregate_type' => $item->aggregateType,
+                    'payload'        => $payload,
+                    'actor_id'       => $actorId,
+                    'actor_type'     => $item->actorType,
+                    'actor_name'     => $actorName,
+                    'actor_email'    => $actorEmail,
+                    'occurred_at'    => $item->occurredAt->toIso8601String(),
+                ];
+            }, $history),
         ]);
     }
 

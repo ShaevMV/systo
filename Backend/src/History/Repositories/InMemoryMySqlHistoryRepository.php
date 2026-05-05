@@ -44,9 +44,13 @@ final class InMemoryMySqlHistoryRepository implements HistoryRepositoryInterface
                 aggregateType: $row->aggregate_type,
                 eventName:     $row->event_name,
                 payload:       is_array($row->payload) ? $row->payload : (json_decode($row->payload, true) ?? []),
-                actorId:       $row?->email ? ($row->email . '|' . $row->name) : $row->actor_id,
+                // Для совместимости с UI actor_id содержит "email|fio"; UUID хранится в actorRealId
+                actorId:       $row->email ? ($row->email . '|' . ($row->name ?? '')) : $row->actor_id,
                 actorType:     $row->actor_type,
                 occurredAt:    $row->occurred_at,
+                actorName:     $row->name  ?? null,
+                actorEmail:    $row->email ?? null,
+                actorRealId:   $row->actor_id,
             ))
             ->all();
     }
