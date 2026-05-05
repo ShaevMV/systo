@@ -55,9 +55,13 @@ class OrderListApproved extends Mailable
 
         $this->subject('Список на ' . $festivalName . ' одобрен');
 
+        // Передаём kilter и tickets чтобы сторонние шаблоны (через email_template) могли их использовать.
+        $firstTicket = $this->tickets[0] ?? null;
         $mail = $this->view('email.' . $emailView, [
             'festivalName' => $festivalName,
             'locationName' => $locationName,
+            'kilter'       => $firstTicket?->getKilter(),
+            'tickets'      => $this->tickets,
         ]);
 
         // У заказа-списка нет ticket_type → нет festivalView; createPdf фолбэчит на дефолтный шаблон 'pdf'
