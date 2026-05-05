@@ -427,12 +427,14 @@ router.beforeEach((to, from, next) => {
         const token = rawToken && rawToken !== 'null' && lifetime
             && Math.trunc(Date.now() / 1000) < +lifetime;
 
-        // Чистый куратор не должен попадать на форму обычного заказа — кидаем на свою.
-        // Мульти-роль pusher_curator остаётся на главной, поэтому редирект не срабатывает.
-        const isPureCurator = localStorage['user.role'] === 'curator';
-        const isAdmin       = localStorage['user.isAdmin'] === 'true' || localStorage['user.role'] === 'admin';
-        if (token && isPureCurator && !isAdmin && to.path === '/hfjlsd65t4732') {
-            return next({ path: '/curatorOrders/create' });
+        // "Рабочие" роли не должны попадать на форму обычного заказа /hfjlsd65t4732 —
+        // кидаем каждую на свою профильную страницу.
+        const role    = localStorage['user.role'];
+        const isAdmin = localStorage['user.isAdmin'] === 'true' || role === 'admin';
+        if (token && !isAdmin && to.path === '/hfjlsd65t4732') {
+            if (role === 'curator')        return next({ path: '/curatorOrders/create' });
+            if (role === 'pusher')         return next({ path: '/frendlyOrder' });
+            if (role === 'pusher_curator') return next({ path: '/frendlyOrder' });
         }
 
         if (to.matched.some(record => record.meta.requiresAuth)) {

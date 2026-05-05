@@ -305,6 +305,7 @@ export default {
       if (!this.isAuth) return '/';
       if (this.isAdmin) return '/orders';
       if (this.isPusher) return '/frendlyOrder';
+      if (this.isPusherCurator) return '/frendlyOrder';
       if (this.isManager) return '/questionnaires/';
       if (this.isCurator) return '/curatorOrders/create';
       return '/hfjlsd65t4732';

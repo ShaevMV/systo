@@ -97,14 +97,13 @@ export default {
           } else {
             if (role === 'admin') {
               location.href = '/orders';
-            } else if (role === 'pusher') {
+            } else if (role === 'pusher' || role === 'pusher_curator') {
               location.href = '/frendlyOrder';
             } else if (role === 'manager') {
               location.href = '/questionnaires/';
             } else if (role === 'curator') {
               location.href = '/curatorOrders/create';
             } else {
-              // pusher_curator и обычный гость — на главную
               location.href = '/hfjlsd65t4732';
             }
           }
