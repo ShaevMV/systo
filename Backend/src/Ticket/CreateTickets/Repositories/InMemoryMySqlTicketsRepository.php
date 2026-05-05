@@ -120,6 +120,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $result = $result->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
+            ->leftJoin(User::TABLE . ' as curator_user', OrderTicketModel::TABLE . '.curator_id', '=', 'curator_user.id')
             ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
             ->leftJoin(TicketTypesModel::TABLE, OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE . '.id')
             ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
@@ -139,6 +140,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
                 OrderTicketModel::TABLE . '.id as order_id',
+                OrderTicketModel::TABLE . '.curator_id',
+                OrderTicketModel::TABLE . '.location_id',
+                OrderTicketModel::TABLE . '.project',
+                'curator_user.email as curator_email',
+                'curator_user.name as curator_name',
                 $this->model::TABLE . '.festival_id',
                 $this->model::TABLE . '.email',
                 User::TABLE . '.email as email_user',
@@ -168,7 +174,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             in_array($result['ticket_type_id'], (array) ['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             empty($result['ticket_type_id']) ? null : new Uuid($result['ticket_type_id']),
             $result['name_type'] ?? null,
-            isset($result['order_id']) ? new Uuid($result['order_id']) : null
+            isset($result['order_id']) ? new Uuid($result['order_id']) : null,
+            empty($result['curator_id']) ? null : new Uuid($result['curator_id']),
+            $result['curator_email'] ?? null,
+            $result['curator_name']  ?? null,
+            $result['project']       ?? null,
+            empty($result['location_id']) ? null : new Uuid($result['location_id']),
         );
     }
 
@@ -193,7 +204,6 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->where('uuid', '=', $ticketsDto->getId()->value())
                     ->update([
                         'status' => $data['status'],
-                        'festival_id' => $data['festival_id'],
                         'is_need_seedling' => $data['is_need_seedling'],
                         'type_ticket_id' => $data['type_ticket_id'],
                         'type_ticket' => $data['type_ticket'],
@@ -201,6 +211,46 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ]);
             }
         } catch (\Exception $e) {
+            return false;
+        } finally {
+            return true;
+        }
+    }
+
+    /**
+     * Запись/обновление билета-списка в таблицу `spisok_tickets` базы Baza.
+     * Используется только для заказов-списков (curator_id IS NOT NULL).
+     * Идентификация билета — по `kilter` (наш PK на стороне tickets).
+     */
+    public function setInBazaList(TicketResponse $ticketsDto): bool
+    {
+        $data = $ticketsDto->toArrayForSpisok();
+        try {
+            DB::connection('mysqlBaza')->getPdo();
+
+            $exists = DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('kilter', '=', $data['kilter'])
+                ->exists();
+
+            if (!$exists) {
+                return DB::connection('mysqlBaza')
+                    ->table('spisok_tickets')
+                    ->insert($data);
+            }
+
+            DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('kilter', '=', $data['kilter'])
+                ->update([
+                    'project'     => $data['project'],
+                    'curator'     => $data['curator'],
+                    'email'       => $data['email'],
+                    'name'        => $data['name'],
+                    'comment'     => $data['comment'],
+                    'status'      => $data['status'],
+                    'festival_id' => $data['festival_id'],
+                ]);
+        } catch (\Exception $e) {
+            Log::error('setInBazaList: ' . $e->getMessage(), ['kilter' => $data['kilter']]);
             return false;
         } finally {
             return true;

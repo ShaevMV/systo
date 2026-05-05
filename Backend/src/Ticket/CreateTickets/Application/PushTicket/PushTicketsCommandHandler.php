@@ -20,7 +20,17 @@ class PushTicketsCommandHandler implements CommandHandler
     {
         $pushTicketsDto = $this->ticketsRepository->getTicket($command->getId(), true);
 
-        if (!$this->ticketsRepository->setInBaza($pushTicketsDto)) {
+        // Заказы-списки → spisok_tickets, обычные → el_tickets.
+        // Если нет ни куратора, ни type_ticket_id — нечего записывать в Baza.
+        if ($pushTicketsDto->isList()) {
+            $isOk = $this->ticketsRepository->setInBazaList($pushTicketsDto);
+        } elseif ($pushTicketsDto->getTypeTicketId() !== null) {
+            $isOk = $this->ticketsRepository->setInBaza($pushTicketsDto);
+        } else {
+            return;
+        }
+
+        if (!$isOk) {
             throw new DomainException('При записи произошла ошибка '. $command->getId()->value());
         };
     }
