@@ -42,6 +42,8 @@ final class AutoModel extends Model
         'id',
         'order_ticket_id',
         'number',
+        'project',
+        'curator',
     ];
 
     public function order(): BelongsTo

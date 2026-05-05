@@ -39,13 +39,18 @@ final class AutoApplication
 
         $order = $this->loadListOrder($orderId);
 
-        $auto = AutoDto::create($orderId, $number);
+        // Денормализуем project/curator в саму запись авто — фиксируем значения
+        // на момент добавления, чтобы потом не зависеть от изменений в заказе.
+        $project = (string) ($order->getProject() ?? '');
+        $curator = $this->buildCurator($order);
+
+        $auto = AutoDto::create($orderId, $number, $project, $curator);
         $this->autoRepository->create($auto);
 
         $this->autoRepository->setInBazaAuto(
             $auto,
-            $this->buildCurator($order),
-            (string) ($order->getProject() ?? ''),
+            $curator,
+            $project,
             $order->getFestivalId(),
         );
 
@@ -84,10 +89,12 @@ final class AutoApplication
 
         $this->autoRepository->delete($autoId);
 
+        // Используем сохранённые в DTO project/curator (зафиксированы на момент создания),
+        // чтобы найти точно ту же запись в Baza, которую туда вставляли.
         $this->autoRepository->removeFromBazaAuto(
             $auto,
-            $this->buildCurator($order),
-            (string) ($order->getProject() ?? ''),
+            (string) ($auto->curator ?? $this->buildCurator($order)),
+            (string) ($auto->project ?? ($order->getProject() ?? '')),
             $order->getFestivalId(),
         );
     }

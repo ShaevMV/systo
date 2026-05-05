@@ -16,16 +16,20 @@ final class AutoDto extends AbstractionEntity
         public readonly Uuid    $id,
         public readonly Uuid    $orderTicketId,
         public readonly string  $number,
+        public readonly ?string $project = null,
+        public readonly ?string $curator = null,
         public readonly ?string $createdAt = null,
     ) {
     }
 
-    public static function create(Uuid $orderTicketId, string $number): self
+    public static function create(Uuid $orderTicketId, string $number, ?string $project = null, ?string $curator = null): self
     {
         return new self(
             Uuid::random(),
             $orderTicketId,
             trim($number),
+            $project,
+            $curator,
         );
     }
 
@@ -35,6 +39,8 @@ final class AutoDto extends AbstractionEntity
             new Uuid($data['id']),
             new Uuid($data['order_ticket_id']),
             (string) $data['number'],
+            $data['project'] ?? null,
+            $data['curator'] ?? null,
             isset($data['created_at']) ? (string) $data['created_at'] : null,
         );
     }
@@ -45,6 +51,8 @@ final class AutoDto extends AbstractionEntity
             'id'              => $this->id->value(),
             'order_ticket_id' => $this->orderTicketId->value(),
             'number'          => $this->number,
+            'project'         => $this->project,
+            'curator'         => $this->curator,
         ];
     }
 
@@ -54,6 +62,8 @@ final class AutoDto extends AbstractionEntity
             'id'              => $this->id->value(),
             'order_ticket_id' => $this->orderTicketId->value(),
             'number'          => $this->number,
+            'project'         => $this->project,
+            'curator'         => $this->curator,
             'created_at'      => $this->createdAt,
         ];
     }
