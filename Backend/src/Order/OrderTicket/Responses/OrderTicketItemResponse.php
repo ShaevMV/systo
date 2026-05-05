@@ -120,4 +120,9 @@ class OrderTicketItemResponse extends AbstractionEntity implements Response
     {
         return $this->kilter;
     }
+
+    public function getCuratorId(): ?string
+    {
+        return $this->curator_id;
+    }
 }

@@ -373,11 +373,15 @@ class OrderTickets extends Controller
         $orderUuid = new Uuid($id);
         $orderItem = $this->getOrder->getItemById($orderUuid);
         /** @var User $user */
-        $user = Auth::user();
-        if (is_null($orderItem) ||
-            (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
-                && !($user->role === AccountRoleHelper::admin))
-        ) {
+        $user    = Auth::user();
+        $authId  = Auth::id();
+
+        $isOwner   = $orderItem !== null && $orderItem->getUserId()->equals(new Uuid($authId));
+        $isCurator = $orderItem !== null && $orderItem->getCuratorId() === $authId;
+        $isAdmin   = $user->role === AccountRoleHelper::admin;
+        $isManager = $user->role === AccountRoleHelper::manager;
+
+        if (is_null($orderItem) || (!$isOwner && !$isCurator && !$isAdmin && !$isManager)) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']
             ], 404);
