@@ -71,6 +71,15 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::get('/getHistory/{id}', [OrderTickets::class, 'getHistory'])
         ->middleware('auth:api')
         ->middleware('admin');
+
+    // Авто заказа-списка: добавление и удаление (admin / curator / pusher_curator)
+    Route::post('/{id}/auto', [OrderTickets::class, 'addAuto'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,curator,pusher_curator');
+
+    Route::delete('/{id}/auto/{autoId}', [OrderTickets::class, 'removeAuto'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,curator,pusher_curator');
 });
 
 

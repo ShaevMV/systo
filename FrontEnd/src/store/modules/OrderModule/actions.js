@@ -32,6 +32,38 @@ export const goToCreateFrendlyOrderTicket = (context, payload) => {
 }
 
 /**
+ * Добавить авто в заказ-список
+ */
+export const addAuto = (context, payload) => {
+    return axios.post(API_ORDER + '/' + payload.orderId + '/auto', { number: payload.number })
+        .then((response) => {
+            if (payload.callback) payload.callback(response.data);
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(error);
+            context.commit('setError', error.response?.data?.errors || error.message);
+            if (payload.callback) payload.callback({ success: false, message: error.response?.data?.message });
+        });
+}
+
+/**
+ * Удалить авто из заказа-списка
+ */
+export const removeAuto = (context, payload) => {
+    return axios.delete(API_ORDER + '/' + payload.orderId + '/auto/' + payload.autoId)
+        .then((response) => {
+            if (payload.callback) payload.callback(response.data);
+            return response.data;
+        })
+        .catch((error) => {
+            console.error(error);
+            context.commit('setError', error.response?.data?.errors || error.message);
+            if (payload.callback) payload.callback({ success: false, message: error.response?.data?.message });
+        });
+}
+
+/**
  * Создать заказ-список (только куратор)
  */
 export const goToCreateListOrder = (context, payload) => {

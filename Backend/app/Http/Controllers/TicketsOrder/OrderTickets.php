@@ -56,6 +56,7 @@ class OrderTickets extends Controller
         private AddComment         $addComment,
         private ChangeTicket       $changeTicket,
         private GetOrderHistory    $getOrderHistory,
+        private \Tickets\Auto\Application\AutoApplication $autoApplication,
        // private Billing            $billing,
     )
     {
@@ -289,6 +290,12 @@ class OrderTickets extends Controller
                 );
             }
 
+            // Авто привязываются после создания заказа (Baza-sync уже включён в AutoApplication::add).
+            $autos = $request->autos ?? [];
+            if (is_array($autos) && !empty($autos)) {
+                $this->autoApplication->addMany($orderTicketDto->getId(), $autos);
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Список зарегистрирован. После проверки администратор/менеджер одобрит его и получатель получит билеты.',
@@ -387,9 +394,75 @@ class OrderTickets extends Controller
             ], 404);
         }
 
+        $payload = $orderItem->toArray();
+        // Авто только для заказов-списков
+        if ($orderItem->getCuratorId() !== null) {
+            $payload['autos'] = array_map(
+                fn (\Tickets\Auto\Dto\AutoDto $a) => $a->toArray(),
+                $this->autoApplication->getByOrder($orderUuid)
+            );
+        }
+
         return response()->json([
-            'order' => $orderItem->toArray()
+            'order' => $payload
         ]);
+    }
+
+    /**
+     * Добавить авто в заказ-список.
+     * Доступ: admin, или куратор-создатель заказа (curator_id == auth_id).
+     */
+    public function addAuto(string $id, \Illuminate\Http\Request $request): JsonResponse
+    {
+        $orderUuid = new Uuid($id);
+        $number    = (string) $request->input('number', '');
+
+        if (! $this->canManageAutoOf($orderUuid)) {
+            return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
+        }
+
+        try {
+            $auto = $this->autoApplication->add($orderUuid, $number);
+            return response()->json(['success' => true, 'auto' => $auto->toArray()]);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Удалить авто из заказа-списка.
+     */
+    public function removeAuto(string $id, string $autoId): JsonResponse
+    {
+        $orderUuid = new Uuid($id);
+
+        if (! $this->canManageAutoOf($orderUuid)) {
+            return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
+        }
+
+        try {
+            $this->autoApplication->remove($orderUuid, new Uuid($autoId));
+            return response()->json(['success' => true]);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Право на управление авто заказа: admin или куратор-создатель.
+     */
+    private function canManageAutoOf(Uuid $orderUuid): bool
+    {
+        /** @var User $user */
+        $user   = Auth::user();
+        $authId = Auth::id();
+
+        if ($user->role === AccountRoleHelper::admin) {
+            return true;
+        }
+
+        $orderItem = $this->getOrder->getItemById($orderUuid);
+        return $orderItem !== null && $orderItem->getCuratorId() === $authId;
     }
 
     /**

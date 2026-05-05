@@ -16,6 +16,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $festival_id
  * @property string $location_id
  * @property array $guests
+ * @property array|null $autos
  */
 class CreateListOrderRequest extends FormRequest
 {
@@ -28,6 +29,8 @@ class CreateListOrderRequest extends FormRequest
             'guests' => 'required|array|min:1',
             'guests.*.value' => 'required|string',
             'project' => 'nullable|string|max:255',
+            'autos' => 'nullable|array',
+            'autos.*' => 'nullable|string|max:255',
         ];
     }
 

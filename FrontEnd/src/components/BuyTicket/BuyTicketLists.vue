@@ -105,6 +105,38 @@
               <h4 class="font-weight-normal">Гостей в списке: <span>{{ guests.length }}</span></h4>
             </div>
 
+            <div class="pp1 row mt-3">
+              <span>ШАГ 4.</span> Автомобили (опционально):
+            </div>
+            <div class="row mt-3 mb-3" id="enter-autos">
+              <div class="not-first-guest input-group mb-3">
+                <input type="text" class="form-control" placeholder="Номер автомобиля" v-model="newAuto" @keyup.enter="addAuto" />
+                <div class="input-group-prepend">
+                  <span class="input-group-text btn" @click="addAuto()">Добавить</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row x-row" v-show="autos.length > 0">
+              <div class="col-12">
+                <div class="form-group">
+                  <div class="input-group mb-3" v-for="(a, index) in autos" :key="index">
+                    <input type="text" class="form-control" readonly :value="a" />
+                    <div class="input-group-prepend">
+                      <span class="input-group-text btn" @click="delAuto(index)">
+                        <i class="fa fa-trash">🗑️</i>
+                      </span>
+                    </div>
+                  </div>
+                  <small class="form-text text-muted">{{ getError('autos') }}</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="row col-12" v-show="autos.length > 0">
+              <h4 class="font-weight-normal">Авто в списке: <span>{{ autos.length }}</span></h4>
+            </div>
+
             <div class="row mt-3">
               <div class="col-md-12">
                 <label>Комментарий (опционально)</label>
@@ -148,6 +180,8 @@ export default {
       newGuest: '',
       newGuestEmail: '',
       guests: [],
+      newAuto: '',
+      autos: [],
       selectedLocationId: null,
       project: null,
       comment: null,
@@ -179,6 +213,15 @@ export default {
     delGuest(index) {
       this.guests.splice(index, 1);
     },
+    addAuto() {
+      const value = (this.newAuto || '').trim();
+      if (value.length === 0) return;
+      this.autos.push(value);
+      this.newAuto = '';
+    },
+    delAuto(index) {
+      this.autos.splice(index, 1);
+    },
     orderList() {
       const self = this;
       const data = {
@@ -188,6 +231,7 @@ export default {
         location_id: this.selectedLocationId,
         project: this.project,
         guests: this.guests,
+        autos: this.autos,
         comment: this.comment,
         callback(success, message) {
           self.message = message;
@@ -203,11 +247,13 @@ export default {
       this.email = null;
       this.phone = null;
       this.guests = [];
+      this.autos = [];
       this.selectedLocationId = null;
       this.project = null;
       this.comment = null;
       this.newGuest = '';
       this.newGuestEmail = '';
+      this.newAuto = '';
     },
   },
   async created() {
