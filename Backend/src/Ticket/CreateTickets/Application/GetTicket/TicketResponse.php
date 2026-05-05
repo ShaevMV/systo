@@ -33,6 +33,7 @@ class TicketResponse extends AbstractionEntity implements Response
         protected ?string $curator_name = null,
         protected ?string $project = null,
         protected ?Uuid $location_id = null,
+        protected bool $isDeleted = false,
     )
     {
     }
@@ -168,11 +169,19 @@ class TicketResponse extends AbstractionEntity implements Response
         return trim($email . ' | ' . $name);
     }
 
+    public function isDeleted(): bool
+    {
+        return $this->isDeleted;
+    }
+
     /**
      * Структура для записи билета-списка во внешнюю БД (таблица spisok_tickets).
      * Поле id таблицы — auto_increment; идентификация билета идёт по kilter.
      * Поля project/comment/curator/email/name в Baza объявлены NOT NULL —
      * пустые значения подменяем на '', чтобы не падал INSERT.
+     *
+     * Если билет soft-deleted (удалён при пересоздании или отмене) — ставим
+     * статус 'cancelled', чтобы старая запись в Baza не висела как действующая.
      */
     public function toArrayForSpisok(): array
     {
@@ -184,7 +193,7 @@ class TicketResponse extends AbstractionEntity implements Response
             'name'        => $this->name,
             'date_order'  => $this->date_order->toDateTimeString(),
             'comment'     => (string) ($this->comment ?? ''),
-            'status'      => $this->status,
+            'status'      => $this->isDeleted ? 'cancelled' : $this->status,
             'festival_id' => $this->festival_id?->value(),
         ];
     }

@@ -132,6 +132,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
+                $this->model::TABLE . '.deleted_at as ticket_deleted_at',
                 TicketTypeFestivalModel::TABLE . '.pdf',
                 TicketTypeFestivalModel::TABLE . '.email as emailView',
                 TypesOfPaymentModel::TABLE . '.email as emailPayView',
@@ -176,10 +177,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['name_type'] ?? null,
             isset($result['order_id']) ? new Uuid($result['order_id']) : null,
             empty($result['curator_id']) ? null : new Uuid($result['curator_id']),
-            $result['curator_email'] ?? null,
-            $result['curator_name']  ?? null,
-            $result['project']       ?? null,
+            $result['curator_email']    ?? null,
+            $result['curator_name']     ?? null,
+            $result['project']          ?? null,
             empty($result['location_id']) ? null : new Uuid($result['location_id']),
+            !empty($result['ticket_deleted_at']),   // isDeleted — soft-deleted билет
         );
     }
 
