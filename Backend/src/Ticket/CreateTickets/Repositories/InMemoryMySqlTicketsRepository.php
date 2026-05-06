@@ -9,6 +9,7 @@ use App\Models\Festival\TicketTypeFestivalModel;
 use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Location\LocationModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
@@ -149,12 +150,14 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
             })
             ->leftJoin(TypesOfPaymentModel::TABLE, OrderTicketModel::TABLE . '.types_of_payment_id', '=', TypesOfPaymentModel::TABLE . '.id')
+            ->leftJoin(LocationModel::TABLE, OrderTicketModel::TABLE . '.location_id', '=', LocationModel::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
                 $this->model::TABLE . '.deleted_at as ticket_deleted_at',
                 TicketTypeFestivalModel::TABLE . '.pdf',
+                LocationModel::TABLE . '.pdf_template as location_pdf_template',
                 TicketTypeFestivalModel::TABLE . '.email as emailView',
                 TypesOfPaymentModel::TABLE . '.email as emailPayView',
                 OrderTicketModel::TABLE . '.phone',
@@ -190,7 +193,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['city'] ?? '',
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            empty($result['pdf']) ? null : $result['pdf'],
+            // Для list-заказов: TicketTypeFestivalModel.pdf = null, берём location.pdf_template (или null → 'pdf' по умолчанию)
+            $result['pdf'] ?: ($result['location_pdf_template'] ?: null),
             $result['emailPayView'] ?? $result['emailView'],
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),

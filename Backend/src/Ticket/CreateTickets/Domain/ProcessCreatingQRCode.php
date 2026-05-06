@@ -32,13 +32,7 @@ class ProcessCreatingQRCode implements ShouldQueue, DomainEvent
     {
         ini_set('memory_limit', '-1');
         try {
-            if($this->dataInfoForPdf->getFestivalView() === null) {
-                return;
-            }
-
-            $pdf = $codeInPdfService->createPdf(
-                $this->dataInfoForPdf
-            );
+            $pdf = $codeInPdfService->createPdf($this->dataInfoForPdf);
 
             $pdf->save(storage_path("app/public/tickets/{$this->dataInfoForPdf->getId()->value()}.pdf"));
         } catch (Throwable $throwable) {
