@@ -51,10 +51,10 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:admin');
 
-    // изменить цену заказа (только admin)
+
     Route::post('/changeTicket/{id}', [OrderTickets::class, 'changeTicket'])
         ->middleware('auth:api')
-        ->middleware('role:admin,pusher,pusher_curator');
+        ->middleware('role:admin,pusher,pusher_curator,curator');
 
     // Список заказов для Пользователя
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])

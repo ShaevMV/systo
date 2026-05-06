@@ -648,8 +648,23 @@ class OrderTickets extends Controller
             ], 422);
         }
 
+        $orderUuid = new Uuid($id);
+
+        // Куратор может менять ФИО только в своём заказе-списке
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        if ($authUser->role === AccountRoleHelper::curator || $authUser->role === AccountRoleHelper::pusher_curator) {
+            $orderItem = $this->getOrder->getItemById($orderUuid);
+            if ($orderItem === null || $orderItem->getCuratorId() !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Нет доступа к этому заказу',
+                ], 403);
+            }
+        }
+
         $this->changeTicket->change(
-            new Uuid($id),
+            $orderUuid,
             $request->input('value', []),
             $request->input('email', []),
             Auth::id(),
