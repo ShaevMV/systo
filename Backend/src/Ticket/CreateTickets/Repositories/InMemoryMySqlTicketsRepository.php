@@ -212,7 +212,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                         'name' => $data['name']
                     ]);
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return false;
         } finally {
             return true;
@@ -221,8 +221,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 
     /**
      * Запись/обновление билета-списка в таблицу `spisok_tickets` базы Baza.
-     * Используется только для заказов-списков (curator_id IS NOT NULL).
-     * Идентификация билета — по `kilter` (наш PK на стороне tickets).
+     * Идентификация — по `ticket_uuid` (UUID билета из нашей системы).
+     * При смене ФИО/email старый soft-deleted билет получит status=cancel;
+     * новый билет (с новым UUID) будет вставлен свежей строкой.
      */
     public function setInBazaList(TicketResponse $ticketsDto): bool
     {
@@ -231,17 +232,17 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             DB::connection('mysqlBaza')->getPdo();
 
             $exists = DB::connection('mysqlBaza')->table('spisok_tickets')
-                ->where('kilter', '=', $data['kilter'])
+                ->where('ticket_uuid', '=', $data['ticket_uuid'])
                 ->exists();
 
             if (!$exists) {
-                return DB::connection('mysqlBaza')
+                return (bool) DB::connection('mysqlBaza')
                     ->table('spisok_tickets')
                     ->insert($data);
             }
 
             DB::connection('mysqlBaza')->table('spisok_tickets')
-                ->where('kilter', '=', $data['kilter'])
+                ->where('ticket_uuid', '=', $data['ticket_uuid'])
                 ->update([
                     'project'     => $data['project'],
                     'curator'     => $data['curator'],
@@ -252,7 +253,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     'festival_id' => $data['festival_id'],
                 ]);
         } catch (\Exception $e) {
-            Log::error('setInBazaList: ' . $e->getMessage(), ['kilter' => $data['kilter']]);
+            Log::error('setInBazaList: ' . $e->getMessage(), ['ticket_uuid' => $data['ticket_uuid']]);
             return false;
         } finally {
             return true;

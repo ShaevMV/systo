@@ -91,7 +91,8 @@ class TicketResponse extends AbstractionEntity implements Response
             'email'            => $this->email,
             'phone'            => $this->phone,
             'date_order'       => $this->date_order->toDateTimeString(),
-            'status'           => $this->status,
+            // Soft-deleted билет (пересоздан при смене ФИО) → статус cancel в el_tickets
+            'status'           => $this->isDeleted ? 'cancel' : $this->status,
             'comment'          => $this->comment,
             'is_need_seedling' => $this->is_need_seedling,
             'type_ticket_id'   => $this->type_ticket_id?->value(),
@@ -193,7 +194,9 @@ class TicketResponse extends AbstractionEntity implements Response
             'name'        => $this->name,
             'date_order'  => $this->date_order->toDateTimeString(),
             'comment'     => (string) ($this->comment ?? ''),
-            'status'      => $this->isDeleted ? 'cancelled' : $this->status,
+            // Soft-deleted билет → cancel, чтобы старая запись в Baza не висела активной
+            'status'      => $this->isDeleted ? 'cancel' : $this->status,
+            'ticket_uuid' => $this->uuid->value(),
             'festival_id' => $this->festival_id?->value(),
         ];
     }
