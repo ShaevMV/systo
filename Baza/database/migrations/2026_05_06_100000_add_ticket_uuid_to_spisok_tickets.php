@@ -13,15 +13,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('spisok_tickets', function (Blueprint $table) {
-            $table->char('ticket_uuid', 36)->nullable()->default(null)->after('id');
-            $table->index('ticket_uuid');
+            $table->uuid('ticket_uuid')->nullable(true)->comment('ссылка на электронный билет');
         });
     }
 
     public function down(): void
     {
         Schema::table('spisok_tickets', function (Blueprint $table) {
-            $table->dropIndex(['ticket_uuid']);
             $table->dropColumn('ticket_uuid');
         });
     }
