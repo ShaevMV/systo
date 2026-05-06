@@ -41,7 +41,8 @@ class FestivalController extends Controller
             throw new DomainException('Не задан идентификатор фестиваля');
         }
         $isAdmin = filter_var($request->get('is_admin', false),FILTER_VALIDATE_BOOLEAN);
-        $isPusher = Auth::user()?->role === AccountRoleHelper::pusher;
+        $role = Auth::user()?->role;
+        $isPusher = in_array($role, [AccountRoleHelper::pusher, AccountRoleHelper::pusher_curator], true);
 
         return $this->allInfoForOrderingTicketsSearcher
             ->getInfoForOrderingDto(

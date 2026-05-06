@@ -29,6 +29,7 @@ use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListsResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
 class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterface
@@ -141,7 +142,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         $rawData = $this->model::whereId($uuid->value())
             ->with([
                 'users',
-                'ticketType'
+                'ticketType',
+                'location',
             ])
             ->first();
 
@@ -151,17 +153,29 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
         $rawDataArr = $rawData->toArray();
         $rawDataArr['email'] = $rawDataArr['users']['email'] ?? '';
+
+        // Заказ-список: нет ticket_type/types_of_payment/price, есть location/curator
+        if (!empty($rawDataArr['curator_id'])) {
+            return OrderTicketDto::fromStateForList(
+                $rawDataArr,
+                new Uuid($rawData['users']['id']),
+                new Uuid($rawDataArr['curator_id']),
+                new Uuid($rawDataArr['location_id']),
+                $rawDataArr['project'] ?? null,
+            );
+        }
+
         $rawDataArr['questionnaire_type_id'] = $rawData->ticketType->questionnaire_type_id ?? null;
-        $guests = json_decode($rawDataArr['guests'],true) ?? [0=>''];
+        $guests = json_decode($rawDataArr['guests'], true) ?? [0 => ''];
         return OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
             new PriceDto(
-                (int)($rawData['price'] / count($guests)),
+                (int) ((float) $rawData['price'] / max(count($guests), 1)),
                 count($guests),
-                $rawData['discount']
+                (float) $rawData['discount'],
             ),
-            (bool)$rawData['ticketType']['is_live_ticket'] ?? false,
+            (bool) ($rawData['ticketType']['is_live_ticket'] ?? false),
         );
     }
 
@@ -198,6 +212,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ])
             ->selectSub($this->getSubQueryLastComment(), 'last_comment')
             ->whereNull($this->model::TABLE . '.friendly_id')
+            ->whereNull($this->model::TABLE . '.curator_id')
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
@@ -318,6 +333,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             ->with('ticketType')
             ->with('typeOfPayment')
             ->with('tickets')
+            ->with('location')
             ->first()
             ?->toArray();
 
@@ -353,6 +369,7 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
                 User::TABLE . '.email as pusher_email',
             ])
             ->whereNotNull($this->model::TABLE . '.friendly_id')
+            ->whereNull($this->model::TABLE . '.curator_id')
             ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
             ->orderBy($this->model::TABLE . '.kilter', 'DESC');
 
@@ -367,5 +384,79 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
         }
 
         return $result;
+    }
+
+    /**
+     * Список заказов-списков для admin / manager.
+     * Фильтр: WHERE curator_id IS NOT NULL.
+     *
+     * @return OrderTicketItemForListsResponse[]
+     * @throws JsonException
+     */
+    public function getListsList(Filters $filters): array
+    {
+        /** @var Builder $builder */
+        $builder = $this->model
+            ->leftJoin(User::TABLE, $this->model::TABLE . '.user_id',
+                '=',
+                User::TABLE . '.id')
+            ->leftJoin(\App\Models\Location\LocationModel::TABLE, $this->model::TABLE . '.location_id',
+                '=',
+                \App\Models\Location\LocationModel::TABLE . '.id')
+            ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id',
+                '=',
+                FestivalModel::TABLE . '.id')
+            ->select([
+                $this->model::TABLE . '.*',
+                User::TABLE . '.email',
+                User::TABLE . '.city',
+                User::TABLE . '.phone',
+                \App\Models\Location\LocationModel::TABLE . '.name as location_name',
+                FestivalModel::TABLE . '.name as festival_name',
+            ])
+            ->selectSub($this->getCuratorNameSubQuery(),  'curator_name')
+            ->selectSub($this->getCuratorEmailSubQuery(), 'curator_email')
+            ->selectSub($this->getSubQueryCountQuestionnaire(), 'questionnaire_count')
+            ->whereNotNull($this->model::TABLE . '.curator_id')
+            ->orderBy($this->model::TABLE . '.kilter', 'DESC');
+
+        $rawData = FilterBuilder::build($builder, $filters)
+            ->get()
+            ->toArray();
+
+        $result = [];
+        foreach ($rawData as $datum) {
+            $result[] = OrderTicketItemForListsResponse::fromState($datum);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Список заказов-списков для конкретного куратора.
+     * Фильтр: WHERE curator_id = :curatorId.
+     *
+     * @return OrderTicketItemForListsResponse[]
+     * @throws JsonException
+     */
+    public function getCuratorList(Filters $filters): array
+    {
+        return $this->getListsList($filters);
+    }
+
+    private function getCuratorNameSubQuery(): Builder
+    {
+        return User::query()->select('name')
+            ->whereColumn('id', $this->model::TABLE . '.curator_id')
+            ->limit(1)
+            ->getQuery();
+    }
+
+    private function getCuratorEmailSubQuery(): Builder
+    {
+        return User::query()->select('email')
+            ->whereColumn('id', $this->model::TABLE . '.curator_id')
+            ->limit(1)
+            ->getQuery();
     }
 }

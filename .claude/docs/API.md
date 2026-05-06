@@ -256,14 +256,66 @@
 
 ---
 
+### POST `/api/v1/order/createList`
+**Middleware:** `auth:api` + `role:curator`
+
+Создание заказа-списка куратором. **Не имеет цены и типа билета.**
+
+**Request:**
+```json
+{
+  "email": "string (required, email — получатель билетов)",
+  "phone": "string?",
+  "festival_id": "UUID (required)",
+  "location_id": "UUID (required, exists:locations)",
+  "guests": [{ "value": "string (required)", "email": "string?" }],
+  "name": "string?",
+  "comment": "string?"
+}
+```
+
+**Response 200:** `{ "success": true, "message": "Список зарегистрирован..." }`
+**Response (error):** `{ "success": false, "message": "...", "link": "...", "file": "..." }`
+
+---
+
+### POST `/api/v1/order/getListsList`
+**Middleware:** `auth:api` + `role:admin,manager`
+
+Список всех заказов-списков (для admin/manager). Фильтрация: `WHERE curator_id IS NOT NULL`.
+
+**Request (фильтр):**
+```json
+{
+  "festivalId": "UUID (required)",
+  "email": "string?", "name": "string?",
+  "locationId": "UUID?", "status": "string?"
+}
+```
+
+**Response:** `{ "list": [...], "totalNumber": {...} }`
+
+---
+
+### POST `/api/v1/order/getCuratorList`
+**Middleware:** `auth:api` + `role:curator,admin`
+
+Список заказов-списков куратора (admin видит все). Для куратора — `WHERE curator_id = Auth::id()`.
+
+**Request/Response:** аналогично `getListsList`.
+
+---
+
 ### POST `/api/v1/order/toChangeStatus/{id}`
-**Middleware:** `auth:api` + `role:seller,admin,pusher`
+**Middleware:** `auth:api` + `role:seller,admin,pusher,manager`
+
+Дополнительно для list-статусов (`APPROVE_LIST`, `CANCEL_LIST`, `DIFFICULTIES_AROSE_LIST`): внутри метода проверяется, что `Auth::user()->role` ∈ `{admin, manager}`. Иначе → 403.
 
 **Request:**
 ```json
 {
   "status": "string (required)",
-  "comment": "string? (required если DIFFICULTIES_AROSE)",
+  "comment": "string? (required если DIFFICULTIES_AROSE или DIFFICULTIES_AROSE_LIST)",
   "liveList": ["int"]? (required если LIVE_TICKET_ISSUED)
 }
 ```
@@ -491,6 +543,34 @@
 
 ---
 
+## 8.1. Локации (для заказов-списков)
+
+Префикс: **`/api/v1/location`**
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список локаций (фильтр: `name`, `festival_id`, `active`) |
+| GET | `/getItem/{id}` | публичный | Одна локация |
+| POST | `/create` | `auth:api` + `admin` | Создать (UUID в `data.id`) |
+| POST | `/edit/{id}` | `auth:api` + `admin` | Редактировать |
+| DELETE | `/delete/{id}` | `auth:api` + `admin` | Удалить |
+
+**Поля Location DTO:**
+```json
+{
+  "id": "UUID",
+  "name": "string (required)",
+  "description": "string?",
+  "festival_id": "UUID (required, exists:festivals)",
+  "questionnaire_type_id": "UUID? (exists:questionnaire_type)",
+  "email_template": "string?",
+  "pdf_template": "string?",
+  "active": "bool (default true)"
+}
+```
+
+---
+
 ## 9. Способы оплаты
 
 Префикс: **`/api/v1/typesOfPayment`**
@@ -554,10 +634,13 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory |
-| **role: seller,admin** | order/getList, order/toChangeStatus |
-| **role: pusher,admin** | order/getListForFriendly, order/createFriendly, order/toChangeStatus |
-| **role: seller,admin,pusher** | order/toChangeStatus |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete} |
+| **role: seller,admin** | order/getList |
+| **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
+| **role: curator** | order/createList |
+| **role: curator,admin** | order/getCuratorList |
+| **role: admin,manager** | order/getListsList |
+| **role: seller,admin,pusher,manager** | order/toChangeStatus (для list-статусов внутри проверка admin/manager) |
 | **bot** | promoCode/savePromoCodeForBot |

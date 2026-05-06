@@ -25,7 +25,8 @@ class ProcessUserNotificationOrderTicketChanged implements ShouldQueue, DomainEv
     public function __construct(
         private string $email,
         private array  $changes,
-        private Uuid   $ticketTypeId,
+        private ?Uuid  $ticketTypeId,
+        private ?Uuid  $festivalId = null,
     ) {
     }
 
@@ -34,6 +35,7 @@ class ProcessUserNotificationOrderTicketChanged implements ShouldQueue, DomainEv
         Mail::to($this->email)->send(new OrderToChangeTicket(
             $this->changes,
             $this->ticketTypeId,
+            $this->festivalId,
         ));
     }
 }

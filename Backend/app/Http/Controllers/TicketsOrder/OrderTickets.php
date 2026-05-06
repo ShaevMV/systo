@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\TicketsOrder;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateListOrderRequest;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
 use App\Models\User;
@@ -22,8 +23,10 @@ use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
+use Tickets\Order\OrderTicket\Application\CreateList\CreateListOrder;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
+use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderFilterQuery as OrderFilterQueryForLists;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
@@ -41,6 +44,7 @@ class OrderTickets extends Controller
 {
     public function __construct(
         private CreateOrder        $createOrder,
+        private CreateListOrder    $createListOrder,
         private GetTicketType      $getTicketType,
         private AccountApplication $accountApplication,
         private PriceService       $priceService,
@@ -52,6 +56,7 @@ class OrderTickets extends Controller
         private AddComment         $addComment,
         private ChangeTicket       $changeTicket,
         private GetOrderHistory    $getOrderHistory,
+        private \Tickets\Auto\Application\AutoApplication $autoApplication,
        // private Billing            $billing,
     )
     {
@@ -237,6 +242,114 @@ class OrderTickets extends Controller
             ]);
     }
 
+    /**
+     * Создать заказ-список (только куратор).
+     *
+     * @throws Throwable
+     */
+    public function createList(CreateListOrderRequest $request): JsonResponse
+    {
+        try {
+            $curatorId = new Uuid(Auth::id());
+
+            // Создание или получение пользователя-получателя билетов по email
+            $userId = new Uuid(
+                $this->accountApplication->creatingOrGetAccountId(
+                    AccountDto::fromState($request->toArray())
+                )->value()
+            );
+
+            $guests = $request->guests;
+            if ($request->name) {
+                array_unshift($guests, [
+                    'value' => $request->name,
+                    'email' => $request->email,
+                ]);
+            }
+
+            $locationId = new Uuid($request->location_id);
+
+            $data = $request->toArray();
+            $data['guests'] = $guests;
+
+            $orderTicketDto = OrderTicketDto::fromStateForList(
+                $data,
+                $userId,
+                $curatorId,
+                $locationId,
+                $request->project ?: null,
+            );
+
+            $this->createListOrder->createAndSave($orderTicketDto);
+
+            if ($request->comment) {
+                $this->addComment->send(
+                    $orderTicketDto->getId(),
+                    $curatorId,
+                    $request->comment
+                );
+            }
+
+            // Авто привязываются после создания заказа (Baza-sync уже включён в AutoApplication::add).
+            $autos = $request->autos ?? [];
+            if (is_array($autos) && !empty($autos)) {
+                $this->autoApplication->addMany($orderTicketDto->getId(), $autos);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Список зарегистрирован. После проверки администратор/менеджер одобрит его и получатель получит билеты.',
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'link' => $exception->getLine(),
+                'file' => $exception->getFile(),
+            ]);
+        }
+    }
+
+    /**
+     * Список заказов-списков для admin / manager.
+     */
+    public function getListsList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        $listResponse = $this->getOrder->listByFilterForLists(
+            OrderFilterQueryForLists::fromState(
+                $filterForTicketOrder->toArray(),
+                null
+            )
+        ) ?? new ListResponse();
+
+        return response()->json([
+            'list' => $listResponse->toArray(),
+            'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray(),
+        ]);
+    }
+
+    /**
+     * Список заказов-списков для конкретного куратора (Auth::id).
+     * Если запрашивает админ — фильтр по куратору не применяется (видит все).
+     */
+    public function getCuratorList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        $listResponse = $this->getOrder->listByFilterForLists(
+            OrderFilterQueryForLists::fromState(
+                $filterForTicketOrder->toArray(),
+                $user->role === AccountRoleHelper::admin ? null : new Uuid(Auth::id()),
+            )
+        ) ?? new ListResponse();
+
+        return response()->json([
+            'list' => $listResponse->toArray(),
+            'totalNumber' => $this->totalNumber->getTotalNumber($listResponse)->toArray(),
+        ]);
+    }
+
     public function getFriendlyList(FilterForTicketOrder $filterForTicketOrder): JsonResponse
     {
         /** @var User $user */
@@ -267,19 +380,89 @@ class OrderTickets extends Controller
         $orderUuid = new Uuid($id);
         $orderItem = $this->getOrder->getItemById($orderUuid);
         /** @var User $user */
-        $user = Auth::user();
-        if (is_null($orderItem) ||
-            (!$orderItem->getUserId()->equals(new Uuid(Auth::id()))
-                && !($user->role === AccountRoleHelper::admin))
-        ) {
+        $user    = Auth::user();
+        $authId  = Auth::id();
+
+        $isOwner   = $orderItem !== null && $orderItem->getUserId()->equals(new Uuid($authId));
+        $isCurator = $orderItem !== null && $orderItem->getCuratorId() === $authId;
+        $isAdmin   = $user->role === AccountRoleHelper::admin;
+        $isManager = $user->role === AccountRoleHelper::manager;
+
+        if (is_null($orderItem) || (!$isOwner && !$isCurator && !$isAdmin && !$isManager)) {
             return response()->json([
                 'errors' => ['error' => 'Заказ не найден']
             ], 404);
         }
 
+        $payload = $orderItem->toArray();
+        // Авто только для заказов-списков
+        if ($orderItem->getCuratorId() !== null) {
+            $payload['autos'] = array_map(
+                fn (\Tickets\Auto\Dto\AutoDto $a) => $a->toArray(),
+                $this->autoApplication->getByOrder($orderUuid)
+            );
+        }
+
         return response()->json([
-            'order' => $orderItem->toArray()
+            'order' => $payload
         ]);
+    }
+
+    /**
+     * Добавить авто в заказ-список.
+     * Доступ: admin, или куратор-создатель заказа (curator_id == auth_id).
+     */
+    public function addAuto(string $id, \Illuminate\Http\Request $request): JsonResponse
+    {
+        $orderUuid = new Uuid($id);
+        $number    = (string) $request->input('number', '');
+
+        if (! $this->canManageAutoOf($orderUuid)) {
+            return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
+        }
+
+        try {
+            $auto = $this->autoApplication->add($orderUuid, $number);
+            return response()->json(['success' => true, 'auto' => $auto->toArray()]);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Удалить авто из заказа-списка.
+     */
+    public function removeAuto(string $id, string $autoId): JsonResponse
+    {
+        $orderUuid = new Uuid($id);
+
+        if (! $this->canManageAutoOf($orderUuid)) {
+            return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
+        }
+
+        try {
+            $this->autoApplication->remove($orderUuid, new Uuid($autoId));
+            return response()->json(['success' => true]);
+        } catch (Throwable $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+    }
+
+    /**
+     * Право на управление авто заказа: admin или куратор-создатель.
+     */
+    private function canManageAutoOf(Uuid $orderUuid): bool
+    {
+        /** @var User $user */
+        $user   = Auth::user();
+        $authId = Auth::id();
+
+        if ($user->role === AccountRoleHelper::admin) {
+            return true;
+        }
+
+        $orderItem = $this->getOrder->getItemById($orderUuid);
+        return $orderItem !== null && $orderItem->getCuratorId() === $authId;
     }
 
     /**
@@ -302,8 +485,25 @@ class OrderTickets extends Controller
         // Добавляем правила в зависимости от статуса
         if (in_array($request->get('status'), [
             Status::DIFFICULTIES_AROSE,
+            Status::DIFFICULTIES_AROSE_LIST,
         ])) {
             $rules['comment'] = 'required|string';
+        }
+
+        // Смена list-статусов разрешена только admin / manager
+        if (in_array($request->get('status'), [
+            Status::APPROVE_LIST,
+            Status::CANCEL_LIST,
+            Status::DIFFICULTIES_AROSE_LIST,
+        ])) {
+            /** @var User $authUser */
+            $authUser = Auth::user();
+            if (! in_array($authUser->role, [AccountRoleHelper::admin, AccountRoleHelper::manager], true)) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['role' => 'Смена статуса списка доступна только администратору или менеджеру'],
+                ], 403);
+            }
         }
 
         if (in_array($request->get('status'), [
@@ -448,8 +648,23 @@ class OrderTickets extends Controller
             ], 422);
         }
 
+        $orderUuid = new Uuid($id);
+
+        // Куратор может менять ФИО только в своём заказе-списке
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        if ($authUser->role === AccountRoleHelper::curator || $authUser->role === AccountRoleHelper::pusher_curator) {
+            $orderItem = $this->getOrder->getItemById($orderUuid);
+            if ($orderItem === null || $orderItem->getCuratorId() !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Нет доступа к этому заказу',
+                ], 403);
+            }
+        }
+
         $this->changeTicket->change(
-            new Uuid($id),
+            $orderUuid,
             $request->input('value', []),
             $request->input('email', []),
             Auth::id(),
@@ -467,16 +682,55 @@ class OrderTickets extends Controller
     {
         $history = $this->getOrderHistory->getByOrderId($id);
 
+        // Определяем, заказ-список ли это — для них чистим
+        // унаследованный payload от полей про деньги, переименовываем event для UI
+        // и подменяем актёра события создания на реального куратора
+        $orderRow = \App\Models\Ordering\OrderTicketModel::query()
+            ->whereId($id)
+            ->first(['curator_id']);
+
+        $isList    = $orderRow && $orderRow->curator_id !== null;
+        $curator   = null;
+        if ($isList) {
+            $curator = User::query()
+                ->whereId($orderRow->curator_id)
+                ->first(['id', 'name', 'email']);
+        }
+
         return response()->json([
             'success' => true,
-            'history' => array_map(fn($item) => [
-                'event_name'     => $item->eventName,
-                'aggregate_type' => $item->aggregateType,
-                'payload'        => $item->payload,
-                'actor_id'       => $item->actorId,
-                'actor_type'     => $item->actorType,
-                'occurred_at'    => $item->occurredAt->toIso8601String(),
-            ], $history),
+            'history' => array_map(function ($item) use ($isList, $curator) {
+                $payload     = $item->payload;
+                $eventName   = $item->eventName;
+                $actorId     = $item->actorId;
+                $actorName   = $item->actorName;
+                $actorEmail  = $item->actorEmail;
+
+                if ($isList && $eventName === 'order_created') {
+                    unset($payload['price'], $payload['ticket_type']);
+                    $eventName = 'order_list_created';
+
+                    // Для устаревших записей подменяем актёра на куратора
+                    if ($curator !== null) {
+                        $actorName  = $curator->name;
+                        $actorEmail = $curator->email;
+                        $actorId    = $curator->email
+                            ? ($curator->email . '|' . ($curator->name ?? ''))
+                            : $curator->id;
+                    }
+                }
+
+                return [
+                    'event_name'     => $eventName,
+                    'aggregate_type' => $item->aggregateType,
+                    'payload'        => $payload,
+                    'actor_id'       => $actorId,
+                    'actor_type'     => $item->actorType,
+                    'actor_name'     => $actorName,
+                    'actor_email'    => $actorEmail,
+                    'occurred_at'    => $item->occurredAt->toIso8601String(),
+                ];
+            }, $history),
         ]);
     }
 

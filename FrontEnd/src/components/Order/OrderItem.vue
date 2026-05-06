@@ -54,6 +54,12 @@
                     :list-tickets="this.getOrderItem.tickets"
                     :status="getStatus"/>
 
+              <order-autos
+                  :order-id="getId"
+                  :curator-id="getCuratorId"
+                  :autos="getAutos"
+              />
+
               <button type="button"
                       @click="back"
                       class="btn btn-primary x-button">Назад в МОИ ОРГВЗНОСЫ</button>
@@ -74,11 +80,12 @@ import {mapGetters} from "vuex";
 import OrderButton from "@/components/Order/OrderButton.vue";
 import NewTicket from "@/components/Order/NewTicket.vue";
 import OrderHistory from "@/components/Order/OrderHistory.vue";
+import OrderAutos from "@/components/Order/OrderAutos.vue";
 import CorrectPrice from "@/components/OrderFriendly/CorrectPrice.vue";
 
 export default {
   name: "OrderItem",
-  components: {NewTicket, OrderButton, OrderHistory, CorrectPrice},
+  components: {NewTicket, OrderButton, OrderHistory, OrderAutos, CorrectPrice},
   computed: {
     ...mapGetters('appOrder', [
       'getOrderItem',
@@ -146,7 +153,13 @@ export default {
     },
     getFriendlyId: function () {
       return this.getOrderItem.friendly_id;
-    }
+    },
+    getCuratorId: function () {
+      return this.getOrderItem.curator_id || null;
+    },
+    getAutos: function () {
+      return this.getOrderItem.autos || [];
+    },
   },
   methods: {
     back: function () {

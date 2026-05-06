@@ -79,8 +79,18 @@ final class OrderTicketModel extends Model
 
     protected $fillable = [
         'id', 'guests', 'user_id', 'ticket_type_id', 'promo_code', 'types_of_payment_id', 'price', 'discount', 'status',
-        'date', 'phone',
+        'date', 'phone', 'friendly_id', 'location_id', 'curator_id', 'project',
     ];
+
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Location\LocationModel::class, 'location_id');
+    }
+
+    public function curator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'curator_id');
+    }
 
     public function comments(): HasMany
     {

@@ -34,6 +34,10 @@ use Tickets\TypesOfPayment\Repositories\InMemoryMySqlTypesOfPaymentRepository;
 use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\History\Repositories\InMemoryMySqlHistoryRepository;
+use Tickets\Auto\Repositories\AutoRepositoryInterface;
+use Tickets\Auto\Repositories\InMemoryMySqlAutoRepository;
+use Tickets\Location\Repositories\InMemoryMySqlLocationRepository;
+use Tickets\Location\Repositories\LocationRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 
@@ -62,5 +66,7 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(QuestionnaireTypeRepositoryInterface::class, InMemoryMySqlQuestionnaireTypeRepository::class);
         $this->app->singleton(QuestionnaireValidationService::class, QuestionnaireValidationService::class);
         $this->app->bind(HistoryRepositoryInterface::class, InMemoryMySqlHistoryRepository::class);
+        $this->app->bind(LocationRepositoryInterface::class, InMemoryMySqlLocationRepository::class);
+        $this->app->bind(AutoRepositoryInterface::class, InMemoryMySqlAutoRepository::class);
     }
 }

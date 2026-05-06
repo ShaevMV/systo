@@ -16,6 +16,10 @@ final class DomainHistoryDto
         public readonly ?string $actorId,
         public readonly string  $actorType,
         public readonly Carbon  $occurredAt,
+        public readonly ?string $actorName  = null,
+        public readonly ?string $actorEmail = null,
+        // Чистый UUID актёра (actorId для совместимости с UI содержит "email|fio")
+        public readonly ?string $actorRealId = null,
     ) {
     }
 }

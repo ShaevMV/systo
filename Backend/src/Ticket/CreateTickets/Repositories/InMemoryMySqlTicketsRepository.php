@@ -9,6 +9,7 @@ use App\Models\Festival\TicketTypeFestivalModel;
 use App\Models\Festival\TicketTypesModel;
 use App\Models\Ordering\CommentOrderTicketModel;
 use App\Models\Ordering\InfoForOrder\TypesOfPaymentModel;
+use App\Models\Location\LocationModel;
 use App\Models\Ordering\OrderTicketModel;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
@@ -71,6 +72,27 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     }
 
     /**
+     * @param Uuid[] $ticketIds
+     * @return bool
+     * @throws Throwable
+     */
+    public function deleteTicketsByTicketsId(array $ticketIds): bool
+    {
+        DB::beginTransaction();
+        try {
+            foreach ($ticketIds as $ticketId) {
+                $this->model::whereId($ticketId->value())->delete();
+            }
+
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+    /**
      * @param Uuid $orderId
      * @param bool $isShowDelete
      * @return Uuid[]
@@ -120,6 +142,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $result = $result->where($this->model::TABLE . '.id', '=', $ticketId->value())
             ->leftJoin(OrderTicketModel::TABLE, $this->model::TABLE . '.order_ticket_id', '=', OrderTicketModel::TABLE . '.id')
             ->leftJoin(User::TABLE, OrderTicketModel::TABLE . '.user_id', '=', User::TABLE . '.id')
+            ->leftJoin(User::TABLE . ' as curator_user', OrderTicketModel::TABLE . '.curator_id', '=', 'curator_user.id')
             ->leftJoin(FestivalModel::TABLE, $this->model::TABLE . '.festival_id', '=', FestivalModel::TABLE . '.id')
             ->leftJoin(TicketTypesModel::TABLE, OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypesModel::TABLE . '.id')
             ->leftJoin(TicketTypeFestivalModel::TABLE, function ($join) {
@@ -127,11 +150,14 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 $join->on(OrderTicketModel::TABLE . '.ticket_type_id', '=', TicketTypeFestivalModel::TABLE . '.ticket_type_id');
             })
             ->leftJoin(TypesOfPaymentModel::TABLE, OrderTicketModel::TABLE . '.types_of_payment_id', '=', TypesOfPaymentModel::TABLE . '.id')
+            ->leftJoin(LocationModel::TABLE, OrderTicketModel::TABLE . '.location_id', '=', LocationModel::TABLE . '.id')
             ->select([
                 $this->model::TABLE . '.id',
                 $this->model::TABLE . '.kilter',
                 $this->model::TABLE . '.name',
+                $this->model::TABLE . '.deleted_at as ticket_deleted_at',
                 TicketTypeFestivalModel::TABLE . '.pdf',
+                LocationModel::TABLE . '.pdf_template as location_pdf_template',
                 TicketTypeFestivalModel::TABLE . '.email as emailView',
                 TypesOfPaymentModel::TABLE . '.email as emailPayView',
                 OrderTicketModel::TABLE . '.phone',
@@ -139,6 +165,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
                 OrderTicketModel::TABLE . '.id as order_id',
+                OrderTicketModel::TABLE . '.curator_id',
+                OrderTicketModel::TABLE . '.location_id',
+                OrderTicketModel::TABLE . '.project',
+                'curator_user.email as curator_email',
+                'curator_user.name as curator_name',
                 $this->model::TABLE . '.festival_id',
                 $this->model::TABLE . '.email',
                 User::TABLE . '.email as email_user',
@@ -157,18 +188,25 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['kilter'],
             new Uuid($result['id']),
             $result['status'],
-            empty($result['email']) ? $result['email_user'] : $result['email'],
-            $result['phone'],
-            $result['city'],
+            empty($result['email']) ? ($result['email_user'] ?? '') : $result['email'],
+            $result['phone'] ?? '',
+            $result['city'] ?? '',
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            empty($result['pdf']) ? null : $result['pdf'],
+            // Для list-заказов: TicketTypeFestivalModel.pdf = null, берём location.pdf_template (или null → 'pdf' по умолчанию)
+            $result['pdf'] ?: ($result['location_pdf_template'] ?: null),
             $result['emailPayView'] ?? $result['emailView'],
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
-            new Uuid($result['ticket_type_id']),
-            $result['name_type'],
-            isset($result['order_id']) ? new Uuid($result['order_id']) : null
+            empty($result['ticket_type_id']) ? null : new Uuid($result['ticket_type_id']),
+            $result['name_type'] ?? null,
+            isset($result['order_id']) ? new Uuid($result['order_id']) : null,
+            empty($result['curator_id']) ? null : new Uuid($result['curator_id']),
+            $result['curator_email'] ?? null,
+            $result['curator_name'] ?? null,
+            $result['project'] ?? null,
+            empty($result['location_id']) ? null : new Uuid($result['location_id']),
+            !empty($result['ticket_deleted_at']),   // isDeleted — soft-deleted билет
         );
     }
 
@@ -193,14 +231,54 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->where('uuid', '=', $ticketsDto->getId()->value())
                     ->update([
                         'status' => $data['status'],
-                        'festival_id' => $data['festival_id'],
                         'is_need_seedling' => $data['is_need_seedling'],
                         'type_ticket_id' => $data['type_ticket_id'],
                         'type_ticket' => $data['type_ticket'],
                         'name' => $data['name']
                     ]);
             }
+        } catch (\Exception) {
+            return false;
+        } finally {
+            return true;
+        }
+    }
+
+    /**
+     * Запись/обновление билета-списка в таблицу `spisok_tickets` базы Baza.
+     * Идентификация — по `ticket_uuid` (UUID билета из нашей системы).
+     * При смене ФИО/email старый soft-deleted билет получит status=cancel;
+     * новый билет (с новым UUID) будет вставлен свежей строкой.
+     */
+    public function setInBazaList(TicketResponse $ticketsDto): bool
+    {
+        $data = $ticketsDto->toArrayForSpisok();
+        try {
+            DB::connection('mysqlBaza')->getPdo();
+
+            $exists = DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('ticket_uuid', '=', $data['ticket_uuid'])
+                ->exists();
+
+            if (!$exists) {
+                return (bool)DB::connection('mysqlBaza')
+                    ->table('spisok_tickets')
+                    ->insert($data);
+            }
+
+            DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('ticket_uuid', '=', $data['ticket_uuid'])
+                ->update([
+                    'project' => $data['project'],
+                    'curator' => $data['curator'],
+                    'email' => $data['email'],
+                    'name' => $data['name'],
+                    'comment' => $data['comment'],
+                    'status' => $data['status'],
+                    'festival_id' => $data['festival_id'],
+                ]);
         } catch (\Exception $e) {
+            Log::error('setInBazaList: ' . $e->getMessage(), ['ticket_uuid' => $data['ticket_uuid']]);
             return false;
         } finally {
             return true;
@@ -219,10 +297,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             throw new DomainException('Не найден билет в Базе входа');
         } else {
             return DB::connection('mysqlBaza')->table('live_tickets')
-                ->where('kilter', '=', $number)
-                ->update([
-                    'el_ticket_id' => $ticketId?->value()
-                ]) > 0;
+                    ->where('kilter', '=', $number)
+                    ->update([
+                        'el_ticket_id' => $ticketId?->value()
+                    ]) > 0;
         }
     }
 

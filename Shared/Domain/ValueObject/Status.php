@@ -17,6 +17,10 @@ final class Status implements EntityDataInterface
     public const CANCEL_FOR_LIVE = 'cancel_for_live';
     public const DIFFICULTIES_AROSE = 'difficulties_arose';
     public const LIVE_TICKET_ISSUED = 'live_ticket_issued';
+    public const NEW_LIST = 'new_list';
+    public const APPROVE_LIST = 'approve_list';
+    public const CANCEL_LIST = 'cancel_list';
+    public const DIFFICULTIES_AROSE_LIST = 'difficulties_arose_list';
 
     private const HUMAN_STATUS_LIST = [
         self::NEW => 'Ожидает проверки',
@@ -27,6 +31,10 @@ final class Status implements EntityDataInterface
         self::PAID_FOR_LIVE => 'Подверждён',
         self::DIFFICULTIES_AROSE => 'Возникли трудности',
         self::LIVE_TICKET_ISSUED => 'Выдан живой билет',
+        self::NEW_LIST => 'Список ожидает проверки',
+        self::APPROVE_LIST => 'Список одобрен',
+        self::CANCEL_LIST => 'Список отменён',
+        self::DIFFICULTIES_AROSE_LIST => 'По списку возникли трудности',
     ];
 
     private function getRoleChanceStatus(string $status): array
@@ -57,7 +65,19 @@ final class Status implements EntityDataInterface
             self::LIVE_TICKET_ISSUED => [
                 self::CANCEL_FOR_LIVE,
             ],
-            self::CANCEL,self::CANCEL_FOR_LIVE => []
+            self::NEW_LIST => [
+                self::APPROVE_LIST,
+                self::CANCEL_LIST,
+                self::DIFFICULTIES_AROSE_LIST,
+            ],
+            self::APPROVE_LIST => [
+                self::DIFFICULTIES_AROSE_LIST,
+            ],
+            self::DIFFICULTIES_AROSE_LIST => [
+                self::APPROVE_LIST,
+                self::CANCEL_LIST,
+            ],
+            self::CANCEL,self::CANCEL_FOR_LIVE,self::CANCEL_LIST => []
         };
     }
 
@@ -138,6 +158,26 @@ final class Status implements EntityDataInterface
     public function isPaidForLive(): bool
     {
         return $this->name === self::PAID_FOR_LIVE;
+    }
+
+    public function isNewList(): bool
+    {
+        return $this->name === self::NEW_LIST;
+    }
+
+    public function isApproveList(): bool
+    {
+        return $this->name === self::APPROVE_LIST;
+    }
+
+    public function isCancelList(): bool
+    {
+        return $this->name === self::CANCEL_LIST;
+    }
+
+    public function isDifficultiesAroseList(): bool
+    {
+        return $this->name === self::DIFFICULTIES_AROSE_LIST;
     }
 
     public function getName(): string

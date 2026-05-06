@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
@@ -35,7 +36,10 @@ class ProcessCreateTicket implements ShouldQueue, DomainEvent
     ): void
     {
         $tickets = $application->createList($this->orderId, $this->quests);
-
+        Log::debug('Создаю билеты на заказ ',[
+            'id' => $this->orderId->value(),
+            'count' => count($this->quests),
+        ]);
         foreach ($tickets as $ticket) {
             $pushTicket->pushTicket($ticket->getId());
         }

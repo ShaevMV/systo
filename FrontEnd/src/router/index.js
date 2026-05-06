@@ -33,6 +33,11 @@ import TypesOfPaymentItemView from "@/views/typesOfPayment/TypesOfPaymentItemVie
 
 import QuestionnaireTypeListView from "@/views/questionnaireType/QuestionnaireTypeListView.vue";
 import QuestionnaireTypeItemView from "@/views/questionnaireType/QuestionnaireTypeItemView.vue";
+import LocationListView from "@/views/location/LocationListView.vue";
+import LocationItemView from "@/views/location/LocationItemView.vue";
+import OrderListsListView from "@/views/order/OrderListsListView.vue";
+import OrderListForCurator from "@/views/order/OrderListForCurator.vue";
+import CreateListOrderView from "@/views/order/CreateListOrderView.vue";
 
 import AccountListView from "@/views/account/AccountListView.vue";
 
@@ -51,7 +56,7 @@ const routes = [
         component: FriendlyView,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'pusher'],
+            'role': ['admin', 'pusher', 'pusher_curator'],
         }
     },
     // инвайт при старте покупка билета
@@ -165,7 +170,38 @@ const routes = [
         component: OrderListForFriendly,
         meta: {
             'requiresAuth': true,
-            'role': ['admin', 'pusher'],
+            'role': ['admin', 'pusher', 'pusher_curator'],
+        }
+    },
+
+    // Заказы-списки (admin/manager)
+    {
+        path: '/ordersLists',
+        name: 'AllOrdersLists',
+        component: OrderListsListView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'manager'],
+        }
+    },
+    // Свои заказы-списки (куратор)
+    {
+        path: '/curatorOrders',
+        name: 'CuratorOrders',
+        component: OrderListForCurator,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'curator', 'pusher_curator'],
+        }
+    },
+    // Форма создания заказа-списка (куратор)
+    {
+        path: '/curatorOrders/create',
+        name: 'CreateListOrder',
+        component: CreateListOrderView,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin', 'curator', 'pusher_curator'],
         }
     },
 
@@ -315,6 +351,28 @@ const routes = [
         }
     },
 
+    // Локации (сцены) для заказов-списков
+    {
+        path: '/location/list',
+        name: 'LocationListView',
+        component: LocationListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/location/:id?',
+        name: 'LocationItemView',
+        component: LocationItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
     // Типы оплат
     {
         path: '/typesOfPayment/list',
@@ -368,6 +426,16 @@ router.beforeEach((to, from, next) => {
         const lifetime = localStorage['user.token.lifetime'];
         const token = rawToken && rawToken !== 'null' && lifetime
             && Math.trunc(Date.now() / 1000) < +lifetime;
+
+        // "Рабочие" роли не должны попадать на форму обычного заказа /hfjlsd65t4732 —
+        // кидаем каждую на свою профильную страницу.
+        const role    = localStorage['user.role'];
+        const isAdmin = localStorage['user.isAdmin'] === 'true' || role === 'admin';
+        if (token && !isAdmin && to.path === '/hfjlsd65t4732') {
+            if (role === 'curator')        return next({ path: '/curatorOrders/create' });
+            if (role === 'pusher')         return next({ path: '/frendlyOrder' });
+            if (role === 'pusher_curator') return next({ path: '/frendlyOrder' });
+        }
 
         if (to.matched.some(record => record.meta.requiresAuth)) {
             if (!token) {

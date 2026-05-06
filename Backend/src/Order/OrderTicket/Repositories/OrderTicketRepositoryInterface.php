@@ -10,6 +10,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
+use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListsResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
 interface OrderTicketRepositoryInterface
@@ -93,4 +94,18 @@ interface OrderTicketRepositoryInterface
      * @return bool
      */
     public function changePrice(Uuid $orderId, float $newPrice): bool;
+
+    /**
+     * Список заказов-списков (для admin / manager).
+     *
+     * @return OrderTicketItemForListsResponse[]
+     */
+    public function getListsList(Filters $filters): array;
+
+    /**
+     * Список заказов-списков для конкретного куратора.
+     *
+     * @return OrderTicketItemForListsResponse[]
+     */
+    public function getCuratorList(Filters $filters): array;
 }

@@ -21,11 +21,19 @@
 | **DIFFICULTIES_AROSE** | ✅ | ✅ | — | — |
 | **LIVE_TICKET_ISSUED** | — | ✅ (CANCEL_FOR_LIVE) | — | — |
 
+#### Заказы-списки (NEW_LIST → APPROVE_LIST)
+
+| Из статуса | → APPROVE_LIST | → CANCEL_LIST | → DIFFICULTIES_AROSE_LIST |
+|------------|----------------|----------------|---------------------------|
+| **NEW_LIST** | ✅ | ✅ | ✅ |
+| **APPROVE_LIST** | — | — | ✅ |
+| **DIFFICULTIES_AROSE_LIST** | ✅ | ✅ | — |
+
 #### Терминальные статусы
 
 | Из статуса | → Любые другие |
 |------------|----------------|
-| **CANCEL** / **CANCEL_FOR_LIVE** | ❌ терминальный |
+| **CANCEL** / **CANCEL_FOR_LIVE** / **CANCEL_LIST** | ❌ терминальный |
 
 ### Краткая сводка переходов
 
@@ -41,6 +49,12 @@
        └──→ CANCEL      └──→ CANCEL_FOR_LIVE └──→ CANCEL_FOR_LIVE
        └──→ DIFFICULTIES_AROSE ──→ PAID (обычный)
        └──→ LIVE_TICKET_ISSUED (сразу выдать)
+
+Заказы-списки (куратор → admin/manager):
+  NEW_LIST ──→ APPROVE_LIST ──→ DIFFICULTIES_AROSE_LIST ──→ APPROVE_LIST (цикл)
+       │                                 │
+       └──→ CANCEL_LIST                  └──→ CANCEL_LIST
+       └──→ DIFFICULTIES_AROSE_LIST ──→ APPROVE_LIST / CANCEL_LIST
 ```
 
 ### Правила смены статуса
@@ -51,10 +65,14 @@
 - **CANCEL_FOR_LIVE** — отменяет живые билеты, освобождает номера
 - **LIVE_TICKET_ISSUED** — требует массив `liveList` (номера живых билетов), присваивает номера билетам, отправляет анкеты
 - **DIFFICULTIES_AROSE** — **обязателен комментарий**, отменяет билеты, отправляет email о трудностях
+- **APPROVE_LIST** — создаёт билеты заказа-списка, шлёт PDF получателю (через `OrderListApproved`, blade-шаблон из `Location.email_template`), рассылает анкеты гостям
+- **CANCEL_LIST** — отменяет билеты заказа-списка, шлёт письмо `OrderListCancel` получателю
+- **DIFFICULTIES_AROSE_LIST** — **обязателен комментарий**, отменяет билеты, шлёт `OrderListDifficultiesArose` получателю
 
 ### Роли для смены статуса
 
-Доступно: `seller`, `admin`, `pusher`
+- Обычные/Live статусы (PAID/CANCEL/PAID_FOR_LIVE/LIVE_TICKET_ISSUED/DIFFICULTIES_AROSE и пр.): `seller`, `admin`, `pusher`
+- List-статусы (APPROVE_LIST / CANCEL_LIST / DIFFICULTIES_AROSE_LIST): только `admin`, `manager`
 
 ---
 
@@ -276,7 +294,8 @@
 | **admin** | Полный доступ | Всё + управление промокодами, типами билетов, пользователями, анкетами |
 | **seller** | Продавец живых билетов | Просмотр списка заказов (`POST /api/v1/order/getList`), смена статуса заказов (`POST /api/v1/order/toChangeStatus`) |
 | **pusher** | Продавец Friendly-билетов | Создание Friendly-заказов (`POST /api/v1/order/createFriendly`), список Friendly-заказов (`POST /api/v1/order/getListForFriendly`), смена статуса (`POST /api/v1/order/toChangeStatus`) |
-| **manager** | Менеджер анкет | Просмотр и одобрение анкет |
+| **manager** | Менеджер анкет и заказов-списков | Просмотр и одобрение анкет, одобрение/отмена заказов-списков (`getListsList`, `toChangeStatus` для `*_list`) |
+| **curator** | Куратор заказов-списков | Создание заказа-списка (`createList`), просмотр своих заказов-списков (`getCuratorList`) |
 
 ### Проверка прав
 
@@ -351,9 +370,56 @@
 
 ---
 
+## 12. Заказы-списки и Локации
+
+### Что это
+**Заказ-список** — третий тип заказа (наряду с обычным и Friendly). Создаёт **куратор** для группы гостей на конкретную **локацию (сцену)** фестиваля.
+
+### Отличия от обычного и Friendly заказов
+- **Не имеет цены** (`price`, `discount`, `types_of_payment_id`, `ticket_type_id` — NULL в `order_tickets`)
+- Привязан к `location_id` (FK → `locations`) вместо `ticket_type_id`
+- В `curator_id` — UUID куратора-создателя (хранится отдельно от `friendly_id`)
+- `user_id` — получатель билетов (создаётся/находится по email, как в обычном заказе)
+
+### Сущность Location (локация / сцена)
+| Поле | Тип | Описание |
+|------|-----|----------|
+| `id` | uuid | PK |
+| `name` | string | Название локации/сцены |
+| `description` | text NULL | Описание |
+| `questionnaire_type_id` | uuid NULL | Шаблон анкеты для гостей этой локации |
+| `festival_id` | uuid | Фестиваль |
+| `email_template` | string NULL | Имя blade-шаблона письма (по умолчанию `orderListApproved`) |
+| `pdf_template` | string NULL | Имя blade-шаблона PDF |
+| `active` | bool | Видна ли в форме создания списка |
+
+### Жизненный цикл заказа-списка
+1. **Куратор** создаёт список через `POST /api/v1/order/createList` → статус `NEW_LIST`. Никаких писем не уходит.
+2. **Admin/manager** одобряет → статус `APPROVE_LIST`:
+   - Создаются билеты (`ProcessCreateTicket`)
+   - Гостям с email уходят ссылки на анкеты (`ProcessGuestNotificationQuestionnaire`)
+   - Получателю (`order.email`) уходит письмо с PDF-билетами (`ProcessUserNotificationListApproved` → `OrderListApproved`)
+3. **Admin/manager** может отменить → `CANCEL_LIST` или поставить `DIFFICULTIES_AROSE_LIST` с обязательным комментарием.
+
+### Кто получает письма
+- **Получатель** (`order.email`, поле `user_id`) — все письма по смене статуса (approve / cancel / difficulties)
+- **Куратор** — НЕ получает писем
+- **Гости** — получают ссылки на анкеты только при `APPROVE_LIST`
+
+### Изоляция от обычных заказов
+В репозитории добавлены фильтры:
+- `getList()` (admin/seller) — `WHERE curator_id IS NULL`
+- `getFriendlyList()` (pusher) — `WHERE friendly_id IS NOT NULL AND curator_id IS NULL`
+- `getListsList()` / `getCuratorList()` — `WHERE curator_id IS NOT NULL`
+
+Заказы-списки **не появляются** в списках обычных и Friendly заказов.
+
+---
+
 ## История изменений статусов
 
 | Дата | Что изменено | Файл |
 |------|--------------|------|
 | 2026-04-12 | Разделены матрицы переходов для обычных и живых билетов. `NEW_FOR_LIVE` → `PAID_FOR_LIVE` (не `PAID`) | `Shared/Domain/ValueObject/Status.php` |
 | 2026-04-12 | Добавлен `PAID_FOR_LIVE` в описание правил смены статуса | `.qwen/docs/BUSINESS_RULES.md` |
+| 2026-05-04 | Добавлены статусы списков: `NEW_LIST`, `APPROVE_LIST`, `CANCEL_LIST`, `DIFFICULTIES_AROSE_LIST` + матрица переходов. Роль `curator`. Сущность `Location`. | `Shared/Domain/ValueObject/Status.php`, `AccountRoleHelper.php`, миграции |

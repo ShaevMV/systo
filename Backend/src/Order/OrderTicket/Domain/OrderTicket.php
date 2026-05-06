@@ -23,6 +23,7 @@ use Tickets\History\Trait\HasHistory;
 use Tickets\History\Domain\Event\OrderStatusChangedEvent;
 use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
 use Tickets\History\Domain\Event\OrderCreatedEvent;
+use Tickets\History\Domain\Event\OrderListCreatedEvent;
 
 final class OrderTicket extends AggregateRoot
 {
@@ -35,12 +36,14 @@ final class OrderTicket extends AggregateRoot
     public function __construct(
         protected Uuid     $festival_id,
         protected Uuid     $user_id,
-        protected Uuid     $types_of_payment_id,
+        protected ?Uuid    $types_of_payment_id,
         protected PriceDto $price,
         protected Status   $status,
         protected array    $ticket,
         protected Uuid     $id,
         protected ?string  $promo_code = null,
+        protected ?Uuid    $location_id = null,
+        protected ?Uuid    $curator_id = null,
     )
     {
     }
@@ -56,6 +59,8 @@ final class OrderTicket extends AggregateRoot
             $orderTicketDto->getTicket(),
             $orderTicketDto->getId(),
             $orderTicketDto->getPromoCode(),
+            $orderTicketDto->getLocationId(),
+            $orderTicketDto->getCuratorId(),
         );
     }
 
@@ -356,8 +361,9 @@ final class OrderTicket extends AggregateRoot
 
         $changes = [];
         $changedIndexes = [];
-
-        foreach ($result->ticket as $index => $guest) {
+        $changedUuid = [];
+        $changedTickets = [];
+        foreach ($result->ticket as $index => &$guest) {
             $ticketId = $guest->getId()->value();
 
             if (isset($valueMap[$ticketId]) || isset($emailMap[$ticketId])) {
@@ -365,6 +371,7 @@ final class OrderTicket extends AggregateRoot
                     'oldName' => $guest->getValue(),
                     'newName' => $valueMap[$ticketId] ?? $guest->getValue(),
                 ];
+                $changedUuid[] = new Uuid($ticketId);
                 $changedIndexes[] = $index;
 
                 if (isset($valueMap[$ticketId])) {
@@ -373,17 +380,16 @@ final class OrderTicket extends AggregateRoot
                 if (isset($emailMap[$ticketId])) {
                     $guest->updateEmail($emailMap[$ticketId]);
                 }
+                $guest->updateId();
+                $changedTickets[] = $guest;
             }
         }
 
-        // Обновляем UUID у всех гостей — старые билеты будут удалены, созданы новые
-        $result->updateIdTicket();
-
-        $result->record(new ProcessCancelTicket($result->id));
+        $result->record(new ProcessCancelTicket($result->id, $changedUuid));
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $changedTickets,
         ));
 
         if (!empty($changes)) {
@@ -391,6 +397,7 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getEmail(),
                 $changes,
                 $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->getFestivalId(),
             ));
         }
 
@@ -461,9 +468,121 @@ final class OrderTicket extends AggregateRoot
         return $this->ticket;
     }
 
-    private static function isChildTicket(Uuid $ticketTypeId): bool
+    private static function isChildTicket(?Uuid $ticketTypeId): bool
     {
-        return $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
+        return $ticketTypeId !== null
+            && $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
     }
 
+    /**
+     * Создать заказ-список (статус NEW_LIST). Куратор писем не получает,
+     * пользователь-получатель тоже не получает на этом этапе — письмо придёт при APPROVE_LIST.
+     */
+    public static function createList(
+        OrderTicketDto $orderTicketDto,
+        int            $kilter,
+        ?string        $locationName = null,
+    ): self {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->recordHistory(new OrderListCreatedEvent(
+            locationId:   $orderTicketDto->getLocationId()?->value() ?? '',
+            locationName: $locationName,
+            project:      $orderTicketDto->getProject(),
+            kilter:       $kilter,
+        ));
+
+        return $result;
+    }
+
+    /**
+     * Перевод заказа-списка в статус APPROVE_LIST.
+     * Создаёт билеты, рассылает гостям ссылки на анкеты, отправляет получателю PDF-билеты.
+     */
+    public static function toApproveList(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $result->record(new ProcessCreateTicket(
+            $result->id,
+            $result->getTicket(),
+        ));
+
+        $result->record(new ProcessUserNotificationListApproved(
+            $orderTicketDto->getEmail(),
+            $result->getTicket(),
+            $orderTicketDto->getFestivalId(),
+            $orderTicketDto->getLocationId(),
+        ));
+
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getTicket() as $item) {
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                $item->getEmail() ?? $orderTicketDto->getEmail(),
+                $orderId->value(),
+                $item->getId()->value(),
+            ));
+        }
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string) $orderTicketDto->getStatus(),
+            toStatus:   Status::APPROVE_LIST,
+        ));
+
+        return $result;
+    }
+
+    /**
+     * Перевод заказа-списка в статус CANCEL_LIST.
+     * Отменяет ранее созданные билеты (если были на approve_list) и шлёт письмо получателю.
+     */
+    public static function toCancelList(OrderTicketDto $orderTicketDto): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+
+        $result->record(new ProcessCancelTicket($result->id));
+
+        $result->record(new ProcessUserNotificationListCancel(
+            $orderTicketDto->getEmail(),
+            $orderTicketDto->getFestivalId(),
+        ));
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string) $orderTicketDto->getStatus(),
+            toStatus:   Status::CANCEL_LIST,
+        ));
+
+        return $result;
+    }
+
+    /**
+     * Перевод заказа-списка в статус DIFFICULTIES_AROSE_LIST.
+     * Отменяет ранее созданные билеты и шлёт письмо получателю с комментарием.
+     */
+    public static function toDifficultiesAroseList(OrderTicketDto $orderTicketDto, ?string $comment): self
+    {
+        if (is_null($comment)) {
+            throw new DomainException('Комментарий обязательный для смены статуса "Возникли трудности (список)"');
+        }
+
+        $result = self::fromOrderTicketDto($orderTicketDto);
+        $result->updateIdTicket();
+
+        $result->record(new ProcessCancelTicket($result->id));
+
+        $result->record(new ProcessUserNotificationListDifficultiesArose(
+            $orderTicketDto->getEmail(),
+            $comment,
+            $orderTicketDto->getFestivalId(),
+        ));
+
+        $result->recordHistory(new OrderStatusChangedEvent(
+            fromStatus: (string) $orderTicketDto->getStatus(),
+            toStatus:   Status::DIFFICULTIES_AROSE_LIST,
+            comment:    $comment,
+        ));
+
+        return $result;
+    }
 }

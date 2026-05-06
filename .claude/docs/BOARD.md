@@ -12,7 +12,7 @@
 | | **Рефакторинг Shared в Baza** <br>*(Бардак в коде приложения)* <br>👤 *Tech Lead* | **Создание Project Memory** <br>*(Контекст и предпочтения)* |
 | | **Логирование действий админов** <br>*(Безопасность)* <br>👤 *DevOps* | **Создание Project Board** <br>*(Визуализация задач)* |
 | **🧸 ЗАВТРА: Детский билет** | | **История заказов** <br>*(модуль History, Event Sourcing, UI для admin)* |
-| | **📧 Friendly email при смене статуса** <br>*(ChangeStatusCommandHandler → friendly email)* <br>👤 *Business Analyst* | |
+| | **📧 Friendly email при смене статуса** <br>*(ChangeStatusCommandHandler → friendly email)* <br>👤 *Business Analyst* | **📋 Заказы-списки + Локации** <br>*(новый тип заказа для куратора, сущность Location, статусы NEW_LIST/APPROVE_LIST/CANCEL_LIST/DIFFICULTIES_AROSE_LIST, роль curator, OrderListApproved Mailable)* <br>🌿 ветка `feat/order-lists-with-locations` |
 
 ---
 
@@ -21,10 +21,11 @@
 - **В работе:** 0
 - **Критичных проблем:** 2 (Тесты, Воркер)
 
-### 🚀 План на завтра
-**Задача:** Создать новый тип билета "Детский" и соответствующую анкету.
-**Анализ:**
-1. Добавить `TicketType` (возможно, фиксированная цена или своя волна).
-2. Создать `QuestionnaireType` (код `child`).
-3. Связать их через `ticket_type.questionnaire_type_id`.
-4. Проверить валидацию на фронтенде.
+### ✅ Сделано 2026-05-04
+**Заказы-списки + сущность Локации.**
+- 3 миграции (`locations` table, `location_id`/`curator_id` в `order_tickets`, nullable полей)
+- 4 новых статуса + матрица переходов в `Status.php`, роль `curator` в `AccountRoleHelper`
+- Модуль `Backend/src/Location/` (DTO, Repository, Application, CRUD контроллер, роуты)
+- Расширение OrderTicket: `createList`/`toApproveList`/`toCancelList`/`toDifficultiesAroseList`, `OrderTicketDto::fromStateForList`, фильтры репозитория
+- 3 новых Mailable + blade: `OrderListApproved`, `OrderListCancel`, `OrderListDifficultiesArose`
+- Frontend: Vuex `LocationModule`, компоненты CRUD локаций, форма `BuyTicketLists`, `OrderLists/OrderList+FilterOrder`, views для куратора и admin/manager, роуты + меню, флаг `isCurator`

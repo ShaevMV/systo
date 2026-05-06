@@ -14,30 +14,15 @@ class OrderTicketDto
     protected Uuid $id;
 
     /**
-     * @param Uuid $festival_id
-     * @param Uuid $user_id
-     * @param string $email
-     * @param string $phone
-     * @param Uuid $types_of_payment_id
-     * @param Uuid $ticket_type_id
      * @param GuestsDto[] $ticket
-     * @param string $id_buy
-     * @param PriceDto $priceDto
-     * @param string $datePay
-     * @param Status|null $status
-     * @param string|null $promo_code
-     * @param bool $is_live_ticket
-     * @param Uuid|null $id
-     * @param Uuid|null $inviteLink
-     * @param Uuid|null $friendly_id
      */
     private function __construct(
         protected Uuid     $festival_id,
         protected Uuid     $user_id,
         protected string   $email,
-        protected string   $phone,
-        protected Uuid     $types_of_payment_id,
-        protected Uuid     $ticket_type_id,
+        protected ?string  $phone,
+        protected ?Uuid    $types_of_payment_id,
+        protected ?Uuid    $ticket_type_id,
         protected array    $ticket,
         protected string   $id_buy,
         protected PriceDto $priceDto,
@@ -49,6 +34,9 @@ class OrderTicketDto
         ?Uuid              $id = null,
         protected ?Uuid    $inviteLink = null,
         protected ?Uuid    $friendly_id = null,
+        protected ?Uuid    $location_id = null,
+        protected ?Uuid    $curator_id = null,
+        protected ?string  $project = null,
     )
     {
         $this->id = $id ?? Uuid::random();
@@ -78,7 +66,7 @@ class OrderTicketDto
             new Uuid($data['festival_id']),
             $userId,
             $data['email'],
-            $data['phone'],
+            $data['phone'] ?? null,
             new Uuid($data['types_of_payment_id']),
             new Uuid($data['ticket_type_id']),
             $tickets,
@@ -86,11 +74,65 @@ class OrderTicketDto
             $priceDto,
             $data['date'] ?? '',
             new Status($status),
-            $data['promo_code'],
+            $data['promo_code'] ?? null,
             $isLiveTicket,
             empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $id,
-            friendly_id: $pusherId
+            friendly_id: $pusherId,
+            location_id: empty($data['location_id']) ? null : new Uuid($data['location_id']),
+            curator_id:  empty($data['curator_id'])  ? null : new Uuid($data['curator_id']),
+            project:     $data['project'] ?? null,
+        );
+    }
+
+    /**
+     * Фабричный метод для заказа-списка (создаётся куратором).
+     *
+     * Отличия от обычного fromState:
+     * - НЕ требует ticket_type_id, types_of_payment_id, price
+     * - Обязательные: festival_id, location_id, curator_id, email получателя, гости
+     * - Статус по умолчанию NEW_LIST
+     *
+     * @throws JsonException
+     */
+    public static function fromStateForList(
+        array   $data,
+        Uuid    $userId,      // получатель билетов
+        Uuid    $curatorId,   // куратор-создатель
+        Uuid    $locationId,
+        ?string $project = null,
+    ): self
+    {
+        $id = isset($data['id']) ? new Uuid($data['id']) : null;
+        $status = $data['status'] ?? Status::NEW_LIST;
+
+        $guests = is_array($data['guests']) ? $data['guests'] : Json::decode($data['guests'], 1);
+        $tickets = [];
+        foreach ($guests as $guest) {
+            $tickets[] = GuestsDto::fromState($guest, $data['festival_id']);
+        }
+
+        return new self(
+            festival_id:           new Uuid($data['festival_id']),
+            user_id:               $userId,
+            email:                 $data['email'],
+            phone:                 $data['phone'] ?? null,
+            types_of_payment_id:   null,
+            ticket_type_id:        null,
+            ticket:                $tickets,
+            id_buy:                $data['id_buy'] ?? '',
+            priceDto:              new PriceDto(0, count($tickets), 0),
+            datePay:               $data['date'] ?? '',
+            status:                new Status($status),
+            promo_code:            null,
+            is_live_ticket:        false,
+            questionnaire_type_id: null,
+            id:                    $id,
+            inviteLink:            null,
+            friendly_id:           null,
+            location_id:           $locationId,
+            curator_id:            $curatorId,
+            project:               $project ?? ($data['project'] ?? null),
         );
     }
 
@@ -114,8 +156,8 @@ class OrderTicketDto
             'id' => $this->id,
             'festival_id' => $this->festival_id,
             'user_id' => $this->user_id,
-            'ticket_type_id' => $this->ticket_type_id,
-            'types_of_payment_id' => $this->types_of_payment_id,
+            'ticket_type_id' => $this->ticket_type_id?->value(),
+            'types_of_payment_id' => $this->types_of_payment_id?->value(),
             'guests' => $jsonTickets,
             'phone' => $this->phone,
             'price' => $this->priceDto->getPrice(),
@@ -125,6 +167,9 @@ class OrderTicketDto
             'promo_code' => $this->promo_code,
             'id_buy' => $this->id_buy,
             'friendly_id' => $this->friendly_id?->value(),
+            'location_id' => $this->location_id?->value(),
+            'curator_id'  => $this->curator_id?->value(),
+            'project'     => $this->project,
         ];
     }
 
@@ -133,33 +178,21 @@ class OrderTicketDto
         return $this->ticket;
     }
 
-    /**
-     * @return Uuid
-     */
     public function getFestivalId(): Uuid
     {
         return $this->festival_id;
     }
 
-    /**
-     * @return Uuid
-     */
     public function getUserId(): Uuid
     {
         return $this->user_id;
     }
 
-    /**
-     * @return Uuid
-     */
-    public function getTypesOfPaymentId(): Uuid
+    public function getTypesOfPaymentId(): ?Uuid
     {
         return $this->types_of_payment_id;
     }
 
-    /**
-     * @return Status
-     */
     public function getStatus(): Status
     {
         return $this->status;
@@ -185,7 +218,7 @@ class OrderTicketDto
         return $this->email;
     }
 
-    public function getTicketTypeId(): Uuid
+    public function getTicketTypeId(): ?Uuid
     {
         return $this->ticket_type_id;
     }
@@ -202,7 +235,8 @@ class OrderTicketDto
 
     public function isBilling(): bool
     {
-        return $this->types_of_payment_id->equals(new Uuid('3fcded69-4aef-4c4a-a041-52c91e5afd91'));
+        return $this->types_of_payment_id !== null
+            && $this->types_of_payment_id->equals(new Uuid('3fcded69-4aef-4c4a-a041-52c91e5afd91'));
     }
 
     public function getInviteLink(): ?Uuid
@@ -220,5 +254,30 @@ class OrderTicketDto
         $this->status = $status;
 
         return $this;
+    }
+
+    public function getFriendlyId(): ?Uuid
+    {
+        return $this->friendly_id;
+    }
+
+    public function getLocationId(): ?Uuid
+    {
+        return $this->location_id;
+    }
+
+    public function getCuratorId(): ?Uuid
+    {
+        return $this->curator_id;
+    }
+
+    public function isList(): bool
+    {
+        return $this->curator_id !== null;
+    }
+
+    public function getProject(): ?string
+    {
+        return $this->project;
     }
 }
