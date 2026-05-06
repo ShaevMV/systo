@@ -11,11 +11,17 @@ class CancelTicketCommandHandler implements CommandHandler
 {
     public function __construct(
         private TicketsRepositoryInterface $ticketsRepository
-    ) {
+    )
+    {
     }
 
     public function __invoke(CancelTicketCommand $command)
     {
-        $this->ticketsRepository->deleteTicketsByOrderId($command->getOrderId());
+        if (count($command->getTicketIds()) > 0) {
+            $this->ticketsRepository->deleteTicketsByTicketsId($command->getTicketIds());
+        } else {
+            $this->ticketsRepository->deleteTicketsByOrderId($command->getOrderId());
+        }
+
     }
 }

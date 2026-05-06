@@ -21,6 +21,7 @@ class ProcessCancelTicket implements ShouldQueue, DomainEvent
 
     public function __construct(
         private Uuid $orderId,
+        private array $ticketIds = []
     ) {
     }
 
@@ -31,7 +32,7 @@ class ProcessCancelTicket implements ShouldQueue, DomainEvent
         TicketApplication $application,
         PushTicket $pushTicket,
     ): void {
-        $application->cancelTicket($this->orderId);
+        $application->cancelTicket($this->orderId, $this->ticketIds);
 
         $pushTicket->pushByOrderId($this->orderId);
     }

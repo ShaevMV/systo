@@ -71,6 +71,27 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
     }
 
     /**
+     * @param Uuid[] $ticketIds
+     * @return bool
+     * @throws Throwable
+     */
+    public function deleteTicketsByTicketsId(array $ticketIds): bool
+    {
+        DB::beginTransaction();
+        try {
+            foreach ($ticketIds as $ticketId) {
+                $this->model::whereId($ticketId->value())->delete();
+            }
+
+            DB::commit();
+            return true;
+        } catch (Exception $exception) {
+            DB::rollBack();
+            throw $exception;
+        }
+    }
+
+    /**
      * @param Uuid $orderId
      * @param bool $isShowDelete
      * @return Uuid[]
@@ -172,14 +193,14 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             empty($result['pdf']) ? null : $result['pdf'],
             $result['emailPayView'] ?? $result['emailView'],
             new Uuid($result['festival_id']),
-            in_array($result['ticket_type_id'], (array) ['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
+            in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             empty($result['ticket_type_id']) ? null : new Uuid($result['ticket_type_id']),
             $result['name_type'] ?? null,
             isset($result['order_id']) ? new Uuid($result['order_id']) : null,
             empty($result['curator_id']) ? null : new Uuid($result['curator_id']),
-            $result['curator_email']    ?? null,
-            $result['curator_name']     ?? null,
-            $result['project']          ?? null,
+            $result['curator_email'] ?? null,
+            $result['curator_name'] ?? null,
+            $result['project'] ?? null,
             empty($result['location_id']) ? null : new Uuid($result['location_id']),
             !empty($result['ticket_deleted_at']),   // isDeleted — soft-deleted билет
         );
@@ -236,7 +257,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 ->exists();
 
             if (!$exists) {
-                return (bool) DB::connection('mysqlBaza')
+                return (bool)DB::connection('mysqlBaza')
                     ->table('spisok_tickets')
                     ->insert($data);
             }
@@ -244,12 +265,12 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             DB::connection('mysqlBaza')->table('spisok_tickets')
                 ->where('ticket_uuid', '=', $data['ticket_uuid'])
                 ->update([
-                    'project'     => $data['project'],
-                    'curator'     => $data['curator'],
-                    'email'       => $data['email'],
-                    'name'        => $data['name'],
-                    'comment'     => $data['comment'],
-                    'status'      => $data['status'],
+                    'project' => $data['project'],
+                    'curator' => $data['curator'],
+                    'email' => $data['email'],
+                    'name' => $data['name'],
+                    'comment' => $data['comment'],
+                    'status' => $data['status'],
                     'festival_id' => $data['festival_id'],
                 ]);
         } catch (\Exception $e) {
@@ -272,10 +293,10 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             throw new DomainException('Не найден билет в Базе входа');
         } else {
             return DB::connection('mysqlBaza')->table('live_tickets')
-                ->where('kilter', '=', $number)
-                ->update([
-                    'el_ticket_id' => $ticketId?->value()
-                ]) > 0;
+                    ->where('kilter', '=', $number)
+                    ->update([
+                        'el_ticket_id' => $ticketId?->value()
+                    ]) > 0;
         }
     }
 

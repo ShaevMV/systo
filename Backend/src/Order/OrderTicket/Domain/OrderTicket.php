@@ -361,8 +361,9 @@ final class OrderTicket extends AggregateRoot
 
         $changes = [];
         $changedIndexes = [];
-
-        foreach ($result->ticket as $index => $guest) {
+        $changedUuid = [];
+        $changedTickets = [];
+        foreach ($result->ticket as $index => &$guest) {
             $ticketId = $guest->getId()->value();
 
             if (isset($valueMap[$ticketId]) || isset($emailMap[$ticketId])) {
@@ -370,6 +371,7 @@ final class OrderTicket extends AggregateRoot
                     'oldName' => $guest->getValue(),
                     'newName' => $valueMap[$ticketId] ?? $guest->getValue(),
                 ];
+                $changedUuid[] = new Uuid($ticketId);
                 $changedIndexes[] = $index;
 
                 if (isset($valueMap[$ticketId])) {
@@ -378,17 +380,16 @@ final class OrderTicket extends AggregateRoot
                 if (isset($emailMap[$ticketId])) {
                     $guest->updateEmail($emailMap[$ticketId]);
                 }
+                $guest->updateId();
+                $changedTickets[] = $guest;
             }
         }
 
-        // Обновляем UUID у всех гостей — старые билеты будут удалены, созданы новые
-        $result->updateIdTicket();
-
-        $result->record(new ProcessCancelTicket($result->id));
+        $result->record(new ProcessCancelTicket($result->id, $changedUuid));
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $changedTickets,
         ));
 
         if (!empty($changes)) {

@@ -6,6 +6,7 @@ namespace Tickets\Ticket\CreateTickets\Application\ChangeTicket;
 
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
+use Throwable;
 
 class ChangeTicket
 {
@@ -21,6 +22,7 @@ class ChangeTicket
     /**
      * @param array $valueMap [ticketId => newValue]
      * @param array $emailMap [ticketId => newEmail]
+     * @throws Throwable
      */
     public function change(
         Uuid    $orderId,

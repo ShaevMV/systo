@@ -26,6 +26,8 @@ interface TicketsRepositoryInterface
 
     public function setInBazaLive(int $number, ?Uuid $ticketId = null): bool;
 
+    public function deleteTicketsByTicketsId(array $ticketIds): bool;
+
     /**
      * @return Uuid[]
      */

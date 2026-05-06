@@ -82,9 +82,9 @@ class TicketApplication
     /**
      * @throws Throwable
      */
-    public function cancelTicket(Uuid $orderId): void
+    public function cancelTicket(Uuid $orderId, array $ticketIds = []): void
     {
-        $this->commandBus->dispatch(new CancelTicketCommand($orderId));
+        $this->commandBus->dispatch(new CancelTicketCommand($orderId, $ticketIds));
     }
 
     /**
