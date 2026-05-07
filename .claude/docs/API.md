@@ -36,6 +36,7 @@
 
 ### POST `/api/register`
 **Middleware:** публичный
+**Описание:** регистрация нового аккаунта с ролью `pusher`. Поля `is_admin` и `role` из тела запроса игнорируются (защита от privilege escalation).
 
 **Request:**
 ```json
@@ -51,6 +52,16 @@
 **Response 200:** аналогично `/login`
 **Response 401:** `{ "message": "Логин и пароль указан не верно" }`
 **Response 422:** `{ "errors": { "email": ["..."] } }`
+
+---
+
+### POST `/api/registerCurator`
+**Middleware:** публичный
+**Описание:** регистрация нового аккаунта с ролью `curator` (куратор может создавать заказы-списки). Поля `is_admin` и `role` из тела запроса игнорируются.
+
+**Request / Response:** идентично `/api/register`.
+
+**Frontend route:** `/regCuratorTgdtr64` → после успеха редирект на `/curatorOrders/create` (или на `?nextUrl=`, если это относительный same-origin путь).
 
 ---
 

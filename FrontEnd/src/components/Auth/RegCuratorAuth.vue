@@ -94,6 +94,16 @@ export default {
       'clearError'
     ]),
 
+    /**
+     * Разрешаем редирект только на same-origin относительные пути.
+     * Защита от open-redirect / javascript:-XSS через ?nextUrl=...
+     */
+    sanitizeNextUrl(raw) {
+      if (typeof raw !== 'string' || raw.length === 0) return null;
+      // Запрещаем абсолютные URL ("http://...", "//attacker.com") и схемы ("javascript:")
+      if (!/^\/[^/\\]/.test(raw)) return null;
+      return raw;
+    },
     reg: function () {
       let self = this;
 
@@ -106,8 +116,8 @@ export default {
         'password_confirmation': this.password_confirmation,
         'callback': function () {
           // После успешной регистрации куратор попадает на форму создания списка
-          let url = self.$route.query.nextUrl || '/curatorOrders/create';
-          location.href = url;
+          const safe = self.sanitizeNextUrl(self.$route.query.nextUrl);
+          location.href = safe || '/curatorOrders/create';
         }
       })
     }
