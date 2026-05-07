@@ -39,7 +39,7 @@
               </select>
             </div>
             <div class="col-md-4">
-              <label for="validationDefault01" class="form-label">Продовец живых билетов</label>
+              <label for="validationDefault01" class="form-label">Продавец живых билетов</label>
               <select class="form-select"
                       v-model="filter.userExternalId"
                       id="validationDefault01">

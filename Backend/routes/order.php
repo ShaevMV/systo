@@ -60,7 +60,7 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::get('/getUserList', [OrderTickets::class, 'getUserList'])
         ->middleware('auth:api');
 
-    // получить определённые заказ
+    // получить определённый заказ
     Route::get('/getItem/{id}', [OrderTickets::class, 'getOrderItem'])
         ->middleware('auth:api');
 

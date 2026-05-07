@@ -93,8 +93,8 @@ export default {
     listRole() {
       return {
         admin: 'Админ',
-        seller: 'Продовец живых билетов',
-        pusher: 'Френдли Продовец ',
+        seller: 'Продавец живых билетов',
+        pusher: 'Френдли Продавец ',
         guest: 'Гость',
         manager: 'Менеджер',
         curator: 'Куратор (списки)',
