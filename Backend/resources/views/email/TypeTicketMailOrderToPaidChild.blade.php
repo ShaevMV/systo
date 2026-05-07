@@ -52,7 +52,7 @@
                             @endforeach
                         </ul>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">по прибытию на событие на КПП также выдадут специальный информационный детский браслет с контактными данными родителей которые вы укажите в анкете.</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у Вас возникли вопросы напишите нам в телеграмм <a href="https://t.me/systo_club" target="_blank" style="text-decoration: underline; color: #1a73e8;">@systo_club</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если у Вас возникли вопросы напишите нам в Telegram <a href="https://t.me/systo_club" target="_blank" style="text-decoration: underline; color: #1a73e8;">@systo_club</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи в лесу!</p>
 
 

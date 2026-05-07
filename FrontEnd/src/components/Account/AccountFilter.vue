@@ -59,7 +59,7 @@
                 <option value=null>Выберите</option>
                 <option value="admin">Админ</option>
                 <option value="seller">реализатор живых билетов</option>
-                <option value="pusher">раелизатор френдли билетов</option>
+                <option value="pusher">реализатор френдли билетов</option>
                 <option value="manager">менеджер</option>
                 <option value="curator">куратор (списки)</option>
                 <option value="pusher_curator">Френдли + Куратор</option>

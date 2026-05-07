@@ -74,7 +74,7 @@
               </select>
             </div>
             <div class="col-md-4" v-show="isAdmin">
-              <label for="validationDefault06" class="form-label">Продовец</label>
+              <label for="validationDefault06" class="form-label">Продавец</label>
               <select class="form-select"
                       v-model="friendlyId"
                       id="validationDefault06">

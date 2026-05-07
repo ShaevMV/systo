@@ -95,7 +95,7 @@ class GetOrder
     }
 
     /**
-     * Высети конкретный заказ
+     * Вывести конкретный заказ
      *
      * @param  Uuid  $uuid
      * @return OrderTicketItemResponse|null

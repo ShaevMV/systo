@@ -41,7 +41,7 @@
                   </div>
                 </div>
                 <div class="col-md-3">
-                  <label for="validationDefault01" class="form-label">Продовец живых билетов</label>
+                  <label for="validationDefault01" class="form-label">Продавец живых билетов</label>
                   <select class="form-select"
                           v-model="userExternalId"
                           id="validationDefault01">

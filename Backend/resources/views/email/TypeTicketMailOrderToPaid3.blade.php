@@ -39,11 +39,11 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой взнос за лесную карту на {{$festivalName}} потдвержден</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой взнос за лесную карту на {{$festivalName}} подтверждён</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Спасибо тебе за твой большой вклад в создание Систо</p>
                         <br/>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">В ближайшее время с тобой свяжется куратор лесных карт Инесса, чтобы обсудить печать новой лесной карты на 2026 год, а также расскажет как получить все остальные бонусы и скидки годового оргвзноса</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напиши ей в телеграмм <a href="https://t.me/Nessa_Asseni" target="_blank">@Nessa_Asseni</a></p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Если по каким-то причинам куратор так и не связался, напиши ей в Telegram <a href="https://t.me/Nessa_Asseni" target="_blank">@Nessa_Asseni</a></p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи в лесу!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
