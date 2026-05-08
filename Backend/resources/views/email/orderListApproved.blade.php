@@ -27,13 +27,13 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6; border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг!</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой список на {{ $festivalName }} одобрен.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой Участие на {{ $festivalName }} одобрено.</p>
                         @if(!empty($locationName))
                             <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Локация: <strong>{{ $locationName }}</strong></p>
                         @endif
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Электронные билеты с QR-кодом на каждого гостя прикреплены к этому письму.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 22px;">ВНИМАНИЕ! Все ваши гости должны заполнить небольшие анкеты для активации QR-кода. Пожалуйста, сообщите своим гостям о том, что им на почту отправлена ссылка на анкету.</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">На входе на фестиваль каждому гостю необходимо будет показать свой QR-код на экране телефона или в распечатанном виде.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">QR-код участника является персональным и предоставляется исключительно лицу, чьи ФИО и адрес электронной почты указаны в файле. Не подлежит перепродаже, передаче и использованию третьими лицами. В случае выявления факта нарушения билет будет незамедлительно аннулирован без права восстановления, а в посещении Систо будет отказано! На входе на фестиваль каждому гостю необходимо будет показать свой QR-код на экране телефона или в распечатанном виде.</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">До встречи на фестивале!</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">С любовью, команда организаторов Solar Systo Togathering</p>
                     </td>
