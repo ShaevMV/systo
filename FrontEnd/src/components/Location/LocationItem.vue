@@ -185,10 +185,16 @@ export default {
       this.$router.push({ name: 'LocationListView' });
     },
   },
-  created() {
+  async created() {
     this.getListFestival();
     this.loadQuestionnaireTypes({ filter: { active: '1' }, orderBy: {} });
-    this.loadTemplate();
+    // Список шаблонов некритичен для сохранения — при ошибке селект остаётся пустым,
+    // пользователь сможет оставить значения по умолчанию.
+    try {
+      await this.loadTemplate();
+    } catch (e) {
+      console.warn('Не удалось загрузить список blade-шаблонов:', e);
+    }
   },
 };
 </script>
