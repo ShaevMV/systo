@@ -45,6 +45,25 @@ export const toRegistration = (context, payload) => {
 };
 
 /**
+ * Регистрация куратора (создаёт аккаунт с ролью curator).
+ *
+ * @param context
+ * @param payload
+ */
+export const toRegistrationCurator = (context, payload) => {
+    let promise = axios.post('/api/registerCurator', payload);
+    promise.then(async function (response) {
+        if (response.data.status === 'success') {
+            context.commit('setToken', response.data.authorisation);
+            context.commit('setUserInfo', response.data.user);
+            payload.callback();
+        }
+    }).catch(function (error) {
+        context.commit('setError', error.response.data.errors);
+    });
+};
+
+/**
  * Восстановления пароля
  *
  * @param context

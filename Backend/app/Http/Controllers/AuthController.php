@@ -30,6 +30,7 @@ class AuthController extends Controller
             'except' => [
                 'login',
                 'register',
+                'registerCurator',
                 'forgotPassword',
                 'resetPassword'
             ]
@@ -63,24 +64,50 @@ class AuthController extends Controller
      */
     public function register(Request $request): JsonResponse
     {
+        return $this->performRegistration($request, AccountRoleHelper::pusher);
+    }
+
+    /**
+     * Регистрация нового куратора — создаёт аккаунт с ролью curator.
+     *
+     * @throws JsonException
+     * @throws \Throwable
+     */
+    public function registerCurator(Request $request): JsonResponse
+    {
+        return $this->performRegistration($request, AccountRoleHelper::curator);
+    }
+
+    /**
+     * Общая логика регистрации публичных аккаунтов (pusher / curator).
+     * Роль задаётся явно вызывающим контроллером — не читается из request body
+     * (защита от подмены роли клиентом). is_admin намеренно не передаётся.
+     *
+     * @throws JsonException
+     * @throws \Throwable
+     */
+    private function performRegistration(Request $request, string $role): JsonResponse
+    {
         $request->validate([
-            'city' => 'required|string|max:255',
-            'phone' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+            'city'     => 'required|string|max:255',
+            'phone'    => 'required|string|max:255',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
             'password' => 'required|confirmed|string|min:6',
         ], [
-            '*.required' => 'Поле обязательно для ввода',
-            '*.email' => 'Поле должно быть email',
-            '*.unique' => 'Такой пользователь уже зарегистрирован в системе',
+            '*.required'  => 'Поле обязательно для ввода',
+            '*.email'     => 'Поле должно быть email',
+            '*.unique'    => 'Такой пользователь уже зарегистрирован в системе',
             '*.confirmed' => 'Пароль не совпадает',
-            '*.min' => 'Минимальное количество символов 6-ть',
+            '*.min'       => 'Минимальное количество символов 6-ть',
         ]);
+
         $accountDto = AccountDto::fromState($request->toArray());
         $this->accountApplication->createNewAccount(
-            $accountDto->setRole(AccountRoleHelper::pusher),
+            $accountDto->setRole($role),
             $request->password
         );
+
         $credentials = $request->only('email', 'password');
         if (!$token = auth()->attempt($credentials, true)) {
             return response()->json(['message' => 'Логин и пароль указан не верно'], 401);

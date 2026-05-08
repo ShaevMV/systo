@@ -12,6 +12,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
     Route::post('register', 'register');
+    Route::post('registerCurator', 'registerCurator');
     Route::post('logout', 'logout');
     Route::post('refresh', 'refresh');
     Route::post('forgot-password', 'forgotPassword');

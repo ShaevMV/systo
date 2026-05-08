@@ -22,6 +22,12 @@ final class AccountDto extends AbstractionEntity
     ) {
     }
 
+    /**
+     * Создание DTO из массива (обычно из user input).
+     * is_admin и role НЕ читаются из $data — это защита от privilege escalation:
+     * пользователь не может зарегистрироваться как admin, отправив isAdmin=true в request body.
+     * Для админа/роли используйте явные сеттеры setIsAdmin() / setRole().
+     */
     public static function fromState(array $data): self
     {
         $id = isset($data['id']) ? new Uuid($data['id']) : Uuid::random();
@@ -32,8 +38,15 @@ final class AccountDto extends AbstractionEntity
             $data['phone'] ?? '',
             $data['city'] ?? '',
             $data['name'] ?? null,
-            $data['isAdmin'] ?? false
+            false,
         );
+    }
+
+    public function setIsAdmin(bool $isAdmin): self
+    {
+        $this->is_admin = $isAdmin;
+
+        return $this;
     }
 
     public function getId(): Uuid

@@ -42,6 +42,7 @@ import CreateListOrderView from "@/views/order/CreateListOrderView.vue";
 import AccountListView from "@/views/account/AccountListView.vue";
 
 import RegView from "@/views/auth/RegView.vue";
+import RegCuratorView from "@/views/auth/RegCuratorView.vue";
 
 const routes = [
     {
@@ -90,6 +91,14 @@ const routes = [
         path: '/regGydhf',
         name: 'registration',
         component: RegView,
+        meta: {
+            'guest': true
+        }
+    },
+    {
+        path: '/regCuratorTgdtr64',
+        name: 'registrationCurator',
+        component: RegCuratorView,
         meta: {
             'guest': true
         }
