@@ -15,7 +15,8 @@ export const loadTemplate = (context) => {
                 resolve(response.data.list);
             })
             .catch((error) => {
-                context.commit('setError', error);
+                // Согласованный формат с другими actions модуля — всегда массив errors
+                context.commit('setError', error.response?.data?.errors ?? []);
                 reject(error);
             });
     });
