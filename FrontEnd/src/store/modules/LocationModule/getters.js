@@ -11,3 +11,7 @@ export const getIsLoading = (state) => state.isLoading;
 export const getDataError = (state) => state.dataError;
 
 export const getMessage = (state) => state.message;
+
+export const getTemplateEmail = (state) => state.templateList?.email ?? [];
+
+export const getTemplatePdf = (state) => state.templateList?.pdf ?? [];

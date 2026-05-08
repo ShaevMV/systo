@@ -29,3 +29,10 @@ export const setMessage = (state, payload) => {
 export const removeInList = (state, payload) => {
     state.list = state.list.filter((item) => item.id !== payload.id);
 };
+
+export const setTemplateList = (state, payload) => {
+    state.templateList = {
+        email: payload?.email ?? [],
+        pdf: payload?.pdf ?? [],
+    };
+};

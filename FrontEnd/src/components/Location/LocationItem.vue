@@ -48,16 +48,22 @@
             <div class="row mb-3">
               <label class="col-4 col-form-label">Шаблон письма (blade):</label>
               <div class="col-8">
-                <input type="text" class="form-control" v-model="emailTemplate" placeholder="orderListApproved">
-                <small class="form-text text-muted">Имя blade-шаблона из resources/views/email (без .blade.php)</small>
+                <select class="form-select" v-model="emailTemplate">
+                  <option :value="''">— по умолчанию (orderListApproved) —</option>
+                  <option v-for="item in getTemplateEmail" :key="item" :value="item">{{ item }}</option>
+                </select>
+                <small class="form-text text-muted">Файл из resources/views/email (без .blade.php)</small>
               </div>
             </div>
 
             <div class="row mb-3">
               <label class="col-4 col-form-label">Шаблон билета (blade):</label>
               <div class="col-8">
-                <input type="text" class="form-control" v-model="pdfTemplate" placeholder="pdf">
-                <small class="form-text text-muted">Имя blade-шаблона PDF (без .blade.php)</small>
+                <select class="form-select" v-model="pdfTemplate">
+                  <option :value="''">— по умолчанию (pdf) —</option>
+                  <option v-for="item in getTemplatePdf" :key="item" :value="item">{{ item }}</option>
+                </select>
+                <small class="form-text text-muted">Файл из resources/views (без .blade.php)</small>
               </div>
             </div>
 
@@ -107,7 +113,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('appLocation', ['getItem', 'getMessage']),
+    ...mapGetters('appLocation', ['getItem', 'getMessage', 'getTemplateEmail', 'getTemplatePdf']),
     ...mapGetters('appFestivalTickets', ['getFestivalList']),
     ...mapGetters('appQuestionnaireType', { getQuestionnaireTypeList: 'getList' }),
     isEdit() {
@@ -150,7 +156,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions('appLocation', ['loadItem', 'create', 'edit']),
+    ...mapActions('appLocation', ['loadItem', 'create', 'edit', 'loadTemplate']),
     ...mapActions('appFestivalTickets', ['getListFestival']),
     ...mapActions('appQuestionnaireType', { loadQuestionnaireTypes: 'loadList' }),
     async save() {
@@ -179,9 +185,16 @@ export default {
       this.$router.push({ name: 'LocationListView' });
     },
   },
-  created() {
+  async created() {
     this.getListFestival();
     this.loadQuestionnaireTypes({ filter: { active: '1' }, orderBy: {} });
+    // Список шаблонов некритичен для сохранения — при ошибке селект остаётся пустым,
+    // пользователь сможет оставить значения по умолчанию.
+    try {
+      await this.loadTemplate();
+    } catch (e) {
+      console.warn('Не удалось загрузить список blade-шаблонов:', e);
+    }
   },
 };
 </script>
