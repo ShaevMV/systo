@@ -2,7 +2,7 @@
   <div style="display: block;">
       <h4 class="download-title">Скачать электронные билеты с qr-кодом:</h4>
       <div class="qr-text"> {{ getText }} </div>
-      <div v-if="status === 'paid'" class="mb-3 mt-3">
+      <div v-if="status === 'paid' || status === 'approve_list'" class="mb-3 mt-3">
         <button type="button"
                 v-for="(item,index) in listTickets"
                 v-bind:key="index"
