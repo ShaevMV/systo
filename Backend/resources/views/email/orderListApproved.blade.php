@@ -27,7 +27,7 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6; border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг!</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой Участие на {{ $festivalName }} одобрено.</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твое участие на {{ $festivalName }} одобрено.</p>
                         @if(!empty($locationName))
                             <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Локация: <strong>{{ $locationName }}</strong></p>
                         @endif

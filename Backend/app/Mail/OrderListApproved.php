@@ -53,7 +53,7 @@ class OrderListApproved extends Mailable
 
         $locationName = $location?->name ?? '';
 
-        $this->subject('Список на ' . $festivalName . ' одобрен');
+        $this->subject('Ваш участие в Солар Систо подтверждено');
 
         // Передаём kilter и tickets чтобы сторонние шаблоны (через email_template) могли их использовать.
         $firstTicket = $this->tickets[0] ?? null;
