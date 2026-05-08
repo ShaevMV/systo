@@ -12,6 +12,7 @@ export default {
         isLoading: false,
         dataError: [],
         message: null,
+        templateList: { email: [], pdf: [] },
     },
     getters,
     actions,

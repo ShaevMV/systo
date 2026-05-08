@@ -1,6 +1,25 @@
 import axios from 'axios';
 
 const API = '/api/v1/location';
+// Список blade-шаблонов общий для типов билетов и локаций — переиспользуем существующий endpoint
+const TEMPLATE_API = '/api/v1/ticketType';
+
+/**
+ * Загрузить список доступных blade-шаблонов (email + pdf).
+ */
+export const loadTemplate = (context) => {
+    return new Promise((resolve, reject) => {
+        axios.get(TEMPLATE_API + '/getBlade')
+            .then((response) => {
+                context.commit('setTemplateList', response.data.list);
+                resolve(response.data.list);
+            })
+            .catch((error) => {
+                context.commit('setError', error);
+                reject(error);
+            });
+    });
+};
 
 export const loadList = (context, payload) => {
     return new Promise((resolve, reject) => {
