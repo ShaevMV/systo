@@ -554,6 +554,58 @@
 
 ---
 
+## 8.0. Волны цен типа билета
+
+Префикс: **`/api/v1/ticketTypePrice`**
+
+Управление таблицей `ticket_type_price` (волны цен — см. BUSINESS_RULES §4). Каждая волна — это запись `{ price, before_date }` для конкретного `ticket_type_id`. Активной считается ближайшая волна, у которой `before_date >= CURDATE()`.
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список волн с фильтром `ticket_type_id` |
+| GET | `/getItem/{id}` | публичный | Одна волна |
+| POST | `/create` | `auth:api` + `admin` | Создать волну (UUID в `data.id` опционально) |
+| POST | `/edit/{id}` | `auth:api` + `admin` | Редактировать |
+| DELETE | `/delete/{id}` | `auth:api` + `admin` | Soft delete (запись помечается как удалённая) |
+
+**create / edit Request:**
+```json
+{
+  "data": {
+    "ticket_type_id": "UUID (required, exists:ticket_type,id)",
+    "price": "float (required, > 0, < 1 000 000)",
+    "before_date": "date (required, after_or_equal:today)"
+  }
+}
+```
+
+**Защита от дурака (валидация):**
+- `price` — обязательно > 0 и < 1 000 000
+- `before_date` — валидная дата, не в прошлом
+- `ticket_type_id` — должен существовать в `ticket_type`
+- На фронте — кнопка `Сохранить` неактивна при невалидной форме, удаление через `confirm()`
+
+**Response 200 (create/edit):**
+```json
+{
+  "success": true,
+  "item": { "id": "...", "ticket_type_id": "...", "price": 4200, "before_date": "..." },
+  "message": "Волна цены создана"
+}
+```
+
+**Response 422 (валидация):**
+```json
+{
+  "errors": {
+    "data.price": ["Цена должна быть больше 0"],
+    "data.before_date": ["Дата не может быть в прошлом"]
+  }
+}
+```
+
+---
+
 ## 8.1. Локации (для заказов-списков)
 
 Префикс: **`/api/v1/location`**
@@ -645,9 +697,9 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete} |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete} |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |

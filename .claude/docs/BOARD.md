@@ -21,6 +21,16 @@
 - **В работе:** 0
 - **Критичных проблем:** 2 (Тесты, Воркер)
 
+### ✅ Сделано 2026-05-10
+**CRUD для волн цен типа билета (`ticket_type_price`).**
+- Backend модуль `Backend/src/TicketTypePrice/` (DTO, Repository + Interface, Application, Create/Edit/Delete/GetList/GetItem handlers)
+- Контроллер `TicketTypePriceController` с FormRequest-валидацией
+- Роуты `/api/v1/ticketTypePrice/*` — read публичный, write только `auth:api + admin`
+- SoftDeletes в `TicketTypesPriceModel` + кастинг `price`/`before_date`
+- Защита от дурака: `price > 0` и `< 1 000 000`, `before_date` не в прошлом, `ticket_type_id` exists; на фронте — disable кнопки, `confirm()` на удаление
+- Frontend: Vuex `TicketTypePriceModule` + компонент `TicketTypePriceList.vue`, встроен в форму редактирования типа билета (`TicketTypeItem.vue`)
+- 🌿 ветка `feat/ticket-type-price-crud`
+
 ### ✅ Сделано 2026-05-04
 **Заказы-списки + сущность Локации.**
 - 3 миграции (`locations` table, `location_id`/`curator_id` в `order_tickets`, nullable полей)

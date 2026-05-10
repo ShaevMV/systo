@@ -8,6 +8,7 @@ use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 use Shared\Infrastructure\Models\HasUuid;
 
@@ -35,7 +36,7 @@ use Shared\Infrastructure\Models\HasUuid;
  */
 class TicketTypesPriceModel extends Model
 {
-    use HasFactory, HasUuid;
+    use HasFactory, HasUuid, SoftDeletes;
 
     public const TABLE = 'ticket_type_price';
 
@@ -44,5 +45,10 @@ class TicketTypesPriceModel extends Model
 
     protected $fillable = [
         'id', 'before_date', 'price', 'ticket_type_id',
+    ];
+
+    protected $casts = [
+        'price' => 'float',
+        'before_date' => 'datetime',
     ];
 }

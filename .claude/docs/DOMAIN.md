@@ -393,6 +393,23 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `editItem(Uuid, LocationDto): bool` | Редактировать |
 | `remove(Uuid): bool` | Удалить |
 
+### TicketTypePriceRepositoryInterface
+
+**Путь:** `Backend/src/TicketTypePrice/Repositories/TicketTypePriceRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlTicketTypePriceRepository` (таблица `ticket_type_price`, soft delete)
+
+| Метод | Описание |
+|-------|----------|
+| `getList(Filters, Order): Collection` | Список волн (фильтр `ticket_type_id`) |
+| `getItem(Uuid): TicketTypePriceDto` | Одна волна |
+| `create(TicketTypePriceDto): bool` | Создать |
+| `editItem(Uuid, TicketTypePriceDto): bool` | Редактировать |
+| `remove(Uuid): bool` | Soft delete (помечает запись как удалённую) |
+
+**DTO `TicketTypePriceDto`:** `id` (Uuid), `ticket_type_id` (Uuid), `price` (float), `before_date` (Carbon).
+
+**Связь с TicketType:** `Tickets\TicketType\Repository\InMemoryTicketTypeRepository::buildBuilder()` берёт текущую цену билета подзапросом к `ticket_type_price` (`before_date >= CURDATE()`, ORDER BY `before_date` ASC LIMIT 1) — поведение не изменено. Новый CRUD управляет содержимым этой таблицы через API.
+
 ### HistoryRepositoryInterface
 
 **Путь:** `Backend/src/History/Repositories/HistoryRepositoryInterface.php`

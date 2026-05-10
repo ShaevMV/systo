@@ -171,6 +171,9 @@
 
             </div>
 
+            <!-- Управление волнами цен (только для существующего типа билета) -->
+            <TicketTypePriceList :ticketTypeId="id" v-if="id"/>
+
           </div>
         </div>
       </div>
@@ -180,9 +183,11 @@
 
 <script>
 import {mapActions, mapGetters} from "vuex";
+import TicketTypePriceList from "@/components/TicketType/TicketTypePriceList.vue";
 
 export default {
   name: "TicketTypeItem",
+  components: {TicketTypePriceList},
   props: {
     id: {
       type: [String],

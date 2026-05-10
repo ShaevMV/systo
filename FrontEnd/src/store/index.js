@@ -10,6 +10,7 @@ import appAccount from './modules/AccountModule/index';
 import appTypesOfPayment from './modules/TypesOfPaymentModule/index';
 import appQuestionnaireType from './modules/QuestionnaireTypeModule/index';
 import appLocation from './modules/LocationModule/index';
+import appTicketTypePrice from './modules/TicketTypePriceModule/index';
 
 export default createStore({
     state: {
@@ -44,5 +45,6 @@ export default createStore({
         'appTypesOfPayment': appTypesOfPayment,
         'appQuestionnaireType': appQuestionnaireType,
         'appLocation': appLocation,
+        'appTicketTypePrice': appTicketTypePrice,
     }
 })
