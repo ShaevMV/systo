@@ -402,12 +402,12 @@ final class OrderTicket extends AggregateRoot
         }
 
         if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            foreach ($changedIndexes as $index) {
-                $guest = $result->ticket[$index];
+            foreach ($changedIndexes as $changedIndex) {
+                $changedGuest = $result->ticket[$changedIndex];
                 $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $guest->getEmail() ?? $orderTicketDto->getEmail(),
+                    $changedGuest->getEmail() ?? $orderTicketDto->getEmail(),
                     $orderTicketDto->getId()->value(),
-                    $guest->getId()->value(),
+                    $changedGuest->getId()->value(),
                 ));
             }
         }
