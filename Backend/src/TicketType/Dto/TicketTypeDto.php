@@ -36,15 +36,32 @@ class TicketTypeDto extends AbstractionEntity implements Response
             $data['name'],
             (int)($data['current_price'] ?? $data['price']),
             (int)$data['sort'],
-            (bool)$data['active'],
-            (bool)($data['is_live_ticket'] ?? false),
-            (bool)($data['is_parking'] ?? false),
+            self::toBool($data['active'] ?? null),
+            self::toBool($data['is_live_ticket'] ?? null),
+            self::toBool($data['is_parking'] ?? null),
             FestivalDto::fromState($data),
             empty($data['questionnaire_type_id']) ? null : new Uuid($data['questionnaire_type_id']),
             $data['groupLimit'] ?? null,
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
         );
+    }
+
+    /**
+     * Корректное приведение к bool: Vue <select> отдаёт строки "true"/"false",
+     * а PHP-каст (bool)"false" === true. filter_var интерпретирует строки правильно.
+     */
+    private static function toBool(mixed $value, bool $default = false): bool
+    {
+        if ($value === null) {
+            return $default;
+        }
+        if (is_bool($value)) {
+            return $value;
+        }
+        $parsed = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        return $parsed ?? $default;
     }
 
     /**

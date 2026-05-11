@@ -104,9 +104,9 @@
                     <select class="form-select"
                             v-model="isLiveTicket"
                             id="validationDefault01">
-                      <option value=null>Выберите</option>
-                      <option value="false">Нет</option>
-                      <option value="true">Да</option>
+                      <option :value="null">Выберите</option>
+                      <option :value="false">Нет</option>
+                      <option :value="true">Да</option>
                     </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('is_live_ticket') }}</small>
@@ -117,9 +117,9 @@
                     <select class="form-select"
                             v-model="isParking"
                             id="validationDefault01">
-                      <option value=null>Выберите</option>
-                      <option value="false">Нет</option>
-                      <option value="true">Да</option>
+                      <option :value="null">Выберите</option>
+                      <option :value="false">Нет</option>
+                      <option :value="true">Да</option>
                     </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('is_parking') }}</small>
@@ -130,9 +130,9 @@
                     <select class="form-select"
                             v-model="active"
                             id="validationDefault01">
-                      <option value=null>Выберите</option>
-                      <option value="false">Нет</option>
-                      <option value="true">Да</option>
+                      <option :value="null">Выберите</option>
+                      <option :value="false">Нет</option>
+                      <option :value="true">Да</option>
                     </select>
                   </div>
                   <small class="form-text text-muted"> {{ getError('active') }}</small>
