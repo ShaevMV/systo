@@ -228,7 +228,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->insert($data);
             }
 
-            $query->update([
+            $affected = $query->update([
                 'status' => $data['status'],
                 'is_need_seedling' => $data['is_need_seedling'],
                 'type_ticket_id' => $data['type_ticket_id'],
@@ -237,7 +237,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 'festival_id' => $data['festival_id'],
             ]);
 
-            return true;
+            // 0 затронутых строк = либо повторный sync с теми же данными (норма),
+            // либо строка исчезла между exists() и update() (race) — отличаем через exists().
+            return $affected > 0 || $query->exists();
         } catch (\Throwable $e) {
             Log::error('setInBaza: ' . $e->getMessage(), ['uuid' => $ticketsDto->getId()->value()]);
 
@@ -266,7 +268,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                     ->insert($data);
             }
 
-            $query->update([
+            $affected = $query->update([
                 'project' => $data['project'],
                 'curator' => $data['curator'],
                 'email' => $data['email'],
@@ -276,7 +278,9 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 'festival_id' => $data['festival_id'],
             ]);
 
-            return true;
+            // 0 затронутых строк = либо повторный sync с теми же данными (норма),
+            // либо строка исчезла между exists() и update() (race) — отличаем через exists().
+            return $affected > 0 || $query->exists();
         } catch (\Throwable $e) {
             Log::error('setInBazaList: ' . $e->getMessage(), ['ticket_uuid' => $data['ticket_uuid']]);
 
