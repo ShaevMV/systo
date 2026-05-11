@@ -562,11 +562,21 @@
 
 | Метод | Маршрут | Middleware | Описание |
 |-------|---------|------------|----------|
-| POST | `/getList` | публичный | Список волн с фильтром `ticket_type_id` |
+| POST | `/getList` | публичный | Список волн **с обязательным** `filter.ticket_type_id` |
 | GET | `/getItem/{id}` | публичный | Одна волна |
 | POST | `/create` | `auth:api` + `admin` | Создать волну (UUID в `data.id` опционально) |
 | POST | `/edit/{id}` | `auth:api` + `admin` | Редактировать |
 | DELETE | `/delete/{id}` | `auth:api` + `admin` | Soft delete (запись помечается как удалённая) |
+
+**getList Request:**
+```json
+{
+  "filter": { "ticket_type_id": "UUID (required, exists:ticket_type,id)" },
+  "orderBy": { "before_date": "asc" }
+}
+```
+- `filter.ticket_type_id` — обязателен, иначе вернётся 422 (нет «получи всё»)
+- `orderBy.*` допускает только `asc` / `desc`; некорректное значение игнорируется (fallback на `Order::none()`)
 
 **create / edit Request:**
 ```json

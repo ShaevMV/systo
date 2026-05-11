@@ -7,9 +7,9 @@ namespace App\Http\Controllers\TicketTypePrice;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TicketTypePrice\TicketTypePriceCreateRequest;
 use App\Http\Requests\TicketTypePrice\TicketTypePriceEditRequest;
+use App\Http\Requests\TicketTypePrice\TicketTypePriceGetListRequest;
 use DomainException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Order;
@@ -22,14 +22,21 @@ use Tickets\TicketTypePrice\Dto\TicketTypePriceDto;
 class TicketTypePriceController extends Controller
 {
     public function getList(
-        Request $request,
+        TicketTypePriceGetListRequest $request,
         TicketTypePriceApplication $application,
     ): JsonResponse {
+        $validated = $request->validated();
+
+        // FormRequest уже валидирует orderBy, но Order::fromState на всякий случай
+        // оборачиваем — OrderType кидает InvalidArgumentException на чужих значениях
+        try {
+            $orderBy = Order::fromState($validated['orderBy'] ?? []);
+        } catch (InvalidArgumentException) {
+            $orderBy = Order::none();
+        }
+
         $collection = $application->getList(
-            new TicketTypePriceGetListQuery(
-                $request->toArray()['filter'] ?? [],
-                Order::fromState($request->toArray()['orderBy'] ?? [])
-            ),
+            new TicketTypePriceGetListQuery($validated['filter'], $orderBy),
         )->getCollection();
 
         return response()->json([
@@ -50,7 +57,7 @@ class TicketTypePriceController extends Controller
                 'success' => true,
                 'item' => $application->getItem(new Uuid($id))->toArray(),
             ]);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             return response()->json([
                 'success' => false,
                 'message' => 'Некорректный идентификатор',
@@ -110,7 +117,7 @@ class TicketTypePriceController extends Controller
                 'item' => $application->getItem(new Uuid($id))->toArray(),
                 'message' => 'Волна цены отредактирована',
             ]);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             return response()->json([
                 'success' => false,
                 'message' => 'Некорректный идентификатор',
@@ -134,7 +141,7 @@ class TicketTypePriceController extends Controller
             return response()->json([
                 'success' => $application->delete(new Uuid($id)),
             ]);
-        } catch (InvalidArgumentException $exception) {
+        } catch (InvalidArgumentException) {
             return response()->json([
                 'success' => false,
                 'message' => 'Некорректный идентификатор',
