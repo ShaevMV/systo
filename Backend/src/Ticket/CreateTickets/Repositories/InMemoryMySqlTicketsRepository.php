@@ -218,30 +218,30 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $data = $ticketsDto->toArrayForBaza();
         try {
             DB::connection('mysqlBaza')->getPdo();
-            if (!DB::connection('mysqlBaza')->table('el_tickets')
-                ->where('uuid', '=', $ticketsDto->getId()->value())->exists()
-            ) {
-                return DB::connection('mysqlBaza')
+
+            $query = DB::connection('mysqlBaza')->table('el_tickets')
+                ->where('uuid', '=', $ticketsDto->getId()->value());
+
+            if (!$query->exists()) {
+                return (bool) DB::connection('mysqlBaza')
                     ->table('el_tickets')
-                    ->insert(
-                        $data
-                    );
-            } else {
-                DB::connection('mysqlBaza')->table('el_tickets')
-                    ->where('uuid', '=', $ticketsDto->getId()->value())
-                    ->update([
-                        'status' => $data['status'],
-                        'is_need_seedling' => $data['is_need_seedling'],
-                        'type_ticket_id' => $data['type_ticket_id'],
-                        'type_ticket' => $data['type_ticket'],
-                        'name' => $data['name'],
-                        'festival_id' => $data['festival_id'],
-                    ]);
+                    ->insert($data);
             }
-        } catch (\Exception) {
-            return false;
-        } finally {
+
+            $query->update([
+                'status' => $data['status'],
+                'is_need_seedling' => $data['is_need_seedling'],
+                'type_ticket_id' => $data['type_ticket_id'],
+                'type_ticket' => $data['type_ticket'],
+                'name' => $data['name'],
+                'festival_id' => $data['festival_id'],
+            ]);
+
             return true;
+        } catch (\Throwable $e) {
+            Log::error('setInBaza: ' . $e->getMessage(), ['uuid' => $ticketsDto->getId()->value()]);
+
+            return false;
         }
     }
 
@@ -257,32 +257,30 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         try {
             DB::connection('mysqlBaza')->getPdo();
 
-            $exists = DB::connection('mysqlBaza')->table('spisok_tickets')
-                ->where('ticket_uuid', '=', $data['ticket_uuid'])
-                ->exists();
+            $query = DB::connection('mysqlBaza')->table('spisok_tickets')
+                ->where('ticket_uuid', '=', $data['ticket_uuid']);
 
-            if (!$exists) {
-                return (bool)DB::connection('mysqlBaza')
+            if (!$query->exists()) {
+                return (bool) DB::connection('mysqlBaza')
                     ->table('spisok_tickets')
                     ->insert($data);
             }
 
-            DB::connection('mysqlBaza')->table('spisok_tickets')
-                ->where('ticket_uuid', '=', $data['ticket_uuid'])
-                ->update([
-                    'project' => $data['project'],
-                    'curator' => $data['curator'],
-                    'email' => $data['email'],
-                    'name' => $data['name'],
-                    'comment' => $data['comment'],
-                    'status' => $data['status'],
-                    'festival_id' => $data['festival_id'],
-                ]);
-        } catch (\Exception $e) {
-            Log::error('setInBazaList: ' . $e->getMessage(), ['ticket_uuid' => $data['ticket_uuid']]);
-            return false;
-        } finally {
+            $query->update([
+                'project' => $data['project'],
+                'curator' => $data['curator'],
+                'email' => $data['email'],
+                'name' => $data['name'],
+                'comment' => $data['comment'],
+                'status' => $data['status'],
+                'festival_id' => $data['festival_id'],
+            ]);
+
             return true;
+        } catch (\Throwable $e) {
+            Log::error('setInBazaList: ' . $e->getMessage(), ['ticket_uuid' => $data['ticket_uuid']]);
+
+            return false;
         }
     }
 

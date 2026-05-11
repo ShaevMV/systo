@@ -232,7 +232,7 @@ class Questionnaire extends AggregateRoot {
 |-----|------|------|
 | **FestivalDto** | `Festival/DTO/` | Данные фестиваля |
 | **PriceDto** | `Festival/DTO/` | `uuid`, `price`, `beforeDate` |
-| **TicketTypeDto** | `Festival/Response/` | `id`, `name`, `price`, `groupLimit`, `festivalList[]`, `priceList[]`, `isLiveTicket` |
+| **TicketTypeDto** | `Festival/Response/` | `id`, `name`, `price`, `groupLimit`, `festivalList[]`, `priceList[]`, `isLiveTicket`, `isParking` |
 | **TypesOfPaymentDto** | `Festival/Response/` | `id`, `name`, `card`, `is_billing` |
 
 ### History Module
