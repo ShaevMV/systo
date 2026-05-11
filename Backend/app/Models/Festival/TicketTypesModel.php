@@ -25,6 +25,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property int $sort
  * @property int $active
  * @property int $is_live_ticket
+ * @property int $is_parking
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Festival\FestivalModel[] $festivals
  * @property-read int|null $festivals_count
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Festival\TicketTypesPriceModel[] $ticketTypePrice
@@ -37,6 +38,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @method static Builder|TicketTypesModel whereGroupLimit($value)
  * @method static Builder|TicketTypesModel whereId($value)
  * @method static Builder|TicketTypesModel whereIsLiveTicket($value)
+ * @method static Builder|TicketTypesModel whereIsParking($value)
  * @method static Builder|TicketTypesModel whereName($value)
  * @method static Builder|TicketTypesModel wherePrice($value)
  * @method static Builder|TicketTypesModel whereSort($value)
@@ -60,6 +62,7 @@ class TicketTypesModel extends Model
         'sort',
         'active',
         'is_live_ticket',
+        'is_parking',
         'groupLimit',
         'questionnaire_type_id',
     ];

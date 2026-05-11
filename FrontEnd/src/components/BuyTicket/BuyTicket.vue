@@ -119,8 +119,8 @@
                   </div>
 
                 </div>
-                <div class="pp2 row">Введи свои Имя и Фамилию или Имя и Фамилию ребёнка, если вносишь оргвзнос за ребёнка</div>
-                <div class="quest-item row" id="first-item-row">
+                <div class="pp2 row" v-show="!isParking">Введи свои Имя и Фамилию или Имя и Фамилию ребёнка, если вносишь оргвзнос за ребёнка</div>
+                <div class="quest-item row" id="first-item-row" v-show="!isParking">
                   <label for="name" style="display: none">Твои Имя и Фамилия или Имя и Фамилия ребёнка: *</label>
 
                   <div class="input-group" id="promo-input" v-show="!isNotNeedQuestionnaire">
@@ -135,7 +135,7 @@
                     />
                   </div>
                 </div>
-                <div class="row mt-3 mb-3" id="enter-guests">
+                <div class="row mt-3 mb-3" id="enter-guests" v-show="!isParking">
                   <div class="pp2">Введи данные дополнительных своих друзей, за которых ты хочешь внести оргвзнос:</div>
                   <div class="not-first-guest input-group mb-3">
 
@@ -166,6 +166,54 @@
                           id="basic-addon1"
                       >Добавить</span
                       >
+                    </div>
+                  </div>
+                </div>
+                <div class="row mt-3 mb-3" id="enter-cars" v-show="isParking">
+                  <div class="pp2">Введи данные автомобилей, для которых нужна парковка:</div>
+                  <div class="not-first-guest input-group mb-3">
+                    <input
+                        type="text"
+                        id="newCarNumber"
+                        class="form-control"
+                        placeholder="Гос. номер (например, А123АА777)"
+                        aria-label="Гос. номер автомобиля"
+                        v-model="newCarNumber"
+                        @blur="addParking"
+                    />
+                    <input
+                        type="text"
+                        id="newCarBrand"
+                        class="form-control"
+                        placeholder="Марка автомобиля"
+                        aria-label="Марка автомобиля"
+                        v-model="newCarBrand"
+                        @blur="addParking"
+                    />
+                    <input
+                        type="text"
+                        id="newDriverName"
+                        class="form-control"
+                        placeholder="ФИО водителя"
+                        aria-label="ФИО водителя"
+                        v-model="newDriverName"
+                        @blur="addParking"
+                    />
+                    <input
+                        type="email"
+                        id="newDriverEmail"
+                        class="form-control"
+                        placeholder="Email для отправки анкеты"
+                        aria-label="Email для отправки анкеты"
+                        v-model="newGuestEmail"
+                        @blur="addParking"
+                    />
+                    <div class="input-group-prepend">
+                      <span
+                          class="input-group-text btn"
+                          @click="addParking()"
+                          id="basic-addon1"
+                      >Добавить</span>
                     </div>
                   </div>
                 </div>
@@ -582,6 +630,9 @@ export default {
       masterName: '',
       newGuest: '',
       newGuestEmail: '',
+      newCarNumber: '',
+      newCarBrand: '',
+      newDriverName: '',
       isFirstGuestAdded: false,
       email: null,
       date: null,
@@ -619,6 +670,12 @@ export default {
     ]),
     ...mapGetters('appUser', ['isAuth', 'getEmail', 'getUserData']),
     ...mapGetters('appOrder', ['getError']),
+    /**
+     * Признак типа билета "парковка" — меняет форму ввода гостей на ввод данных автомобиля
+     */
+    isParking: function () {
+      return this.getSelectTicketType?.isParking === true;
+    },
     selectTypesOfPaymentIsBilling: function () {
       let typesOfPaymentList = this.getTypesOfPayment;
       if(this.selectTypesOfPayment !== null ) {
@@ -650,7 +707,7 @@ export default {
           (this.isAuth || this.email)
       )
 
-      if(!this.isNotNeedQuestionnaire) {
+      if(!this.isNotNeedQuestionnaire && !this.isParking) {
         result = result && this.masterName.length > 0;
       } else {
         result = result && this.guests.length > 0;
@@ -773,6 +830,27 @@ export default {
       }
     },
     /**
+     * Добавить парковочное место — гос. номер, марка и водитель склеиваются в одну строку value,
+     * чтобы backend получал привычный формат guests[].value/email без изменений.
+     */
+    addParking: function () {
+      if (
+          this.newCarNumber.length > 0 &&
+          this.newCarBrand.length > 0 &&
+          this.newDriverName.length > 0 &&
+          this.newGuestEmail.length > 0
+      ) {
+        this.guests.push({
+          value: this.newCarNumber + ' / ' + this.newCarBrand + ' / ' + this.newDriverName,
+          email: this.newGuestEmail,
+        });
+        this.newCarNumber = '';
+        this.newCarBrand = '';
+        this.newDriverName = '';
+        this.newGuestEmail = '';
+      }
+    },
+    /**
      * Удалить гостя
      * @param index
      */
@@ -825,6 +903,9 @@ export default {
       this.preload = false;
       this.newGuest = '';
       this.newGuestEmail = '';
+      this.newCarNumber = '';
+      this.newCarBrand = '';
+      this.newDriverName = '';
       this.email = this.getEmail;
       this.promoCode = null;
       this.day = null;

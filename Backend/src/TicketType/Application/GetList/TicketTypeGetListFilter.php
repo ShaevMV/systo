@@ -13,6 +13,7 @@ class TicketTypeGetListFilter
         private ?string $name = null,
         private ?bool   $active = null,
         private ?bool   $is_live_ticket = null,
+        private ?bool   $is_parking = null,
         private ?Uuid   $festival_id = null
     )
     {
@@ -33,6 +34,11 @@ class TicketTypeGetListFilter
         return $this->is_live_ticket;
     }
 
+    public function getIsParking(): ?bool
+    {
+        return $this->is_parking;
+    }
+
     public static function fromState(array $data): self
     {
         $festivalId = null;
@@ -44,6 +50,7 @@ class TicketTypeGetListFilter
             $data['name'] ?? null,
             ($data['active'] ?? null) === null ? null : $data['active'] === 'true',
             ($data['is_live_ticket'] ?? null) === null ? null : $data['is_live_ticket'] === 'true',
+            ($data['is_parking'] ?? null) === null ? null : $data['is_parking'] === 'true',
             $festivalId,
         );
     }

@@ -97,6 +97,7 @@ class TicketResponse extends AbstractionEntity implements Response
             'is_need_seedling' => $this->is_need_seedling,
             'type_ticket_id'   => $this->type_ticket_id?->value(),
             'type_ticket'      => $this->type_ticket,
+            'festival_id'      => $this->festival_id?->value(),
         ];
     }
 
