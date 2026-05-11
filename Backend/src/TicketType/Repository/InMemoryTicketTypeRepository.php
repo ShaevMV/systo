@@ -60,6 +60,7 @@ class InMemoryTicketTypeRepository implements TicketTypeRepositoryInterface
             (SELECT price
              FROM ' . TicketTypesPriceModel::TABLE . '
              WHERE ' . TicketTypesPriceModel::TABLE . '.ticket_type_id = ' . $this->model::TABLE . '.id
+             AND ' . TicketTypesPriceModel::TABLE . '.deleted_at IS NULL
              AND before_date >= CURDATE()
              ORDER BY before_date ASC
              LIMIT 1),
