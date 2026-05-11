@@ -25,6 +25,7 @@ class TicketTypePriceCreateRequest extends FormRequest
     {
         return [
             'data' => ['required', 'array'],
+            'data.id' => ['sometimes', 'string', 'uuid'],
             'data.ticket_type_id' => ['required', 'string', 'uuid', 'exists:ticket_type,id'],
             'data.price' => ['required', 'numeric', 'gt:0', 'lt:1000000'],
             'data.before_date' => ['required', 'date', 'after_or_equal:today'],
@@ -34,6 +35,7 @@ class TicketTypePriceCreateRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'data.id.uuid' => 'Идентификатор должен быть UUID',
             'data.ticket_type_id.required' => 'Не указан тип билета',
             'data.ticket_type_id.uuid' => 'Тип билета должен быть UUID',
             'data.ticket_type_id.exists' => 'Указанный тип билета не существует',

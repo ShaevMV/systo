@@ -10,6 +10,7 @@ use App\Http\Requests\TicketTypePrice\TicketTypePriceEditRequest;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 use Nette\Utils\JsonException;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
@@ -49,11 +50,16 @@ class TicketTypePriceController extends Controller
                 'success' => true,
                 'item' => $application->getItem(new Uuid($id))->toArray(),
             ]);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Некорректный идентификатор',
+            ], 400);
         } catch (DomainException $exception) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ]);
+            ], 404);
         }
     }
 
@@ -64,13 +70,22 @@ class TicketTypePriceController extends Controller
         TicketTypePriceCreateRequest $request,
         TicketTypePriceApplication $application,
     ): JsonResponse {
-        $data = TicketTypePriceDto::fromState($request->validated()['data']);
+        try {
+            $data = TicketTypePriceDto::fromState($request->validated()['data']);
 
-        return response()->json([
-            'success' => $application->create($data),
-            'item' => $application->getItem($data->getId())->toArray(),
-            'message' => 'Волна цены создана',
-        ]);
+            return response()->json([
+                'success' => $application->create($data),
+                'item' => $application->getItem($data->getId())->toArray(),
+                'message' => 'Волна цены создана',
+            ]);
+        } catch (InvalidArgumentException $exception) {
+            // Защита от некорректного UUID в data.id (FormRequest уже валидирует,
+            // но оставляем guard для случаев минуя валидацию)
+            return response()->json([
+                'success' => false,
+                'message' => 'Некорректный идентификатор',
+            ], 400);
+        }
     }
 
     /**
@@ -95,11 +110,16 @@ class TicketTypePriceController extends Controller
                 'item' => $application->getItem(new Uuid($id))->toArray(),
                 'message' => 'Волна цены отредактирована',
             ]);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Некорректный идентификатор',
+            ], 400);
         } catch (DomainException $exception) {
             return response()->json([
                 'success' => false,
                 'message' => $exception->getMessage(),
-            ]);
+            ], 404);
         }
     }
 
@@ -110,8 +130,20 @@ class TicketTypePriceController extends Controller
         string $id,
         TicketTypePriceApplication $application,
     ): JsonResponse {
-        return response()->json([
-            'success' => $application->delete(new Uuid($id)),
-        ]);
+        try {
+            return response()->json([
+                'success' => $application->delete(new Uuid($id)),
+            ]);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Некорректный идентификатор',
+            ], 400);
+        } catch (DomainException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 404);
+        }
     }
 }
