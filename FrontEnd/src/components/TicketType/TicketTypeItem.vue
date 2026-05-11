@@ -112,6 +112,19 @@
                   <small class="form-text text-muted"> {{ getError('is_live_ticket') }}</small>
                 </div>
                 <div class="row mb-3">
+                  <label for="company" class="col-4 col-form-label">Для парковки:</label>
+                  <div class="col-8">
+                    <select class="form-select"
+                            v-model="isParking"
+                            id="validationDefault01">
+                      <option value=null>Выберите</option>
+                      <option value="false">Нет</option>
+                      <option value="true">Да</option>
+                    </select>
+                  </div>
+                  <small class="form-text text-muted"> {{ getError('is_parking') }}</small>
+                </div>
+                <div class="row mb-3">
                   <label for="company" class="col-4 col-form-label">Активность:</label>
                   <div class="col-8">
                     <select class="form-select"
@@ -197,6 +210,7 @@ export default {
       newSort: null,
       newActive: null,
       newIsLiveTicket: null,
+      newIsParking: null,
       newFestivalId: null,
       newDescription: null,
       newEmail: null,
@@ -328,10 +342,21 @@ export default {
         this.newIsLiveTicket = newValue;
       },
     },
+    isParking: {
+      get: function () {
+        if (this.newIsParking === null) {
+          return this.getItem.is_parking;
+        }
+        return this.newIsParking;
+      },
+      set: function (newValue) {
+        this.newIsParking = newValue;
+      },
+    },
     questionnaire_type_id: {
       get: function () {
         if (this.newQuestionnaireTypeId === null) {
-          return this.getItem.questionnaireTypeId;
+          return this.getItem.questionnaire_type_id;
         }
         return this.newQuestionnaireTypeId;
       },
@@ -358,6 +383,7 @@ export default {
         'sort': this.sortItem,
         'active': this.active,
         'is_live_ticket': this.isLiveTicket,
+        'is_parking': this.isParking,
         'festival_id': this.festival_id,
         'festival_pdf': this.festival_pdf,
         'festival_email': this.festival_email,
