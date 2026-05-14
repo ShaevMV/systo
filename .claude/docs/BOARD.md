@@ -21,6 +21,16 @@
 - **В работе:** 0
 - **Критичных проблем:** 2 (Тесты, Воркер)
 
+### ✅ Сделано 2026-05-15
+**Авто-одобрение заказа по заголовку `AutoPayment` на `POST /api/v1/order/create`.**
+- Конфиг: `AUTO_PAYMENT_TOKEN` в `.env.example` + `config/services.php → auto_payment.token`
+- `ActorType::AUTO_PAYMENT` (`auto_payment`) добавлен в `Backend/src/History/Domain/ActorType.php`
+- `TypesOfPaymentDto::isBilling()` — геттер для проверки биллингового способа оплаты
+- `OrderTickets::create()` — проверка заголовка `AutoPayment` до создания: невалидный токен → `403`, валидный + не-биллинговый способ оплаты → после `createAndSave` вызывается `ChangeStatus` с `Status::PAID` (запускается `ProcessCreateTicket` + email с PDF); биллинговый способ — заголовок игнорируется
+- Сравнение токенов через `hash_equals` (защита от timing-attack)
+- Документация: `API.md` (раздел `/api/v1/order/create` — заголовки и поведение), `BUSINESS_RULES.md` (§1 Роли для смены статуса), `DOMAIN.md` (ActorType)
+- 🌿 ветка `feat/auto-payment-token`
+
 ### ✅ Сделано 2026-05-10
 **CRUD для волн цен типа билета (`ticket_type_price`).**
 - Backend модуль `Backend/src/TicketTypePrice/` (DTO, Repository + Interface, Application, Create/Edit/Delete/GetList/GetItem handlers)

@@ -73,6 +73,7 @@
 
 - Обычные/Live статусы (PAID/CANCEL/PAID_FOR_LIVE/LIVE_TICKET_ISSUED/DIFFICULTIES_AROSE и пр.): `seller`, `admin`, `pusher`
 - List-статусы (APPROVE_LIST / CANCEL_LIST / DIFFICULTIES_AROSE_LIST): только `admin`, `manager`
+- **Авто-одобрение (без авторизации)**: `POST /api/v1/order/create` с заголовком `AutoPayment: <AUTO_PAYMENT_TOKEN>` сразу переводит свежесозданный заказ `NEW → PAID` (через тот же `ChangeStatus`). Только для не-биллинговых способов оплаты (`types_of_payment.is_billing = false`). В историю пишется `actor_type = auto_payment`. Если токен невалиден — `403`, заказ не создаётся.
 
 ---
 

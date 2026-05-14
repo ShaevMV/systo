@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    // Авто-одобрение заказа на /api/v1/order/create по заголовку "AutoPayment".
+    // Если токен пустой — фича выключена.
+    'auto_payment' => [
+        'token' => env('AUTO_PAYMENT_TOKEN'),
+    ],
+
 ];

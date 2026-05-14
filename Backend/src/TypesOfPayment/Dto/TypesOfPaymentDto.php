@@ -97,4 +97,9 @@ class TypesOfPaymentDto extends AbstractionEntity implements Response
     {
         return $this->email;
     }
+
+    public function isBilling(): bool
+    {
+        return $this->is_billing;
+    }
 }

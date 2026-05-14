@@ -242,6 +242,12 @@ class Questionnaire extends AggregateRoot {
 | **SaveHistoryDto** | `History/Dto/` | `aggregateId` (string), `event` (HistoryEventInterface), `actorId` (?string), `actorType` (string) |
 | **DomainHistoryDto** | `History/Dto/` | `aggregateId` (string), `aggregateType` (string), `eventName` (string), `payload` (array), `actorId` (?string), `actorType` (string), `occurredAt` (Carbon) |
 
+**ActorType** (`History/Domain/ActorType.php`) — типы инициаторов событий в `domain_history.actor_type`:
+- `user` — действие выполнил пользователь (актер берётся из `Auth::id()`)
+- `system` — системное действие (фоновые задачи, события)
+- `artisan` — действие из artisan-команды (CLI)
+- `auto_payment` — авто-одобрение заказа на `POST /api/v1/order/create` по валидному заголовку `AutoPayment` (`actorId` пишется `null`)
+
 ---
 
 ## Domain Events
