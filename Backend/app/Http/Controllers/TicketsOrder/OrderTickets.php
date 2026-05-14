@@ -19,6 +19,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Festival\Application\GetTicketType\GetTicketType;
 use Tickets\History\Application\GetHistory\GetOrderHistory;
+use Tickets\History\Domain\ActorType;
+use Tickets\TypesOfPayment\Application\TypesOfPaymentApplication;
 use Tickets\Order\OrderTicket\Application\AddComment\AddComment;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 use Tickets\Order\OrderTicket\Application\ChangeStatus\ChangeStatus;
@@ -57,6 +59,7 @@ class OrderTickets extends Controller
         private ChangeTicket       $changeTicket,
         private GetOrderHistory    $getOrderHistory,
         private \Tickets\Auto\Application\AutoApplication $autoApplication,
+        private TypesOfPaymentApplication $typesOfPaymentApplication,
        // private Billing            $billing,
     )
     {
@@ -67,8 +70,24 @@ class OrderTickets extends Controller
      *
      * @throws Throwable
      */
-    public function create(CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
+    public function create(CreateOrderTicketsRequest $createOrderTicketsRequest, Request $request): JsonResponse
     {
+        // Авто-одобрение: проверяем заголовок до любых действий.
+        // Если заголовок передан, но токен не совпадает с конфигом — сразу 403.
+        $autoPaymentHeader = $request->headers->get('AutoPayment');
+        $autoPaymentToken  = config('services.auto_payment.token');
+        $isAutoPayment     = false;
+
+        if ($autoPaymentHeader !== null) {
+            if (empty($autoPaymentToken) || !hash_equals((string) $autoPaymentToken, $autoPaymentHeader)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Неверный токен авто-одобрения',
+                ], 403);
+            }
+            $isAutoPayment = true;
+        }
+
         try {
             // Создание или получение пользователя по email
             $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
@@ -116,6 +135,23 @@ class OrderTickets extends Controller
                     $userId,
                     $createOrderTicketsRequest->comment
                 );
+            }
+
+            // Авто-одобрение заказа: только для не-биллинговых способов оплаты.
+            // Для биллинговых (СБП и т.п.) заголовок игнорируем — заказ остаётся в NEW и идёт штатным flow.
+            if ($isAutoPayment) {
+                $typesOfPayment = $this->typesOfPaymentApplication->getItem(
+                    new Uuid($createOrderTicketsRequest->types_of_payment_id)
+                );
+
+                if (!$typesOfPayment->isBilling()) {
+                    $this->chanceStatus->change(
+                        $orderTicketDto->getId(),
+                        new Status(Status::PAID),
+                        $userId,
+                        actorType: ActorType::AUTO_PAYMENT,
+                    );
+                }
             }
 
             return response()->json([

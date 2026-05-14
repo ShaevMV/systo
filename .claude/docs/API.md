@@ -200,6 +200,13 @@
 ### POST `/api/v1/order/create`
 **Middleware:** публичный
 
+**Заголовки (опциональные):**
+- `AutoPayment: <token>` — авто-одобрение заказа. Токен сравнивается с `AUTO_PAYMENT_TOKEN` (см. `config/services.php → auto_payment.token`).
+  - Заголовок **не передан** → заказ создаётся в `NEW` (штатный flow).
+  - Заголовок передан, токен **совпал** и `types_of_payment.is_billing = false` → после создания заказ сразу переводится в `PAID` через `ChangeStatus` (запускается `ProcessCreateTicket` + email с PDF). В `domain_history.actor_type` пишется `auto_payment`, `actor_id = null`.
+  - Заголовок передан, токен совпал, но `types_of_payment.is_billing = true` → заголовок **игнорируется**, заказ остаётся в `NEW` (биллинговый flow управляет статусом сам через webhook `/api/v1/order/succes`).
+  - Заголовок передан, токен **не совпал** (или `AUTO_PAYMENT_TOKEN` пуст) → `403 { "success": false, "message": "Неверный токен авто-одобрения" }`, заказ **не** создаётся.
+
 **Request:**
 ```json
 {
@@ -229,6 +236,14 @@
 {
   "success": true,
   "message": "Мы удачно зарегистрировали ваш заказ..."
+}
+```
+
+**Response 403 (битый токен авто-одобрения):**
+```json
+{
+  "success": false,
+  "message": "Неверный токен авто-одобрения"
 }
 ```
 
