@@ -115,7 +115,7 @@
 <body>
 <img src="https://api.spaceofjoy.ru/images/bilet_avto.png" alt="fon" id="fon">
 <div id="top"></div>
-<img src="https://api.spaceofjoy.ru/images/top-img.png" alt="top" id="top-img">
+<div id="top-img"></div>
 <img src="{{$url}}" width="420" height="420" id="qr-code">
 
 <p id="top-class-title">Привет друг, это твой эко-сбор на Solar Systo Togathering {{date('Y')}}!</p>
