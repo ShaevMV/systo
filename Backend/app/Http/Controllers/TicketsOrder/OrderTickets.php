@@ -70,7 +70,7 @@ class OrderTickets extends Controller
      *
      * @throws Throwable
      */
-    public function create(CreateOrderTicketsRequest $createOrderTicketsRequest, Request $request): JsonResponse
+    public function create(Request $request, CreateOrderTicketsRequest $createOrderTicketsRequest): JsonResponse
     {
         // Авто-одобрение: проверяем заголовок до любых действий.
         // Если заголовок передан, но токен не совпадает с конфигом — сразу 403.
