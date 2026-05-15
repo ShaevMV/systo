@@ -10,7 +10,7 @@ use Throwable;
 
 class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
 {
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b7';
+    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
 
     public function __construct(
         private AutoModel $model

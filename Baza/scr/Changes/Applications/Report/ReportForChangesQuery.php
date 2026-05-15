@@ -9,7 +9,7 @@ use Baza\Shared\Domain\Bus\Query\Query;
 class ReportForChangesQuery implements Query
 {
     public function __construct(
-        private string $festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b7',
+        private string $festivalId = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8',
     )
     {
     }
