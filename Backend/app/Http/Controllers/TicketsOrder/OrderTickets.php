@@ -144,7 +144,7 @@ class OrderTickets extends Controller
                     new Uuid($createOrderTicketsRequest->types_of_payment_id)
                 );
 
-                if (!$typesOfPayment->isBilling()) {
+                if ($typesOfPayment->isBilling()) {
                     $this->chanceStatus->change(
                         $orderTicketDto->getId(),
                         new Status(Status::PAID),
