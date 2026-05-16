@@ -207,7 +207,7 @@
         const typeTicketResult = document.getElementById('type_ticket');
 
         function showResult(data) {
-            if (data.date_change === null && data.status === 'paid') {
+            if (data.date_change === null && (data.status === 'paid' || data.status === 'paid_for_live' || data.status === 'approve_list')) {
                 enterResult.style.display = "block";
             } else {
 

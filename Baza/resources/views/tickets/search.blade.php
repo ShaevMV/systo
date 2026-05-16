@@ -1,4 +1,4 @@
-@php use Baza\Shared\Domain\ValueObject\Status;use Baza\Shared\Services\DefineService; @endphp
+@php use Shared\Domain\ValueObject\Status;use Baza\Shared\Services\DefineService; @endphp
 @extends('layouts.app', ['page' => __('Поиск'), 'pageSlug' => 'search'])
 
 @section('content')
@@ -127,7 +127,7 @@
                                                 @foreach($result[DefineService::ELECTRON_TICKET] as $ticket)
                                                     <tr>
                                                         <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            @if($ticket['date_change'] === null && in_array($ticket['status'],Status::PAID_LIST))
                                                                 <form method="post"
                                                                       action="/enterForTable">
                                                                     @csrf
@@ -223,7 +223,7 @@
                                                 @foreach($result[DefineService::SPISOK_TICKET] as $ticket)
                                                     <tr>
                                                         <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            @if($ticket['date_change'] === null && in_array($ticket['status'],Status::PAID_LIST))
                                                                 <form method="post"
                                                                       action="/enterForTable">
                                                                     @csrf
@@ -316,7 +316,7 @@
                                                 @foreach($result[DefineService::DRUG_TICKET] as $ticket)
                                                     <tr>
                                                         <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            @if($ticket['date_change'] === null && in_array($ticket['status'],Status::PAID_LIST))
                                                                 <form method="post"
                                                                       action="/enterForTable">
                                                                     @csrf
@@ -397,7 +397,7 @@
                                                 @foreach($result[DefineService::LIVE_TICKET] as $ticket)
                                                     <tr>
                                                         <td>
-                                                            @if($ticket['date_change'] === null && $ticket['status'] === Status::PAID)
+                                                            @if($ticket['date_change'] === null && in_array($ticket['status'],Status::PAID_LIST))
                                                                 <form method="post"
                                                                       action="/enterForTable">
                                                                     @csrf
