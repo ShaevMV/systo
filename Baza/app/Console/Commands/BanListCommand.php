@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\LiveTicketModel;
-use Baza\Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Status;
 use Illuminate\Console\Command;
 
 class BanListCommand extends Command

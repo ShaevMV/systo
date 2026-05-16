@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Responses;
 
-use Baza\Shared\Domain\ValueObject\Status;
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Status;
+use Shared\Domain\ValueObject\Uuid;
 use Baza\Shared\Services\DefineService;
 use Baza\Shared\Services\ShowSearchWordService;
 use Baza\Tickets\Applications\Scan\TicketResponseInterface;
