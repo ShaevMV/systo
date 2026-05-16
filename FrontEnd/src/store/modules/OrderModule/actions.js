@@ -270,6 +270,23 @@ export const sendNewTicket = (context, payload) => {
     });
 }
 
+export const sendRemove = (context, payload) => {
+    console.log(payload)
+    let promise = axios.delete(API_ORDER + '/removeTicket/' + payload.id + '/' + payload.ticketId);
+    promise.then(function () {
+        if (payload.callback !== undefined) {
+            payload.callback()
+        }
+    }).catch(function (error) {
+        console.error(error.response.data.errors);
+        if (payload.callbackError !== undefined) {
+            payload.callbackError(
+                error.response.data.errors
+            )
+        }
+    });
+}
+
 export const getUrlForPdf = (context, payload) => {
     return new Promise((resolve, reject) => {
         let promise = axios.get(API_ORDER + '/getTicketPdf/' + payload);

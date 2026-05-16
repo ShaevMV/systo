@@ -2,25 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Tickets\Ticket\CreateTickets\Application\ChangeTicket;
+namespace Tickets\Ticket\CreateTickets\Application\RemoveTicket;
 
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Throwable;
-use Tickets\Ticket\CreateTickets\Application\RemoveTicket\RemoveTicketCommand;
-use Tickets\Ticket\CreateTickets\Application\RemoveTicket\RemoveTicketCommandHandler;
+use Tickets\Ticket\CreateTickets\Application\ChangeTicket\ChangeTicketCommand;
 
-class ChangeTicket
+class RemoveTicket
 {
     private InMemorySymfonyCommandBus $commandBus;
 
-    public function __construct(
-        ChangeTicketCommandHandler $commandHandler,
-        RemoveTicketCommandHandler $commandHandlerRemove,
-    ){
+    public function __construct(RemoveTicketCommandHandler $commandHandler)
+    {
         $this->commandBus = new InMemorySymfonyCommandBus([
-            ChangeTicketCommand::class => $commandHandler,
-            RemoveTicketCommand::class => $commandHandlerRemove,
+            RemoveTicketCommand::class => $commandHandler,
         ]);
     }
 
@@ -46,12 +42,12 @@ class ChangeTicket
     public function remove(
         Uuid    $orderId,
         Uuid   $ticketId,
-        string $actionId = null
+        ?string $actorId = null,
     ): void {
         $this->commandBus->dispatch(new RemoveTicketCommand(
             $orderId,
             $ticketId,
-            $actionId,
+            $actorId,
         ));
     }
 }

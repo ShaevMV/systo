@@ -22,6 +22,16 @@
             {{ getErrorMessage('value', guest.id) }}
           </div>
         </div>
+        <div class="col-md-4" v-if="isList">
+          <button type="button"
+                  class="btn btn-outline-primary"
+                  @click="remove(guest.id)">
+            Удалить
+          </button>
+          <div class="text-danger small mt-1" v-if="getErrorMessage('value', guest.id)">
+            {{ getErrorMessage('value', guest.id) }}
+          </div>
+        </div>
       </div>
     </div>
     <button class="btn btn-primary mt-2" @click="editTicket">Сменить билеты</button>
@@ -34,7 +44,7 @@ import { toRaw } from 'vue';
 
 export default {
   name: "NewTicket",
-  props: ['oldGuests'],
+  props: ['oldGuests', 'isList'],
   data() {
     return {
       newEmail: {},
@@ -43,7 +53,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions('appOrder', ['sendNewTicket']),
+    ...mapActions('appOrder', ['sendNewTicket','sendRemove']),
 
     getErrorMessage(field, uuid) {
       if (!this.errors) return null;
@@ -62,6 +72,21 @@ export default {
       return null;
     },
 
+    remove(ticketId) {
+      console.log(1111);
+      this.errors = null;
+
+      this.sendRemove({
+        id: this.$route.params.id,
+        ticketId: ticketId,
+        callback: () => {
+          window.location.reload();
+        },
+        callbackError: (errorObject) => {
+          this.errors = errorObject;
+        }
+      });
+    },
     editTicket() {
       this.errors = null;
       const email = Object.fromEntries(Object.entries(toRaw(this.newEmail)));

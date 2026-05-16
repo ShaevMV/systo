@@ -77,6 +77,10 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('role:admin,curator,pusher_curator');
 
+    Route::delete('/removeTicket/{orderId}/{ticketId}', [OrderTickets::class, 'removeTicket'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,curator,pusher_curator');
+
     Route::delete('/{id}/auto/{autoId}', [OrderTickets::class, 'removeAuto'])
         ->middleware('auth:api')
         ->middleware('role:admin,curator,pusher_curator');

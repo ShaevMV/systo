@@ -484,6 +484,19 @@ class OrderTickets extends Controller
         }
     }
 
+    public function removeTicket(string $orderId, string $ticketId): JsonResponse
+    {
+        $this->changeTicket->remove(
+            new Uuid($orderId),
+            new Uuid($ticketId),
+            Auth::id(),
+        );
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
     /**
      * Право на управление авто заказа: admin или куратор-создатель.
      */

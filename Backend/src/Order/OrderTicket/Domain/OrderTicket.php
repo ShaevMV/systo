@@ -8,6 +8,7 @@ use DomainException;
 use Shared\Domain\Aggregate\AggregateRoot;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\History\Domain\Event\OrderTicketDataRemoveEvent;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramByQuestionnaireSend;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
@@ -18,7 +19,6 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCancelLiveTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
-use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderTicketChanged;
 use Tickets\History\Trait\HasHistory;
 use Tickets\History\Domain\Event\OrderStatusChangedEvent;
 use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
@@ -28,6 +28,7 @@ use Tickets\History\Domain\Event\OrderListCreatedEvent;
 final class OrderTicket extends AggregateRoot
 {
     use HasHistory;
+
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
     /**
@@ -81,8 +82,8 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderCreatedEvent(
             ticketType: $orderTicketDto->getTicketTypeId()->value(),
-            price:      $orderTicketDto->getPriceDto()->getTotalPrice(),
-            kilter:     $kilter,
+            price: $orderTicketDto->getPriceDto()->getTotalPrice(),
+            kilter: $kilter,
         ));
 
         return $result;
@@ -119,7 +120,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::PAID_FOR_LIVE,
+            toStatus: Status::PAID_FOR_LIVE,
         ));
 
         return $result;
@@ -187,7 +188,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::PAID,
+            toStatus: Status::PAID,
         ));
 
         return $result;
@@ -244,7 +245,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::PAID,
+            toStatus: Status::PAID,
         ));
 
         return $result;
@@ -266,7 +267,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::CANCEL,
+            toStatus: Status::CANCEL,
         ));
 
         return $result;
@@ -288,7 +289,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::CANCEL_FOR_LIVE,
+            toStatus: Status::CANCEL_FOR_LIVE,
         ));
 
         return $result;
@@ -329,10 +330,56 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::LIVE_TICKET_ISSUED,
+            toStatus: Status::LIVE_TICKET_ISSUED,
         ));
 
         return $result;
+    }
+
+    /**
+     *
+     */
+    public static function toRemoveTicket(
+        OrderTicketDto $orderTicketDto,
+        Uuid           $ticketId
+    ): self
+    {
+        $result = self::fromOrderTicketDto($orderTicketDto);
+
+        $changes = [];
+
+        foreach ($result->ticket as $index => &$guest) {
+            if ($ticketId->equals($guest->getId())) {
+                $changes = [
+                    'oldName' => $guest->getValue(),
+                    'newUuid' => null,
+                ];
+                $result->removeGuest($ticketId);
+            }
+
+        }
+
+        $result->record(new ProcessCancelTicket($result->id, [$ticketId]));
+
+
+        if (!empty($changes)) {
+            $result->recordHistory(new OrderTicketDataRemoveEvent($changes));
+        }
+
+        return $result;
+    }
+
+
+    private function removeGuest(Uuid $ticketId)
+    {
+        $result = [];
+        foreach ($this->ticket as $item) {
+            if (!$item->getId()->equals($ticketId)) {
+                $result[] = $item;
+            }
+        }
+
+        $this->ticket = $result;
     }
 
     /**
@@ -352,7 +399,8 @@ final class OrderTicket extends AggregateRoot
         OrderTicketDto $orderTicketDto,
         array          $valueMap,
         array          $emailMap,
-    ): self {
+    ): self
+    {
         if (empty($valueMap) && empty($emailMap)) {
             throw new DomainException('Не переданы данные для изменения билета');
         }
@@ -448,8 +496,8 @@ final class OrderTicket extends AggregateRoot
 
         $result->recordHistory(new OrderStatusChangedEvent(
             fromStatus: (string)$orderTicketDto->getStatus(),
-            toStatus:   Status::DIFFICULTIES_AROSE,
-            comment:    $comment,
+            toStatus: Status::DIFFICULTIES_AROSE,
+            comment: $comment,
         ));
 
         return $result;
@@ -482,14 +530,15 @@ final class OrderTicket extends AggregateRoot
         OrderTicketDto $orderTicketDto,
         int            $kilter,
         ?string        $locationName = null,
-    ): self {
+    ): self
+    {
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $result->recordHistory(new OrderListCreatedEvent(
-            locationId:   $orderTicketDto->getLocationId()?->value() ?? '',
+            locationId: $orderTicketDto->getLocationId()?->value() ?? '',
             locationName: $locationName,
-            project:      $orderTicketDto->getProject(),
-            kilter:       $kilter,
+            project: $orderTicketDto->getProject(),
+            kilter: $kilter,
         ));
 
         return $result;
@@ -525,8 +574,8 @@ final class OrderTicket extends AggregateRoot
         }
 
         $result->recordHistory(new OrderStatusChangedEvent(
-            fromStatus: (string) $orderTicketDto->getStatus(),
-            toStatus:   Status::APPROVE_LIST,
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus: Status::APPROVE_LIST,
         ));
 
         return $result;
@@ -549,8 +598,8 @@ final class OrderTicket extends AggregateRoot
         ));
 
         $result->recordHistory(new OrderStatusChangedEvent(
-            fromStatus: (string) $orderTicketDto->getStatus(),
-            toStatus:   Status::CANCEL_LIST,
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus: Status::CANCEL_LIST,
         ));
 
         return $result;
@@ -578,11 +627,12 @@ final class OrderTicket extends AggregateRoot
         ));
 
         $result->recordHistory(new OrderStatusChangedEvent(
-            fromStatus: (string) $orderTicketDto->getStatus(),
-            toStatus:   Status::DIFFICULTIES_AROSE_LIST,
-            comment:    $comment,
+            fromStatus: (string)$orderTicketDto->getStatus(),
+            toStatus: Status::DIFFICULTIES_AROSE_LIST,
+            comment: $comment,
         ));
 
         return $result;
     }
+
 }

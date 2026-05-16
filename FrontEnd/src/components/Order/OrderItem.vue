@@ -22,13 +22,14 @@
                   <td>{{ getName }}</td>
                   <td>
                     <div
-                      v-if="!(isAdmin || isPusher)"
+                      v-if="!(isAdmin || isPusher || isCurator)"
                       v-html="getGuests"
                     >
                     </div>
                     <new-ticket
-                        v-if="(isAdmin || isPusher)"
+                        v-if="(isAdmin || isPusher || isCurator || isPusherCurator)"
                         :oldGuests="getOrderItem.guests"
+                        :is-list="getCuratorId !== null"
                     />
                   </td>
                   <td v-if="!getFriendlyId">{{ getTypeOfPayment }}</td>
@@ -93,6 +94,8 @@ export default {
     ...mapGetters('appUser', [
       'isAdmin',
       'isPusher',
+      'isCurator',
+      'isPusherCurator',
     ]),
     /**
      * Вывести названия билета
