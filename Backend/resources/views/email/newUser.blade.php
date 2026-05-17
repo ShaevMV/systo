@@ -39,7 +39,7 @@
                 <tr>
                     <td style="padding: 10px 20px 20px 20px; border-top: 1px solid #e6e6e6;  border-bottom: 1px solid #e6e6e6;">
                         <p style="text-align: center; font-family: Tahoma, sans-serif; font-size: 24px; font-weight: 500;">Привет, дорогой друг</p>
-                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой аккаунт в системе регистрации оргвзносов на Систо создан</p>
+                        <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Твой аккаунт в системе регистрации оргвзносов на <a href="https://org.spaceofjoy.ru/login" style="font-family: Tahoma, sans-serif; font-size: 18px; color: #0000EE; text-decoration: underline;">Систо</a>.</p> создан</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ваш логин {{$login}}</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">Ваш пароль {{$password}}</p>
                         <p style="font-family: Tahoma, sans-serif; font-size: 18px;">C любовью, команда организаторов Solar Systo Togathering</p>
