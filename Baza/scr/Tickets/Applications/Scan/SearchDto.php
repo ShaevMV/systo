@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Applications\Scan;
 
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Baza\Shared\Services\DefineService;
 
 

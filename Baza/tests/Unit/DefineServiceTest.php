@@ -2,7 +2,7 @@
 
 namespace Tests\Unit;
 
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Baza\Shared\Services\DefineService;
 use PHPUnit\Framework\TestCase;
 

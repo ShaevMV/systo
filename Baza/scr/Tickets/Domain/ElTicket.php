@@ -6,7 +6,7 @@ namespace Baza\Tickets\Domain;
 
 use Baza\Tickets\ValueObject\Color;
 use Carbon\Carbon;
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 class ElTicket extends Ticket
 {

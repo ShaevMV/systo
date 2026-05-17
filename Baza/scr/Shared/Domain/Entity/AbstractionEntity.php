@@ -6,7 +6,7 @@ namespace Baza\Shared\Domain\Entity;
 use Carbon\Carbon;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 
 abstract class AbstractionEntity implements EntityInterface
 {
