@@ -19,11 +19,8 @@ class LiveTicketQueryHandler implements QueryHandler
 
     public function __invoke(LiveTicketQuery $query): ?LiveTicketResponse
     {
-        dump($query->getKilter());
-        die;
         $number = TicketLiveService::decrypt($query->getKilter());
 
-        die;
         return $this->liveTicketRepository->search((int)$number);
     }
 }
