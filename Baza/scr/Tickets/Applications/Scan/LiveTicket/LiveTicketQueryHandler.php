@@ -7,7 +7,7 @@ namespace Baza\Tickets\Applications\Scan\LiveTicket;
 use Baza\Shared\Domain\Bus\Query\QueryHandler;
 use Baza\Tickets\Repositories\LiveTicketRepositoryInterface;
 use Baza\Tickets\Responses\LiveTicketResponse;
-use Tickets\Ticket\Live\Service\TicketLiveService;
+use Baza\Tickets\Live\Service\TicketLiveService;
 
 class LiveTicketQueryHandler implements QueryHandler
 {
