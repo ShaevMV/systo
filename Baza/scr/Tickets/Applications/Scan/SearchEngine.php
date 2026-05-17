@@ -50,7 +50,9 @@ class SearchEngine
             DefineService::ELECTRON_TICKET => new ElTicketQuery($searchDto->getId()),
             DefineService::SPISOK_TICKET => new SpisokTicketQuery($searchDto->getId()),
             DefineService::DRUG_TICKET => new FriendlyTicketQuery($searchDto->getId()),
-            DefineService::LIVE_TICKET => new LiveTicketQuery($searchDto->getId()),
+            DefineService::LIVE_TICKET => new LiveTicketQuery(
+                $searchDto->getId()
+            ),
             DefineService::PARKING_TICKET,
             DefineService::PARKING_FREE_TICKET,
             DefineService::PARKING_CROSS_COUNTRY_TICKET => new ParkingTicketQuery($searchDto->getId(), $searchDto->getType()),
@@ -62,8 +64,7 @@ class SearchEngine
         if (is_null($result)) {
             throw new DomainException('Не найден билет: Тип ' . DefineService::HUMAN_LIST[$searchDto->getType()] . ' идентификатор ' . $searchDto->getIdToString());
         }
-        dump($result);
-        die;
+
         return $result;
     }
 }
