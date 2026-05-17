@@ -62,7 +62,8 @@ class SearchEngine
         if (is_null($result)) {
             throw new DomainException('Не найден билет: Тип ' . DefineService::HUMAN_LIST[$searchDto->getType()] . ' идентификатор ' . $searchDto->getIdToString());
         }
-
+        dump($result);
+        die;
         return $result;
     }
 }
