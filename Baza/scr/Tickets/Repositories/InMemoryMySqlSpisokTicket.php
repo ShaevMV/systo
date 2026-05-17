@@ -25,7 +25,7 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 
     public function search(Uuid $kilter): ?SpisokTicketResponse
     {
-        $data = $this->spisokTicketModel::whereKilter($kilter)
+        $data = $this->spisokTicketModel::where('ticket_uuid','=',$kilter)
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->first()?->toArray();
 
@@ -39,9 +39,9 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
     /**
      * @throws Throwable
      */
-    public function skip(int $id, int $userId): bool
+    public function skip(Uuid $id, int $userId): bool
     {
-        $rawData = $this->spisokTicketModel::whereKilter($id)
+        $rawData = $this->spisokTicketModel::where('ticket_uuid','=',$kilter)
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->first();
 

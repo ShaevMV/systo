@@ -33,7 +33,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     public function search(Uuid $id): ?ElTicketResponse
     {
         $data = $this->addFestivalUuid()
-            ->where('ticket_uuid', '=', $id->value())
+            ->whereUuid($id->value())
             ->first()?->toArray();
 
         if (is_null($data)) {

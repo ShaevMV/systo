@@ -11,7 +11,7 @@ interface SpisokTicketsRepositoryInterface
 {
     public function search(Uuid $kilter): ?SpisokTicketResponse;
 
-    public function skip(int $id, int $userId): bool;
+    public function skip(Uuid $id, int $userId): bool;
 
     /**
      * @param string $q
