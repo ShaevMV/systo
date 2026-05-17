@@ -76,14 +76,7 @@ class DefineService
             $type = self::ELECTRON_TICKET;
             $uuid = str_replace(self::ELECTRON_TICKET_URL, '', $link);
             $id = new Uuid($uuid);
-        } elseif (strripos($link, 's') !== false) {
-            $type = self::SPISOK_TICKET;
-            $id = $this->getOnlyNumber($link, 's');
-        } elseif (strripos($link, 'f') !== false) {
-            $type = self::DRUG_TICKET;
-            $id = $this->getOnlyNumber($link, 'f');
-
-        } elseif (strripos($link, self::LIVE_TICKET_URL) !== false) {
+        }  elseif (strripos($link, self::LIVE_TICKET_URL) !== false) {
             $type = self::LIVE_TICKET;
             $id = (int)str_replace(self::LIVE_TICKET_URL, '', $link);
         } else {
