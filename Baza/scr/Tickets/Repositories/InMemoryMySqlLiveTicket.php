@@ -28,8 +28,7 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
         if (is_null($data)) {
             return null;
         }
-        dump($data);
-        die();
+
         return LiveTicketResponse::fromState($data);
     }
 
