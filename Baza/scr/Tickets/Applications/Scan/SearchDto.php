@@ -12,7 +12,7 @@ class SearchDto
 {
     public function __construct(
         private string   $type,
-        private int|Uuid $id,
+        private int|Uuid|string $id,
     )
     {
     }
@@ -22,7 +22,7 @@ class SearchDto
         return $this->type;
     }
 
-    public function getId(): Uuid|int
+    public function getId(): Uuid|int|string
     {
         return $this->id;
     }
