@@ -73,11 +73,6 @@ class CreateUserCommand extends Command
                 "password" => "znaytvse2",
             ],
             [
-                "name" => "Инфоцентр4",
-                "email" => "Infocenter4@spaceofjoy.ru",
-                "password" => "znaytvse2",
-            ],
-            [
                 "name" => "кп3-1",
                 "email" => "kp3-1@spaceofjoy.ru",
                 "password" => "znaytvse2",
