@@ -34,8 +34,7 @@ class TicketLiveService
 
     // Дешифрование из URL
     public static function decrypt(string $data): string {
-        dump($data);
-        die;
+
         // Преобразуем обратно из URL-безопасного base64
         $base64 = self::base64UrlDecode($data);
         $combined = base64_decode($base64);
