@@ -78,7 +78,7 @@ class DefineService
             $id = new Uuid($uuid);
         }  elseif (strripos($link, self::LIVE_TICKET_URL) !== false) {
             $type = self::LIVE_TICKET;
-            $id = (int)str_replace(self::LIVE_TICKET_URL, '', $link);
+            $id = (string)str_replace(self::LIVE_TICKET_URL, '', $link);
         } else {
             throw new InvalidArgumentException('Данная ссылка не опознана ' . $origLink);
         }
