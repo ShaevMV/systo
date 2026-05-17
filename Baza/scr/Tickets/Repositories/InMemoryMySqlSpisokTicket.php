@@ -8,6 +8,7 @@ use App\Models\SpisokTicketModel;
 use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
+use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 
 class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
@@ -22,7 +23,7 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
     }
 
 
-    public function search(int $kilter): ?SpisokTicketResponse
+    public function search(Uuid $kilter): ?SpisokTicketResponse
     {
         $data = $this->spisokTicketModel::whereKilter($kilter)
             ->where('festival_id', '=', self::UUID_FESTIVAL)

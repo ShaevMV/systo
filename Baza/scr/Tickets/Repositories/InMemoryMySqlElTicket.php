@@ -3,7 +3,7 @@
 namespace Baza\Tickets\Repositories;
 
 use App\Models\ElTicketsModel;
-use Baza\Shared\Domain\ValueObject\Uuid;
+use Shared\Domain\ValueObject\Uuid;
 use Baza\Tickets\Responses\ElTicketResponse;
 use Carbon\Carbon;
 use DB;
@@ -15,13 +15,14 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
     public function __construct(
         private ElTicketsModel $elTicketsModel,
-        private ?string $festivalId = self::UUID_FESTIVAL,
+        private ?string        $festivalId = self::UUID_FESTIVAL,
     )
     {
     }
+
     private function addFestivalUuid()
     {
-        if($this->festivalId) {
+        if ($this->festivalId) {
             return $this->elTicketsModel->where('festival_id', '=', self::UUID_FESTIVAL);
         }
 
@@ -32,7 +33,7 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     public function search(Uuid $id): ?ElTicketResponse
     {
         $data = $this->addFestivalUuid()
-            ->whereUuid($id->value())
+            ->where('ticket_uuid', '=', $id->value())
             ->first()?->toArray();
 
         if (is_null($data)) {
@@ -68,12 +69,12 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     public function find(string $q): array
     {
         $resultRawList = $this->addFestivalUuid()
-            ->where(function($query) use ($q) {
+            ->where(function ($query) use ($q) {
                 return $query->whereKilter((int)$q)
-                    ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`phone`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
+                    ->orWhereRaw('LOWER(`name`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
+                    ->orWhereRaw('LOWER(`phone`) LIKE ? ', ['%' . strtolower(trim($q)) . '%']);
             })
             ->get()->toArray();
 
