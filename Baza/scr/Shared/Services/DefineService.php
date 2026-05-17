@@ -58,7 +58,7 @@ class DefineService
     ];
 
     private const ELECTRON_TICKET_URL = '/newTickets/';
-    private const LIVE_TICKET_URL = '/live?id=';
+    private const LIVE_TICKET_URL = '/ticket/live/';
 
     public function getTypeByReference(string $origLink): SearchDto
     {
