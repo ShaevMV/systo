@@ -9,12 +9,12 @@ use Baza\Shared\Domain\Bus\Query\Query;
 class LiveTicketQuery implements Query
 {
     public function __construct(
-        private int $kilter
+        private string $kilter
     )
     {
     }
 
-    public function getKilter(): int
+    public function getKilter(): string
     {
         return $this->kilter;
     }
