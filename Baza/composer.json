@@ -68,6 +68,12 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore": {
+                "PKSA-8qx3-n5y5-vvnd": "Laravel 9 — миграция на 11 запланирована после 1 июня 2026 (см. TECH_DEBT.md)",
+                "PKSA-w7xr-vk7n-rstm": "Laravel 9 — миграция на 11 запланирована после 1 июня 2026 (см. TECH_DEBT.md)"
+            }
         }
     },
     "minimum-stability": "stable",
