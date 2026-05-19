@@ -5,6 +5,7 @@ use App\Http\Controllers\Changes\ChangesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Sync\SyncController;
 use App\Http\Controllers\Tickets\ScanController;
 use App\Http\Controllers\Tickets\SearchController;
 use App\Http\Controllers\UserController;
@@ -67,3 +68,8 @@ Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->n
 Route::post('/change/close', [ChangesController::class, 'close'])->name('changes.close')->middleware('admin');
 Route::post('/change/save', [ChangesController::class, 'save'])->name('changes.save')->middleware('admin');
 Route::post('/change/remove', [ChangesController::class, 'remove'])->name('changes.remove')->middleware('admin');
+
+// sync (только для админов)
+Route::get('/sync', [SyncController::class, 'index'])->name('sync.index')->middleware('admin');
+Route::post('/sync/export', [SyncController::class, 'export'])->name('sync.export')->middleware('admin');
+Route::post('/sync/import', [SyncController::class, 'import'])->name('sync.import')->middleware('admin');

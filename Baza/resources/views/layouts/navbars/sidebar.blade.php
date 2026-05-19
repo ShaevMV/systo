@@ -20,6 +20,12 @@
                         <p>{{ __('Смены') }}</p>
                     </a>
                 </li>
+                <li @if ($pageSlug == 'sync') class="active " @endif>
+                    <a href="{{ route('sync.index') }}">
+                        <i class="tim-icons icon-cloud-download-93"></i>
+                        <p>{{ __('Синхронизация') }}</p>
+                    </a>
+                </li>
             @endif
         </ul>
     </div>

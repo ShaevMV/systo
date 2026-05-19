@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use Baza\Changes\Repositories\ChangesRepositoryInterface;
 use Baza\Changes\Repositories\InMemoryMySqlChangesRepository;
+use Baza\Sync\Repositories\InMemoryMySqlSyncRepository;
+use Baza\Sync\Repositories\SyncRepositoryInterface;
 use Baza\Tickets\Repositories\AutoTicketRepositoryInterface;
 use Baza\Tickets\Repositories\ElTicketsRepositoryInterface;
 use Baza\Tickets\Repositories\FriendlyTicketRepositoryInterface;
@@ -34,5 +36,6 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(AutoTicketRepositoryInterface::class, InMemoryMySqlAutoTicket::class);
         $this->app->bind(ParkingTicketRepositoryInterface::class, InMemoryMySqlParkingTicketRepository::class);
         $this->app->bind(UserRepositoryInterface::class, InMemoryMySqlUserRepository::class);
+        $this->app->bind(SyncRepositoryInterface::class, InMemoryMySqlSyncRepository::class);
     }
 }
