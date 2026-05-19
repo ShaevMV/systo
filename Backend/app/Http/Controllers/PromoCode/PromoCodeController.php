@@ -105,7 +105,7 @@ class PromoCodeController extends Controller
     {
 
         $data = $createPromoCodeRequest->toArray();
-        if (!$createPromoCodeRequest->get('is_not_modify', false)) {
+        if (!$createPromoCodeRequest->get('is_not_modify', true)) {
             $data['name'] = mb_strtoupper(trim($data['name']) . (empty($data['id']) ? Str::random(3) : ''));
         } else {
             $data['name'] = mb_strtoupper(trim($data['name']));
