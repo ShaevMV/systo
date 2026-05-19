@@ -7,9 +7,11 @@ namespace App\Console\Commands;
 use App\Models\Ordering\OrderTicketModel;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Shared\Domain\ValueObject\Uuid;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Throwable;
+use Tickets\History\Domain\ActorType;
+use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPrice;
 
 /**
  * Корректирует завышенные суммы Friendly-заказов.
@@ -18,12 +20,12 @@ use Throwable;
  *   - заказ создан до 12 мая 2026 включительно → 5900 ₽ за билет
  *   - заказ создан с 13 мая 2026                → 6500 ₽ за билет
  *
- * Если фактическая сумма > (count * корректная_цена) — заменяем на правильную.
+ * Если фактическая сумма > (count * корректная_цена) — заменяет на правильную
+ * через готовый ChangeOrderPrice Application. Запись в domain_history
+ * происходит внутри ChangeOrderPriceCommandHandler — здесь дополнительно не пишем,
+ * иначе будет задвоение.
  *
  * Защита от случайной правки: по умолчанию dry-run, реально пишет только с --apply.
- *
- * Одноразовый скрипт фикса — по решению автора работаем с моделью напрямую
- * (как в существующих командах AddPriceForTypeTicket / CheckCreateTicket).
  */
 class FixFriendlyPricesCommand extends Command
 {
@@ -41,7 +43,7 @@ class FixFriendlyPricesCommand extends Command
     private const PRICE_BEFORE = 5900;
     private const PRICE_AFTER  = 6500;
 
-    public function handle(): int
+    public function handle(ChangeOrderPrice $changeOrderPrice): int
     {
         $apply = (bool)$this->option('apply');
         $cutoff = Carbon::parse(self::PRICE_WAVE_CUTOFF);
@@ -74,7 +76,7 @@ class FixFriendlyPricesCommand extends Command
                     'count'        => $count,
                     'price_was'    => (float)$order->price,
                     'unit_correct' => $correctUnitPrice,
-                    'price_correct'=> $correctTotal,
+                    'price_correct'=> (float)$correctTotal,
                     'diff'         => (float)$order->price - $correctTotal,
                 ];
             }
@@ -118,16 +120,16 @@ class FixFriendlyPricesCommand extends Command
         $applied = 0;
         $failed = 0;
         foreach ($toFix as $item) {
-            DB::beginTransaction();
             try {
-                $order = OrderTicketModel::query()->find($item['id']);
-                $order->price = $item['price_correct'];
-                $order->discount = 0;
-                $order->save();
-                DB::commit();
+                $changeOrderPrice->change(
+                    orderId:   new Uuid($item['id']),
+                    price:     $item['price_correct'],
+                    adminId:   null,
+                    actorType: ActorType::ARTISAN,
+                    reason:    'orders:fix-friendly-prices (artisan-команда фикса завышенных сумм)',
+                );
                 $applied++;
             } catch (Throwable $e) {
-                DB::rollBack();
                 $failed++;
                 $this->error('Ошибка на заказе ' . $item['id'] . ': ' . $e->getMessage());
             }
