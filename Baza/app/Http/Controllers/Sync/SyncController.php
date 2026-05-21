@@ -41,20 +41,33 @@ class SyncController extends Controller
 
     public function export(): BinaryFileResponse
     {
-        $sessionDir = storage_path('app/' . self::SYNC_TMP_DIR . '/export-' . Carbon::now()->format('Ymd-His'));
+        // Уникальный идентификатор сессии: timestamp с микросекундами + 8 hex случайных
+        // символов. Защита от коллизий, если экспорт стартует у двух админов в одну секунду.
+        $sessionId  = Carbon::now()->format('Ymd-His-u') . '-' . bin2hex(random_bytes(4));
+        $sessionDir = storage_path('app/' . self::SYNC_TMP_DIR . '/export-' . $sessionId);
+        $zipPath    = $sessionDir . '.zip';
 
-        $stats = $this->exportApplication->export($sessionDir);
+        try {
+            $stats = $this->exportApplication->export($sessionDir);
+            $this->packZip($sessionDir, $zipPath);
 
-        $zipPath = $sessionDir . '.zip';
-        $this->packZip($sessionDir, $zipPath);
+            session()->flash('sync_export_stats', $stats);
 
-        $this->removeDirectory($sessionDir);
-
-        session()->flash('sync_export_stats', $stats);
-
-        return response()
-            ->download($zipPath, 'baza-export-' . Carbon::now()->format('Ymd-His') . '.zip')
-            ->deleteFileAfterSend(true);
+            return response()
+                ->download($zipPath, 'baza-export-' . $sessionId . '.zip')
+                ->deleteFileAfterSend(true);
+        } catch (Throwable $e) {
+            // При ошибке zip мог успеть частично создаться — удаляем явно,
+            // т.к. deleteFileAfterSend не сработает (response не возвращён).
+            if (is_file($zipPath)) {
+                @unlink($zipPath);
+            }
+            throw $e;
+        } finally {
+            // Папка-источник нужна только для упаковки в zip — удаляем всегда:
+            // и при успехе (zip уже собран), и при ошибке.
+            $this->removeDirectory($sessionDir);
+        }
     }
 
     public function import(Request $request): RedirectResponse
