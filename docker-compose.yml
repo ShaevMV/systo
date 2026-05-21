@@ -135,6 +135,7 @@ services:
     volumes:
       - ./Baza:/var/www/vhod
       - ./Shared:${ENV_SHARED_PATCH}
+      - ./Docker/php/upload_limits.ini:/usr/local/etc/php/conf.d/upload_limits.ini
     working_dir: ${ENV_VHOD_PATCH}
     user: user
     environment:
