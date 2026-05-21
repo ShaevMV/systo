@@ -26,12 +26,21 @@ use ZipArchive;
  */
 class SyncController extends Controller
 {
-    private const SYNC_TMP_DIR = 'baza-sync-tmp';
-
     public function __construct(
         private readonly ExportApplication $exportApplication,
         private readonly ImportApplication $importApplication,
     ) {
+    }
+
+    /**
+     * Базовая папка временных файлов sync. Используем системный /tmp вместо
+     * storage/app — на проде у php-fpm часто нет прав на запись в storage,
+     * а в /tmp права гарантированы. Persistence нам не нужна — мы всегда
+     * чистим в finally.
+     */
+    private function syncTmpBase(): string
+    {
+        return sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'baza-sync-tmp';
     }
 
     public function index(): View
@@ -44,7 +53,7 @@ class SyncController extends Controller
         // Уникальный идентификатор сессии: timestamp с микросекундами + 8 hex случайных
         // символов. Защита от коллизий, если экспорт стартует у двух админов в одну секунду.
         $sessionId  = Carbon::now()->format('Ymd-His-u') . '-' . bin2hex(random_bytes(4));
-        $sessionDir = storage_path('app/' . self::SYNC_TMP_DIR . '/export-' . $sessionId);
+        $sessionDir = $this->syncTmpBase() . DIRECTORY_SEPARATOR . 'export-' . $sessionId;
         $zipPath    = $sessionDir . '.zip';
 
         try {
@@ -80,7 +89,8 @@ class SyncController extends Controller
             'archive.max' => 'Максимальный размер архива — 500 МБ',
         ]);
 
-        $sessionDir = storage_path('app/' . self::SYNC_TMP_DIR . '/import-' . Carbon::now()->format('Ymd-His'));
+        $sessionId  = Carbon::now()->format('Ymd-His-u') . '-' . bin2hex(random_bytes(4));
+        $sessionDir = $this->syncTmpBase() . DIRECTORY_SEPARATOR . 'import-' . $sessionId;
 
         try {
             if (!mkdir($sessionDir, 0775, true) && !is_dir($sessionDir)) {
