@@ -78,7 +78,7 @@
                     </p>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{{ route('sync.export') }}">
+                    <form method="post" action="/sync/export">
                         @csrf
                         <button type="submit" class="btn btn-fill btn-primary">
                             Выгрузить и скачать ZIP
@@ -98,7 +98,7 @@
                     </p>
                 </div>
                 <div class="card-body">
-                    <form method="post" action="{{ route('sync.import') }}" enctype="multipart/form-data">
+                    <form method="post" action="/sync/import" enctype="multipart/form-data">
                         @csrf
                         <div class="input-group" style="margin-bottom: 15px;">
                             <input type="file" name="archive" accept=".zip,application/zip" required>
