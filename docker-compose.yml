@@ -5,7 +5,6 @@ services:
   nginx:
     build:
       context: ./Docker/nginx
-      network: host
     ports:
       - "${NGINX_PORT:-50080}:8083"
     volumes:
@@ -42,7 +41,6 @@ services:
     hostname: ${ENV_ORG_BACKEND_HOST}
     build:
       context: ./Docker/php
-      network: host
       args:
         - WITH_XDEBUG=false
     image: 'ogr_laravel'
@@ -64,7 +62,6 @@ services:
     hostname: ${ENV_ORG_FRONTEND_HOST}
     build:
       context: ./Docker/node
-      network: host
     working_dir: ${ENV_ORG_FRONT_PATCH}
     ports:
       - "8082:8080"
@@ -81,7 +78,6 @@ services:
   redis:
     build:
       context: ./Docker/redis
-      network: host
     container_name: redis-solarSysto
     command: redis-server --appendonly yes
     ports:
@@ -131,7 +127,6 @@ services:
     hostname: ${ENV_VHOD_BACKEND_HOST}
     build:
       context: ./Docker/php
-      network: host
       args:
         - WITH_XDEBUG=false
     container_name: php-baza
@@ -153,7 +148,6 @@ services:
   worker:
     build:
       context: ./Docker/worker
-      network: host
     image: 'laravelworker'
     volumes:
       - ./Backend:${ENV_ORG_BACKEND_PATCH}
