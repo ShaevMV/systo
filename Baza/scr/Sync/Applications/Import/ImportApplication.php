@@ -6,6 +6,7 @@ namespace Baza\Sync\Applications\Import;
 
 use Baza\Sync\Repositories\SyncRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
@@ -85,19 +86,31 @@ class ImportApplication
                 }
 
                 $id = (int)$row['id'];
-                $existing = $this->repository->findById($table, $id);
 
-                if ($existing === null) {
-                    $this->repository->insert($table, $row);
-                    $inserted++;
-                    continue;
-                }
+                // Per-row try/catch: невалидные timestamp, ошибка БД, ошибка normalize() и т.п.
+                // → пропускаем строку, не валим весь импорт. Контекст (таблица + id) уходит в лог.
+                try {
+                    $existing = $this->repository->findById($table, $id);
 
-                if ($this->isFresher($row, $existing)) {
-                    $this->repository->update($table, $id, $row);
-                    $updated++;
-                } else {
+                    if ($existing === null) {
+                        $this->repository->insert($table, $row);
+                        $inserted++;
+                        continue;
+                    }
+
+                    if ($this->isFresher($row, $existing)) {
+                        $this->repository->update($table, $id, $row);
+                        $updated++;
+                    } else {
+                        $skipped++;
+                    }
+                } catch (Throwable $e) {
                     $skipped++;
+                    Log::warning('Sync import: строка пропущена', [
+                        'table'   => $table,
+                        'id'      => $id,
+                        'error'   => $e->getMessage(),
+                    ]);
                 }
             }
         } finally {
@@ -109,6 +122,9 @@ class ImportApplication
 
     /**
      * Запись из файла свежее, чем в БД, по метке updated_at.
+     *
+     * При невалидном формате updated_at бросаем RuntimeException — caller поймает
+     * в общем per-row try/catch и пропустит строку с логом.
      */
     private function isFresher(array $incoming, array $existing): bool
     {
@@ -123,6 +139,15 @@ class ImportApplication
             return true;
         }
 
-        return Carbon::parse($incomingAt)->gt(Carbon::parse($existingAt));
+        try {
+            return Carbon::parse($incomingAt)->gt(Carbon::parse($existingAt));
+        } catch (Throwable $e) {
+            throw new RuntimeException(
+                'Не удалось сравнить updated_at: incoming=' . var_export($incomingAt, true)
+                    . ', existing=' . var_export($existingAt, true),
+                0,
+                $e,
+            );
+        }
     }
 }

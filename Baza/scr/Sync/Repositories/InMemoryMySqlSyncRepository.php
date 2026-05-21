@@ -12,6 +12,8 @@ use App\Models\ParkingTicketModel;
 use App\Models\SpisokTicketModel;
 use Carbon\Carbon;
 use InvalidArgumentException;
+use RuntimeException;
+use Throwable;
 
 class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
 {
@@ -75,21 +77,43 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
     }
 
     /**
-     * Нормализует значения перед сырым insert/update: Eloquent при toArray()
-     * сериализует timestamps в ISO-8601 (Y-m-d\TH:i:s.uP), а MySQL принимает
-     * только 'Y-m-d H:i:s'. Здесь конвертируем все ISO-строки обратно.
-     *
-     * Без срабатывания Eloquent-кастов timestamps пройдут «как есть» — поэтому
-     * нормализация делается в инфраструктурном слое (репозитории).
+     * Поля-таймстемпы, которые могут прийти в ISO-8601 формате от Eloquent::toArray()
+     * и нуждаются в нормализации к MySQL-формату 'Y-m-d H:i:s' перед сырым insert/update.
+     * Whitelist (а не сканирование всех значений) исключает ложные срабатывания
+     * на полях типа comment, где случайно может оказаться ISO-подобная строка.
+     */
+    private const TIMESTAMP_FIELDS = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'date_change',
+    ];
+
+    /**
+     * Нормализует timestamp-поля перед сырым insert/update.
+     * Eloquent через toArray() сериализует в ISO-8601 (Y-m-d\TH:i:s.uP), MySQL ждёт
+     * 'Y-m-d H:i:s' — конвертируем. При невалидном формате бросаем RuntimeException
+     * с указанием поля и значения — ImportApplication поймает в per-row catch.
      */
     private function normalize(array $data): array
     {
-        foreach ($data as $key => $value) {
-            if (!is_string($value)) {
+        foreach (self::TIMESTAMP_FIELDS as $field) {
+            if (!array_key_exists($field, $data) || !is_string($data[$field])) {
                 continue;
             }
-            if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/', $value) === 1) {
-                $data[$key] = Carbon::parse($value)->format('Y-m-d H:i:s');
+            $value = $data[$field];
+            // Если уже в MySQL-формате (нет 'T') — оставляем как есть.
+            if (preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/', $value) !== 1) {
+                continue;
+            }
+            try {
+                $data[$field] = Carbon::parse($value)->format('Y-m-d H:i:s');
+            } catch (Throwable $e) {
+                throw new RuntimeException(
+                    "Невалидный timestamp в поле '{$field}': " . var_export($value, true),
+                    0,
+                    $e,
+                );
             }
         }
 
