@@ -60,6 +60,29 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
         return $modelClass::query()->find($id)?->toArray();
     }
 
+    public function findUpdatedAtByIds(string $table, array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $modelClass = $this->resolveModel($table);
+
+        // Без toArray() — нам нужны только id и updated_at, не вся запись.
+        $rows = $modelClass::query()
+            ->whereIn('id', $ids)
+            ->get(['id', 'updated_at']);
+
+        $result = [];
+        foreach ($rows as $row) {
+            $updatedAt = $row->updated_at;
+            // Eloquent кастит updated_at в Carbon → строка для сравнения
+            $result[(int)$row->id] = $updatedAt !== null ? (string)$updatedAt : null;
+        }
+
+        return $result;
+    }
+
     public function insert(string $table, array $data): bool
     {
         $modelClass = $this->resolveModel($table);

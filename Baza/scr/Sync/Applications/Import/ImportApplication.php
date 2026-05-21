@@ -53,6 +53,12 @@ class ImportApplication
     }
 
     /**
+     * Размер чанка: компромисс между числом SELECT-ов и размером IN-списка.
+     * 500 даёт ~80 запросов на 40k строк вместо 40k.
+     */
+    private const CHUNK_SIZE = 500;
+
+    /**
      * @return array{inserted:int, updated:int, skipped:int}
      */
     private function importTable(string $table, string $filePath): array
@@ -62,9 +68,9 @@ class ImportApplication
             throw new RuntimeException("Не удалось открыть файл '{$filePath}' на чтение");
         }
 
-        $inserted = 0;
-        $updated = 0;
-        $skipped = 0;
+        $stats = ['inserted' => 0, 'updated' => 0, 'skipped' => 0];
+        /** @var array<int, array> $buffer id => row */
+        $buffer = [];
 
         try {
             while (($line = fgets($handle)) !== false) {
@@ -76,69 +82,82 @@ class ImportApplication
                 try {
                     $row = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Throwable) {
-                    $skipped++;
+                    $stats['skipped']++;
                     continue;
                 }
 
                 if (!is_array($row) || !isset($row['id'])) {
-                    $skipped++;
+                    $stats['skipped']++;
                     continue;
                 }
 
-                $id = (int)$row['id'];
+                $buffer[(int)$row['id']] = $row;
 
-                // Per-row try/catch: невалидные timestamp, ошибка БД, ошибка normalize() и т.п.
-                // → пропускаем строку, не валим весь импорт. Контекст (таблица + id) уходит в лог.
-                try {
-                    $existing = $this->repository->findById($table, $id);
-
-                    if ($existing === null) {
-                        $this->repository->insert($table, $row);
-                        $inserted++;
-                        continue;
-                    }
-
-                    if ($this->isFresher($row, $existing)) {
-                        $this->repository->update($table, $id, $row);
-                        $updated++;
-                    } else {
-                        $skipped++;
-                    }
-                } catch (Throwable $e) {
-                    $skipped++;
-                    Log::warning('Sync import: строка пропущена', [
-                        'table'   => $table,
-                        'id'      => $id,
-                        'error'   => $e->getMessage(),
-                    ]);
+                if (count($buffer) >= self::CHUNK_SIZE) {
+                    $this->processChunk($table, $buffer, $stats);
+                    $buffer = [];
                 }
+            }
+
+            // Хвост — если последний чанк не дотянул до CHUNK_SIZE
+            if (!empty($buffer)) {
+                $this->processChunk($table, $buffer, $stats);
             }
         } finally {
             fclose($handle);
         }
 
-        return ['inserted' => $inserted, 'updated' => $updated, 'skipped' => $skipped];
+        return $stats;
     }
 
     /**
-     * Запись из файла свежее, чем в БД, по метке updated_at.
+     * Обработка чанка: один SELECT для всех id, затем per-id insert/update.
+     * Без транзакции — лояльный контракт: одна сбойная строка → skip, остальные доезжают.
      *
-     * При невалидном формате updated_at бросаем RuntimeException — caller поймает
-     * в общем per-row try/catch и пропустит строку с логом.
+     * @param array<int, array> $buffer
+     * @param array{inserted:int, updated:int, skipped:int} &$stats
      */
-    private function isFresher(array $incoming, array $existing): bool
+    private function processChunk(string $table, array $buffer, array &$stats): void
     {
-        $incomingAt = $incoming['updated_at'] ?? null;
-        $existingAt = $existing['updated_at'] ?? null;
+        $existing = $this->repository->findUpdatedAtByIds($table, array_keys($buffer));
 
+        foreach ($buffer as $id => $row) {
+            try {
+                if (!array_key_exists($id, $existing)) {
+                    $this->repository->insert($table, $row);
+                    $stats['inserted']++;
+                    continue;
+                }
+
+                if ($this->isFresherThan($row['updated_at'] ?? null, $existing[$id])) {
+                    $this->repository->update($table, $id, $row);
+                    $stats['updated']++;
+                } else {
+                    $stats['skipped']++;
+                }
+            } catch (Throwable $e) {
+                $stats['skipped']++;
+                Log::warning('Sync import: строка пропущена', [
+                    'table' => $table,
+                    'id'    => $id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param string|null $incomingAt из JSONL (ISO-8601 или Y-m-d H:i:s)
+     * @param string|null $existingAt из БД (Y-m-d H:i:s)
+     */
+    private function isFresherThan(?string $incomingAt, ?string $existingAt): bool
+    {
         if ($incomingAt === null) {
             return false;
         }
-
         if ($existingAt === null) {
             return true;
         }
-
         try {
             return Carbon::parse($incomingAt)->gt(Carbon::parse($existingAt));
         } catch (Throwable $e) {
@@ -150,4 +169,5 @@ class ImportApplication
             );
         }
     }
+
 }

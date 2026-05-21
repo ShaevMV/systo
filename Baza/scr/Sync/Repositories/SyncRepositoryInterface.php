@@ -39,6 +39,16 @@ interface SyncRepositoryInterface
     public function findById(string $table, int $id): ?array;
 
     /**
+     * Bulk-выборка для импорта: один SELECT вместо N findById().
+     * Возвращает мапу [id => updated_at] для существующих записей.
+     * Отсутствующие id в результат не попадают — значит запись надо INSERT'ить.
+     *
+     * @param int[] $ids
+     * @return array<int, string|null>
+     */
+    public function findUpdatedAtByIds(string $table, array $ids): array;
+
+    /**
      * Вставить сырую запись (без срабатывания Eloquent events/casts —
      * чтобы сохранить timestamps как есть в источнике).
      *

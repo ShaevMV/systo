@@ -50,6 +50,10 @@ class SyncController extends Controller
 
     public function export(): BinaryFileResponse
     {
+        // Sync-операции — bulk (десятки тысяч строк). HTTP-дефолт 30s недостаточно.
+        // Endpoint admin-only, защищён middleware — снимать лимит безопасно.
+        set_time_limit(0);
+
         // Уникальный идентификатор сессии: timestamp с микросекундами + 8 hex случайных
         // символов. Защита от коллизий, если экспорт стартует у двух админов в одну секунду.
         $sessionId  = Carbon::now()->format('Ymd-His-u') . '-' . bin2hex(random_bytes(4));
@@ -81,6 +85,9 @@ class SyncController extends Controller
 
     public function import(Request $request): RedirectResponse
     {
+        // См. комментарий в export(): админская bulk-операция, дефолтные 30s не хватает.
+        set_time_limit(0);
+
         $request->validate([
             'archive' => ['required', 'file', 'mimetypes:application/zip,application/x-zip-compressed,application/octet-stream', 'max:512000'],
         ], [
