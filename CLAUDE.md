@@ -117,3 +117,9 @@ docker exec -it php-solarSysto ./vendor/bin/phpunit
 @.claude/docs/TECH_DEBT.md
 @.claude/docs/PROJECT_MEMORY.md
 @.claude/docs/BOARD.md
+
+### Процессы (релизы, версионирование, ветки)
+
+Все файлы из `.claude/docs/process/` — обязательны к прочтению при работе над релизами, версионированием, CI/CD.
+
+@.claude/docs/process/RELEASES.md
