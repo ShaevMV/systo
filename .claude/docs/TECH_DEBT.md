@@ -33,6 +33,7 @@
 | TD-12 | **Миграция Bootstrap 4 → 5** (модалки через vanilla JS) | frontend-helper | После Laravel 11 |
 | TD-13 | **Настройка CI/CD пайплайна (GitHub Actions)** — базовый CI в v2.5.0, полный CD в v2.7.0 | devops-engineer | **v2.5.0 + v2.7.0** |
 | TD-14 | **Единый паттерн для `Order::none()` в фильтрах списков** — `Order::fromState($data)` кидает на чужих значениях. Сделать `Order::fromStateSafe()` или базовый `ListRequest` FormRequest | tech-lead | До следующего публичного `getList`-эндпоинта |
+| TD-22 | **Первый проход Laravel Pint по базе кода Backend** — `pint --test` нашёл нарушения в ~411 файлах (порядок импортов, пробелы вокруг операторов, трейлинг-запятые). Применить `pint` отдельным коммитом, согласовав окно (чтобы не конфликтовать с feature-ветками в работе). В CI пока `continue-on-error: true` на lint-backend и lint-baza. После применения — снять continue-on-error | code-reviewer + tech-lead | После закрытия активных feature-веток |
 
 ---
 

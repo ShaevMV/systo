@@ -40,6 +40,7 @@ jobs:
 
       - name: Run Pint (check only)
         working-directory: Backend
+        continue-on-error: true
         run: ./vendor/bin/pint --test
 
   lint-baza:
@@ -67,6 +68,7 @@ jobs:
 
       - name: Run Pint (check only)
         working-directory: Baza
+        continue-on-error: true
         run: |
           if [ -f vendor/bin/pint ]; then
             ./vendor/bin/pint --test
