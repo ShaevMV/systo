@@ -11,7 +11,68 @@
 
 ## [Unreleased]
 
-_(пока пусто — все изменения вошли в [2.5.0])_
+_(пока пусто — все изменения вошли в [2.5.1])_
+
+---
+
+## [2.5.1] — 2026-05-29
+
+**Патч после v2.5.0.** Починка PHPUnit Baza — теперь 0 errors / 0 skipped / 0 risky. Чистый тестовый прогон через `baza_test` БД с фикстурами. Заодно — фикс расхождения миграций со схемой прода (две колонки добавлены руками без миграций). Подготовлена спецификация фичи «История билета» как кандидат в backlog.
+
+### Added (Добавлено)
+
+- **Спецификация фичи «История билета»** (`.claude/specs/ticket-history.md`, 465 строк) — кандидат в backlog v2.7.0–v2.8.0. 10 типов событий, 10 user stories, рекомендация по архитектуре (общий `domain_history` с агрегатом `ticket`), гибридная синхронизация Baza↔Backend для офлайн-режима. 10 открытых вопросов для пользователя.
+- **ChangesFactory** (`Baza/database/factories/`) — factory для модели `ChangesModel` с состояниями `closed()` и `forUsers(array)`
+- **ChangesTestDataSeeder** (`Baza/database/seeders/`) — сидер для интеграционных тестов: вызывает `UsersTableSeeder` + создаёт открытую смену для admin (user_id=1)
+- **Отдельная тестовая БД `baza_test`** через `phpunit.xml` (`DB_DATABASE=baza_test`) — `RefreshDatabase` пересоздаёт схему на каждом прогоне, не трогая локальную `baza`
+- **Шаг `php artisan migrate --force`** в CI job `test-baza` (до прогона PHPUnit) — на свежем CI runner'е миграций раньше не было
+- `Baza/tests/Feature/.gitkeep` — пустая папка для будущих feature-тестов (phpunit.xml требует существования директории)
+- **HasFactory trait + `newFactory()`** в `App\Models\ChangesModel`
+
+### Changed (Изменено)
+
+- **`Baza/tests/Unit/ChangesTest`** — переписан под интеграционный режим:
+  - 3 теста с реальной БД: `test_get_changes_id_returns_open_shift_for_admin`, `test_get_changes_id_throws_for_user_without_shift`, `test_get_report_returns_response_with_seeded_shift`
+  - `RefreshDatabase` trait + `$this->seed(ChangesTestDataSeeder::class)` в setUp
+  - Убран `markTestSkipped` с обоих исходных тестов
+- **`Baza/tests/Unit/SearchServiceTest`** — добавлен `assertInstanceOf(SearchResponse::class)` (раньше был Risky из-за отсутствия ассертов)
+
+### Fixed (Исправлено)
+
+- **Синхронизация миграций со схемой прода (TD-2 follow-up)** — добавлены 2 миграции для колонок, которые на проде/локалке заведены руками:
+  - `2026_05_11_125000_add_festival_id_to_el_tickets_table` — `festival_id` (uuid, nullable) в `el_tickets`. Без неё backfill-миграция `2026_05_11_130000_backfill_festival_id_in_el_tickets` падала на чистой БД с `Column not found`
+  - `2026_05_29_180000_add_festival_id_and_count_auto_to_changes_table` — `festival_id` и `count_auto_tickets` в `changes`
+  - Обе миграции используют `Schema::hasColumn()` — на проде ничего не сломают, лишь зарегистрируются в таблице `migrations`
+- **PHPUnit Baza:** было 2 skipped + 1 risky → стало **8 тестов, 10 ассертов, 0 проблем**. TD-2 закрыт.
+
+### Breaking Changes
+
+Нет. Патч-релиз.
+
+### Migration Guide
+
+Для разработчиков:
+
+```bash
+# Создать тестовую БД (один раз)
+docker exec php-baza php -r "
+\$pdo = new PDO('mysql:host=database', 'root', 'common404');
+\$pdo->exec('CREATE DATABASE IF NOT EXISTS baza_test CHARACTER SET utf8mb4');
+"
+
+# Прогон миграций на тест-БД
+docker exec -e DB_DATABASE=baza_test php-baza php artisan migrate --force
+
+# Прогон тестов
+docker exec php-baza ./vendor/bin/phpunit --testdox
+```
+
+Для прода:
+- Миграции безопасны (используют `Schema::hasColumn()`), но фактически не добавят ничего — колонки уже существуют. Запись о миграции в `migrations` появится при следующем `php artisan migrate`.
+
+### Заметки по релизу
+
+Из-за неправильно смерженного PR #36 (вместо backport-PR #37 пользователь сначала смержил feat/v2.5.1-baza-seeders с WIP-коммитом) в истории `master` оказался коммит `29ea36e4 wip: v2.5.1 baza-seeders draft (will be squashed)`. Это разовая аномалия, для следующих релизов будет жёстко следить за порядком: backport-ветка после релиза идёт ПЕРВОЙ.
 
 ---
 
@@ -92,5 +153,6 @@ make test          # все тесты
 
 ---
 
-[Unreleased]: https://github.com/ShaevMV/systo/compare/v2.5.0...HEAD
+[Unreleased]: https://github.com/ShaevMV/systo/compare/v2.5.1...HEAD
+[2.5.1]: https://github.com/ShaevMV/systo/releases/tag/v2.5.1
 [2.5.0]: https://github.com/ShaevMV/systo/releases/tag/v2.5.0

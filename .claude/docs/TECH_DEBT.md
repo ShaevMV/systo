@@ -12,9 +12,9 @@
 
 | ID | Описание | Кто ведёт | Куда направлено |
 |----|----------|-----------|-----------------|
-| TD-1 | **Race Condition воркера** — воркер стартует раньше БД (commit → rollback → disconnect). Внедрить healthcheck на MySQL + `depends_on: service_healthy` в `docker-compose.yml` (только прод) | devops-engineer | **v2.5.0** |
-| TD-2 | **Починка PHPUnit-тестов** — ошибки PDO/Connection. Сначала запустить и подсчитать количество сломанных, потом чинить. Использовать отдельную БД `systo_test` | auto-tester | **v2.5.1** (патч) |
-| TD-3 | **Очистка документации от Friendly-приложения** — Friendly как микросервис удалён, осталось 3 приложения. Очистить CLAUDE.md, API.md, DOMAIN.md, CONVENTIONS.md, PROJECT_MEMORY.md. Friendly как тип заказа (роль `pusher`, поле `friendly_id`) — сохранить | technical-writer | **v2.5.0** |
+| ✅ TD-1 | **Race Condition воркера** — закрыт в v2.5.0 (healthcheck mysql + worker `depends_on: service_healthy` в prod-compose). | devops-engineer | ✅ **v2.5.0** |
+| ✅ TD-2 | **Починка PHPUnit-тестов** — закрыт в v2.5.0 (Backend 55/0) + v2.5.1 (Baza 8/0/0 ассертов). Чистый прогон через `baza_test` БД + фикстуры. | auto-tester | ✅ **v2.5.0 + v2.5.1** |
+| ✅ TD-3 | **Очистка документации от Friendly-приложения** — закрыт в v2.5.0. Friendly как тип заказа (роль `pusher`, поле `friendly_id`) сохранён в Backend. | technical-writer | ✅ **v2.5.0** |
 | TD-4 | **Обновление Laravel 9 → 11** на всех 3 приложениях (Backend, Baza, FrontEnd). Заблокировано до 1 июня (после фестиваля) | tech-lead | **v2.8.0 (staging) + v2.9.0 (прод)** |
 
 ---
@@ -126,3 +126,4 @@ Telegram-бот анкет (`http://77.222.60.58:8000`) — **сторонний
 | 2026-04-12 | Закрыт пункт: «Фильтрация festivalId в Vuex store OrderModule» |
 | 2026-05-10 | Добавлен пункт: «Единый паттерн для `Order::none()` в фильтрах списков» |
 | 2026-05-28 | Полная актуализация: расставлены приоритеты с ID, добавлены TD-3 (очистка Friendly), TD-6 (альтернатива Telegram), TD-7 (152-ФЗ), TD-8 (место на VPS), TD-15 (mobile отдельный SPA). Привязка к версиям v2.5.0 → v2.9.0 |
+| 2026-05-29 | Закрыты TD-1 (Race Condition воркера, v2.5.0), TD-3 (очистка Friendly, v2.5.0), TD-2 (PHPUnit Backend+Baza, v2.5.0+v2.5.1). Помечены ✅ |
