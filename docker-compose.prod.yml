@@ -1,5 +1,16 @@
 version: '3.7'
 
+# Prod compose. Структура — 3 приложения:
+#   - php (Backend, SolarSysto)
+#   - phpBaza (Baza, аутентификация)
+#   - node (FrontEnd, Vue 3 SPA через nginx-сборку)
+# Плюс mysql, redis, nginx, worker (Laravel queue worker для Backend).
+#
+# Удалены устаревшие сервисы phpFriendly, phpList, database (mysql 5.7 для
+# Friendly) и mount-ы ./Friendly, ./List — отдельные приложения Friendly и
+# List убраны из монорепо. Friendly как тип заказа и заказы-списки живут
+# внутри Backend.
+
 services:
 
   nginx:
@@ -17,22 +28,16 @@ services:
       - ./FrontEnd:${ENV_ORG_FRONT_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
       - ./Baza:${ENV_VHOD_PATCH}
-      - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
     user: user
     environment:
       - ENV_ORG_BACKEND_HOST=${ENV_ORG_BACKEND_HOST}
       - ENV_ORG_FRONTEND_HOST=${ENV_ORG_FRONTEND_HOST}
       - ENV_VHOD_BACKEND_HOST=${ENV_VHOD_BACKEND_HOST}
-      - ENV_DRUG_BACKEND_HOST=${ENV_DRUG_BACKEND_HOST}
-      - ENV_SPISOK_BACKEND_HOST=${ENV_SPISOK_BACKEND_HOST}
 
       - ENV_ORG_BACKEND_PATCH=${ENV_ORG_BACKEND_PATCH}
       - ENV_ORG_FRONT_PATCH=${ENV_ORG_FRONT_PATCH}
       - ENV_SHARED_PATCH=${ENV_SHARED_PATCH}
       - ENV_VHOD_PATCH=${ENV_VHOD_PATCH}
-      - ENV_DRUG_PATCH=${ENV_DRUG_PATCH}
-      - ENV_SPISOK_PATCH=${ENV_SPISOK_PATCH}
 
     networks:
       - backend
@@ -40,8 +45,6 @@ services:
       - mysql
       - node
       - phpBaza
-      - phpFriendly
-      - phpList
       - php
 
   php:
@@ -101,46 +104,6 @@ services:
     networks:
       - backend
 
-  phpFriendly:
-    hostname: ${ENV_DRUG_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=false
-    container_name: php-friendly
-    image: 'friendly_laravel'
-    env_file:
-      - ./Friendly/.env
-    volumes:
-      - ./Friendly:${ENV_DRUG_PATCH}
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_DRUG_PATCH}
-    environment:
-      - WITH_XDEBUG=false
-      - WORKING_DIR=${ENV_DRUG_PATCH}
-    user: user
-    networks:
-      - backend
-
-  phpList:
-    hostname: ${ENV_SPISOK_BACKEND_HOST}
-    build:
-      context: ./Docker/php
-      args:
-        - WITH_XDEBUG=false
-    container_name: php-list
-    image: 'list_laravel'
-    volumes:
-      - ./List:${ENV_SPISOK_PATCH}
-      - ./Shared:${ENV_SHARED_PATCH}
-    working_dir: ${ENV_SPISOK_PATCH}
-    environment:
-      - WITH_XDEBUG=false
-      - WORKING_DIR=${ENV_SPISOK_PATCH}
-    user: user
-    networks:
-      - backend
-
   redis:
     build: ./Docker/redis
     container_name: redis-solarSysto
@@ -156,8 +119,6 @@ services:
     image: 'laravelworker'
     volumes:
       - ./Backend:${ENV_ORG_BACKEND_PATCH}
-      - ./Friendly:${ENV_DRUG_PATCH}
-      - ./List:${ENV_SPISOK_PATCH}
       - ./Shared:${ENV_SHARED_PATCH}
       - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
       - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
@@ -165,9 +126,14 @@ services:
     command: [ "supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf" ]
     networks:
       - backend
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
   mysql:
     image: mysql:8
+    restart: unless-stopped
     ports:
       - "3306:3306"
     environment:
@@ -180,20 +146,12 @@ services:
       - ./Docker/mysql/db:/var/lib/mysql
     networks:
       - backend
-
-  database:
-    image: mysql:5.7
-    environment:
-      - "MYSQL_ROOT_PASSWORD=common404"
-      - "MYSQL_DATABASE=friendly"
-    volumes:
-      - ./Docker/mysqlFriendly/db:/var/lib/mysql
-      - ./Docker/mysqlFriendly/log/mysql.log:/var/log/mysql/mysql.log
-      - ./Docker/mysqlFriendly/my.cnf:/etc/mysql/my.cnf
-    ports:
-      - "33065:3306"
-    networks:
-      - backend
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 networks:
   backend:
