@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+# Commitlint git-хук — проверяет формат commit message.
+# Мягкий режим: при нарушении показывает warning, но НЕ блокирует коммит
+# (см. `|| true` в конце). Если захотите ужесточить — уберите `|| true`
+# и поменяйте severity в commitlint.config.js с 1 на 2.
+
+npx --no-install commitlint --edit "$1" || true

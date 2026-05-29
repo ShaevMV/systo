@@ -23,3 +23,6 @@
 # Тестовые артефакты
 Backend/tests/**/QR/*.png
 Backend/storage/app/public/tickets/*.pdf
+
+# node_modules корневые (для husky + commitlint)
+/node_modules/

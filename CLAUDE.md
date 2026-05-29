@@ -45,11 +45,12 @@
 
 | Компонент | Описание | Технологии |
 |-----------|----------|------------|
-| **Backend** | Основное приложение SolarSysto | Laravel 9, PHP 8.2 |
+| **Backend** | Основное приложение SolarSysto (включая Friendly-заказы) | Laravel 9, PHP 8.2 |
 | **Baza** | Аутентификация | Laravel 9, PHP 8.2 |
-| **Friendly** | Дружественные заказы | Laravel 8, PHP 8.2 |
 | **FrontEnd** | Vue.js SPA | Vue 3, Vuex, Vue Router |
 | **Shared** | Общий код (CQRS, DDD, VO) | PHP PSR-4 |
+
+**Примечание:** ранее отдельное приложение **Friendly** было удалено из монорепо. Friendly как **тип заказа** (роль `pusher`, поле `friendly_id`, эндпоинты `/api/v1/order/createFriendly` и `/api/v1/order/getListForFriendly`) сохранён внутри Backend.
 
 ### Архитектурные паттерны
 
@@ -117,3 +118,9 @@ docker exec -it php-solarSysto ./vendor/bin/phpunit
 @.claude/docs/TECH_DEBT.md
 @.claude/docs/PROJECT_MEMORY.md
 @.claude/docs/BOARD.md
+
+### Процессы (релизы, версионирование, ветки)
+
+Все файлы из `.claude/docs/process/` — обязательны к прочтению при работе над релизами, версионированием, CI/CD.
+
+@.claude/docs/process/RELEASES.md

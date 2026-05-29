@@ -1,0 +1,14 @@
+{
+  "name": "systo-monorepo",
+  "version": "2.5.0",
+  "private": true,
+  "description": "Корневой package.json монорепо. Здесь только инфраструктура: husky (git-хуки) и commitlint (проверка commit message). Frontend живёт в ./FrontEnd с собственным package.json.",
+  "scripts": {
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "husky": "^9.1.6"
+  }
+}
