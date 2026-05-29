@@ -1,0 +1,313 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+# Базовый CI v2.5.0: lint, build, audit, PHPUnit (allow-failure).
+# Полный CD — позже (v2.7.0), после получения доступа к хостингу.
+
+permissions:
+  contents: read
+
+jobs:
+  # ─────────────── Линтеры PHP ───────────────
+
+  lint-backend:
+    name: Lint Backend (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache composer (Backend)
+        uses: actions/cache@v4
+        with:
+          path: Backend/vendor
+          key: ${{ runner.os }}-composer-backend-${{ hashFiles('Backend/composer.lock') }}
+
+      - name: Install Backend dependencies
+        working-directory: Backend
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
+
+      - name: Run Pint (check only)
+        working-directory: Backend
+        run: ./vendor/bin/pint --test
+
+  lint-baza:
+    name: Lint Baza (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Cache composer (Baza)
+        uses: actions/cache@v4
+        with:
+          path: Baza/vendor
+          key: ${{ runner.os }}-composer-baza-${{ hashFiles('Baza/composer.lock') }}
+
+      - name: Install Baza dependencies
+        working-directory: Baza
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
+
+      - name: Run Pint (check only)
+        working-directory: Baza
+        run: |
+          if [ -f vendor/bin/pint ]; then
+            ./vendor/bin/pint --test
+          else
+            echo "::warning::Pint не установлен в Baza — добавьте laravel/pint в require-dev"
+          fi
+
+  # ─────────────── Линтер JS ───────────────
+
+  lint-frontend:
+    name: Lint Frontend (ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: FrontEnd/package-lock.json
+
+      - name: Install dependencies
+        working-directory: FrontEnd
+        run: npm ci --no-audit --no-fund
+
+      - name: Run ESLint
+        working-directory: FrontEnd
+        run: npm run lint -- --no-fix
+
+  # ─────────────── Сборка фронта ───────────────
+
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: FrontEnd/package-lock.json
+
+      - name: Install dependencies
+        working-directory: FrontEnd
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        working-directory: FrontEnd
+        run: npm run build
+
+  # ─────────────── Аудит безопасности ───────────────
+
+  audit:
+    name: Security audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: composer audit (Backend)
+        working-directory: Backend
+        run: composer audit --no-dev --format=plain || true
+
+      - name: composer audit (Baza)
+        working-directory: Baza
+        run: composer audit --no-dev --format=plain || true
+
+      - name: npm audit (FrontEnd)
+        working-directory: FrontEnd
+        run: npm audit --production --audit-level=high || true
+
+  # ─────────────── PHPUnit Backend ───────────────
+
+  test-backend:
+    name: PHPUnit Backend
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: systo_test
+          MYSQL_USER: default
+          MYSQL_PASSWORD: secret
+        ports:
+          - 33069:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          extensions: pdo, pdo_mysql, mbstring, intl, gd, zip, bcmath
+          coverage: none
+
+      - name: Cache composer (Backend)
+        uses: actions/cache@v4
+        with:
+          path: Backend/vendor
+          key: ${{ runner.os }}-composer-backend-${{ hashFiles('Backend/composer.lock') }}
+
+      - name: Install Backend dependencies
+        working-directory: Backend
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
+
+      - name: Copy .env.testing
+        working-directory: Backend
+        run: |
+          if [ -f .env.testing ]; then cp .env.testing .env; else cp .env.example .env; fi
+
+      - name: Generate APP_KEY
+        working-directory: Backend
+        run: php artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 33069 -psecret --silent; then
+              echo "MySQL готов"; exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL не отвечает" && exit 1
+
+      - name: Run migrations (test database)
+        working-directory: Backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33069
+          DB_DATABASE: systo_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+        run: php artisan migrate --force || true
+
+      - name: Run PHPUnit
+        working-directory: Backend
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33069
+          DB_DATABASE: systo_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+        continue-on-error: true
+        run: ./vendor/bin/phpunit --testdox
+
+  # ─────────────── PHPUnit Baza ───────────────
+
+  test-baza:
+    name: PHPUnit Baza
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: secret
+          MYSQL_DATABASE: baza_test
+          MYSQL_USER: default
+          MYSQL_PASSWORD: secret
+        ports:
+          - 33065:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+          --health-start-period=30s
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          extensions: pdo, pdo_mysql, mbstring, intl, gd, zip, bcmath
+          coverage: none
+
+      - name: Cache composer (Baza)
+        uses: actions/cache@v4
+        with:
+          path: Baza/vendor
+          key: ${{ runner.os }}-composer-baza-${{ hashFiles('Baza/composer.lock') }}
+
+      - name: Install Baza dependencies
+        working-directory: Baza
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
+
+      - name: Copy .env
+        working-directory: Baza
+        run: cp .env.example .env
+
+      - name: Generate APP_KEY
+        working-directory: Baza
+        run: php artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 1 30); do
+            if mysqladmin ping -h 127.0.0.1 -P 33065 -psecret --silent; then
+              echo "MySQL готов"; exit 0
+            fi
+            sleep 2
+          done
+          echo "MySQL не отвечает" && exit 1
+
+      - name: Run PHPUnit
+        working-directory: Baza
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33065
+          DB_DATABASE: baza_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+        continue-on-error: true
+        run: ./vendor/bin/phpunit --testdox
