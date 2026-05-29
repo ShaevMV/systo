@@ -11,7 +11,7 @@
 
 | Версия | Срок | Главное | Статус |
 |--------|------|---------|--------|
-| **2.5.0** | конец мая — начало июня 2026 | Старт версионирования, базовый CI, новые агенты, healthcheck воркера, очистка от Friendly-приложения | 🔄 В работе |
+| **2.5.0** | 2026-05-29 | Старт версионирования, базовый CI, новые агенты, healthcheck воркера, очистка от Friendly-приложения | ✅ Выпущена |
 | **2.5.1** | патч | Починка PHPUnit | ⏳ Запланировано |
 | **2.6.0** | июнь 2026 | SSL для ноутбука-сканера, offline docker-compose, CD staging | ⏳ Запланировано |
 | **2.7.0** | июль 2026 | Loki + Grafana, audit + воронка покупки, CD prod tag-based | ⏳ Запланировано |
@@ -23,23 +23,9 @@
 
 ---
 
-## 🔄 Текущая работа (v2.5.0)
+## 🔄 Текущая работа
 
-| Задача | Ответственный | Статус |
-|--------|---------------|--------|
-| Папка `.claude/docs/process/` + импорты в CLAUDE.md | scrum-master | ✅ |
-| `RELEASES.md` (SemVer + branching + DoD + roadmap) | scrum-master | ✅ |
-| `CHANGELOG.md` (русский, Keep a Changelog) | scrum-master | ✅ |
-| Обновление `BOARD.md` (этот файл) | scrum-master | 🔄 |
-| Обновление `TECH_DEBT.md` (приоритеты + TD3-TD8) | scrum-master | ⏳ |
-| Очистка документации от Friendly-приложения | technical-writer | ⏳ |
-| Создание агента scrum-master | claude | ⏳ |
-| Создание агента security-engineer | claude | ⏳ |
-| husky + commitlint (мягкий warning, 3 приложения) | devops-engineer | ⏳ |
-| Healthcheck воркера в `docker-compose.yml` (прод) | devops-engineer | ⏳ |
-| Базовый CI на GitHub Actions | devops-engineer | ⏳ |
-| Подсчёт сломанных PHPUnit-тестов → TECH_DEBT | auto-tester | ⏳ |
-| Тег `v2.5.0` + GitHub Release | scrum-master | ⏳ |
+_Сейчас нет активного спринта. Следующий — v2.5.1 (патч с продолжением починки PHPUnit для Baza Risky-теста и созданием сидеров)._
 
 ---
 
@@ -73,6 +59,29 @@
 ---
 
 ## ✅ Сделано
+
+### 2026-05-29 — v2.5.0 «Старт версионирования» 🎉
+
+**Первая официальная версия проекта. Фундамент процесса релизов и инфраструктуры.**
+
+- 🏷️ Тег: `v2.5.0`
+- 📜 [CHANGELOG.md §2.5.0](../../CHANGELOG.md)
+- 🌿 PR: feat/v2.5.0-foundation → master (#35), 16 коммитов
+- 📦 Релиз: GitHub Release (см. https://github.com/ShaevMV/systo/releases/tag/v2.5.0)
+
+**Что вошло:**
+- Процесс релизов: `RELEASES.md` (SemVer + branching + DoD + roadmap), `CHANGELOG.md`
+- CI на GitHub Actions: 7 параллельных job (lint Backend/Baza/Frontend, build, audit, PHPUnit Backend/Baza), MySQL service, кэш, триггеры push + PR
+- husky + commitlint (мягкий warning, conventional commits)
+- Makefile: 30+ целей с группами + `make help`
+- Агенты команды: `scrum-master`, `security-engineer`
+- Материалы к встрече с организаторами 2026-05-30
+- Очистка документации от Friendly-приложения (и косвенно от List)
+- TD-1 закрыт (Race Condition воркера на проде через healthcheck)
+- TD-2 закрыт частично (Backend 55 тестов 0 ошибок, Baza 7 тестов 0 ошибок 2 skipped)
+- TD-3 закрыт (cleanup от Friendly + List)
+- Починка docker-compose.prod.yml (удалены мёртвые phpFriendly, phpList, database)
+- Починка Baza/composer.lock (endroid/qr-code добавлен)
 
 ### 2026-05-15 — Авто-одобрение заказа
 
