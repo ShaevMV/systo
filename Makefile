@@ -3,9 +3,15 @@
 DC := docker-compose
 DC_PROD := docker-compose -f docker-compose.prod.yml
 
-PHP := docker exec -it php-solarSysto
-PHP_BAZA := docker exec -it php-baza
-NODE := docker exec -it -u0 node-solarSysto
+# Интерактивные команды (shell, tinker) — требуют TTY (-it)
+# Команды без stdin (тесты, миграции, composer) — без -t, чтобы работать в CI
+PHP_IT := docker exec -it php-solarSysto
+PHP_BAZA_IT := docker exec -it php-baza
+NODE_IT := docker exec -it -u0 node-solarSysto
+
+PHP := docker exec php-solarSysto
+PHP_BAZA := docker exec php-baza
+NODE := docker exec -u0 node-solarSysto
 
 ##@ Помощь
 
@@ -89,15 +95,15 @@ down-prod: ## Остановить prod-окружение
 
 .PHONY: shell-php
 shell-php: ## Войти в Backend php-контейнер
-	$(PHP) bash
+	$(PHP_IT) bash
 
 .PHONY: shell-baza
 shell-baza: ## Войти в Baza php-контейнер
-	$(PHP_BAZA) bash
+	$(PHP_BAZA_IT) bash
 
 .PHONY: shell-node
 shell-node: ## Войти в node-контейнер (root)
-	$(NODE) bash
+	$(NODE_IT) bash
 
 .PHONY: shell-mysql
 shell-mysql: ## MySQL CLI как root
@@ -125,7 +131,7 @@ cache-clear: ## Сбросить весь кеш Laravel (Backend)
 
 .PHONY: tinker
 tinker: ## Laravel Tinker (Backend)
-	$(PHP) php artisan tinker
+	$(PHP_IT) php artisan tinker
 
 ##@ Laravel — Baza
 
