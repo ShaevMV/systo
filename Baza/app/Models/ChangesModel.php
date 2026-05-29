@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\ChangesFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Nette\Utils\Json;
@@ -38,6 +40,8 @@ use Nette\Utils\Json;
  */
 class ChangesModel extends Model
 {
+    use HasFactory;
+
     protected $table = self::TABLE;
 
     public const TABLE = 'changes';
@@ -55,4 +59,15 @@ class ChangesModel extends Model
         'end',
         'festival_id',
     ];
+
+    /**
+     * App\Models\ChangesModel живёт в namespace App\Models,
+     * а Laravel ищет factory как Database\Factories\ChangesModelFactory
+     * (по конвенции — имя модели + "Factory"). Наш файл называется
+     * ChangesFactory (без суффикса Model), поэтому переопределяем.
+     */
+    protected static function newFactory(): ChangesFactory
+    {
+        return ChangesFactory::new();
+    }
 }
