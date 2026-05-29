@@ -305,6 +305,17 @@ jobs:
           done
           echo "MySQL не отвечает" && exit 1
 
+      - name: Run migrations (test database)
+        working-directory: Baza
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 33065
+          DB_DATABASE: baza_test
+          DB_USERNAME: root
+          DB_PASSWORD: secret
+        run: php artisan migrate --force || true
+
       - name: Run PHPUnit
         working-directory: Baza
         env:
