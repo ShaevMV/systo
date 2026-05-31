@@ -226,6 +226,21 @@ jobs:
             sleep 2
           done
 
+      # Если БД `baza` ещё не создана (например, MySQL был инициализирован до
+      # появления init-скрипта Docker/mysql/init/01-create-baza.sql) — создаём её
+      # на лету. Идемпотентно через IF NOT EXISTS.
+      - name: Ensure Baza database exists
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          ROOT_PWD="$(grep ^MYSQL_ROOT_PASSWORD .env.staging | cut -d= -f2)"
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T mysql-staging \
+            mysql -uroot -p"$ROOT_PWD" -e "
+              CREATE DATABASE IF NOT EXISTS baza CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+              GRANT ALL PRIVILEGES ON baza.* TO 'systo'@'%';
+              FLUSH PRIVILEGES;
+            "
+          echo "✓ БД baza существует, права у systo выданы"
+
       # ─── Миграции и сидеры ─────────────────────────────────────────────────
       - name: Run migrations (Backend + Baza)
         working-directory: ${{ env.PROJECT_DIR }}
