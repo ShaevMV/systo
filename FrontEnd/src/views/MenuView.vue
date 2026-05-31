@@ -243,6 +243,11 @@
         </router-link>
       </li>
       <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'OptionListView' }">
+          Опции к билетам
+        </router-link>
+      </li>
+      <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'TypesOfPaymentListView' }">
           Типы оплат
         </router-link>
