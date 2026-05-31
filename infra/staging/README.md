@@ -175,7 +175,64 @@ ssh root@77.222.32.244 'bash /tmp/staging/setup-ssl.sh твой-email@example.co
 
 Сертификаты обновляются автоматически за 30 дней до истечения.
 
-### 10. Проверка
+### 10. Docker-compose staging
+
+После того как host nginx + SSL настроены (шаги 1-9), приложение разворачивается через `docker-compose.staging.yml`.
+
+#### 10.1. Подготовка .env файлов (один раз на сервере)
+
+```bash
+ssh -i ~/.ssh/gha_deploy deploy@77.222.32.244 << 'EOF'
+cd /var/www/systo
+cp .env.staging.example          .env.staging
+cp Backend/.env.staging.example  Backend/.env
+cp Baza/.env.staging.example     Baza/.env
+
+# Заменить CHANGE_ME на сильные пароли
+sed -i "s/staging_secret_CHANGE_ME/$(openssl rand -hex 16)/g" .env.staging Backend/.env Baza/.env
+sed -i "s/staging_root_secret_CHANGE_ME/$(openssl rand -hex 16)/g" .env.staging
+
+# Сгенерировать APP_KEY через контейнер (после build'a)
+docker compose -f docker-compose.staging.yml --env-file .env.staging build
+docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm php-staging php artisan key:generate --force --no-interaction
+docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm phpbaza-staging php artisan key:generate --force --no-interaction
+EOF
+```
+
+#### 10.2. Build frontend (один раз и при изменениях)
+
+```bash
+ssh -i ~/.ssh/gha_deploy deploy@77.222.32.244 'cd /var/www/systo && docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm node-staging sh -c "npm ci && npm run build"'
+```
+
+#### 10.3. Запуск всех контейнеров
+
+```bash
+ssh -i ~/.ssh/gha_deploy deploy@77.222.32.244 'cd /var/www/systo && docker compose -f docker-compose.staging.yml --env-file .env.staging up -d'
+```
+
+#### 10.4. Миграции + сидеры
+
+```bash
+ssh -i ~/.ssh/gha_deploy deploy@77.222.32.244 << 'EOF'
+cd /var/www/systo
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan migrate --force --no-interaction
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan db:seed --force --no-interaction
+docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T phpbaza-staging php artisan migrate --force --no-interaction
+EOF
+```
+
+#### 10.5. Проверка
+
+| URL | Ожидаемо |
+|-----|----------|
+| `https://staging.spaceofjoy.ru/` | Vue SPA фронтенд |
+| `https://api.staging.spaceofjoy.ru/` | Laravel API ответ |
+| `https://vhod.staging.spaceofjoy.ru/` | Baza интерфейс |
+| `https://pma.staging.spaceofjoy.ru/` | phpMyAdmin (basic auth + MySQL auth) |
+| `https://mail.staging.spaceofjoy.ru/` | Mailpit web UI (basic auth) |
+
+### 11. Проверка SSH
 
 С локальной машины:
 
