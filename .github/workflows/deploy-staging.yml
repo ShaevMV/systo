@@ -108,7 +108,8 @@ jobs:
 
       - name: Show deployed commit
         working-directory: ${{ env.PROJECT_DIR }}
-        run: git log -1 --pretty=format:"%h %s%n%nAuthor: %an <%ae>%nDate:   %ad" --date=short
+        run: |
+          git log -1 --pretty=format:'%h %s%n%nAuthor: %an <%ae>%nDate:   %ad' --date=short
 
       # ─── Bootstrap .env при первом деплое ──────────────────────────────────
       - name: Bootstrap .env.staging (first deploy)
