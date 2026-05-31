@@ -172,26 +172,19 @@ jobs:
       # ->change() который требует doctrine/dbal, а dbal сейчас приходит только как
       # transitive dependency из require-dev. Правильный фикс — `composer require
       # doctrine/dbal:^3.5` в основные deps, но требует обновления composer.lock
-      # (которому сейчас мешает сеть). TD-задача — перенести dbal в require.
+      # (которому сейчас мешает сеть). TD-25 — перенести dbal в require.
+      #
+      # composer install запускается ВСЕГДА (не идемпотентно) — он быстрый когда
+      # vendor совпадает с lock, и нам важно подтянуть свежие deps при изменениях.
       - name: Composer install (Backend)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          if [[ ! -f Backend/vendor/autoload.php ]]; then
-            echo "vendor/ отсутствует — устанавливаю зависимости…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
-          else
-            echo "✓ Backend/vendor уже есть — пропускаю"
-          fi
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
 
       - name: Composer install (Baza)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          if [[ ! -f Baza/vendor/autoload.php ]]; then
-            echo "vendor/ (Baza) отсутствует — устанавливаю зависимости…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
-          else
-            echo "✓ Baza/vendor уже есть — пропускаю"
-          fi
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
 
       - name: Generate APP_KEY for Backend (if missing)
         working-directory: ${{ env.PROJECT_DIR }}
