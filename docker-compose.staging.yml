@@ -124,6 +124,9 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-staging_secret}
     volumes:
       - mysql-staging-data:/var/lib/mysql
+      # Init-скрипты выполняются только при первой инициализации (пустой volume).
+      # Создаёт БД `baza` и выдаёт права пользователю systo.
+      - ./Docker/mysql/init:/docker-entrypoint-initdb.d:ro
     networks:
       - staging
     healthcheck:
