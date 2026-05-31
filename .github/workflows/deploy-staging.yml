@@ -168,6 +168,26 @@ jobs:
       # ⚠ ENTRYPOINT в Docker/php/Dockerfile хардкодит запуск php-fpm и игнорирует
       # переданную команду — поэтому для `run` подменяем entrypoint на `sh`.
       # На уже запущенный контейнер можно ходить через `exec` без подмены.
+      - name: Composer install (Backend)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [[ ! -f Backend/vendor/autoload.php ]]; then
+            echo "vendor/ отсутствует — устанавливаю зависимости…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
+          else
+            echo "✓ Backend/vendor уже есть — пропускаю"
+          fi
+
+      - name: Composer install (Baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [[ ! -f Baza/vendor/autoload.php ]]; then
+            echo "vendor/ (Baza) отсутствует — устанавливаю зависимости…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
+          else
+            echo "✓ Baza/vendor уже есть — пропускаю"
+          fi
+
       - name: Generate APP_KEY for Backend (if missing)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
