@@ -61,7 +61,10 @@ jobs:
       - name: Verify docker-compose syntax
         run: |
           # docker compose доступен на ubuntu-latest
-          cp .env.staging.example .env.staging
+          # Копируем все .env.staging.example → реальные .env, т.к. compose ссылается на них через env_file
+          cp .env.staging.example         .env.staging
+          cp Backend/.env.staging.example Backend/.env
+          cp Baza/.env.staging.example    Baza/.env
           docker compose -f docker-compose.staging.yml --env-file .env.staging config --quiet
           echo "✓ docker-compose.staging.yml syntax ok"
 

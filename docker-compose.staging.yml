@@ -20,7 +20,6 @@
 #  TD-1 (race condition воркера): mysql-staging имеет healthcheck,
 #  worker и app зависят с condition: service_healthy.
 # ─────────────────────────────────────────────────────────────────────────────
-version: '3.8'
 
 services:
 
