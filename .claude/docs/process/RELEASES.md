@@ -93,10 +93,11 @@ master           ─── основная линия разработки
 |--------|------|------------|--------|
 | **2.5.0** | 2026-05-29 | Старт версионирования: SemVer-инфра, базовый CI, healthcheck воркера, новые агенты | ✅ Выпущена |
 | **2.5.1** | 2026-05-29 | Baza-сидеры, чистый PHPUnit, spec истории билета | ✅ Выпущена |
-| **2.6.0** | **до 2026-06-12 (2 недели)** | **🔥 XL-релиз:** опции к билетам + новый формат заказа (BREAKING) + миграция данных + промокоды-агрегатор + qr.spaceofjoy.ru SSO (Passport). Всё одним релизом — нужно к старту продаж осеннего фестиваля | В работе |
-| **2.7.0** | **начало сентября 2026** | SSL mkcert для ноутбука-сканера, offline docker-compose bundle, CD staging | Запланировано |
-| **2.8.0** | сентябрь–октябрь 2026 | Loki + Promtail + Grafana, audit + воронка покупки, CD prod tag-based + release-please | Запланировано |
-| **3.0.0** | TBD | Laravel 11 + OrderKind VO + 3 Application-сервиса | Открытый |
+| **2.6.0** | **до 2026-06-12 (2 недели)** | **🔥 Минимум для старта продаж:** опции к билетам + новый формат заказа (BREAKING) + миграция + фронт + тесты. Сокращён после анализа 3 спецификаций. | В работе |
+| **2.7.0** | **июль 2026** | Промокоды-агрегатор (история + права на роли кроме guest) + qr.spaceofjoy.ru SSO (Passport hybrid с JWT, роль `qr_service`) | Запланировано |
+| **2.8.0** | **начало сентября 2026** | SSL mkcert для ноутбука-сканера, offline docker-compose bundle, CD staging | Запланировано |
+| **2.9.0** | сентябрь–октябрь 2026 | Loki + Promtail + Grafana, audit + воронка покупки, CD prod tag-based + release-please | Запланировано |
+| **3.0.0** | TBD | Laravel 11 + OrderKind VO + 3 Application-сервиса + (возможно) full Passport migration | Открытый |
 
 > **Дедлайн 2026-06-12** — критичный. До этой даты v2.6.0 должен быть в продакшене (с тестами). Это окно перед запуском продаж осеннего фестиваля.
 >
@@ -112,63 +113,92 @@ master           ─── основная линия разработки
 
 См. `CHANGELOG.md §2.5.1`. Тег `v2.5.1`. Закрыт TD-2 (PHPUnit).
 
-#### v2.6.0 — 🔥 XL-релиз: всё для старта продаж осеннего фестиваля
+#### v2.6.0 — 🔥 Минимум для старта продаж осеннего фестиваля
 
 **Дедлайн: 2026-06-12.** Без этого не запустить продажи осеннего фестиваля.
 
-Это **один большой релиз** (XL), объединяющий 6 блоков работ. Делается через интеграционную ветку `feat/v2.6.0-fall-festival` + sub-ветки.
+**Scope сокращён** после анализа 3 спецификаций (`.claude/specs/ticket-options.md`, `order-format-architecture.md`, `qr-sso-security.md`). Промокоды-агрегатор и Passport SSO перенесены в v2.7.0 (июль).
 
-**Блок 1 — Опции к билетам:**
-- Новая сущность `Option` (модуль `Backend/src/Option/`)
-  - Поля: `id`, `name`, `price`, `ticket_type_id`, `active`
-  - Миграция + CRUD endpoints + админ UI
-- Возможно с волнами цен (по аналогии с `ticket_type_price`) — TBD
+Делается через интеграционную ветку `feat/v2.6.0-fall-festival` + 6 sub-веток.
 
-**Блок 2 — Новый формат заказа (BREAKING):**
-- `ticket_type_id` → переезжает с уровня заказа на уровень гостя (`guests[].ticket_type_id`)
-- `promo_code` → переезжает с уровня заказа на уровень гостя (`guests[].promo_code`)
-- Новое поле `guests[].options[]` — массив UUID опций
-- **Перестройка домена** `OrderTicket`:
-  - `OrderTicketDto`: убрать `ticket_type_id` (на уровне заказа), добавить `Order::totalPrice()` который сам считает всё
-  - Новая VO `OrderGuestLine` (гость + ticket_type + options + promo_code)
-- Перестройка фронта формы покупки (`BuyTicket.vue`) — каждый гость как отдельная карточка с выбором типа/опций/промокода
+**Включено:**
 
-**Блок 3 — Миграция существующих данных:**
-- Бэкап всех заказов перед миграцией
-- Переносить `order_ticket.ticket_type_id` в `guests[].ticket_type_id` (для всех гостей одинаковый)
-- Переносить `order_ticket.promo_code` в `guests[].promo_code` (тоже всем одинаковый)
-- Проверка целостности
+1. **Опции к билетам** (`feat/v2.6.0-option-entity`)
+   - Новая сущность `Option` (модуль `Backend/src/Option/`)
+   - Поля: `id`, `name`, `price`, `active`, `description?`, `image_url?`
+   - Связь many-to-many с `ticket_type` через pivot `option_ticket_type`
+   - Snapshot цены/имени в `order_ticket_options` (на момент покупки)
+   - Миграция + CRUD endpoints + админ UI
 
-**Блок 4 — Промокоды-агрегатор:**
+2. **Новый формат заказа BREAKING** (`feat/v2.6.0-order-domain-rewrite`)
+   - `ticket_type_id` → переезжает на уровень гостя (`guests[].ticket_type_id`)
+   - `promo_code` → переезжает на уровень гостя (`guests[].promo_code`)
+   - Новое поле `guests[].options[]` — массив `{option_id, qty}` (кратность через `qty`)
+   - Перестройка домена `OrderTicket` — новые VO `OrderGuestLine`, `Money`, `MoneySnapshot`
+   - Новый Application-сервис `OrderPriceCalculator` (расчёт цены)
+
+3. **Миграция существующих данных** (`feat/v2.6.0-order-data-migration`)
+   - Бэкап всех заказов перед миграцией (5 копий)
+   - Идемпотентный SQL-скрипт: для каждого `order_ticket` распределить `ticket_type_id` и `promo_code` родителя на каждого гостя в JSON
+   - Валидация после миграции
+   - Rollback план (старые колонки nullable для безопасного отката)
+
+4. **Контроллеры под новый формат** (`feat/v2.6.0-controllers-rewrite`)
+   - `POST /order/create`, `POST /order/createFriendly` — новый формат
+   - `POST /order/createList` — БЕЗ опций (списки бесплатные)
+   - Legacy формат — НЕ поддерживаем, сразу BREAKING (все клиенты обновляются одновременно)
+   - Валидация: live + non-live в одном заказе — нельзя
+
+5. **Frontend `BuyTicket.vue`** (`feat/v2.6.0-buy-form-rewrite`)
+   - Каждый гость как карточка с выбором типа/опций/промокода
+   - Live-расчёт цены (обновление при изменении опций)
+   - Multi-select опций с qty
+
+6. **Тесты + регресс** (`feat/v2.6.0-tests`)
+   - PHPUnit для `OrderGuestLine::calculatePrice()` (критично)
+   - PHPUnit для `OrderTicket::totalPrice()`
+   - Регресс на staging
+   - E2E проверка форм покупки
+
+**Финальные технические решения:**
+- Промокод процентный — только от базового билета (не от опций)
+- Кратность опций — через `qty` (`options: [{option_id, qty: 2}]`)
+- Опции в `createList` — НЕ нужны
+- Live + non-live в одном заказе — нельзя
+
+**Не входит (перенесено в v2.7.0):**
+- Промокоды-агрегатор (история, привязка к создателю, права на роли)
+- Passport SSO с qr.spaceofjoy.ru
+
+#### v2.7.0 — Промокоды-агрегатор + qr.spaceofjoy.ru SSO
+
+**Срок:** июль 2026 (после релиза v2.6.0 и периода стабилизации).
+
+**Перенесено из бывшего v2.6.0 (XL → разрезано на v2.6.0 + v2.7.0).**
+
+**Блок A — Промокоды-агрегатор:**
 - История использования: новая таблица `promo_code_usage` (`promo_code_id, order_ticket_id, user_id, applied_at, discount_amount`)
 - Привязка к создателю: поле `created_by_user_id` в `promo_code`
 - Расширение прав: эндпоинты CRUD промокодов доступны всем ролям **кроме `guest`** (admin, manager, pusher, curator, seller, pusher_curator)
 - UI «мои промокоды» для не-админских ролей
 
-**Блок 5 — qr.spaceofjoy.ru SSO:**
-- Внедрение **`laravel/passport`** (зафиксировано на встрече, не Sanctum)
-- Backend как OAuth2 Provider
-- qr.spaceofjoy.ru как OAuth2 Client (наш внутренний сервис партнёра, обе стороны под контролем)
-- Выделенная роль `qr_service` в `AccountRoleHelper`
+**Блок B — qr.spaceofjoy.ru SSO (Hybrid):**
+- Внедрение `laravel/passport` (зафиксировано на встрече, не Sanctum)
+- **Hybrid подход** (по рекомендации security-engineer):
+  - Существующий JWT остаётся для основного auth (`api` guard, tickets.spaceofjoy.ru)
+  - Passport добавляется отдельным guard'ом (`api-oauth`) только для qr.spaceofjoy.ru
+  - Чёткое разделение в `config/auth.php` — без collision'а
+- Authorization Code grant с **PKCE** (для публичного SPA-клиента qr.spaceofjoy.ru)
+- httpOnly secure cookies для access token на qr.spaceofjoy.ru (не localStorage!)
+- Выделенная роль `qr_service` в `AccountRoleHelper` (service-account, не user-роль)
 - SSO flow: пользователь авторизуется в Systo → бесшовно работает в qr.spaceofjoy.ru
-- Документация по интеграции в `.claude/docs/INTEGRATION_QR.md` (новый файл)
+- Consent screen для 152-ФЗ (явное согласие на передачу персданных)
+- Документация по интеграции в `.claude/docs/INTEGRATION_QR.md`
+- Full Passport migration — отложена в v3.0.0
 
-**Блок 6 — Тесты + регресс:**
-- PHPUnit для новой логики расчёта цены
-- Регресс на staging
-- E2E проверка форм покупки
+#### v2.8.0 — SSL + Offline-ноутбук (сентябрь)
 
-**Открытые вопросы** (см. `.claude/meetings/2026-05-30/RESULTS.md`):
-- Опция привязывается к одному ticket_type или нескольким?
-- Кратность опций (несколько одной опции на гостя)?
-- Промокод действует на: только базовый билет / на сумму с опциями?
-- Опции отображаются на PDF/QR?
-- Какие именно роли получат право создавать промокоды (все кроме guest или подмножество)?
-- Что хранится в qr.spaceofjoy.ru — своя БД или через наш API?
-
-#### v2.7.0 — SSL + Offline-ноутбук (сентябрь)
-
-Сдвинут с прежнего v2.6.0. Делается ближе к фестивалю.
+Сдвинут с прежнего v2.6.0 → v2.7.0 → v2.8.0 (после пересмотра scope под v2.7.0). Делается ближе к фестивалю.
 
 - SSL mkcert + локальный CA для ноутбука-сканера (через `/etc/hosts`, свежий сертификат каждый фестиваль)
 - Offline docker-compose bundle (до 15 ГБ, дамп БД файлом, для фестивальной машины)
@@ -176,7 +206,7 @@ master           ─── основная линия разработки
 - Проверка сканера + поиска на стенде после SSL-фикса
 - Упаковка SPA для офлайн-работы на ноутбуке-сканере
 
-#### v2.8.0 — Логи + полный CD (сентябрь–октябрь)
+#### v2.9.0 — Логи + полный CD (сентябрь–октябрь)
 
 Бывший v2.7.0 scope, сдвинут после фестиваля.
 
@@ -288,3 +318,4 @@ master           ─── основная линия разработки
 |------|-----------|
 | 2026-05-28 | Создан документ. Roadmap 2.5.0 → 3.0.0-alpha, SemVer-правила, branching, DoD, шаблоны |
 | 2026-05-30 | **Roadmap полностью переработан после встречи с организаторами.** v2.6.0 = XL-релиз (опции к билетам + новый формат заказа BREAKING + миграция + промокоды-агрегатор + qr.spaceofjoy.ru SSO Passport). Дедлайн 2026-06-12 — старт продаж осеннего фестиваля. Бывший v2.6.0 (SSL+offline) сдвинут в v2.7.0 (сентябрь). Источник: `.claude/meetings/2026-05-30/RESULTS.md`. |
+| 2026-05-30 | **Scope v2.6.0 сокращён** после анализа 3 спецификаций в `.claude/specs/` (ticket-options, order-format-architecture, qr-sso-security). Все три агента независимо рекомендовали резать — объём ~29 дней не уложится в 13. **Промокоды-агрегатор и Passport SSO перенесены в v2.7.0** (июль 2026). v2.6.0 теперь L-релиз: только опции + новый формат заказа + миграция. Зафиксированы решения по 6 открытым вопросам (промокод от билета, кратность через qty, опций в createList нет, live + non-live нельзя, legacy API сразу убираем, Passport hybrid с JWT). |
