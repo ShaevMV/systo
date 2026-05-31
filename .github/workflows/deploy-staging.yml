@@ -168,12 +168,17 @@ jobs:
       # ⚠ ENTRYPOINT в Docker/php/Dockerfile хардкодит запуск php-fpm и игнорирует
       # переданную команду — поэтому для `run` подменяем entrypoint на `sh`.
       # На уже запущенный контейнер можно ходить через `exec` без подмены.
+      # ⚠ Без --no-dev: миграция 2026_01_27_add_fields_in_questionnaire использует
+      # ->change() который требует doctrine/dbal, а dbal сейчас приходит только как
+      # transitive dependency из require-dev. Правильный фикс — `composer require
+      # doctrine/dbal:^3.5` в основные deps, но требует обновления composer.lock
+      # (которому сейчас мешает сеть). TD-задача — перенести dbal в require.
       - name: Composer install (Backend)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           if [[ ! -f Backend/vendor/autoload.php ]]; then
             echo "vendor/ отсутствует — устанавливаю зависимости…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
           else
             echo "✓ Backend/vendor уже есть — пропускаю"
           fi
@@ -183,7 +188,7 @@ jobs:
         run: |
           if [[ ! -f Baza/vendor/autoload.php ]]; then
             echo "vendor/ (Baza) отсутствует — устанавливаю зависимости…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
           else
             echo "✓ Baza/vendor уже есть — пропускаю"
           fi
