@@ -87,69 +87,113 @@ master           ─── основная линия разработки
 
 ---
 
-## 4. Roadmap 2.5.0 → 3.0.0-alpha
+## 4. Roadmap 2.5.0 → 3.0.0 (обновлён 2026-05-30 после встречи с организаторами)
 
 | Версия | Срок | Содержимое | Статус |
 |--------|------|------------|--------|
-| **2.5.0** | 2026-05-28 → 2026-06-05 | Старт версионирования: SemVer-инфра, базовый CI, healthcheck воркера, новые агенты (scrum-master, security-engineer), очистка документации от Friendly-приложения | В работе |
-| **2.5.1** | patch, параллельно | Починка PHPUnit (auto-tester) | Запланировано |
-| **2.6.0** | июнь 2026 | SSL mkcert для ноутбука-сканера, offline docker-compose bundle, CD staging | Запланировано |
-| **2.7.0** | июль 2026 | Loki + Promtail + Grafana, единый поток логов (audit + воронка покупки), CD prod tag-based + release-please | Запланировано |
-| **2.8.0** | август 2026 | Laravel 11 update part 1 (staging), упаковка SPA для офлайн-работы на ноутбуке-сканере | Запланировано |
-| **2.9.0** | август–сентябрь 2026 | OrderKind VO + 3 Application-сервиса (поэтапная миграция), Laravel 11 part 2 (прод) | Запланировано |
-| **3.0.0-alpha** | сентябрь 2026 после встречи с бизнесом | Новый scope от организаторов фестиваля | Открытый |
+| **2.5.0** | 2026-05-29 | Старт версионирования: SemVer-инфра, базовый CI, healthcheck воркера, новые агенты | ✅ Выпущена |
+| **2.5.1** | 2026-05-29 | Baza-сидеры, чистый PHPUnit, spec истории билета | ✅ Выпущена |
+| **2.6.0** | **до 2026-06-12 (2 недели)** | **🔥 XL-релиз:** опции к билетам + новый формат заказа (BREAKING) + миграция данных + промокоды-агрегатор + qr.spaceofjoy.ru SSO (Passport). Всё одним релизом — нужно к старту продаж осеннего фестиваля | В работе |
+| **2.7.0** | **начало сентября 2026** | SSL mkcert для ноутбука-сканера, offline docker-compose bundle, CD staging | Запланировано |
+| **2.8.0** | сентябрь–октябрь 2026 | Loki + Promtail + Grafana, audit + воронка покупки, CD prod tag-based + release-please | Запланировано |
+| **3.0.0** | TBD | Laravel 11 + OrderKind VO + 3 Application-сервиса | Открытый |
 
-### Детализация версий — см. ниже
+> **Дедлайн 2026-06-12** — критичный. До этой даты v2.6.0 должен быть в продакшене (с тестами). Это окно перед запуском продаж осеннего фестиваля.
+>
+> **Источник:** встреча с организаторами 2026-05-30 (см. `.claude/meetings/2026-05-30/RESULTS.md`).
 
-#### v2.5.0 — Старт версионирования
+### Детализация версий
 
-**Включено:**
-- Папка `.claude/docs/process/` + импорты в CLAUDE.md
-- `CHANGELOG.md` (русский, формат Keep a Changelog 1.1.0)
-- Очистка документации от Friendly-приложения (CLAUDE.md, API.md, DOMAIN.md, CONVENTIONS.md, PROJECT_MEMORY.md)
-- Описания агентов: `scrum-master`, `security-engineer`
-- husky + commitlint (мягкий warning) на Backend, Baza, FrontEnd
-- Healthcheck воркера в `docker-compose.yml` (прод)
-- Базовый CI: Pint + ESLint + npm build + composer/npm audit + PHPUnit с `continue-on-error`
-- Подсчёт сломанных PHPUnit-тестов, фиксация в TECH_DEBT
-- Тег `v2.5.0` + первый GitHub Release
+#### v2.5.0 — Старт версионирования ✅ Выпущена 2026-05-29
 
-**Не входит:**
-- Починка PHPUnit (→ v2.5.1)
-- SSL / offline docker / CD (→ v2.6.0)
+См. `CHANGELOG.md §2.5.0`. Тег `v2.5.0`.
 
-#### v2.6.0 — Локалка фестиваля + dev environment
+#### v2.5.1 — Baza-сидеры и чистый PHPUnit ✅ Выпущена 2026-05-29
+
+См. `CHANGELOG.md §2.5.1`. Тег `v2.5.1`. Закрыт TD-2 (PHPUnit).
+
+#### v2.6.0 — 🔥 XL-релиз: всё для старта продаж осеннего фестиваля
+
+**Дедлайн: 2026-06-12.** Без этого не запустить продажи осеннего фестиваля.
+
+Это **один большой релиз** (XL), объединяющий 6 блоков работ. Делается через интеграционную ветку `feat/v2.6.0-fall-festival` + sub-ветки.
+
+**Блок 1 — Опции к билетам:**
+- Новая сущность `Option` (модуль `Backend/src/Option/`)
+  - Поля: `id`, `name`, `price`, `ticket_type_id`, `active`
+  - Миграция + CRUD endpoints + админ UI
+- Возможно с волнами цен (по аналогии с `ticket_type_price`) — TBD
+
+**Блок 2 — Новый формат заказа (BREAKING):**
+- `ticket_type_id` → переезжает с уровня заказа на уровень гостя (`guests[].ticket_type_id`)
+- `promo_code` → переезжает с уровня заказа на уровень гостя (`guests[].promo_code`)
+- Новое поле `guests[].options[]` — массив UUID опций
+- **Перестройка домена** `OrderTicket`:
+  - `OrderTicketDto`: убрать `ticket_type_id` (на уровне заказа), добавить `Order::totalPrice()` который сам считает всё
+  - Новая VO `OrderGuestLine` (гость + ticket_type + options + promo_code)
+- Перестройка фронта формы покупки (`BuyTicket.vue`) — каждый гость как отдельная карточка с выбором типа/опций/промокода
+
+**Блок 3 — Миграция существующих данных:**
+- Бэкап всех заказов перед миграцией
+- Переносить `order_ticket.ticket_type_id` в `guests[].ticket_type_id` (для всех гостей одинаковый)
+- Переносить `order_ticket.promo_code` в `guests[].promo_code` (тоже всем одинаковый)
+- Проверка целостности
+
+**Блок 4 — Промокоды-агрегатор:**
+- История использования: новая таблица `promo_code_usage` (`promo_code_id, order_ticket_id, user_id, applied_at, discount_amount`)
+- Привязка к создателю: поле `created_by_user_id` в `promo_code`
+- Расширение прав: эндпоинты CRUD промокодов доступны всем ролям **кроме `guest`** (admin, manager, pusher, curator, seller, pusher_curator)
+- UI «мои промокоды» для не-админских ролей
+
+**Блок 5 — qr.spaceofjoy.ru SSO:**
+- Внедрение **`laravel/passport`** (зафиксировано на встрече, не Sanctum)
+- Backend как OAuth2 Provider
+- qr.spaceofjoy.ru как OAuth2 Client (наш внутренний сервис партнёра, обе стороны под контролем)
+- Выделенная роль `qr_service` в `AccountRoleHelper`
+- SSO flow: пользователь авторизуется в Systo → бесшовно работает в qr.spaceofjoy.ru
+- Документация по интеграции в `.claude/docs/INTEGRATION_QR.md` (новый файл)
+
+**Блок 6 — Тесты + регресс:**
+- PHPUnit для новой логики расчёта цены
+- Регресс на staging
+- E2E проверка форм покупки
+
+**Открытые вопросы** (см. `.claude/meetings/2026-05-30/RESULTS.md`):
+- Опция привязывается к одному ticket_type или нескольким?
+- Кратность опций (несколько одной опции на гостя)?
+- Промокод действует на: только базовый билет / на сумму с опциями?
+- Опции отображаются на PDF/QR?
+- Какие именно роли получат право создавать промокоды (все кроме guest или подмножество)?
+- Что хранится в qr.spaceofjoy.ru — своя БД или через наш API?
+
+#### v2.7.0 — SSL + Offline-ноутбук (сентябрь)
+
+Сдвинут с прежнего v2.6.0. Делается ближе к фестивалю.
 
 - SSL mkcert + локальный CA для ноутбука-сканера (через `/etc/hosts`, свежий сертификат каждый фестиваль)
 - Offline docker-compose bundle (до 15 ГБ, дамп БД файлом, для фестивальной машины)
-- CD staging автодеплой через GitHub Actions (когда появится staging-сервер)
+- CD staging автодеплой через GitHub Actions
 - Проверка сканера + поиска на стенде после SSL-фикса
+- Упаковка SPA для офлайн-работы на ноутбуке-сканере
 
-#### v2.7.0 — Логи + полный CD
+#### v2.8.0 — Логи + полный CD (сентябрь–октябрь)
+
+Бывший v2.7.0 scope, сдвинут после фестиваля.
 
 - Loki + Promtail + Grafana на отдельной RU VPS, retention 1+ год
 - Audit-канал в Laravel: все действия всех пользователей, JSON + человеко-читаемый формат
 - Логирование воронки покупки/заказа (этапы) — единый поток с audit (Ф1.A)
-- Починка PHPUnit → переключение в CI на required
-- CD prod tag-based deploy + release-please (автогенерация CHANGELOG)
+- Переключение Pint и PHPUnit в CI на required (снять `continue-on-error`)
+- CD prod tag-based deploy + release-please
 - 5 бэкапов БД перед каждым деплоем
 
-#### v2.8.0 — Laravel 11 + Offline-ноутбук
+#### v3.0.0 — Laravel 11 + OrderKind VO (TBD)
 
-- Laravel 11 update part 1 — на staging, все 3 приложения (Backend, Baza, FrontEnd)
-- Упаковка SPA для офлайн-работы на ноутбуке-сканере (не PWA — раз сканер ноутбук со встроенной камерой, нужна локальная установка + SSL)
+Открытый scope. Делается **после** v2.8.0 (после фестиваля), окно для major-изменений.
 
-#### v2.9.0 — OrderKind VO + Laravel 11 part 2
-
-- Колонка `kind ENUM('guest','friendly','list')` в `order_tickets`
-- Поэтапная миграция данных (без жёсткого простоя), Claude (агент) пишет миграцию
-- 3 Application-сервиса: `GuestOrderApplication`, `FriendlyOrderApplication`, `ListOrderApplication`
-- **Никакого Base-класса** — только VO-метка + полиморфизм через композицию
-- Laravel 11 деплой на прод
-
-#### v3.0.0-alpha — После встречи с бизнесом
-
-Открытый scope. Зависит от итогов встречи с организаторами фестиваля.
+- Laravel 11 update (Backend, Baza, FrontEnd)
+- OrderKind VO + 3 Application-сервиса (`GuestOrderApplication`, `FriendlyOrderApplication`, `ListOrderApplication`)
+- Поэтапная миграция данных (без жёсткого простоя)
 
 ---
 
@@ -243,3 +287,4 @@ master           ─── основная линия разработки
 | Дата | Изменение |
 |------|-----------|
 | 2026-05-28 | Создан документ. Roadmap 2.5.0 → 3.0.0-alpha, SemVer-правила, branching, DoD, шаблоны |
+| 2026-05-30 | **Roadmap полностью переработан после встречи с организаторами.** v2.6.0 = XL-релиз (опции к билетам + новый формат заказа BREAKING + миграция + промокоды-агрегатор + qr.spaceofjoy.ru SSO Passport). Дедлайн 2026-06-12 — старт продаж осеннего фестиваля. Бывший v2.6.0 (SSL+offline) сдвинут в v2.7.0 (сентябрь). Источник: `.claude/meetings/2026-05-30/RESULTS.md`. |
