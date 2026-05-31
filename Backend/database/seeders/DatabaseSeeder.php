@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         private TypeTicketsSecondFestivalSeeder $secondFestivalSeeder,
         private TypeTicketsGroupSeeder $groupSeeder,
         private QuestionnaireTestDataSeeder $questionnaireTestDataSeeder,
+        private OptionTestDataSeeder $optionTestDataSeeder,
     ) {
     }
 
@@ -43,5 +44,6 @@ class DatabaseSeeder extends Seeder
         $this->secondFestivalSeeder->run();
         $this->groupSeeder->run();
         $this->questionnaireTestDataSeeder->run();
+        $this->optionTestDataSeeder->run();
     }
 }
