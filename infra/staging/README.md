@@ -10,8 +10,26 @@
 - `setup-swap.sh` — опциональный swap-файл (рекомендуется при RAM ≤ 2 ГБ).
 - `setup-runner.sh` — устанавливает self-hosted GitHub Actions runner
   как systemd service.
-- (далее) `setup-project.sh` — bootstrap проекта в /var/www/systo (git clone)
+- `setup-host-nginx.sh` — настраивает host nginx как reverse proxy
+  для 5 поддоменов.
+- `setup-basic-auth.sh` — создаёт `.htpasswd` для phpMyAdmin и Mailpit.
+- `setup-ssl.sh` — Let's Encrypt SSL через certbot для всех 5 поддоменов.
+- `nginx/sites-available/*.conf` — шаблоны nginx server-блоков.
 - (далее) `docker-compose.staging.yml` — конфигурация контейнеров staging
+
+## Архитектура поддоменов
+
+```
+[Internet:80/443]
+       │
+  [HOST NGINX] (Let's Encrypt SSL)
+       │
+       ├─ staging.spaceofjoy.ru          → 127.0.0.1:8080  Frontend (Vue SPA)
+       ├─ api.staging.spaceofjoy.ru      → 127.0.0.1:8081  Backend (Laravel)
+       ├─ vhod.staging.spaceofjoy.ru     → 127.0.0.1:8082  Baza (Laravel)
+       ├─ pma.staging.spaceofjoy.ru      → 127.0.0.1:8083  phpMyAdmin   + basic auth
+       └─ mail.staging.spaceofjoy.ru     → 127.0.0.1:8084  Mailpit      + basic auth
+```
 
 ## Workflow
 
@@ -113,7 +131,51 @@ exit
 
 После — workflow сам делает `sudo git pull` при каждом push в staging.
 
-### 7. Проверка
+### 7. Host nginx как reverse proxy (5 поддоменов)
+
+**Перед запуском убедись что DNS распространился:**
+
+```bash
+for sub in '' api. vhod. pma. mail.; do
+  echo -n "${sub}staging.spaceofjoy.ru: "
+  dig +short ${sub}staging.spaceofjoy.ru @8.8.8.8
+done
+# Должно вернуть 77.222.32.244 пять раз
+```
+
+Запуск:
+
+```bash
+# Локально — нужна вся директория infra/staging (включая nginx/sites-available/)
+scp -r infra/staging root@77.222.32.244:/tmp/
+ssh root@77.222.32.244 'bash /tmp/staging/setup-host-nginx.sh'
+```
+
+После — все 5 поддоменов на 80 порту, но возвращают 502 (контейнеры ещё нет).
+
+### 8. Basic auth для phpMyAdmin и Mailpit
+
+```bash
+ssh root@77.222.32.244 'bash /tmp/staging/setup-basic-auth.sh admin'
+# Введёшь пароль (без эха). Запиши его — пригодится для входа в pma/mail.
+```
+
+### 9. SSL через Let's Encrypt
+
+```bash
+ssh root@77.222.32.244 'bash /tmp/staging/setup-ssl.sh твой-email@example.com'
+```
+
+Скрипт сам:
+- Проверит распространение DNS
+- Проверит доступность `/.well-known/acme-challenge/`
+- Запросит сертификаты для всех 5 поддоменов
+- Настроит HTTP → HTTPS редирект
+- Включит auto-renew через `certbot.timer`
+
+Сертификаты обновляются автоматически за 30 дней до истечения.
+
+### 10. Проверка
 
 С локальной машины:
 
