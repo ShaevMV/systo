@@ -58,12 +58,14 @@ ssh root@77.222.32.244 'bash /tmp/setup-swap.sh 4'
 scp infra/staging/setup-deploy-user.sh root@77.222.32.244:/tmp/
 ```
 
-Зайди и запусти:
+Запусти с **локальной** машины одной строкой (ключ читается локально, без копирования на сервер):
 
 ```bash
-ssh root@77.222.32.244
-bash /tmp/setup-deploy-user.sh "$(cat ~/.ssh/gha_deploy.pub)"
+ssh root@77.222.32.244 "bash /tmp/setup-deploy-user.sh '$(cat ~/.ssh/gha_deploy.pub)'"
 ```
+
+> Важно: запускать именно с локальной — там лежит `~/.ssh/gha_deploy.pub`.
+> Если запустить на сервере (`ssh ... && bash ...`), он не найдёт файл.
 
 > ⚠️ Скрипт идемпотентен — можно запускать повторно без вреда. Каждое уже
 > сделанное действие будет пропущено.

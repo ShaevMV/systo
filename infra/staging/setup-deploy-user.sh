@@ -37,6 +37,11 @@ DEPLOY_HOME="/home/${DEPLOY_USER}"
 PROJECT_DIR="/var/www/systo"
 SUDOERS_FILE="/etc/sudoers.d/${DEPLOY_USER}"
 
+# Если ключ не передан аргументом — попробуем прочитать stdin (для bash script.sh < pub.key)
+if [[ -z "$GHA_PUBLIC_KEY" ]] && [[ ! -t 0 ]]; then
+    GHA_PUBLIC_KEY="$(cat)"
+fi
+
 log()  { echo -e "\033[1;34m[setup]\033[0m $*"; }
 warn() { echo -e "\033[1;33m[warn]\033[0m  $*" >&2; }
 err()  { echo -e "\033[1;31m[err]\033[0m   $*" >&2; exit 1; }
@@ -47,7 +52,25 @@ if [[ "$EUID" -ne 0 ]]; then
 fi
 
 if [[ -z "$GHA_PUBLIC_KEY" ]]; then
-    err "Передай публичный ключ первым аргументом: bash $0 \"\$(cat ~/.ssh/gha_deploy.pub)\""
+    cat >&2 <<'HELP'
+[err]   Публичный ключ не передан.
+
+  Способы запуска:
+
+  1. С локальной машины одной строкой (рекомендую):
+       ssh root@<host> "bash /tmp/setup-deploy-user.sh '$(cat ~/.ssh/gha_deploy.pub)'"
+
+  2. На сервере, если ключ уже скопирован в /tmp:
+       bash /tmp/setup-deploy-user.sh "$(cat /tmp/gha_deploy.pub)"
+
+  3. Через stdin:
+       bash /tmp/setup-deploy-user.sh < ~/.ssh/gha_deploy.pub
+
+  ВАЖНО: файл gha_deploy.pub должен лежать на ЛОКАЛЬНОЙ машине
+  (там же где приватный ключ ~/.ssh/gha_deploy). На сервер
+  попадает только публичная часть.
+HELP
+    exit 1
 fi
 
 if [[ ! "$GHA_PUBLIC_KEY" =~ ^(ssh-rsa|ssh-ed25519|ecdsa-sha2-) ]]; then
