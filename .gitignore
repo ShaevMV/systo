@@ -2,6 +2,7 @@
 .idea/*
 .env
 .env.production
+.env.staging
 .env.testing
 .env.local
 /Backend/phpunit.xml.dist

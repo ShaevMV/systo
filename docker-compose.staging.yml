@@ -1,0 +1,202 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  docker-compose.staging.yml
+#
+#  STAGING-окружение на 77.222.32.244.
+#  Host nginx (на сервере) делает SSL + reverse proxy на эти контейнеры.
+#  Все контейнеры биндятся ТОЛЬКО на 127.0.0.1 — публично торчит только host nginx.
+#
+#  Поддомены:
+#   - api.staging.spaceofjoy.ru   → backend (nginx-staging → php-staging)
+#   - vhod.staging.spaceofjoy.ru  → baza    (nginx-staging → phpbaza-staging)
+#   - staging.spaceofjoy.ru       → frontend (nginx-staging serves FrontEnd/dist)
+#   - pma.staging.spaceofjoy.ru   → phpmyadmin (port 8083)
+#   - mail.staging.spaceofjoy.ru  → mailpit web UI (port 8084)
+#
+#  Запуск (вручную или из workflow):
+#    cd /var/www/systo
+#    docker compose -f docker-compose.staging.yml --env-file .env.staging build
+#    docker compose -f docker-compose.staging.yml --env-file .env.staging up -d
+#
+#  TD-1 (race condition воркера): mysql-staging имеет healthcheck,
+#  worker и app зависят с condition: service_healthy.
+# ─────────────────────────────────────────────────────────────────────────────
+version: '3.8'
+
+services:
+
+  # ═══ NGINX (3 поддомена, без SSL — host nginx делает SSL) ══════════════════
+  nginx-staging:
+    build:
+      context: ./Docker/nginx
+    container_name: nginx-staging
+    # Сбрасываем prod entrypoint (с envsubst) — у нас готовый default.staging.conf
+    entrypoint: []
+    command: ["nginx", "-g", "daemon off;"]
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./Docker/nginx/default.staging.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./Backend:/var/www/org
+      - ./FrontEnd:/var/www/app
+      - ./Shared:/var/www/Shared
+      - ./Baza:/var/www/vhod
+    networks:
+      - staging
+    depends_on:
+      - php-staging
+      - phpbaza-staging
+    restart: unless-stopped
+
+  # ═══ BACKEND (php-fpm SolarSysto) ══════════════════════════════════════════
+  php-staging:
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=false
+    container_name: php-staging
+    env_file:
+      - ./Backend/.env
+    volumes:
+      - ./Backend:/var/www/org
+      - ./Shared:/var/www/Shared
+    working_dir: /var/www/org
+    environment:
+      - WITH_XDEBUG=false
+      - WORKING_DIR=/var/www/org
+    networks:
+      - staging
+    depends_on:
+      mysql-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ═══ BAZA (php-fpm аутентификации) ═════════════════════════════════════════
+  phpbaza-staging:
+    build:
+      context: ./Docker/php
+      args:
+        - WITH_XDEBUG=false
+    container_name: phpbaza-staging
+    env_file:
+      - ./Baza/.env
+    volumes:
+      - ./Baza:/var/www/vhod
+      - ./Shared:/var/www/Shared
+    working_dir: /var/www/vhod
+    environment:
+      - WITH_XDEBUG=false
+      - WORKING_DIR=/var/www/vhod
+    networks:
+      - staging
+    depends_on:
+      mysql-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ═══ FRONTEND (Vue build, dist раздаётся через nginx) ══════════════════════
+  # Build делается через `docker compose run --rm node-staging sh -c "npm ci && npm run build"`
+  # — выполняется в workflow перед `up -d`.
+  node-staging:
+    build:
+      context: ./Docker/node
+    container_name: node-staging
+    working_dir: /var/www/app
+    volumes:
+      - ./FrontEnd:/var/www/app
+    command: tail -f /dev/null
+    networks:
+      - staging
+    environment:
+      - NODE_ENV=production
+      - VUE_APP_API_URL=https://api.staging.spaceofjoy.ru/
+      - VUE_APP_BAZA_URL=https://vhod.staging.spaceofjoy.ru/
+    restart: unless-stopped
+
+  # ═══ MYSQL 8 (internal, persistent volume) ═════════════════════════════════
+  mysql-staging:
+    image: mysql:8
+    container_name: mysql-staging
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-systo}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-staging_root_secret}
+      MYSQL_USER: ${MYSQL_USER:-systo}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-staging_secret}
+    volumes:
+      - mysql-staging-data:/var/lib/mysql
+    networks:
+      - staging
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${MYSQL_ROOT_PASSWORD:-staging_root_secret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ═══ REDIS (internal, кэш + очереди) ═══════════════════════════════════════
+  redis-staging:
+    image: redis:7-alpine
+    container_name: redis-staging
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-staging-data:/data
+    networks:
+      - staging
+    restart: unless-stopped
+
+  # ═══ WORKER (Laravel queue worker для Backend) ═════════════════════════════
+  worker-staging:
+    build:
+      context: ./Docker/worker
+    container_name: worker-staging
+    image: 'laravelworker'
+    volumes:
+      - ./Backend:/var/www/org
+      - ./Shared:/var/www/Shared
+      - ./Docker/php/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
+      - ./Docker/worker/conf/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    command: ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+    networks:
+      - staging
+    depends_on:
+      mysql-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ═══ PHPMYADMIN (веб-интерфейс к MySQL) ════════════════════════════════════
+  phpmyadmin-staging:
+    image: phpmyadmin/phpmyadmin:5
+    container_name: phpmyadmin-staging
+    environment:
+      PMA_HOST: mysql-staging
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 100M
+    ports:
+      - "127.0.0.1:8083:80"
+    networks:
+      - staging
+    depends_on:
+      mysql-staging:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ═══ MAILPIT (SMTP-перехватчик + web UI) ═══════════════════════════════════
+  # SMTP — внутренний (1025), для приложений: MAIL_HOST=mailpit-staging.
+  # Web UI — наружу (8084) для просмотра писем.
+  mailpit-staging:
+    image: axllent/mailpit:latest
+    container_name: mailpit-staging
+    ports:
+      - "127.0.0.1:8084:8025"
+    networks:
+      - staging
+    restart: unless-stopped
+
+volumes:
+  mysql-staging-data:
+  redis-staging-data:
+
+networks:
+  staging:
+    driver: bridge
