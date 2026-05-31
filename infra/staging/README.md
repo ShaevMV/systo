@@ -5,11 +5,17 @@
 
 ## Состав
 
-- `setup-deploy-user.sh` — скрипт первой настройки: создаёт пользователя
-  `deploy` для CD, настраивает sudoers, готовит директорию проекта.
+- `setup-deploy-user.sh` — создаёт пользователя `deploy` для CD,
+  настраивает sudoers, готовит директорию проекта.
 - `setup-swap.sh` — опциональный swap-файл (рекомендуется при RAM ≤ 2 ГБ).
-- (далее) `setup-runner.sh` — установка GitHub Actions self-hosted runner
+- `setup-runner.sh` — устанавливает self-hosted GitHub Actions runner
+  как systemd service.
+- (далее) `setup-project.sh` — bootstrap проекта в /var/www/systo (git clone)
 - (далее) `docker-compose.staging.yml` — конфигурация контейнеров staging
+
+## Workflow
+
+- `.github/workflows/deploy-staging.yml` — auto-deploy при push в ветку `staging`
 
 ## Текущий staging-сервер
 
@@ -70,7 +76,44 @@ ssh root@77.222.32.244 "bash /tmp/setup-deploy-user.sh '$(cat ~/.ssh/gha_deploy.
 > ⚠️ Скрипт идемпотентен — можно запускать повторно без вреда. Каждое уже
 > сделанное действие будет пропущено.
 
-### 5. Проверка
+### 5. Установка self-hosted GitHub Actions runner
+
+Runner подхватывает job-ы с лейблом `staging` из workflow `deploy-staging.yml`.
+
+С локальной машины:
+
+```bash
+# Получить одноразовый registration-token (валиден 1 час)
+TOKEN=$(gh api -X POST repos/ShaevMV/systo/actions/runners/registration-token --jq .token)
+
+# Скопировать скрипт
+scp infra/staging/setup-runner.sh root@77.222.32.244:/tmp/
+
+# Запустить (от root — нужен для systemd unit, внутри сам делает sudo -u deploy)
+ssh root@77.222.32.244 "bash /tmp/setup-runner.sh https://github.com/ShaevMV/systo '$TOKEN'"
+```
+
+После запуска:
+- В `Settings → Actions → Runners` появится `staging-systo` со статусом `Idle`
+- Логи: `ssh root@... 'sudo journalctl -u actions.runner.*.service -f'`
+
+### 6. Bootstrap проекта (один раз, **до первого деплоя**)
+
+Runner работает в `/home/deploy/actions-runner/_work`, но проект разворачиваем
+в `/var/www/systo` (созданном `setup-deploy-user.sh`). Первый клон делается
+вручную как `deploy`:
+
+```bash
+ssh -i ~/.ssh/gha_deploy deploy@77.222.32.244
+cd /var/www/systo
+git clone https://github.com/ShaevMV/systo.git .
+git checkout staging  # ветка должна существовать в репо
+exit
+```
+
+После — workflow сам делает `sudo git pull` при каждом push в staging.
+
+### 7. Проверка
 
 С локальной машины:
 
