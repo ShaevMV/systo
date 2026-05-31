@@ -208,10 +208,12 @@ jobs:
             echo "✓ APP_KEY (Baza) уже есть"
           fi
 
+      # NODE_ENV=production в compose заставляет `npm ci` пропустить devDependencies,
+      # а vue-cli-service лежит как раз в devDependencies → нужен --include=dev для сборки.
       - name: Build frontend (npm ci + npm run build)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci && npm run build"
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci --include=dev && npm run build"
 
       - name: Up containers
         working-directory: ${{ env.PROJECT_DIR }}
