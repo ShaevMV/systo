@@ -165,12 +165,15 @@ jobs:
         run: |
           docker compose -f docker-compose.staging.yml --env-file .env.staging build
 
+      # ⚠ ENTRYPOINT в Docker/php/Dockerfile хардкодит запуск php-fpm и игнорирует
+      # переданную команду — поэтому для `run` подменяем entrypoint на `sh`.
+      # На уже запущенный контейнер можно ходить через `exec` без подмены.
       - name: Generate APP_KEY for Backend (if missing)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           if ! grep -qE "^APP_KEY=base64:" Backend/.env; then
             echo "APP_KEY пуст — генерирую…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps php-staging php artisan key:generate --force --no-interaction
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "php artisan key:generate --force --no-interaction"
           else
             echo "✓ APP_KEY уже есть"
           fi
@@ -180,7 +183,7 @@ jobs:
         run: |
           if ! grep -qE "^APP_KEY=base64:" Baza/.env; then
             echo "APP_KEY (Baza) пуст — генерирую…"
-            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps phpbaza-staging php artisan key:generate --force --no-interaction
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "php artisan key:generate --force --no-interaction"
           else
             echo "✓ APP_KEY (Baza) уже есть"
           fi
