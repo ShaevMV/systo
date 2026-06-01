@@ -169,6 +169,7 @@ class Questionnaire extends AggregateRoot {
 |----|------|----------|
 | **Uuid** | `Shared/Domain/ValueObject/Uuid.php` | UUID v4 (Ramsey), методы: `random()`, `value()`, `equals()` |
 | **Status** | `Shared/Domain/ValueObject/Status.php` | Статусы заказов с матрицей переходов. **См. BUSINESS_RULES.md §1** |
+| **Money** | `Shared/Domain/ValueObject/Money.php` | Денежная сумма в **целых рублях** (`int`), default `RUB`. Иммутабельный, арифметика: `add`, `subtract` (клампит к 0), `multiply`, `equals`, `isZero`, `isGreaterThan`. Фабрики: `zero()`, `fromFloat()` с banker's rounding (half-to-even). Защищён от NaN/INF и значений вне `int`. **Введён в v2.6.0** для нового формата заказа (см. `.claude/specs/order-format-architecture.md` §2.3) |
 | **Enum** | `Shared/Domain/ValueObject/Enum.php` | Абстрактный Enum: `__callStatic()`, `fromString()`, `randomValue()` |
 | **StringValueObject** | `Shared/Domain/ValueObject/StringValueObject.php` | Абстрактная обёртка `?string` |
 | **IntValueObject** | `Shared/Domain/ValueObject/IntValueObject.php` | Абстрактная обёртка `int`, метод `isBiggerThan()` |
