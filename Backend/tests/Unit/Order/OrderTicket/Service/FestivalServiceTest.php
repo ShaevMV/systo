@@ -38,18 +38,16 @@ class FestivalServiceTest extends TestCase
 
     public function dataProvider(): array
     {
+        // v2.6.0: убран multi-fest кейс ('Solar Systo Togathering ... и на Систо-Осень ...') —
+        // концепт «билет на оба фестиваля» больше не поддерживается.
         return [
             [
-                TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL,
-                'Solar Systo Togathering 2026 и на Систо-Осень 2026'
-            ],
-            [
                 TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
-                'Solar Systo Togathering 2026'
+                'Solar Systo Togathering 2026',
             ],
             [
                 TypeTicketsSeeder::ID_FOR_NEXT_FESTIVAL,
-                'Систо-Осень 2026'
+                'Систо-Осень 2026',
             ],
         ];
     }

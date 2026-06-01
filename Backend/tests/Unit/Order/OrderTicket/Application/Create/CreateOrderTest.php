@@ -83,16 +83,18 @@ class CreateOrderTest extends TestCase
      */
     public function dataProvider(): array
     {
+        // v2.6.0: убран multi-fest билет — заказ создаётся с обычным «Оргвзнос»
+        // (ID_FOR_FIRST_WAVE), оба гостя на одном фестивале.
         $request = Json::decode(
             '{
             "festival_id":"' . FestivalHelper::UUID_FESTIVAL . '",
             "email":"admin@admin.ru",
             "phone": "+9555555555",
             "city": "SPB",
-            "ticket_type_id":"' . TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL . '",
+            "ticket_type_id":"' . TypeTicketsSeeder::ID_FOR_FIRST_WAVE . '",
             "guests":[
                 {"value":"321", "festival_id": "' . FestivalHelper::UUID_FESTIVAL . '"},
-                {"value":"321321", "festival_id": "' . FestivalHelper::UUID_SECOND_FESTIVAL . '"}
+                {"value":"321321", "festival_id": "' . FestivalHelper::UUID_FESTIVAL . '"}
                 ],
             "promo_code":"Systo",
             "id_buy":"321",
