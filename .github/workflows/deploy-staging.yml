@@ -210,12 +210,25 @@ jobs:
       # JWT-токены ловят InvalidKeyProvided("Key cannot be empty") на любом
       # запросе через api-guard middleware. Команда генерирует случайный
       # 64-символьный hex и пишет в .env (флаг --force обходит подтверждение).
+      #
+      # ВАЖНО: env_file читается docker compose при СОЗДАНИИ контейнера, не при
+      # restart. Если генерировали ПОСЛЕ up — нужен force-recreate, иначе
+      # php-staging и worker-staging продолжат работать с пустым JWT_SECRET.
+      # На первом деплое это безопасно: up -d идёт после этого шага. На
+      # последующих — если JWT_SECRET уже есть, шаг скипается, recreate не
+      # нужен. Recreate делаем ТОЛЬКО когда реально сгенерировали.
       - name: Generate JWT_SECRET for Backend (if missing)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           if ! grep -qE "^JWT_SECRET=.+" Backend/.env; then
             echo "JWT_SECRET пуст — генерирую…"
             docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "php artisan jwt:secret --force --no-interaction"
+            # Recreate'им только если контейнеры уже запущены (повторный деплой).
+            # На первом деплое они ещё не подняты — будут созданы со свежим .env.
+            if docker compose -f docker-compose.staging.yml --env-file .env.staging ps php-staging | grep -q "Up"; then
+              echo "Контейнеры уже запущены — пересоздаю php-staging и worker-staging чтобы подхватить новый JWT_SECRET…"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --force-recreate --no-deps php-staging worker-staging
+            fi
           else
             echo "✓ JWT_SECRET уже есть"
           fi
