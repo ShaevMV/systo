@@ -206,6 +206,20 @@ jobs:
             echo "✓ APP_KEY (Baza) уже есть"
           fi
 
+      # JWT_SECRET для php-open-source-saver/jwt-auth. Если пустой —
+      # JWT-токены ловят InvalidKeyProvided("Key cannot be empty") на любом
+      # запросе через api-guard middleware. Команда генерирует случайный
+      # 64-символьный hex и пишет в .env (флаг --force обходит подтверждение).
+      - name: Generate JWT_SECRET for Backend (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE "^JWT_SECRET=.+" Backend/.env; then
+            echo "JWT_SECRET пуст — генерирую…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "php artisan jwt:secret --force --no-interaction"
+          else
+            echo "✓ JWT_SECRET уже есть"
+          fi
+
       # NODE_ENV=production в compose заставляет `npm ci` пропустить devDependencies,
       # а vue-cli-service лежит как раз в devDependencies → нужен --include=dev для сборки.
       - name: Build frontend (npm ci + npm run build)
