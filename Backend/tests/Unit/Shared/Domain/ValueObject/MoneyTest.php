@@ -147,4 +147,39 @@ class MoneyTest extends TestCase
 
         Money::fromFloat(-100.0);
     }
+
+    public function test_add_rejects_int_overflow(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('overflow in add');
+
+        // PHP_INT_MAX + 1 → без проверки PHP молча превратит результат в float.
+        (new Money(PHP_INT_MAX))->add(new Money(1));
+    }
+
+    public function test_add_at_exact_int_max_is_allowed(): void
+    {
+        // граничный кейс: сумма === PHP_INT_MAX — должна проходить без ошибок
+        $sum = (new Money(PHP_INT_MAX - 100))->add(new Money(100));
+
+        self::assertSame(PHP_INT_MAX, $sum->amount());
+    }
+
+    public function test_multiply_rejects_int_overflow(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('overflow in multiply');
+
+        // (PHP_INT_MAX / 2 + 1) * 2 > PHP_INT_MAX
+        (new Money(intdiv(PHP_INT_MAX, 2) + 1))->multiply(2);
+    }
+
+    public function test_multiply_by_zero_returns_zero_without_overflow_check(): void
+    {
+        // factor === 0 — особый кейс: intdiv(X, 0) кинул бы DivisionByZeroError,
+        // поэтому защита overflow пропускает 0. Результат всегда 0.
+        $result = (new Money(PHP_INT_MAX))->multiply(0);
+
+        self::assertTrue($result->isZero());
+    }
 }

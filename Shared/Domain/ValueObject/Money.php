@@ -81,6 +81,17 @@ final class Money
     {
         $this->assertSameCurrency($other);
 
+        // Защита от int overflow: при выходе за PHP_INT_MAX PHP молча конвертирует
+        // int → float, и конструктор Money (strict_types) кинет TypeError.
+        // Бросаем понятный доменный InvalidArgumentException заранее.
+        if (PHP_INT_MAX - $this->amount < $other->amount) {
+            throw new InvalidArgumentException(sprintf(
+                'Money overflow in add(): %d + %d exceeds PHP_INT_MAX',
+                $this->amount,
+                $other->amount
+            ));
+        }
+
         return new self($this->amount + $other->amount, $this->currency);
     }
 
@@ -103,6 +114,17 @@ final class Money
             throw new InvalidArgumentException(
                 sprintf('Money multiplier cannot be negative, got %d', $factor)
             );
+        }
+
+        // Защита от int overflow: при выходе за PHP_INT_MAX PHP конвертирует
+        // результат в float, и конструктор (strict_types) кинет TypeError.
+        // intdiv() избегает float-арифметики, оставаясь в int-домене.
+        if ($factor !== 0 && intdiv(PHP_INT_MAX, $factor) < $this->amount) {
+            throw new InvalidArgumentException(sprintf(
+                'Money overflow in multiply(): %d * %d exceeds PHP_INT_MAX',
+                $this->amount,
+                $factor
+            ));
         }
 
         return new self($this->amount * $factor, $this->currency);
