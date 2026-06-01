@@ -27,11 +27,11 @@ on:
         required: false
         default: 'staging'
       seed:
-        description: 'Запустить db:seed после миграций? (только для пересборки тестовых данных)'
+        description: 'Режим сидеров: auto = только при пустой БД (default); force = db:seed на любой; fresh = migrate:fresh + seed (DROP всех таблиц!); skip = ничего'
         required: false
-        default: 'false'
+        default: 'auto'
         type: choice
-        options: ['false', 'true']
+        options: ['auto', 'force', 'fresh', 'skip']
 
 concurrency:
   group: deploy-staging
@@ -77,7 +77,7 @@ jobs:
     env:
       PROJECT_DIR: /var/www/systo
       BRANCH: ${{ github.event.inputs.ref || github.ref_name }}
-      RUN_SEED: ${{ github.event.inputs.seed || 'false' }}
+      SEED_MODE: ${{ github.event.inputs.seed || 'auto' }}
 
     steps:
       # ─── Подготовка ─────────────────────────────────────────────────────────
@@ -87,7 +87,7 @@ jobs:
           echo "User:        $(whoami)"
           echo "Groups:      $(id -nG)"
           echo "Branch:      $BRANCH"
-          echo "Run seed:    $RUN_SEED"
+          echo "Seed mode:   $SEED_MODE"
           echo "Project:     $PROJECT_DIR"
           docker --version
 
@@ -304,12 +304,70 @@ jobs:
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging     php artisan migrate --force --no-interaction
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T phpbaza-staging php artisan migrate --force --no-interaction
 
-      - name: Seed (manual trigger)
-        if: env.RUN_SEED == 'true'
+      # Сидеры — 4 режима:
+      #
+      #   auto  (default, на push в staging)
+      #         → если БД пустая (festivals=0) — запустить db:seed
+      #         → если есть данные — пропустить (не затирать ручные правки)
+      #
+      #   force → db:seed независимо от состояния БД.
+      #           Учти: часть сидеров (FestivalSeeder, PromoCodSeeder,
+      #           TypeTicketsSeeder и др.) использует прямой DB::insert()
+      #           с фиксированными UUID — на непустой БД упадёт с duplicate
+      #           key (TD-27). Использовать только когда уверен, что
+      #           уникальные данные пока не появились.
+      #
+      #   fresh → migrate:fresh --seed: DROP всех таблиц БД systo, прогон
+      #           всех миграций с нуля, затем seed. Полный reset стенда —
+      #           самый надёжный способ пересборки тестовых данных.
+      #           ВНИМАНИЕ: стирает всё, включая ручные правки тестера.
+      #
+      #   skip  → не трогать БД даже если она пуста (для отладки workflow)
+      - name: Seed (mode-driven)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          echo "::notice::Запускаю db:seed (Backend) — пересоздать тестовые данные"
-          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan db:seed --force --no-interaction
+          MODE="$SEED_MODE"
+
+          # auto → детектим состояние и выбираем skip / force-через-seed
+          if [[ "$MODE" == "auto" ]]; then
+            COUNT=$(docker compose -f docker-compose.staging.yml --env-file .env.staging \
+              exec -T mysql-staging \
+              sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -N -e "SELECT COUNT(*) FROM systo.festivals;" 2>/dev/null' \
+              | tr -d '\r\n ' || echo "")
+
+            if [[ "$COUNT" == "0" ]]; then
+              echo "::notice::auto: БД свежая (festivals=0) — запускаю db:seed"
+              MODE="force"
+            elif [[ -z "$COUNT" ]]; then
+              echo "::warning::auto: не удалось определить состояние БД (mysql exec упал) — сиды пропускаю"
+              MODE="skip"
+            else
+              echo "✓ auto: БД содержит данные (festivals=$COUNT) — сиды пропускаю. Для пересборки → workflow_dispatch seed=fresh"
+              MODE="skip"
+            fi
+          fi
+
+          case "$MODE" in
+            skip)
+              echo "✓ Сиды пропущены (mode=skip)"
+              ;;
+            force)
+              echo "::notice::Запускаю db:seed"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging \
+                exec -T php-staging \
+                php artisan db:seed --force --no-interaction
+              ;;
+            fresh)
+              echo "::warning::Запускаю migrate:fresh --seed — DROP всех таблиц systo и пересборка с нуля"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging \
+                exec -T php-staging \
+                php artisan migrate:fresh --seed --force --no-interaction
+              ;;
+            *)
+              echo "::error::Неизвестный режим сидеров: $MODE"
+              exit 1
+              ;;
+          esac
 
       # ─── Healthcheck ───────────────────────────────────────────────────────
       - name: Healthcheck endpoints
