@@ -35,6 +35,8 @@ import QuestionnaireTypeListView from "@/views/questionnaireType/QuestionnaireTy
 import QuestionnaireTypeItemView from "@/views/questionnaireType/QuestionnaireTypeItemView.vue";
 import LocationListView from "@/views/location/LocationListView.vue";
 import LocationItemView from "@/views/location/LocationItemView.vue";
+import OptionListView from "@/views/option/OptionListView.vue";
+import OptionItemView from "@/views/option/OptionItemView.vue";
 import OrderListsListView from "@/views/order/OrderListsListView.vue";
 import OrderListForCurator from "@/views/order/OrderListForCurator.vue";
 import CreateListOrderView from "@/views/order/CreateListOrderView.vue";
@@ -375,6 +377,28 @@ const routes = [
         path: '/location/:id?',
         name: 'LocationItemView',
         component: LocationItemView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+
+    // Опции к билетам (v2.6.0)
+    {
+        path: '/option/list',
+        name: 'OptionListView',
+        component: OptionListView,
+        props: true,
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
+    {
+        path: '/option/:id?',
+        name: 'OptionItemView',
+        component: OptionItemView,
         props: true,
         meta: {
             'requiresAuth': true,
