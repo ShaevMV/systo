@@ -226,6 +226,35 @@ jobs:
             sleep 2
           done
 
+      # php-fpm в контейнере работает от www-data, но composer install/key:generate
+      # запускались через --entrypoint sh под root → файлы в storage/ и bootstrap/cache/
+      # принадлежат root. Без chown Laravel падает с "Permission denied" на laravel.log.
+      - name: Fix storage permissions
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # php-контейнеры depends_on mysql healthcheck, поэтому стартуют после mysql.
+          # Между up -d и моментом когда контейнер реально в running есть небольшой
+          # гэп — ждём что docker compose exec реально подключается.
+          for svc in php-staging phpbaza-staging; do
+            echo "Жду готовности контейнера $svc…"
+            for i in $(seq 1 30); do
+              if docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T "$svc" true 2>/dev/null; then
+                echo "  ✓ $svc отвечает (через ${i}s)"
+                break
+              fi
+              if [ "$i" = "30" ]; then
+                echo "::error::$svc не запустился за 30 секунд"
+                docker compose -f docker-compose.staging.yml --env-file .env.staging ps "$svc"
+                exit 1
+              fi
+              sleep 1
+            done
+          done
+
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging     chown -R www-data:www-data storage bootstrap/cache
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root phpbaza-staging chown -R www-data:www-data storage bootstrap/cache
+          echo "✓ storage и bootstrap/cache принадлежат www-data"
+
       # Если БД `baza` ещё не создана (например, MySQL был инициализирован до
       # появления init-скрипта Docker/mysql/init/01-create-baza.sql) — создаём её
       # на лету. Идемпотентно через IF NOT EXISTS.
