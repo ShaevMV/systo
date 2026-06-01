@@ -118,6 +118,7 @@ docker exec -it php-solarSysto ./vendor/bin/phpunit
 @.claude/docs/TECH_DEBT.md
 @.claude/docs/PROJECT_MEMORY.md
 @.claude/docs/BOARD.md
+@.claude/docs/STAGING_LINKS.md
 
 ### Процессы (релизы, версионирование, ветки)
 
