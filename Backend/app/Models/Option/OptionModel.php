@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models\Option;
 
-use App\Models\TicketTypes\TicketTypesModel;
+use App\Models\Festival\TicketTypesModel;
 use Eloquent;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
