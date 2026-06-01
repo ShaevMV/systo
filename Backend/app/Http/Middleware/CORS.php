@@ -40,34 +40,39 @@ class CORS
         $this->allowCredentials = true;
         $this->maxAge = 600;
         $this->exposeHeaders = [];
+        // Браузер шлёт Origin в формате `scheme://host[:port]` БЕЗ trailing slash —
+        // элементы со слэшами на конце никогда не сматчатся, поэтому их тут нет.
+        // Группировка: dev → prod → staging → legacy. Дубли удалены.
         $this->allowOrigins = [
-            /*        'http://localhost:8080',
-                    'http://localhost:8081',*/
+            // dev (локальная разработка)
+            'http://localhost',
+            'http://localhost:8080',
+            'http://localhost:8081',
             'http://api.tickets.loc',
-            'http://193.106.175.59:8081',
             'http://org.tickets.loc',
-            'http://api.solarsysto.ru',
-            'https://api.solarsysto.ru',
-            'http://org.solarsysto.ru',
-            'https://org.solarsysto.ru',
-            'http://org.solarsysto.ru',
 
-            'http://org.tickets.loc/',
-            'http://193.106.175.59',
-
+            // prod
             'http://org.spaceofjoy.ru',
-            'https://org.spaceofjoy.ru/',
             'https://org.spaceofjoy.ru',
-            'https://api.spaceofjoy.ru/',
             'http://api.spaceofjoy.ru',
             'https://api.spaceofjoy.ru',
-        ];
-        $this->allowOrigins = array_merge(['http://localhost:8080',
-            'http://localhost:8081',
-            'http://localhost'], $this->allowOrigins);
-        if (env('APP_DEBUG')) {
 
-        }
+            // staging (77.222.32.244)
+            'http://staging.spaceofjoy.ru',
+            'https://staging.spaceofjoy.ru',
+            'http://api.staging.spaceofjoy.ru',
+            'https://api.staging.spaceofjoy.ru',
+
+            // legacy (старый домен solarsysto.ru, до переезда на spaceofjoy.ru)
+            'http://org.solarsysto.ru',
+            'https://org.solarsysto.ru',
+            'http://api.solarsysto.ru',
+            'https://api.solarsysto.ru',
+
+            // legacy (старый stage по IP)
+            'http://193.106.175.59',
+            'http://193.106.175.59:8081',
+        ];
     }
 
     public function handle(Request $request, Closure $next)
