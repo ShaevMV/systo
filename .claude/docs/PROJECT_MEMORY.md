@@ -59,6 +59,11 @@
 - **CQRS**: Команды для изменения, Query для чтения. Shared Bus.
 - **Типизация**: Frontend state должен совпадать с Backend DTO (snake_case).
 - **Безопасность**: Секреты в `.env`, реальные ключи в git **запрещены**.
+- **Staging deploy** (`.github/workflows/deploy-staging.yml`):
+  - Все секреты (`MYSQL_*`, `APP_KEY`, `JWT_SECRET`) генерируются **автоматически** при first deploy через `openssl rand` / `php artisan key:generate` / `php artisan jwt:secret`.
+  - Все шаги идемпотентны — повторный деплой не перезаписывает существующие секреты.
+  - После генерации `JWT_SECRET` на уже работающих контейнерах workflow делает `up -d --force-recreate php-staging worker-staging` (env_file читается только при создании контейнера).
+  - Подробности и команды ротации — `.claude/docs/process/RELEASES.md §9`.
 
 ## 💻 Технические предпочтения
 

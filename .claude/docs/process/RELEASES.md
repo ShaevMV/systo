@@ -312,6 +312,41 @@ master           ─── основная линия разработки
 
 ---
 
+## 9. Staging deploy pipeline
+
+`.github/workflows/deploy-staging.yml` — auto-deploy на сервер `77.222.32.244` при push в ветку `staging`. Подробности — в `infra/staging/README.md`.
+
+### Автоматически генерируемые секреты (first deploy)
+
+При первом запуске workflow на чистом сервере следующие секреты создаются автоматически и пишутся в `.env`:
+
+| Секрет | Где | Как генерируется |
+|--------|-----|-------------------|
+| `MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD` | `.env.staging` | `openssl rand -hex 16` в шаге Bootstrap |
+| `APP_KEY` (Backend, Baza) | `Backend/.env`, `Baza/.env` | `php artisan key:generate --force` |
+| `JWT_SECRET` (Backend) | `Backend/.env` | `php artisan jwt:secret --force` |
+
+Все шаги идемпотентны: если значение уже задано в `.env` (не пустое и формат корректный) — шаг пропускается. **Никогда не перезаписываем существующие секреты.**
+
+### Ротация
+
+Чтобы пересоздать секрет — удалить строку из `.env` на сервере и перезапустить workflow:
+
+```bash
+ssh deploy@77.222.32.244 'sed -i "s/^JWT_SECRET=.*//g" /var/www/systo/Backend/.env'
+gh workflow run deploy-staging.yml -f ref=staging
+```
+
+Workflow увидит пустой `JWT_SECRET`, сгенерирует новый, и сделает `up -d --force-recreate php-staging worker-staging` чтобы контейнеры подхватили новое значение (`env_file` читается только при создании контейнера, restart не помогает).
+
+### Проверка применённого секрета
+
+```bash
+ssh deploy@77.222.32.244 'docker exec php-staging php -r "echo config(\"jwt.secret\");"'
+```
+
+---
+
 ## История изменений документа
 
 | Дата | Изменение |
