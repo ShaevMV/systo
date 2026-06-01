@@ -2,6 +2,7 @@
 .idea/*
 .env
 .env.production
+.env.staging
 .env.testing
 .env.local
 /Backend/phpunit.xml.dist
@@ -14,6 +15,8 @@
 /Baza/bootstrap/cache/
 /FrontEnd/src/main.js
 *.sql
+# Init-скрипты MySQL — нужны в репо для docker-entrypoint-initdb.d
+!Docker/mysql/init/*.sql
 .qwen/*
 !.qwen/agents/
 !.qwen/PROJECT_MEMORY.md

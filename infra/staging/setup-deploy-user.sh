@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────────────────────
+#  setup-deploy-user.sh
+#  Создаёт пользователя `deploy` на staging-сервере для GitHub Actions CD.
+#
+#  Идемпотентен — можно запускать повторно. Каждое действие пропускается,
+#  если уже выполнено. Все шаги логируются.
+#
+#  Запускать на сервере как root:
+#      bash setup-deploy-user.sh "<GHA_PUBLIC_KEY>"
+#
+#  Где <GHA_PUBLIC_KEY> — содержимое файла ~/.ssh/gha_deploy.pub
+#  (тот ключ, что ты создал в пункте 1 ранее).
+#
+#  Что делает:
+#    1. Создаёт системного пользователя `deploy` (без пароля, только SSH-ключ)
+#    2. Кладёт публичный ключ GHA в /home/deploy/.ssh/authorized_keys
+#    3. Добавляет в группу docker (если docker установлен)
+#    4. Настраивает sudoers — НЕ root-shell, только конкретные команды:
+#       - docker / docker compose / docker-compose
+#       - systemctl restart * (для перезапуска сервисов)
+#       - git pull в /var/www/systo
+#    5. Создаёт /var/www/systo с правильными владельцами для git pull
+#    6. Проверяет sudoers через visudo -c (не сломает sudo если что)
+#
+#  Что НЕ делает (намеренно):
+#    - НЕ даёт passwordless sudo на ALL ALL — только белый список команд
+#    - НЕ открывает /etc/sudoers напрямую — пишет в /etc/sudoers.d/deploy
+#    - НЕ меняет настройки sshd (это отдельный шаг, если потребуется)
+#    - НЕ устанавливает docker (это отдельный шаг, если его нет)
+# ─────────────────────────────────────────────────────────────────────────────
+set -euo pipefail
+
+GHA_PUBLIC_KEY="${1:-}"
+DEPLOY_USER="deploy"
+DEPLOY_HOME="/home/${DEPLOY_USER}"
+PROJECT_DIR="/var/www/systo"
+SUDOERS_FILE="/etc/sudoers.d/${DEPLOY_USER}"
+
+# Если ключ не передан аргументом — попробуем прочитать stdin (для bash script.sh < pub.key)
+if [[ -z "$GHA_PUBLIC_KEY" ]] && [[ ! -t 0 ]]; then
+    GHA_PUBLIC_KEY="$(cat)"
+fi
+
+log()  { echo -e "\033[1;34m[setup]\033[0m $*"; }
+warn() { echo -e "\033[1;33m[warn]\033[0m  $*" >&2; }
+err()  { echo -e "\033[1;31m[err]\033[0m   $*" >&2; exit 1; }
+
+# ─── 0. Sanity checks ─────────────────────────────────────────────────────────
+if [[ "$EUID" -ne 0 ]]; then
+    err "Скрипт должен запускаться от root (sudo bash setup-deploy-user.sh ...)"
+fi
+
+if [[ -z "$GHA_PUBLIC_KEY" ]]; then
+    cat >&2 <<'HELP'
+[err]   Публичный ключ не передан.
+
+  Способы запуска:
+
+  1. С локальной машины одной строкой (рекомендую):
+       ssh root@<host> "bash /tmp/setup-deploy-user.sh '$(cat ~/.ssh/gha_deploy.pub)'"
+
+  2. На сервере, если ключ уже скопирован в /tmp:
+       bash /tmp/setup-deploy-user.sh "$(cat /tmp/gha_deploy.pub)"
+
+  3. Через stdin:
+       bash /tmp/setup-deploy-user.sh < ~/.ssh/gha_deploy.pub
+
+  ВАЖНО: файл gha_deploy.pub должен лежать на ЛОКАЛЬНОЙ машине
+  (там же где приватный ключ ~/.ssh/gha_deploy). На сервер
+  попадает только публичная часть.
+HELP
+    exit 1
+fi
+
+if [[ ! "$GHA_PUBLIC_KEY" =~ ^(ssh-rsa|ssh-ed25519|ecdsa-sha2-) ]]; then
+    err "Аргумент не похож на публичный SSH-ключ: '${GHA_PUBLIC_KEY:0:30}...'"
+fi
+
+# ─── 1. Создать пользователя ──────────────────────────────────────────────────
+if id "$DEPLOY_USER" >/dev/null 2>&1; then
+    log "✓ Пользователь '$DEPLOY_USER' уже существует — пропускаем"
+else
+    log "Создаю пользователя '$DEPLOY_USER' (без пароля)…"
+    # --disabled-password = нельзя логиниться по паролю (только по SSH-ключу)
+    # --gecos "" = не задавать имя/телефон интерактивно
+    if command -v adduser >/dev/null 2>&1; then
+        adduser --disabled-password --gecos "" "$DEPLOY_USER"
+    else
+        useradd -m -s /bin/bash "$DEPLOY_USER"
+        passwd -l "$DEPLOY_USER" >/dev/null
+    fi
+    log "✓ Пользователь создан"
+fi
+
+# ─── 2. SSH-ключ ──────────────────────────────────────────────────────────────
+log "Настраиваю SSH-доступ…"
+install -d -m 700 -o "$DEPLOY_USER" -g "$DEPLOY_USER" "$DEPLOY_HOME/.ssh"
+
+if grep -qF "$GHA_PUBLIC_KEY" "$DEPLOY_HOME/.ssh/authorized_keys" 2>/dev/null; then
+    log "✓ Публичный ключ уже добавлен — пропускаем"
+else
+    echo "$GHA_PUBLIC_KEY" >> "$DEPLOY_HOME/.ssh/authorized_keys"
+    chown "$DEPLOY_USER:$DEPLOY_USER" "$DEPLOY_HOME/.ssh/authorized_keys"
+    chmod 600 "$DEPLOY_HOME/.ssh/authorized_keys"
+    log "✓ Публичный ключ GHA добавлен"
+fi
+
+# ─── 3. Группа docker ─────────────────────────────────────────────────────────
+if getent group docker >/dev/null; then
+    if id -nG "$DEPLOY_USER" | tr ' ' '\n' | grep -qx docker; then
+        log "✓ '$DEPLOY_USER' уже в группе docker"
+    else
+        usermod -aG docker "$DEPLOY_USER"
+        log "✓ '$DEPLOY_USER' добавлен в группу docker"
+    fi
+else
+    warn "Группы docker нет — docker не установлен? Пропускаем."
+fi
+
+# ─── 4. Sudoers (точечные права, НЕ ALL ALL) ──────────────────────────────────
+log "Настраиваю sudoers (только конкретные команды)…"
+
+# Пути к docker / docker-compose могут отличаться — определим динамически
+DOCKER_BIN="$(command -v docker || true)"
+COMPOSE_BIN="$(command -v docker-compose || true)"
+SYSTEMCTL_BIN="$(command -v systemctl || true)"
+GIT_BIN="$(command -v git || true)"
+
+SUDOERS_TMP="$(mktemp)"
+{
+    echo "# Auto-generated by infra/staging/setup-deploy-user.sh"
+    echo "# Точечные права для CD-пайплайна GitHub Actions"
+    echo "# НЕ редактируй вручную — перезапусти скрипт"
+    echo ""
+    [[ -n "$DOCKER_BIN"    ]] && echo "$DEPLOY_USER ALL=(root) NOPASSWD: $DOCKER_BIN"
+    [[ -n "$COMPOSE_BIN"   ]] && echo "$DEPLOY_USER ALL=(root) NOPASSWD: $COMPOSE_BIN"
+    [[ -n "$SYSTEMCTL_BIN" ]] && echo "$DEPLOY_USER ALL=(root) NOPASSWD: $SYSTEMCTL_BIN restart *"
+    [[ -n "$SYSTEMCTL_BIN" ]] && echo "$DEPLOY_USER ALL=(root) NOPASSWD: $SYSTEMCTL_BIN status *"
+    [[ -n "$GIT_BIN"       ]] && echo "$DEPLOY_USER ALL=(root) NOPASSWD: $GIT_BIN -C $PROJECT_DIR *"
+} > "$SUDOERS_TMP"
+
+# Проверка через visudo перед заменой — если ошибка, sudo не сломается
+if ! visudo -c -f "$SUDOERS_TMP" >/dev/null; then
+    rm -f "$SUDOERS_TMP"
+    err "visudo не одобрил sudoers-файл — ничего не меняю"
+fi
+
+install -m 0440 -o root -g root "$SUDOERS_TMP" "$SUDOERS_FILE"
+rm -f "$SUDOERS_TMP"
+log "✓ Sudoers настроен: $SUDOERS_FILE"
+
+# ─── 5. Директория проекта ────────────────────────────────────────────────────
+if [[ ! -d "$PROJECT_DIR" ]]; then
+    mkdir -p "$PROJECT_DIR"
+    log "✓ Создал $PROJECT_DIR"
+fi
+chown -R "$DEPLOY_USER:$DEPLOY_USER" "$PROJECT_DIR"
+log "✓ Владелец $PROJECT_DIR — $DEPLOY_USER"
+
+# ─── 6. Финальный отчёт ───────────────────────────────────────────────────────
+echo ""
+log "════════════════════════════════════════════════════════"
+log "  Настройка завершена."
+log "════════════════════════════════════════════════════════"
+echo ""
+echo "  Пользователь:        $DEPLOY_USER"
+echo "  Домашняя:            $DEPLOY_HOME"
+echo "  Проект:              $PROJECT_DIR"
+echo "  Sudoers:             $SUDOERS_FILE"
+echo "  В группе docker:     $(id -nG "$DEPLOY_USER" | tr ' ' '\n' | grep -qx docker && echo YES || echo NO)"
+echo ""
+echo "  Проверь подключение от GHA-ключа (с другой машины):"
+echo "      ssh -i ~/.ssh/gha_deploy ${DEPLOY_USER}@<host>"
+echo ""
+echo "  Список разрешённых sudo-команд:"
+sudo -l -U "$DEPLOY_USER" 2>/dev/null | tail -n +3 || echo "  (не могу прочитать — это нормально, проверь руками: sudo -l -U $DEPLOY_USER)"

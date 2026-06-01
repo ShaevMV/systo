@@ -1,0 +1,338 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Деплой на staging-стенд (77.222.32.244)
+#
+#  Гибрид:
+#   - pre-deploy-check: GHA-hosted runner (быстрые проверки — бесплатные минуты)
+#   - deploy:           self-hosted runner на staging (docker compose + migrate)
+#
+#  Триггеры:
+#   - push в ветку `staging` (после merge в неё) → auto-deploy
+#   - workflow_dispatch — ручной запуск + опционально db:seed
+#
+#  Окружение на сервере:
+#   - Self-hosted runner работает под пользователем `deploy`
+#   - deploy в группе docker → команды docker без sudo
+#   - sudo разрешён для: docker, systemctl, git -C /var/www/systo
+#   - Репозиторий клонирован в /var/www/systo, владелец deploy
+# ─────────────────────────────────────────────────────────────────────────────
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ветка или тег (по умолчанию — staging)'
+        required: false
+        default: 'staging'
+      seed:
+        description: 'Запустить db:seed после миграций? (только для пересборки тестовых данных)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: false
+
+jobs:
+  # ═══ Стадия 1: быстрые проверки на GHA-hosted ════════════════════════════════
+  pre-deploy-check:
+    name: Pre-deploy checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref_name }}
+
+      - name: Verify required files
+        run: |
+          test -f docker-compose.staging.yml          || (echo "::error::docker-compose.staging.yml missing" && exit 1)
+          test -f .env.staging.example                || (echo "::error::.env.staging.example missing" && exit 1)
+          test -f Backend/.env.staging.example        || (echo "::error::Backend/.env.staging.example missing" && exit 1)
+          test -f Baza/.env.staging.example           || (echo "::error::Baza/.env.staging.example missing" && exit 1)
+          test -f Docker/nginx/default.staging.conf   || (echo "::error::Docker/nginx/default.staging.conf missing" && exit 1)
+          echo "✓ All required files on board"
+
+      - name: Verify docker-compose syntax
+        run: |
+          # docker compose доступен на ubuntu-latest
+          # Копируем все .env.staging.example → реальные .env, т.к. compose ссылается на них через env_file
+          cp .env.staging.example         .env.staging
+          cp Backend/.env.staging.example Backend/.env
+          cp Baza/.env.staging.example    Baza/.env
+          docker compose -f docker-compose.staging.yml --env-file .env.staging config --quiet
+          echo "✓ docker-compose.staging.yml syntax ok"
+
+  # ═══ Стадия 2: деплой на self-hosted ═════════════════════════════════════════
+  deploy:
+    name: Deploy to staging server
+    needs: pre-deploy-check
+    runs-on: [self-hosted, staging]
+    timeout-minutes: 30  # docker build + npm ci может занять время на 2 ядрах
+    env:
+      PROJECT_DIR: /var/www/systo
+      BRANCH: ${{ github.event.inputs.ref || github.ref_name }}
+      RUN_SEED: ${{ github.event.inputs.seed || 'false' }}
+
+    steps:
+      # ─── Подготовка ─────────────────────────────────────────────────────────
+      - name: Show runner info
+        run: |
+          echo "Runner:      $(hostname)"
+          echo "User:        $(whoami)"
+          echo "Groups:      $(id -nG)"
+          echo "Branch:      $BRANCH"
+          echo "Run seed:    $RUN_SEED"
+          echo "Project:     $PROJECT_DIR"
+          docker --version
+
+      - name: Ensure project directory exists
+        run: |
+          if [[ ! -d "$PROJECT_DIR/.git" ]]; then
+            echo "::error::$PROJECT_DIR/.git не найден. Сделай bootstrap (см. README §6)"
+            exit 1
+          fi
+          echo "✓ Project directory ok"
+
+      - name: Pull latest code
+        run: |
+          sudo git -C "$PROJECT_DIR" fetch --all --prune
+          sudo git -C "$PROJECT_DIR" checkout "$BRANCH"
+          sudo git -C "$PROJECT_DIR" reset --hard "origin/$BRANCH"
+          # Восстановить владельца после sudo git
+          sudo chown -R deploy:deploy "$PROJECT_DIR" 2>/dev/null || true
+          echo ""
+          echo "✓ Pulled to $(git -C "$PROJECT_DIR" rev-parse --short HEAD)"
+
+      - name: Show deployed commit
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          git log -1 --pretty=format:'%h %s%n%nAuthor: %an <%ae>%nDate:   %ad' --date=short
+
+      # ─── Bootstrap .env при первом деплое ──────────────────────────────────
+      - name: Bootstrap .env.staging (first deploy)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [[ ! -f .env.staging ]]; then
+            echo "First-time bootstrap: создаю .env.staging с рандомными паролями"
+            cp .env.staging.example .env.staging
+            ROOT_PWD="$(openssl rand -hex 16)"
+            DB_PWD="$(openssl rand -hex 16)"
+            sed -i "s/staging_root_secret_CHANGE_ME/$ROOT_PWD/g" .env.staging
+            sed -i "s/staging_secret_CHANGE_ME/$DB_PWD/g"        .env.staging
+            chmod 600 .env.staging
+            echo "::notice::.env.staging создан. Пароли сгенерированы автоматически."
+          else
+            echo "✓ .env.staging уже существует — пропускаю"
+          fi
+
+      - name: Bootstrap Backend/.env (first deploy)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [[ ! -f Backend/.env ]]; then
+            echo "First-time bootstrap: создаю Backend/.env"
+            cp Backend/.env.staging.example Backend/.env
+            DB_PWD="$(grep ^MYSQL_PASSWORD .env.staging | cut -d= -f2)"
+            sed -i "s/staging_secret_CHANGE_ME/$DB_PWD/g" Backend/.env
+            chmod 600 Backend/.env
+            echo "::notice::Backend/.env создан. APP_KEY будет сгенерирован после build."
+          else
+            echo "✓ Backend/.env уже существует — пропускаю"
+          fi
+
+      - name: Bootstrap Baza/.env (first deploy)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if [[ ! -f Baza/.env ]]; then
+            echo "First-time bootstrap: создаю Baza/.env"
+            cp Baza/.env.staging.example Baza/.env
+            DB_PWD="$(grep ^MYSQL_PASSWORD .env.staging | cut -d= -f2)"
+            sed -i "s/staging_secret_CHANGE_ME/$DB_PWD/g" Baza/.env
+            chmod 600 Baza/.env
+            echo "::notice::Baza/.env создан. APP_KEY будет сгенерирован после build."
+          else
+            echo "✓ Baza/.env уже существует — пропускаю"
+          fi
+
+      # ─── Build + Up containers ─────────────────────────────────────────────
+      - name: Build containers
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging build
+
+      # ⚠ ENTRYPOINT в Docker/php/Dockerfile хардкодит запуск php-fpm и игнорирует
+      # переданную команду — поэтому для `run` подменяем entrypoint на `sh`.
+      # На уже запущенный контейнер можно ходить через `exec` без подмены.
+      # ⚠ Без --no-dev: миграция 2026_01_27_add_fields_in_questionnaire использует
+      # ->change() который требует doctrine/dbal, а dbal сейчас приходит только как
+      # transitive dependency из require-dev. Правильный фикс — `composer require
+      # doctrine/dbal:^3.5` в основные deps, но требует обновления composer.lock
+      # (которому сейчас мешает сеть). TD-25 — перенести dbal в require.
+      #
+      # composer install запускается ВСЕГДА (не идемпотентно) — он быстрый когда
+      # vendor совпадает с lock, и нам важно подтянуть свежие deps при изменениях.
+      - name: Composer install (Backend)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+
+      - name: Composer install (Baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+
+      - name: Generate APP_KEY for Backend (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE "^APP_KEY=base64:" Backend/.env; then
+            echo "APP_KEY пуст — генерирую…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "php artisan key:generate --force --no-interaction"
+          else
+            echo "✓ APP_KEY уже есть"
+          fi
+
+      - name: Generate APP_KEY for Baza (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE "^APP_KEY=base64:" Baza/.env; then
+            echo "APP_KEY (Baza) пуст — генерирую…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh phpbaza-staging -c "php artisan key:generate --force --no-interaction"
+          else
+            echo "✓ APP_KEY (Baza) уже есть"
+          fi
+
+      # JWT_SECRET для php-open-source-saver/jwt-auth. Если пустой —
+      # JWT-токены ловят InvalidKeyProvided("Key cannot be empty") на любом
+      # запросе через api-guard middleware. Команда генерирует случайный
+      # 64-символьный hex и пишет в .env (флаг --force обходит подтверждение).
+      #
+      # ВАЖНО: env_file читается docker compose при СОЗДАНИИ контейнера, не при
+      # restart. Если генерировали ПОСЛЕ up — нужен force-recreate, иначе
+      # php-staging и worker-staging продолжат работать с пустым JWT_SECRET.
+      # На первом деплое это безопасно: up -d идёт после этого шага. На
+      # последующих — если JWT_SECRET уже есть, шаг скипается, recreate не
+      # нужен. Recreate делаем ТОЛЬКО когда реально сгенерировали.
+      - name: Generate JWT_SECRET for Backend (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE "^JWT_SECRET=.+" Backend/.env; then
+            echo "JWT_SECRET пуст — генерирую…"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps --entrypoint sh php-staging -c "php artisan jwt:secret --force --no-interaction"
+            # Recreate'им только если контейнеры уже запущены (повторный деплой).
+            # На первом деплое они ещё не подняты — будут созданы со свежим .env.
+            if docker compose -f docker-compose.staging.yml --env-file .env.staging ps php-staging | grep -q "Up"; then
+              echo "Контейнеры уже запущены — пересоздаю php-staging и worker-staging чтобы подхватить новый JWT_SECRET…"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --force-recreate --no-deps php-staging worker-staging
+            fi
+          else
+            echo "✓ JWT_SECRET уже есть"
+          fi
+
+      # NODE_ENV=production в compose заставляет `npm ci` пропустить devDependencies,
+      # а vue-cli-service лежит как раз в devDependencies → нужен --include=dev для сборки.
+      - name: Build frontend (npm ci + npm run build)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci --include=dev && npm run build"
+
+      - name: Up containers
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging up -d
+          echo "Жду healthy mysql…"
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.staging.yml --env-file .env.staging ps mysql-staging | grep -q "healthy"; then
+              echo "✓ mysql healthy (через $((i*2))s)"
+              break
+            fi
+            sleep 2
+          done
+
+      # php-fpm в контейнере работает от www-data, но composer install/key:generate
+      # запускались через --entrypoint sh под root → файлы в storage/ и bootstrap/cache/
+      # принадлежат root. Без chown Laravel падает с "Permission denied" на laravel.log.
+      - name: Fix storage permissions
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # php-контейнеры depends_on mysql healthcheck, поэтому стартуют после mysql.
+          # Между up -d и моментом когда контейнер реально в running есть небольшой
+          # гэп — ждём что docker compose exec реально подключается.
+          for svc in php-staging phpbaza-staging; do
+            echo "Жду готовности контейнера $svc…"
+            for i in $(seq 1 30); do
+              if docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T "$svc" true 2>/dev/null; then
+                echo "  ✓ $svc отвечает (через ${i}s)"
+                break
+              fi
+              if [ "$i" = "30" ]; then
+                echo "::error::$svc не запустился за 30 секунд"
+                docker compose -f docker-compose.staging.yml --env-file .env.staging ps "$svc"
+                exit 1
+              fi
+              sleep 1
+            done
+          done
+
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging     chown -R www-data:www-data storage bootstrap/cache
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root phpbaza-staging chown -R www-data:www-data storage bootstrap/cache
+          echo "✓ storage и bootstrap/cache принадлежат www-data"
+
+      # Если БД `baza` ещё не создана (например, MySQL был инициализирован до
+      # появления init-скрипта Docker/mysql/init/01-create-baza.sql) — создаём её
+      # на лету. Идемпотентно через IF NOT EXISTS.
+      - name: Ensure Baza database exists
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          ROOT_PWD="$(grep ^MYSQL_ROOT_PASSWORD .env.staging | cut -d= -f2)"
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T mysql-staging \
+            mysql -uroot -p"$ROOT_PWD" -e "
+              CREATE DATABASE IF NOT EXISTS baza CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+              GRANT ALL PRIVILEGES ON baza.* TO 'systo'@'%';
+              FLUSH PRIVILEGES;
+            "
+          echo "✓ БД baza существует, права у systo выданы"
+
+      # ─── Миграции и сидеры ─────────────────────────────────────────────────
+      - name: Run migrations (Backend + Baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging     php artisan migrate --force --no-interaction
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T phpbaza-staging php artisan migrate --force --no-interaction
+
+      - name: Seed (manual trigger)
+        if: env.RUN_SEED == 'true'
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          echo "::notice::Запускаю db:seed (Backend) — пересоздать тестовые данные"
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan db:seed --force --no-interaction
+
+      # ─── Healthcheck ───────────────────────────────────────────────────────
+      - name: Healthcheck endpoints
+        run: |
+          set +e  # не падаем — это soft-check
+          ALL_OK=true
+          for url in \
+            https://staging.spaceofjoy.ru/ \
+            https://api.staging.spaceofjoy.ru/ \
+            https://vhod.staging.spaceofjoy.ru/; do
+            STATUS=$(curl -sS -o /dev/null -w "%{http_code}" "$url" --max-time 10)
+            if [[ "$STATUS" =~ ^(200|301|302)$ ]]; then
+              echo "✓ $url → $STATUS"
+            else
+              echo "::warning::$url → $STATUS (ожидался 200/301/302)"
+              ALL_OK=false
+            fi
+          done
+          if [[ "$ALL_OK" == "true" ]]; then
+            echo "✓ Все 3 поддомена отвечают"
+          fi
+
+      - name: Show container status
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging ps

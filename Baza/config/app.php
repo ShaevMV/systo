@@ -189,7 +189,6 @@ return [
         /*
          * Application Service Providers...
          */
-        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
