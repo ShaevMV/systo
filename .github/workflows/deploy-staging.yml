@@ -226,6 +226,16 @@ jobs:
             sleep 2
           done
 
+      # php-fpm в контейнере работает от www-data, но composer install/key:generate
+      # запускались через --entrypoint sh под root → файлы в storage/ и bootstrap/cache/
+      # принадлежат root. Без chown Laravel падает с "Permission denied" на laravel.log.
+      - name: Fix storage permissions
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging     chown -R www-data:www-data storage bootstrap/cache
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root phpbaza-staging chown -R www-data:www-data storage bootstrap/cache
+          echo "✓ storage и bootstrap/cache принадлежат www-data"
+
       # Если БД `baza` ещё не создана (например, MySQL был инициализирован до
       # появления init-скрипта Docker/mysql/init/01-create-baza.sql) — создаём её
       # на лету. Идемпотентно через IF NOT EXISTS.
