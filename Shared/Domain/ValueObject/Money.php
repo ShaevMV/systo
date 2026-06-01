@@ -37,10 +37,29 @@ final class Money
      * Из float — округление до целых рублей (банкирское, half-even).
      *
      * Используется на границе с legacy-кодом, где цены — float (`ticket_type_price.price`).
+     *
+     * Защищает от тихих ошибок на граничных значениях:
+     * - `NaN` / `INF` — `(int) NaN` в PHP молча даёт `0` и испортит сумму
+     * - значения вне диапазона `int` после округления — кастинг к int обрезает
+     * - отрицательные значения отсекаются конструктором
      */
     public static function fromFloat(float $value, string $currency = 'RUB'): self
     {
-        return new self((int) round($value, 0, PHP_ROUND_HALF_EVEN), $currency);
+        if (!is_finite($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Money cannot be created from non-finite value: %s', var_export($value, true))
+            );
+        }
+
+        $rounded = round($value, 0, PHP_ROUND_HALF_EVEN);
+
+        if ($rounded > PHP_INT_MAX || $rounded < PHP_INT_MIN) {
+            throw new InvalidArgumentException(
+                sprintf('Money amount out of int range after rounding: %s', var_export($rounded, true))
+            );
+        }
+
+        return new self((int) $rounded, $currency);
     }
 
     public function amount(): int

@@ -106,4 +106,45 @@ class MoneyTest extends TestCase
     {
         self::assertSame(4200.0, (new Money(4200))->asFloat());
     }
+
+    public function test_from_float_rejects_nan(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('non-finite');
+
+        Money::fromFloat(NAN);
+    }
+
+    public function test_from_float_rejects_positive_infinity(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('non-finite');
+
+        Money::fromFloat(INF);
+    }
+
+    public function test_from_float_rejects_negative_infinity(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('non-finite');
+
+        Money::fromFloat(-INF);
+    }
+
+    public function test_from_float_rejects_out_of_int_range(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('out of int range');
+
+        // PHP_INT_MAX = 9.22e18 на 64-bit. 1e20 заведомо больше.
+        Money::fromFloat(1.0e20);
+    }
+
+    public function test_from_float_rejects_negative_value_via_constructor(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('cannot be negative');
+
+        Money::fromFloat(-100.0);
+    }
 }
