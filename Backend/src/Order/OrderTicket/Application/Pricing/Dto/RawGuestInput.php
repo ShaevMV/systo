@@ -98,10 +98,22 @@ final class RawGuestInput
             ));
         }
 
-        $options = array_map(
-            static fn (array $raw): RawGuestOptionInput => RawGuestOptionInput::fromState($raw),
-            array_values($rawOptions),
-        );
+        // Каждый элемент `options[]` обязан быть массивом (вложенный payload опции).
+        // Без этой проверки `array_map(fn (array $raw) => ...)` бросит непредсказуемый
+        // `TypeError` (HTTP 500) при `options: ["x"]` / `options: [null]` — а граница
+        // слоя должна возвращать домен-понятный `InvalidArgumentException`.
+        $options = [];
+        foreach (array_values($rawOptions) as $index => $raw) {
+            if (! is_array($raw)) {
+                throw new InvalidArgumentException(sprintf(
+                    'RawGuestInput::fromState() options[%d] must be array, got %s: %s',
+                    $index,
+                    get_debug_type($raw),
+                    var_export($raw, true),
+                ));
+            }
+            $options[] = RawGuestOptionInput::fromState($raw);
+        }
 
         $promoCode = $data['promo_code'] ?? null;
         if (is_string($promoCode)) {

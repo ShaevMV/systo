@@ -207,6 +207,35 @@ class RawGuestInputTest extends TestCase
         ]);
     }
 
+    /**
+     * @dataProvider invalidOptionElementProvider
+     */
+    public function test_from_state_rejects_non_array_option_element(mixed $badElement): void
+    {
+        // Раньше `array_map(fn (array $raw) => ...)` с `strict_types=1` бросал TypeError → HTTP 500.
+        // Граница слоя должна давать домен-понятный InvalidArgumentException (qodo PR #68).
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('options[0]');
+
+        RawGuestInput::fromState([
+            'value' => 'Иван Иванов',
+            'email' => 'ivan@example.com',
+            'ticket_type_id' => self::TICKET_TYPE_ID,
+            'options' => [$badElement],
+        ]);
+    }
+
+    public static function invalidOptionElementProvider(): array
+    {
+        return [
+            'string' => ['x'],
+            'null' => [null],
+            'int' => [42],
+            'float' => [3.14],
+            'bool' => [true],
+        ];
+    }
+
     public function test_from_state_expands_multiple_options(): void
     {
         $input = RawGuestInput::fromState([
