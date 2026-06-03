@@ -66,26 +66,6 @@ class ChangeStatusTest extends TestCase
     /**
      * @throws Throwable
      */
-    public function test_is_correct_chance_status_to_buy_for_multi_festival(): void
-    {
-        if (!\View::exists('TypeTicketPdf3.black')) {
-            $this->markTestSkipped('View TypeTicketPdf3.black.php not found — integration test requires full environment');
-        }
-        $this->chanceStatus->change(
-            new Uuid(OrderSeeder::ID_FOR_MULTI_FESTIVAL_ORDER),
-            new Status(Status::PAID),
-            new Uuid(UserSeeder::ID_FOR_ADMIN_UUID),
-            now: true,
-        );
-        $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_MULTI_FESTIVAL_ORDER));
-        $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_MULTI_FESTIVAL_ORDER));
-        self::assertTrue($orderDto->getStatus()->isPaid());
-        self::assertCount(2, $idList);
-    }
-
-    /**
-     * @throws Throwable
-     */
     public function test_is_correct_chance_status_to_difficulties_arose(): void
     {
         $this->chanceStatus->change(

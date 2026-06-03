@@ -66,8 +66,11 @@ class ToGetListTest extends TestCase
         self::assertEmpty($result?->toArray());
     }
 
-    public function test_is_filter_for_multi_festival(): void
+    public function test_is_filter_by_price_and_ticket_type(): void
     {
+        // v2.6.0: раньше тест фильтровал по multi-fest билету (7600₽ + ID_FOR_MULTI_FESTIVAL).
+        // Концепт убран — фильтруем по существующему «Оргвзносу» 3800₽ + ID_FOR_FIRST_WAVE.
+        // Соответствует первому заказу из OrderSeeder.
         $result = $this->toGetList->listByFilter(
             new OrderFilterQuery(
                 new Uuid(FestivalHelper::UUID_FESTIVAL),
@@ -75,8 +78,8 @@ class ToGetListTest extends TestCase
                 null,
                 null,
                 null,
-                TypeTicketsSeeder::DEFAULT_MULTI_FESTIVAL_PRICE,
-                new Uuid(TypeTicketsSeeder::ID_FOR_MULTI_FESTIVAL),
+                TypeTicketsSeeder::DEFAULT_PRICE,
+                new Uuid(TypeTicketsSeeder::ID_FOR_FIRST_WAVE),
             )
         );
 

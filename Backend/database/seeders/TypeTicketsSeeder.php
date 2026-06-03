@@ -6,27 +6,31 @@ use App\Models\Festival\TicketTypesModel;
 use Illuminate\Database\Seeder;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
+/**
+ * Сидер типов билетов.
+ *
+ * Создаёт типы билетов привязанные к разным фестивалям — для тестирования
+ * фильтра «по фестивалю» на staging.
+ *
+ * **v2.6.0** — убран концепт «мульти-фестивальных» билетов (Оргвзнос мульти
+ * фестиваль / Живой билет лесная карта, оба по 7600₽). Эти билеты давали
+ * доступ к нескольким фестивалям одним билетом — концепт сейчас неактуален.
+ *
+ * NB: не идемпотентен (insert + attach при существующем ID → конфликт).
+ * См. TD-27 — план переделки всех сидеров на updateOrCreate.
+ */
 class TypeTicketsSeeder extends Seeder
 {
     public const ID_FOR_FIRST_WAVE = '222abc0c-fc8e-4a1d-a4b0-d345cafacf95';
     public const DEFAULT_PRICE = 3800;
     public const ID_FOR_REGIONS = '37c6b8d8-e01e-4bc4-b7b8-fcaa422ab25b';
 
-    public const ID_FOR_MULTI_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf99';
     public const ID_FOR_NEXT_FESTIVAL = '37c6b8d8-e01e-4bc4-b7b8-fcaa422ab25f';
-
-    PUBLIC CONST ID_LIVE_FOR_MULTI_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf00';
-    PUBLIC CONST ID_LIVE_FOR_NEXT_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
+    public const ID_LIVE_FOR_NEXT_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
 
     public const ID_CHILD_TICKET = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
     public const CHILD_TICKET_PRICE = 400;
 
-    public const DEFAULT_MULTI_FESTIVAL_PRICE = 7600;
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run(): void
     {
         $ticketTypes = new TicketTypesModel();
@@ -36,7 +40,7 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->sort = 1;
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL, [
             'pdf' => 'TypeTicketPdf1.black.php',
-            'email' => 'TypeTicketMailOrderToPaid1.black.php'
+            'email' => 'TypeTicketMailOrderToPaid1.black.php',
         ]);
         $ticketTypes->save();
 
@@ -45,22 +49,10 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос для регионов';
         $ticketTypes->price = '3600';
         $ticketTypes->sort = 2;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL,[
+        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL, [
             'pdf' => 'TypeTicketPdf2.black.php',
-            'email' => 'TypeTicketMailOrderToPaid2.black.php'
+            'email' => 'TypeTicketMailOrderToPaid2.black.php',
         ]);
-        $ticketTypes->save();
-
-        $ticketTypes = new TicketTypesModel();
-        $ticketTypes->id = self::ID_FOR_MULTI_FESTIVAL;
-        $ticketTypes->name = 'Оргвзнос мульти фестиваль';
-        $ticketTypes->price = self::DEFAULT_MULTI_FESTIVAL_PRICE;
-        $ticketTypes->sort = 3;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL,[
-            'pdf' => 'TypeTicketPdf3.black.php',
-            'email' => 'TypeTicketMailOrderToPaid3.black.php'
-        ]);
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
         $ticketTypes->save();
 
         $ticketTypes = new TicketTypesModel();
@@ -68,16 +60,6 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->name = 'Оргвзнос на осень';
         $ticketTypes->price = '4000';
         $ticketTypes->sort = 4;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
-        $ticketTypes->save();
-
-        $ticketTypes = new TicketTypesModel();
-        $ticketTypes->id = self::ID_LIVE_FOR_MULTI_FESTIVAL;
-        $ticketTypes->name = 'Оргвзнос Живой билет лесная карта';
-        $ticketTypes->price = self::DEFAULT_MULTI_FESTIVAL_PRICE;
-        $ticketTypes->sort = 5;
-        $ticketTypes->is_live_ticket = true;
-        $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL);
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
         $ticketTypes->save();
 
