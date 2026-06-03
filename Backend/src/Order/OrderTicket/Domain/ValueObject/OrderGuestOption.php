@@ -54,10 +54,11 @@ final class OrderGuestOption
      * Десериализация одной опции из JSON-payload.
      *
      * Strict-валидация: все 3 ключа обязательны. Особенно критично для `price` —
-     * молчаливый fallback к 0 даёт **бесплатные опции** через корявый payload
-     * (атакующий вектор / тихая порча данных).
+     * `(int) null` / `(int) ""` / `(int) "abc"` молча дают `0` → **бесплатные
+     * опции через корявый payload** (атакующий вектор). Используем
+     * {@see Money::fromInteger()} которая отсекает не-int / не-numeric-string.
      *
-     * @throws InvalidArgumentException если отсутствует option_id / name / price
+     * @throws InvalidArgumentException если ключ отсутствует ИЛИ price не int / numeric string
      */
     public static function fromState(array $data): self
     {
@@ -74,7 +75,7 @@ final class OrderGuestOption
         return new self(
             optionId: new Uuid($data['option_id']),
             nameSnapshot: $data['name'],
-            priceSnapshot: new Money((int) $data['price']),
+            priceSnapshot: Money::fromInteger($data['price'], 'price'),
         );
     }
 

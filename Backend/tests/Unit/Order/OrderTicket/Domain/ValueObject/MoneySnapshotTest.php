@@ -141,4 +141,46 @@ class MoneySnapshotTest extends TestCase
 
         MoneySnapshot::fromState([]);
     }
+
+    /**
+     * @dataProvider invalidMonetaryValueProvider
+     */
+    public function test_from_state_rejects_non_integer_monetary_value(mixed $invalidValue): void
+    {
+        // Раньше `(int) $value` молча превращал null/""/"abc"/true/false → 0.
+        // Это маскировало data corruption. Теперь Money::fromInteger() кидает exception.
+        $this->expectException(InvalidArgumentException::class);
+
+        MoneySnapshot::fromState([
+            'base_price' => $invalidValue,
+            'options_sum' => 0,
+            'discount' => 0,
+        ]);
+    }
+
+    public static function invalidMonetaryValueProvider(): array
+    {
+        return [
+            'null' => [null],
+            'empty string' => [''],
+            'non-numeric string' => ['abc'],
+            'float string' => ['12.5'],
+            'float' => [12.5],
+            'boolean true' => [true],
+            'boolean false' => [false],
+            'array' => [[100]],
+        ];
+    }
+
+    public function test_from_state_accepts_numeric_strings(): void
+    {
+        // JSON с числовыми строками — валидно (некоторые БД отдают цены как строку)
+        $snapshot = MoneySnapshot::fromState([
+            'base_price' => '4200',
+            'options_sum' => '500',
+            'discount' => '0',
+        ]);
+
+        self::assertSame(4700, $snapshot->total()->amount());
+    }
 }

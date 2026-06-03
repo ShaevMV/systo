@@ -67,14 +67,14 @@ final class MoneySnapshot
     /**
      * Десериализация из JSON-payload (`order_tickets.guests[].price_snapshot`).
      *
-     * Strict-валидация: все 3 ключа обязательны. Молчаливый fallback к 0 запрещён —
-     * это маскировало бы data corruption (например, силовое чтение из частично
-     * мигрированной БД дало бы заказы с нулевой ценой).
+     * Strict-валидация: все 3 ключа обязательны + типы значений int / numeric string.
+     * Молчаливый fallback к 0 запрещён — `(int) null` / `(int) "abc"` молча
+     * дают `0` и маскируют data corruption. Используем {@see Money::fromInteger()}.
      *
      * Поле `total` в payload игнорируется — пересчитывается через {@see self::total()}
      * (защита от рассинхрона payload).
      *
-     * @throws InvalidArgumentException если отсутствует один из ключей base_price / options_sum / discount
+     * @throws InvalidArgumentException если ключ отсутствует ИЛИ значение не is_int / numeric string
      */
     public static function fromState(array $data): self
     {
@@ -89,9 +89,9 @@ final class MoneySnapshot
         }
 
         return new self(
-            basePrice: new Money((int) $data['base_price']),
-            optionsSum: new Money((int) $data['options_sum']),
-            discount: new Money((int) $data['discount']),
+            basePrice: Money::fromInteger($data['base_price'], 'base_price'),
+            optionsSum: Money::fromInteger($data['options_sum'], 'options_sum'),
+            discount: Money::fromInteger($data['discount'], 'discount'),
         );
     }
 

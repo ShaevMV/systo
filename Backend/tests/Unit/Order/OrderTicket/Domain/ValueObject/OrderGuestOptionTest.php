@@ -95,4 +95,45 @@ class OrderGuestOptionTest extends TestCase
 
         OrderGuestOption::fromState(['option_id' => self::SAPLING_ID, 'name' => 'Саженец']);
     }
+
+    /**
+     * @dataProvider invalidPriceProvider
+     */
+    public function test_from_state_rejects_non_integer_price(mixed $invalidPrice): void
+    {
+        // Раньше `(int) $price` молча превращал null/""/"abc"/true/false → 0
+        // → бесплатные опции через корявый payload (атакующий вектор!).
+        // Теперь Money::fromInteger() кидает exception.
+        $this->expectException(InvalidArgumentException::class);
+
+        OrderGuestOption::fromState([
+            'option_id' => self::SAPLING_ID,
+            'name' => 'Саженец',
+            'price' => $invalidPrice,
+        ]);
+    }
+
+    public static function invalidPriceProvider(): array
+    {
+        return [
+            'null → was silently 0 (FREE OPTION attack vector!)' => [null],
+            'empty string → was silently 0' => [''],
+            'non-numeric string → was silently 0' => ['abc'],
+            'float string → was silently truncated' => ['12.5'],
+            'float value' => [12.5],
+            'boolean true → was silently 1' => [true],
+            'boolean false → was silently 0' => [false],
+        ];
+    }
+
+    public function test_from_state_accepts_numeric_string_price(): void
+    {
+        $option = OrderGuestOption::fromState([
+            'option_id' => self::SAPLING_ID,
+            'name' => 'Саженец',
+            'price' => '500',
+        ]);
+
+        self::assertSame(500, $option->priceSnapshot->amount());
+    }
 }
