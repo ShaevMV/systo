@@ -182,4 +182,53 @@ class MoneyTest extends TestCase
 
         self::assertTrue($result->isZero());
     }
+
+    public function test_from_integer_accepts_int(): void
+    {
+        $money = Money::fromInteger(4200);
+
+        self::assertSame(4200, $money->amount());
+    }
+
+    public function test_from_integer_accepts_numeric_string(): void
+    {
+        // JSON-payload может прийти со строкой (особенно из старых клиентов / БД)
+        self::assertSame(4200, Money::fromInteger('4200')->amount());
+        self::assertSame(0, Money::fromInteger('0')->amount());
+    }
+
+    /**
+     * @dataProvider invalidIntegerProvider
+     */
+    public function test_from_integer_rejects_invalid_value(mixed $value, string $expectedSubstring): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedSubstring);
+
+        Money::fromInteger($value, 'test_field');
+    }
+
+    public static function invalidIntegerProvider(): array
+    {
+        return [
+            // ← Ключевая защита от тихой `(int)X = 0` маскировки:
+            'null becomes 0 silently with (int)' => [null, 'test_field'],
+            'empty string becomes 0 silently' => ['', 'test_field'],
+            'non-numeric string becomes 0 silently' => ['abc', 'test_field'],
+            'float string truncates silently' => ['12.5', 'test_field'],
+            'float value' => [12.5, 'test_field'],
+            'boolean true becomes 1 silently' => [true, 'test_field'],
+            'boolean false becomes 0 silently' => [false, 'test_field'],
+            'array' => [[1, 2], 'test_field'],
+            'object' => [new \stdClass(), 'test_field'],
+        ];
+    }
+
+    public function test_from_integer_includes_field_name_in_error_for_debugging(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('"base_price"');  // имя поля видно в ошибке
+
+        Money::fromInteger(null, 'base_price');
+    }
 }

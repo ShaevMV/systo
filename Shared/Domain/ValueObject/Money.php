@@ -62,6 +62,48 @@ final class Money
         return new self((int) $rounded, $currency);
     }
 
+    /**
+     * Строгая фабрика для десериализации из payload (JSON/array).
+     *
+     * Принимает только `int` или строку-целое (`"4200"`, `"-100"`). Всё остальное
+     * (`null`, `""`, `"abc"`, `"12.5"`, `false`, объекты) — бросает {@see InvalidArgumentException}.
+     *
+     * Зачем: на входной границе `(int) $value` молча превращает `null`/`""`/`"abc"`
+     * в `0` — это маскирует data corruption и в случае с ценой опции даёт
+     * **бесплатные опции** через корявый payload (атакующий вектор).
+     * Поэтому `fromState()` методов VO должны использовать эту фабрику.
+     *
+     * @param mixed $value  значение из payload — что угодно
+     * @param string $field имя поля для понятного сообщения об ошибке
+     */
+    public static function fromInteger(mixed $value, string $field = 'value', string $currency = 'RUB'): self
+    {
+        if (is_int($value)) {
+            return new self($value, $currency);
+        }
+
+        if (is_string($value) && $value !== '' && preg_match('/^-?\d+$/', $value) === 1) {
+            $intValue = (int) $value;
+            // Проверяем что строка влезает в int (для очень больших чисел приведение к int обрезает)
+            if ((string) $intValue !== $value) {
+                throw new InvalidArgumentException(sprintf(
+                    'Money::fromInteger() field "%s": value out of int range: %s',
+                    $field,
+                    $value
+                ));
+            }
+
+            return new self($intValue, $currency);
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Money::fromInteger() field "%s" requires int or numeric string, got %s: %s',
+            $field,
+            get_debug_type($value),
+            var_export($value, true)
+        ));
+    }
+
     public function amount(): int
     {
         return $this->amount;
