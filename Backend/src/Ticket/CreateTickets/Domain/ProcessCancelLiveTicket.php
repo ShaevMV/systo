@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Throwable;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Tickets\Ticket\CreateTickets\Application\PushTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
@@ -23,7 +23,7 @@ class ProcessCancelLiveTicket implements ShouldQueue, DomainEvent
 
     /**
      * @param Uuid $orderId
-     * @param GuestsDto[] $guest
+     * @param OrderGuestLine[] $guest
      */
     public function __construct(
         private Uuid $orderId,
@@ -43,8 +43,8 @@ class ProcessCancelLiveTicket implements ShouldQueue, DomainEvent
         $pushTicket->pushByOrderId($this->orderId);
 
         foreach ($this->guest as $item) {
-            if($item->getNumber() > 0) {
-                $pushTicket->pushTicketLive($item->getNumber());
+            if (($item->number ?? 0) > 0) {
+                $pushTicket->pushTicketLive($item->number);
             }
         }
     }

@@ -6,7 +6,7 @@ namespace Tickets\Ticket\CreateTickets\Application;
 
 use Illuminate\Support\Facades\Bus;
 use Throwable;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Command\InMemorySymfonyCommandBus;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
@@ -46,7 +46,7 @@ class TicketApplication
     }
 
     /**
-     * @param  GuestsDto[]  $guests
+     * @param  OrderGuestLine[]  $guests
      * TODO: рефакторинг
      * @return Ticket[]
      * @throws Throwable
@@ -57,10 +57,10 @@ class TicketApplication
         foreach ($guests as $guest) {
             $ticketDto =  new TicketDto(
                 $orderId,
-                $guest->getValue(),
-                $guest->getFestivalId(),
-                $guest->getId() ?? null,
-                email:$guest->getEmail() ?? null,
+                $guest->value,
+                $guest->festivalId,
+                $guest->id,
+                email: $guest->email,
             );
             $this->commandBus->dispatch(new CreateTicketCommand(
                 $ticketDto
