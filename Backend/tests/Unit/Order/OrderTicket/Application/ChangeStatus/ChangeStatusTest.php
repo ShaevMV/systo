@@ -59,8 +59,8 @@ class ChangeStatusTest extends TestCase
         $idList = $this->ticketsRepository->getListIdByOrderId(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isPaid());
         self::assertCount(1, $idList);
-        self::assertTrue($orderDto->getTicket()[0]->getId()->equals($idList[0]));
-        self::assertTrue($orderDto->getTicket()[0]->getFestivalId()->equals(new Uuid(FestivalHelper::UUID_FESTIVAL)));
+        self::assertTrue($orderDto->getGuests()[0]->id->equals($idList[0]));
+        self::assertTrue($orderDto->getGuests()[0]->festivalId->equals(new Uuid(FestivalHelper::UUID_FESTIVAL)));
     }
 
     /**
@@ -77,7 +77,7 @@ class ChangeStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isDifficultiesArose());
-        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+        self::assertFalse($orderDto->getGuests()[0]->id->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
     /**
@@ -94,7 +94,7 @@ class ChangeStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isCancel());
-        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+        self::assertFalse($orderDto->getGuests()[0]->id->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
     /**
@@ -119,7 +119,7 @@ class ChangeStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER));
         self::assertTrue($orderDto->getStatus()->isLiveIssued());
-        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+        self::assertFalse($orderDto->getGuests()[0]->id->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 
     /**
@@ -149,6 +149,6 @@ class ChangeStatusTest extends TestCase
         );
         $orderDto = $this->repositoryOrder->findOrder(new Uuid(OrderSeeder::ID_FOR_LIVE_FESTIVAL_ORDER));
         self::assertTrue($orderDto->getStatus()->isLiveIssued());
-        self::assertFalse($orderDto->getTicket()[0]->getId()->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
+        self::assertFalse($orderDto->getGuests()[0]->id->equals(new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET)));
     }
 }

@@ -9,7 +9,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Shared\Services\CreatingQrCodeService;
 use Tests\TestCase;
 use Throwable;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\MoneySnapshot;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 
@@ -37,12 +38,16 @@ class ApplicationTicketTest extends TestCase
         $tickets = $this->TicketApplication->createList(
             new Uuid(OrderSeeder::ID_FOR_FIRST_ORDER),
             [
-                new GuestsDto(
-                    'test',
-                    null,
-                    null,
-                    new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET),
-                    new Uuid(FestivalHelper::UUID_FESTIVAL),
+                new OrderGuestLine(
+                    id: new Uuid(OrderSeeder::ID_FOR_FIRST_TICKET),
+                    value: 'test',
+                    email: null,
+                    number: null,
+                    festivalId: new Uuid(FestivalHelper::UUID_FESTIVAL),
+                    ticketTypeId: null,
+                    options: [],
+                    promoCode: null,
+                    price: MoneySnapshot::zero(),
                 ),
             ]
         );

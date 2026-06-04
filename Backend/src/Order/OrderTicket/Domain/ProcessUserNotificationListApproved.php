@@ -14,20 +14,20 @@ use Illuminate\Support\Facades\Log;
 use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 /**
  * Письмо получателю заказа-списка при переходе в статус APPROVE_LIST.
  *
- * @property GuestsDto[] $tickets
+ * @property OrderGuestLine[] $tickets
  */
 class ProcessUserNotificationListApproved implements ShouldQueue, DomainEvent
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @param GuestsDto[] $tickets
+     * @param OrderGuestLine[] $tickets
      */
     public function __construct(
         private string $email,
@@ -42,7 +42,7 @@ class ProcessUserNotificationListApproved implements ShouldQueue, DomainEvent
         $result = [];
 
         foreach ($this->tickets as $ticket) {
-            $result[] = $repository->getTicket($ticket->getId());
+            $result[] = $repository->getTicket($ticket->id);
         }
 
         $resultMail = Mail::to($this->email)->send(new OrderListApproved(

@@ -13,7 +13,6 @@ use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPriceCommand;
 use Tickets\Order\OrderTicket\Application\ChangeOrderPrice\ChangeOrderPriceCommandHandler;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 
 /**
@@ -36,7 +35,6 @@ class ChangeOrderPriceTest extends TestCase
             'email' => 'friendly@example.com',
             'phone' => '+79991234567',
             'types_of_payment_id' => 'cccccccc-cccc-cccc-cccc-cccccccccccc',
-            'ticket_type_id' => 'ffffffff-ffff-ffff-ffff-ffffffffffff',
             'guests' => [
                 [
                     'value' => 'Тестовый Гость',
@@ -44,21 +42,27 @@ class ChangeOrderPriceTest extends TestCase
                     'number' => null,
                     'id' => 'dddddddd-dddd-dddd-dddd-dddddddddddd',
                     'festival_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                    'ticket_type_id' => 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+                    'options' => [],
+                    'promo_code' => null,
+                    'price_snapshot' => [
+                        'base_price' => (int) $price,
+                        'options_sum' => 0,
+                        'discount' => 0,
+                    ],
+                    'is_live_ticket' => false,
                 ],
             ],
             'id_buy' => 'test-buy-id',
             'date' => date('Y-m-d H:i:s'),
             'status' => Status::NEW,
-            'promo_code' => null,
-            'questionnaire_type_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
             'id' => 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
         ];
 
         $userId = new Uuid('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
-        $priceDto = new PriceDto((int)$price, 1, 0);
         $pusherId = $isFriendly ? new Uuid('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb') : null;
 
-        return OrderTicketDto::fromState($data, $userId, $priceDto, false, $pusherId);
+        return OrderTicketDto::fromState($data, $userId, $pusherId);
     }
 
     /** @test */

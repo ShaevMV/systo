@@ -10,9 +10,7 @@ use Shared\Domain\ValueObject\Status;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderPaidFriendly;
 use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderPaid;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 
 /**
  * Unit тест для OrderTicket::toPaidFriendly() и ProcessUserNotificationOrderPaidFriendly.
@@ -32,7 +30,6 @@ class OrderTicketToPaidFriendlyTest extends TestCase
             'email' => 'guest@example.com',
             'phone' => '+79991234567',
             'types_of_payment_id' => 'cccccccc-cccc-cccc-cccc-cccccccccccc',
-            'ticket_type_id' => 'ffffffff-ffff-ffff-ffff-ffffffffffff',
             'guests' => [
                 [
                     'value' => 'Тестовый Гость',
@@ -40,21 +37,27 @@ class OrderTicketToPaidFriendlyTest extends TestCase
                     'number' => null,
                     'id' => 'dddddddd-dddd-dddd-dddd-dddddddddddd',
                     'festival_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+                    'ticket_type_id' => 'ffffffff-ffff-ffff-ffff-ffffffffffff',
+                    'options' => [],
+                    'promo_code' => null,
+                    'price_snapshot' => [
+                        'base_price' => 3800,
+                        'options_sum' => 0,
+                        'discount' => 0,
+                    ],
+                    'is_live_ticket' => false,
                 ],
             ],
             'id_buy' => 'test-buy-id',
             'date' => date('Y-m-d H:i:s'),
             'status' => Status::PAID,
-            'promo_code' => null,
-            'questionnaire_type_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
             'id' => 'eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee',
         ];
 
         $userId = new Uuid('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb');
-        $priceDto = new PriceDto(3800, 1, 0, 3800, 3800);
         $pusherId = $isFriendly ? new Uuid('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb') : null;
 
-        return OrderTicketDto::fromState($data, $userId, $priceDto, false, $pusherId);
+        return OrderTicketDto::fromState($data, $userId, $pusherId);
     }
 
     /** @test */

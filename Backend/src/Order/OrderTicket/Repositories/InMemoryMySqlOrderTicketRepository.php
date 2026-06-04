@@ -24,9 +24,8 @@ use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForFriendlyListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListResponse;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemForListsResponse;
@@ -165,17 +164,11 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             );
         }
 
-        $rawDataArr['questionnaire_type_id'] = $rawData->ticketType->questionnaire_type_id ?? null;
-        $guests = json_decode($rawDataArr['guests'], true) ?? [0 => ''];
+        // Формат v2.6.0: цена и live-флаг живут внутри guests[] (price_snapshot / is_live_ticket),
+        // тип анкеты определяется per-guest. Дополнительные данные заказу больше не нужны.
         return OrderTicketDto::fromState(
             $rawDataArr,
             new Uuid($rawData['users']['id']),
-            new PriceDto(
-                (int) ((float) $rawData['price'] / max(count($guests), 1)),
-                count($guests),
-                (float) $rawData['discount'],
-            ),
-            (bool) ($rawData['ticketType']['is_live_ticket'] ?? false),
         );
     }
 
@@ -232,21 +225,19 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
     /**
      * @param Uuid $orderId
      * @param Status $newStatus
-     * @param GuestsDto[] $guests
+     * @param OrderGuestLine[] $guests
      * @return bool
      * @throws Throwable
      */
     public function changeStatus(Uuid $orderId, Status $newStatus, array $guests): bool
     {
+        // Формат v2.6.0: сериализуем строку целиком (ticket_type_id / options / price_snapshot
+        // и пр.), а не усечённый набор value/id/email — иначе потеряем per-guest данные.
+        $arrGuests = array_map(
+            static fn (OrderGuestLine $guest): array => $guest->toArray(),
+            $guests,
+        );
 
-        $arrGuests = [];
-        foreach ($guests as $guest) {
-            $arrGuests[] = [
-                'value' => $guest->getValue(),
-                'id' => $guest->getId()->value(),
-                'email' => $guest->getEmail(),
-            ];
-        }
         DB::beginTransaction();
         try {
             $order = $this->model::find($orderId->value());
@@ -258,7 +249,8 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
             }
 
             $order->status = (string)$newStatus;
-            $order->guests = $arrGuests;
+            // Колонка guests — JSON без Eloquent-каста, пишем валидной JSON-строкой.
+            $order->guests = json_encode($arrGuests, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
             $order->save();
             DB::commit();
 
@@ -271,27 +263,22 @@ class InMemoryMySqlOrderTicketRepository implements OrderTicketRepositoryInterfa
 
     /**
      * @param Uuid $orderId
-     * @param array $guests
+     * @param OrderGuestLine[] $guests
      * @return bool
      * @throws Throwable
      */
     public function updateGuests(Uuid $orderId, array $guests): bool
     {
-        $arrGuests = [];
-        foreach ($guests as $guest) {
-            $arrGuests[] = [
-                'value' => $guest->getValue(),
-                'id' => $guest->getId()->value(),
-                'email' => $guest->getEmail(),
-                'number' => $guest->getNumber(),
-                'festival_id' => $guest->getFestivalId()?->value(),
-            ];
-        }
+        $arrGuests = array_map(
+            static fn (OrderGuestLine $guest): array => $guest->toArray(),
+            $guests,
+        );
 
         DB::beginTransaction();
         try {
             $order = $this->model::find($orderId->value());
-            $order->guests = $arrGuests;
+            // Колонка guests — JSON без Eloquent-каста, пишем валидной JSON-строкой.
+            $order->guests = json_encode($arrGuests, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
             $order->save();
             DB::commit();
 

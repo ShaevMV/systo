@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Throwable;
-use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\Questionnaire\Application\Questionnaire\GetList\QuestionnaireGetListQuery;
 use Tickets\Questionnaire\Application\Questionnaire\QuestionnaireApplication;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessReplayNotificationQuestionnaire;
@@ -45,23 +44,21 @@ class QuestionnaireController extends Controller
         QuestionnaireApplication $questionnaireApplication,
         QuestionnaireRepositoryInterface $questionnaireRepository,
         QuestionnaireValidationService $validationService,
-        OrderTicketRepositoryInterface $orderTicketRepository,
         string $orderId,
         string $ticketId,
     ): JsonResponse {
         $data = $request->toArray();
         $questionnaireData = $data['questionnaire'] ?? [];
 
-        // Получаем тип анкеты по заказу
+        // Тип анкеты определяется по строке гостя (его ticket_type) — формат v2.6.0.
         $questionnaireTypeId = null;
         try {
-            $uuid = new \Shared\Domain\ValueObject\Uuid($orderId);
-            $orderTicket = $orderTicketRepository->findOrder($uuid);
-            if ($orderTicket) {
-                $questionnaireTypeId = $orderTicket->getQuestionnaireTypeId()?->value();
-            }
+            $orderUuid = new \Shared\Domain\ValueObject\Uuid($orderId);
+            $ticketUuid = new \Shared\Domain\ValueObject\Uuid($ticketId);
+            $questionnaireType = $questionnaireApplication->getQuestionnaireTypeByOrderTicket($orderUuid, $ticketUuid);
+            $questionnaireTypeId = $questionnaireType?->getId()->value();
         } catch (\Throwable) {
-            // Игнорируем ошибку
+            // Игнорируем ошибку — упадём на гостевую анкету ниже
         }
 
         // Fallback: если заказ не найден или нет questionnaire_type_id — используем гостевую анкету

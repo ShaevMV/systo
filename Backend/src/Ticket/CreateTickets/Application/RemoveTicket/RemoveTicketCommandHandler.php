@@ -47,7 +47,7 @@ class RemoveTicketCommandHandler implements CommandHandler
             ));
         }
         $ar = [];
-        foreach ($orderTicket->getTicket() as $item) {
+        foreach ($orderTicket->guests() as $item) {
             $ar[]=$item->toArray();
         }
         Log::debug('Удаляем билет' . $command->getOrderTicketId()->value(),[
@@ -55,7 +55,7 @@ class RemoveTicketCommandHandler implements CommandHandler
         ]);
         $this->orderTicketRepository->updateGuests(
             $command->getOrderId(),
-            $orderTicket->getTicket(),
+            $orderTicket->guests(),
         );
 
         $this->bus::chain($list)->dispatch();

@@ -6,25 +6,43 @@ namespace Tickets\Order\OrderTicket\Domain;
 
 use DomainException;
 use Shared\Domain\Aggregate\AggregateRoot;
+use Shared\Domain\ValueObject\Money;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\History\Domain\Event\OrderCreatedEvent;
+use Tickets\History\Domain\Event\OrderListCreatedEvent;
+use Tickets\History\Domain\Event\OrderStatusChangedEvent;
+use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
 use Tickets\History\Domain\Event\OrderTicketDataRemoveEvent;
+use Tickets\History\Trait\HasHistory;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
+use Tickets\PromoCode\Response\ExternalPromoCodeDto;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramByQuestionnaireSend;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
-use Tickets\PromoCode\Response\ExternalPromoCodeDto;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelLiveTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessPushLiveTicket;
-use Tickets\History\Trait\HasHistory;
-use Tickets\History\Domain\Event\OrderStatusChangedEvent;
-use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
-use Tickets\History\Domain\Event\OrderCreatedEvent;
-use Tickets\History\Domain\Event\OrderListCreatedEvent;
 
+/**
+ * OrderTicket — агрегат заказа в формате v2.6.0 (BREAKING change).
+ *
+ * Заказ — это контейнер строк {@see OrderGuestLine}. Каждая строка несёт свой
+ * `ticket_type_id`, `promo_code`, опции и снимок цены. Цена заказа — функция строк
+ * ({@see self::totalPrice()}), а не отдельное поле (см. `.claude/specs/order-format-architecture.md` §1).
+ *
+ * На уровне заказа остаются: `festival_id`, `user_id`, `types_of_payment_id`, `status`,
+ * `location_id`/`curator_id` (для заказов-списков).
+ *
+ * Проверка «детского билета» теперь **per-guest** (`OrderGuestLine::isChild()`) — в одном
+ * заказе могут смешиваться типы (оргвзнос + детский + парковка), и анкета каждого гостя
+ * определяется его строкой.
+ *
+ * Источник: Чистая архитектура (Р. Мартин) — агрегат самодостаточен, цену собирает сам
+ * (Tell, don't ask); Domain не знает про репозитории — готовые `MoneySnapshot` приходят
+ * из Application-сервиса `OrderPriceCalculator`.
+ */
 final class OrderTicket extends AggregateRoot
 {
     use HasHistory;
@@ -32,19 +50,17 @@ final class OrderTicket extends AggregateRoot
     public const CHILD_TICKET_TYPE_ID = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
 
     /**
-     * @param GuestsDto[] $ticket
+     * @param OrderGuestLine[] $guests
      */
     public function __construct(
-        protected Uuid     $festival_id,
-        protected Uuid     $user_id,
-        protected ?Uuid    $types_of_payment_id,
-        protected PriceDto $price,
-        protected Status   $status,
-        protected array    $ticket,
-        protected Uuid     $id,
-        protected ?string  $promo_code = null,
-        protected ?Uuid    $location_id = null,
-        protected ?Uuid    $curator_id = null,
+        protected Uuid   $festival_id,
+        protected Uuid   $user_id,
+        protected ?Uuid  $types_of_payment_id,
+        protected Status $status,
+        protected array  $guests,
+        protected Uuid   $id,
+        protected ?Uuid  $location_id = null,
+        protected ?Uuid  $curator_id = null,
     )
     {
     }
@@ -55,16 +71,13 @@ final class OrderTicket extends AggregateRoot
             $orderTicketDto->getFestivalId(),
             $orderTicketDto->getUserId(),
             $orderTicketDto->getTypesOfPaymentId(),
-            $orderTicketDto->getPriceDto(),
             $orderTicketDto->getStatus(),
-            $orderTicketDto->getTicket(),
+            $orderTicketDto->getGuests(),
             $orderTicketDto->getId(),
-            $orderTicketDto->getPromoCode(),
             $orderTicketDto->getLocationId(),
             $orderTicketDto->getCuratorId(),
         );
     }
-
 
     public static function create(
         OrderTicketDto $orderTicketDto,
@@ -75,14 +88,14 @@ final class OrderTicket extends AggregateRoot
         $result->record(new ProcessUserNotificationNewOrderTicket(
                 $orderTicketDto->getEmail(),
                 $kilter,
-                $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->firstTicketTypeId(),
                 $result->festival_id,
             )
         );
 
         $result->recordHistory(new OrderCreatedEvent(
-            ticketType: $orderTicketDto->getTicketTypeId()->value(),
-            price: $orderTicketDto->getPriceDto()->getTotalPrice(),
+            ticketType: $orderTicketDto->firstTicketTypeId()?->value() ?? '',
+            price: $result->totalPrice()->asFloat(),
             kilter: $kilter,
         ));
 
@@ -95,27 +108,28 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->guests(),
         ));
-
 
         $result->record(new ProcessUserNotificationOrderPaidLiveTicket(
                 $orderTicketDto->getEmail(),
-                $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->firstTicketTypeId(),
                 $orderTicketDto->getTypesOfPaymentId(),
                 $kilter,
             )
         );
 
-        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail(),
-                        $orderTicketDto->getId()->value(),
-                        $item->getId()->value(),
-                    )
-                );
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getGuests() as $guest) {
+            if ($guest->isChild()) {
+                continue;
             }
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $guest->email ?? $orderTicketDto->getEmail(),
+                    $orderId->value(),
+                    $guest->id->value(),
+                )
+            );
         }
 
         $result->recordHistory(new OrderStatusChangedEvent(
@@ -128,17 +142,17 @@ final class OrderTicket extends AggregateRoot
 
     public static function toProcessGuestNotificationQuestionnaire(OrderTicketDto $orderTicketDto): self
     {
-        if (self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            return self::fromOrderTicketDto($orderTicketDto);
-        }
-
         $result = self::fromOrderTicketDto($orderTicketDto);
 
-        foreach ($orderTicketDto->getTicket() as $item) {
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getGuests() as $guest) {
+            if ($guest->isChild()) {
+                continue;
+            }
             $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $item->getEmail(),
-                    $orderTicketDto->getId()->value(),
-                    $item->getId()->value(),
+                    $guest->email ?? $orderTicketDto->getEmail(),
+                    $orderId->value(),
+                    $guest->id->value(),
                 )
             );
         }
@@ -157,33 +171,31 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->guests(),
         ));
 
         $result->record(new ProcessUserNotificationOrderPaid(
                 $orderTicketDto->getEmail(),
-                $result->getTicket(),
-                $orderTicketDto->getTicketTypeId(),
+                $result->guests(),
+                $orderTicketDto->firstTicketTypeId(),
                 $comment,
                 $externalPromoCodeDto?->getPromocode(),
             )
         );
 
-        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            $orderId = $orderTicketDto->getId();
-
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail() ?? $orderTicketDto->getEmail(),
-                        $orderId->value(),
-                        $item->getId()->value(),
-                    )
-                );
-                $result->record(new ProcessTelegramByQuestionnaireSend(
-                        $item->getEmail() ?? $orderTicketDto->getEmail()
-                    )
-                );
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getGuests() as $guest) {
+            if ($guest->isChild()) {
+                continue;
             }
+            $email = $guest->email ?? $orderTicketDto->getEmail();
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $email,
+                    $orderId->value(),
+                    $guest->id->value(),
+                )
+            );
+            $result->record(new ProcessTelegramByQuestionnaireSend($email));
         }
 
         $result->recordHistory(new OrderStatusChangedEvent(
@@ -214,33 +226,31 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->guests(),
         ));
 
         $result->record(new ProcessUserNotificationOrderPaidFriendly(
                 $orderTicketDto->getEmail(),
-                $result->getTicket(),
-                $orderTicketDto->getTicketTypeId(),
+                $result->guests(),
+                $orderTicketDto->firstTicketTypeId(),
                 $comment,
                 $externalPromoCodeDto?->getPromocode(),
             )
         );
 
-        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            $orderId = $orderTicketDto->getId();
-
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail() ?? $orderTicketDto->getEmail(),
-                        $orderId->value(),
-                        $item->getId()->value(),
-                    )
-                );
-                $result->record(new ProcessTelegramByQuestionnaireSend(
-                        $item->getEmail() ?? $orderTicketDto->getEmail()
-                    )
-                );
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getGuests() as $guest) {
+            if ($guest->isChild()) {
+                continue;
             }
+            $email = $guest->email ?? $orderTicketDto->getEmail();
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $email,
+                    $orderId->value(),
+                    $guest->id->value(),
+                )
+            );
+            $result->record(new ProcessTelegramByQuestionnaireSend($email));
         }
 
         $result->recordHistory(new OrderStatusChangedEvent(
@@ -261,7 +271,7 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessUserNotificationOrderCancel(
                 $orderTicketDto->getEmail(),
-                $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->firstTicketTypeId(),
             )
         );
 
@@ -282,7 +292,7 @@ final class OrderTicket extends AggregateRoot
         ));
         $result->record(new ProcessCancelLiveTicket(
             $result->id,
-            $orderTicketDto->getTicket()
+            $orderTicketDto->getGuests()
         ));
 
         $result->updateIdTicket();
@@ -307,18 +317,20 @@ final class OrderTicket extends AggregateRoot
         $result = self::fromOrderTicketDto($orderTicketDto);
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->guests(),
         ));
 
-        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            foreach ($orderTicketDto->getTicket() as $item) {
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                        $item->getEmail(),
-                        $orderTicketDto->getId()->value(),
-                        $item->getId()->value(),
-                    )
-                );
+        $orderId = $orderTicketDto->getId();
+        foreach ($orderTicketDto->getGuests() as $guest) {
+            if ($guest->isChild()) {
+                continue;
             }
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                    $guest->email ?? $orderTicketDto->getEmail(),
+                    $orderId->value(),
+                    $guest->id->value(),
+                )
+            );
         }
 
         foreach ($liveNumber as $key => $item) {
@@ -337,7 +349,7 @@ final class OrderTicket extends AggregateRoot
     }
 
     /**
-     *
+     * Удаление одного гостя (билета) из заказа.
      */
     public static function toRemoveTicket(
         OrderTicketDto $orderTicketDto,
@@ -348,19 +360,17 @@ final class OrderTicket extends AggregateRoot
 
         $changes = [];
 
-        foreach ($result->ticket as $index => &$guest) {
-            if ($ticketId->equals($guest->getId())) {
+        foreach ($result->guests as $guest) {
+            if ($ticketId->equals($guest->id)) {
                 $changes = [
-                    'oldName' => $guest->getValue(),
+                    'oldName' => $guest->value,
                     'newUuid' => null,
                 ];
                 $result->removeGuest($ticketId);
             }
-
         }
 
         $result->record(new ProcessCancelTicket($result->id, [$ticketId]));
-
 
         if (!empty($changes)) {
             $result->recordHistory(new OrderTicketDataRemoveEvent($changes));
@@ -369,28 +379,26 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
-
-    private function removeGuest(Uuid $ticketId)
+    /**
+     * Убрать гостя из заказа по id строки (VO иммутабелен — пересобираем массив).
+     */
+    private function removeGuest(Uuid $ticketId): void
     {
-        $result = [];
-        foreach ($this->ticket as $item) {
-            if (!$item->getId()->equals($ticketId)) {
-                $result[] = $item;
-            }
-        }
-
-        $this->ticket = $result;
+        $this->guests = array_values(array_filter(
+            $this->guests,
+            static fn (OrderGuestLine $guest): bool => !$guest->id->equals($ticketId),
+        ));
     }
 
     /**
      * Смена данных (ФИО/email) одного или нескольких гостей в заказе.
      *
      * Алгоритм аналогичен toDifficultiesArose:
-     * 1. Применяем изменения к нужным гостям
-     * 2. Обновляем UUID у всех гостей (старые билеты будут удалены, новые созданы)
-     * 3. Отменяем все старые билеты
+     * 1. Применяем изменения к нужным гостям (новый VO через withValue/withEmail)
+     * 2. Регенерируем UUID у изменённых строк (старые билеты будут удалены, новые созданы)
+     * 3. Отменяем старые билеты (по старым id)
      * 4. Создаём новые билеты с обновлёнными данными
-     * 5. Отправляем письмо и ссылки на анкеты изменённым гостям
+     * 5. Отправляем письмо и ссылки на анкеты изменённым (не-детским) гостям
      *
      * @param array $valueMap [ticketId => newValue] — ФИО для изменения
      * @param array $emailMap [ticketId => newEmail] — email для изменения
@@ -408,30 +416,37 @@ final class OrderTicket extends AggregateRoot
         $result = self::fromOrderTicketDto($orderTicketDto);
 
         $changes = [];
-        $changedIndexes = [];
-        $changedUuid = [];
-        $changedTickets = [];
-        foreach ($result->ticket as $index => &$guest) {
-            $ticketId = $guest->getId()->value();
+        $changedUuid = [];      // старые id строк — для отмены билетов
+        $changedTickets = [];   // новые строки — для создания билетов
+        $rebuilt = [];
+
+        foreach ($result->guests as $guest) {
+            $ticketId = $guest->id->value();
 
             if (isset($valueMap[$ticketId]) || isset($emailMap[$ticketId])) {
                 $changes[] = [
-                    'oldName' => $guest->getValue(),
-                    'newName' => $valueMap[$ticketId] ?? $guest->getValue(),
+                    'oldName' => $guest->value,
+                    'newName' => $valueMap[$ticketId] ?? $guest->value,
                 ];
-                $changedUuid[] = new Uuid($ticketId);
-                $changedIndexes[] = $index;
+                $changedUuid[] = $guest->id;
 
+                $updated = $guest;
                 if (isset($valueMap[$ticketId])) {
-                    $guest->updateValue($valueMap[$ticketId]);
+                    $updated = $updated->withValue($valueMap[$ticketId]);
                 }
                 if (isset($emailMap[$ticketId])) {
-                    $guest->updateEmail($emailMap[$ticketId]);
+                    $updated = $updated->withEmail($emailMap[$ticketId]);
                 }
-                $guest->updateId();
-                $changedTickets[] = $guest;
+                $updated = $updated->withRegeneratedId();
+
+                $changedTickets[] = $updated;
+                $rebuilt[] = $updated;
+            } else {
+                $rebuilt[] = $guest;
             }
         }
+
+        $result->guests = $rebuilt;
 
         $result->record(new ProcessCancelTicket($result->id, $changedUuid));
 
@@ -444,20 +459,21 @@ final class OrderTicket extends AggregateRoot
             $result->record(new ProcessUserNotificationOrderTicketChanged(
                 $orderTicketDto->getEmail(),
                 $changes,
-                $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->firstTicketTypeId(),
                 $orderTicketDto->getFestivalId(),
             ));
         }
 
-        if (!self::isChildTicket($orderTicketDto->getTicketTypeId())) {
-            foreach ($changedIndexes as $changedIndex) {
-                $changedGuest = $result->ticket[$changedIndex];
-                $result->record(new ProcessGuestNotificationQuestionnaire(
-                    $changedGuest->getEmail() ?? $orderTicketDto->getEmail(),
-                    $orderTicketDto->getId()->value(),
-                    $changedGuest->getId()->value(),
-                ));
+        $orderId = $orderTicketDto->getId();
+        foreach ($changedTickets as $changedGuest) {
+            if ($changedGuest->isChild()) {
+                continue;
             }
+            $result->record(new ProcessGuestNotificationQuestionnaire(
+                $changedGuest->email ?? $orderTicketDto->getEmail(),
+                $orderId->value(),
+                $changedGuest->id->value(),
+            ));
         }
 
         if (!empty($changes)) {
@@ -467,11 +483,15 @@ final class OrderTicket extends AggregateRoot
         return $result;
     }
 
+    /**
+     * Регенерация id всех строк (VO иммутабелен — пересобираем массив новыми объектами).
+     */
     private function updateIdTicket(): void
     {
-        foreach ($this->ticket as &$guestsDto) {
-            $guestsDto->updateId();
-        }
+        $this->guests = array_map(
+            static fn (OrderGuestLine $guest): OrderGuestLine => $guest->withRegeneratedId(),
+            $this->guests,
+        );
     }
 
     public static function toDifficultiesArose(OrderTicketDto $orderTicketDto, ?string $comment): self
@@ -490,7 +510,7 @@ final class OrderTicket extends AggregateRoot
                 $orderTicketDto->getId(),
                 $orderTicketDto->getEmail(),
                 $comment,
-                $orderTicketDto->getTicketTypeId(),
+                $orderTicketDto->firstTicketTypeId(),
             )
         );
 
@@ -509,17 +529,68 @@ final class OrderTicket extends AggregateRoot
     }
 
     /**
-     * @return GuestsDto[]
+     * @return OrderGuestLine[]
      */
-    public function getTicket(): array
+    public function guests(): array
     {
-        return $this->ticket;
+        return $this->guests;
     }
 
-    private static function isChildTicket(?Uuid $ticketTypeId): bool
+    /**
+     * Итог по заказу — сумма {@see OrderGuestLine::total()} по всем строкам (Tell, don't ask).
+     */
+    public function totalPrice(): Money
     {
-        return $ticketTypeId !== null
-            && $ticketTypeId->value() === self::CHILD_TICKET_TYPE_ID;
+        return array_reduce(
+            $this->guests,
+            static fn (Money $acc, OrderGuestLine $guest): Money => $acc->add($guest->total()),
+            Money::zero(),
+        );
+    }
+
+    /**
+     * Суммарная скидка по заказу.
+     */
+    public function discountTotal(): Money
+    {
+        return array_reduce(
+            $this->guests,
+            static fn (Money $acc, OrderGuestLine $guest): Money => $acc->add($guest->price->discount),
+            Money::zero(),
+        );
+    }
+
+    /**
+     * Live-заказ определяется по строкам (по инварианту все строки одного типа —
+     * live + non-live в одном заказе запрещены, см. OrderPriceCalculator).
+     */
+    public function isLive(): bool
+    {
+        return isset($this->guests[0]) && $this->guests[0]->isLive();
+    }
+
+    /**
+     * Уникальные `ticket_type_id` по строкам заказа — для совместимости со старыми
+     * событиями/фильтрами, которым нужен перечень типов.
+     *
+     * @return Uuid[]
+     */
+    public function uniqueTicketTypeIds(): array
+    {
+        $seen = [];
+        $result = [];
+        foreach ($this->guests as $guest) {
+            if ($guest->ticketTypeId === null) {
+                continue;
+            }
+            $key = $guest->ticketTypeId->value();
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $result[] = $guest->ticketTypeId;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -554,22 +625,22 @@ final class OrderTicket extends AggregateRoot
 
         $result->record(new ProcessCreateTicket(
             $result->id,
-            $result->getTicket(),
+            $result->guests(),
         ));
 
         $result->record(new ProcessUserNotificationListApproved(
             $orderTicketDto->getEmail(),
-            $result->getTicket(),
+            $result->guests(),
             $orderTicketDto->getFestivalId(),
             $orderTicketDto->getLocationId(),
         ));
 
         $orderId = $orderTicketDto->getId();
-        foreach ($orderTicketDto->getTicket() as $item) {
+        foreach ($orderTicketDto->getGuests() as $guest) {
             $result->record(new ProcessGuestNotificationQuestionnaire(
-                $item->getEmail() ?? $orderTicketDto->getEmail(),
+                $guest->email ?? $orderTicketDto->getEmail(),
                 $orderId->value(),
-                $item->getId()->value(),
+                $guest->id->value(),
             ));
         }
 

@@ -5,7 +5,6 @@ namespace Tests\Unit\Order\OrderTicket\Application\Create;
 
 use Database\Seeders\TypeTicketsSeeder;
 use Database\Seeders\UserSeeder;
-use Nette\Utils\Json;
 use Nette\Utils\JsonException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -15,7 +14,6 @@ use Throwable;
 use Tickets\Order\OrderTicket\Application\Create\CreateOrder;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Repositories\InMemoryMySqlOrderTicketRepository;
 use Tickets\Order\OrderTicket\Service\TicketService;
@@ -84,31 +82,42 @@ class CreateOrderTest extends TestCase
     public function dataProvider(): array
     {
         // v2.6.0: убран multi-fest билет — заказ создаётся с обычным «Оргвзнос»
-        // (ID_FOR_FIRST_WAVE), оба гостя на одном фестивале.
-        $request = Json::decode(
-            '{
-            "festival_id":"' . FestivalHelper::UUID_FESTIVAL . '",
-            "email":"admin@admin.ru",
-            "phone": "+9555555555",
-            "city": "SPB",
-            "ticket_type_id":"' . TypeTicketsSeeder::ID_FOR_FIRST_WAVE . '",
-            "guests":[
-                {"value":"321", "festival_id": "' . FestivalHelper::UUID_FESTIVAL . '"},
-                {"value":"321321", "festival_id": "' . FestivalHelper::UUID_FESTIVAL . '"}
-                ],
-            "promo_code":"Systo",
-            "id_buy":"321",
-            "date":"2023-02-10T17:02",
-            "types_of_payment_id":"3fcded69-4aef-4c4a-a041-52c91e5afd63"
-            }
-        ', 1);
+        // (ID_FOR_FIRST_WAVE), оба гостя на одном фестивале. Каждый гость — это
+        // OrderGuestLine с собственным ticket_type_id и снимком цены (price_snapshot).
+        $guest = static fn (string $id, string $value): array => [
+            'id' => $id,
+            'value' => $value,
+            'email' => null,
+            'number' => null,
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+            'options' => [],
+            'promo_code' => null,
+            'price_snapshot' => [
+                'base_price' => 1000,
+                'options_sum' => 0,
+                'discount' => 0,
+            ],
+            'is_live_ticket' => false,
+        ];
+
+        $request = [
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
+            'email' => 'admin@admin.ru',
+            'phone' => '+9555555555',
+            'city' => 'SPB',
+            'guests' => [
+                $guest((string) Uuid::random(), '321'),
+                $guest((string) Uuid::random(), '321321'),
+            ],
+            'id_buy' => '321',
+            'date' => '2023-02-10T17:02',
+            'types_of_payment_id' => '3fcded69-4aef-4c4a-a041-52c91e5afd63',
+        ];
 
         $orderTicketDto = OrderTicketDto::fromState(
             $request,
             new Uuid(UserSeeder::ID_FOR_USER_UUID),
-            new PriceDto(1000,
-                count($request['guests']) * 100
-            ),
         );
 
         return [
