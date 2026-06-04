@@ -12,7 +12,6 @@ use Shared\Domain\Criteria\Filters;
 use Symfony\Component\Console\Command\Command as CommandAlias;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 
 class PushQuestionnaireCommand extends Command
@@ -63,9 +62,17 @@ class PushQuestionnaireCommand extends Command
 
             foreach ($orderTicketRepository->getFriendlyList($filter) as $item) {
                 $this->info('Нашел заказ '.$item->getKilter());
+                // Формат v2.6.0: строки гостя несут ticket_type_id и price_snapshot.
+                // Команда только рассылает анкеты (цена не важна) — снимок нулевой.
                 $guests = [];
                 foreach ($item->getGuests() as $guest) {
-                    $guests[] = $guest->toArray();
+                    $guests[] = array_merge($guest->toArray(), [
+                        'ticket_type_id' => 'cd85c591-a991-4f4a-990c-0f7288a348f3',
+                        'options' => [],
+                        'promo_code' => null,
+                        'price_snapshot' => ['base_price' => 0, 'options_sum' => 0, 'discount' => 0],
+                        'is_live_ticket' => false,
+                    ]);
                     $this->info('Нашел билет '.$guest->getEmail());
 
                 }
@@ -77,10 +84,7 @@ class PushQuestionnaireCommand extends Command
                     'email' => '',
                     'phone' => '',
                     'types_of_payment_id' => '613d6bb9-a3a0-480e-ade8-05625fc19544',
-                    'ticket_type_id' => 'cd85c591-a991-4f4a-990c-0f7288a348f3',
-                    'promo_code' => null,
-                ], $item->getUserId(),
-                    new PriceDto(1000, count($guests)));
+                ], $item->getUserId());
 
                 $orderTicket = OrderTicket::toProcessGuestNotificationQuestionnaire($orderTicketDto);
                 $bus::chain($orderTicket->pullDomainEvents())

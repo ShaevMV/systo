@@ -50,7 +50,7 @@ class AccountApplicationTest extends TestCase
         $token = auth()->attempt(
             [
                 'email' => UserSeeder::EMAIL_ADMIN,
-                'password' => UserSeeder::PASSWORD_ADMIN
+                'password' => UserSeeder::PASSWORD
             ], true);
 
         self::assertNotFalse($token);
@@ -58,7 +58,7 @@ class AccountApplicationTest extends TestCase
         $token = auth()->attempt(
             [
                 'email' => UserSeeder::EMAIL_ADMIN,
-                'password' => UserSeeder::PASSWORD_ADMIN . '1564',
+                'password' => UserSeeder::PASSWORD . '1564',
             ], true);
 
         self::assertFalse($token);

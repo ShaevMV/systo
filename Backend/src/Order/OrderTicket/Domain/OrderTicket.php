@@ -16,6 +16,7 @@ use Tickets\History\Domain\Event\OrderTicketDataChangedEvent;
 use Tickets\History\Domain\Event\OrderTicketDataRemoveEvent;
 use Tickets\History\Trait\HasHistory;
 use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
+use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\PromoCode\Response\ExternalPromoCodeDto;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramByQuestionnaireSend;

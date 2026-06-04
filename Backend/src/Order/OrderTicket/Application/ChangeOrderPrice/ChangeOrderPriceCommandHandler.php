@@ -35,7 +35,10 @@ class ChangeOrderPriceCommandHandler implements CommandHandler
             throw new DomainException('Цена должна быть больше нуля');
         }
 
-        $fromPrice = (float)$orderTicketDto->getPriceDto()->getTotalPrice();
+        // Старая цена для истории — денормализованный итог по строкам заказа.
+        // changePrice() (deprecated) меняет только order-level колонку price, не трогая
+        // per-guest price_snapshot — полноценный per-guest перерасчёт запланирован в v2.7.0.
+        $fromPrice = $orderTicketDto->totalPrice()->asFloat();
         $toPrice   = (float)$command->getPrice();
 
         // Атомарно: смена цены + запись в domain_history. История пишется

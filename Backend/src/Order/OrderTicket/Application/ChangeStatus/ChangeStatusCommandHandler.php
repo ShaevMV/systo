@@ -60,8 +60,8 @@ class ChangeStatusCommandHandler implements CommandHandler
             Status::PAID => OrderTicket::toPaid(
                 $orderTicketDto,
                 $command->getComment(),
-                $orderTicketDto->getTicketTypeId() !== null
-                && $orderTicketDto->getTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
+                $orderTicketDto->firstTicketTypeId() !== null
+                && $orderTicketDto->firstTicketTypeId()->equals(new Uuid('222abc0c-fc8e-4a1d-a4b0-d345cafada08')) ?
                     $this->externalPromocode->getPromocodeByOrderId($command->getOrderId()) :
                     null,
             ),
@@ -111,7 +111,7 @@ class ChangeStatusCommandHandler implements CommandHandler
         $this->orderTicketRepository->changeStatus(
             $command->getOrderId(),
             $command->getNextStatus(),
-            $orderTicket->getTicket()
+            $orderTicket->guests()
         );
 
         if ($command->isNow()) {

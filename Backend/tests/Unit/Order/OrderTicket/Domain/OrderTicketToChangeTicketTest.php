@@ -11,7 +11,6 @@ use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
 use Tickets\Order\OrderTicket\Domain\ProcessUserNotificationOrderTicketChanged;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessGuestNotificationQuestionnaire;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCancelTicket;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreateTicket;
@@ -45,21 +44,16 @@ class OrderTicketToChangeTicketTest extends TestCase
             'email'                 => 'buyer@example.com',
             'phone'                 => '+79991234567',
             'types_of_payment_id'   => self::PAYMENT_ID,
-            'ticket_type_id'        => self::TICKET_TYPE,
             'guests'                => $guestRows,
             'id_buy'                => 'test-buy-id',
             'date'                  => date('Y-m-d H:i:s'),
             'status'                => Status::PAID,
-            'promo_code'            => null,
-            'questionnaire_type_id' => self::FESTIVAL_ID,
             'id'                    => self::ORDER_ID,
         ];
 
         return OrderTicketDto::fromState(
             $data,
             new Uuid(self::USER_ID),
-            new PriceDto(3800, count($guestRows), 0),
-            false,
             null,
         );
     }
@@ -67,11 +61,20 @@ class OrderTicketToChangeTicketTest extends TestCase
     private function guestRow(string $id, string $name, ?string $email): array
     {
         return [
-            'value'       => $name,
-            'email'       => $email,
-            'number'      => null,
-            'id'          => $id,
-            'festival_id' => self::FESTIVAL_ID,
+            'value'          => $name,
+            'email'          => $email,
+            'number'         => null,
+            'id'             => $id,
+            'festival_id'    => self::FESTIVAL_ID,
+            'ticket_type_id' => self::TICKET_TYPE,
+            'options'        => [],
+            'promo_code'     => null,
+            'price_snapshot' => [
+                'base_price'  => 3800,
+                'options_sum' => 0,
+                'discount'    => 0,
+            ],
+            'is_live_ticket' => false,
         ];
     }
 
@@ -92,22 +95,22 @@ class OrderTicketToChangeTicketTest extends TestCase
         $emailMap = [self::GUEST_A_ID => 'anna-new@example.com'];
 
         $orderTicket = OrderTicket::toChangeTicket($dto, $valueMap, $emailMap);
-        $guests = $orderTicket->getTicket();
+        $guests = $orderTicket->guests();
 
         $this->assertCount(2, $guests, 'После изменения должно остаться 2 гостя');
 
         // Гость A — изменён (имя+email новые, UUID новый)
-        $this->assertSame('Анна Новая', $guests[0]->getValue());
-        $this->assertSame('anna-new@example.com', $guests[0]->getEmail());
-        $this->assertNotSame(self::GUEST_A_ID, $guests[0]->getId()->value(),
+        $this->assertSame('Анна Новая', $guests[0]->value);
+        $this->assertSame('anna-new@example.com', $guests[0]->email);
+        $this->assertNotSame(self::GUEST_A_ID, $guests[0]->id->value(),
             'У изменённого гостя должен быть новый UUID');
 
         // Гость B — НЕ тронут
-        $this->assertSame('Борис', $guests[1]->getValue(),
+        $this->assertSame('Борис', $guests[1]->value,
             'Имя неизменённого гостя не должно затираться (регрессия &$guest)');
-        $this->assertSame('boris@example.com', $guests[1]->getEmail(),
+        $this->assertSame('boris@example.com', $guests[1]->email,
             'Email неизменённого гостя не должен затираться (регрессия &$guest)');
-        $this->assertSame(self::GUEST_B_ID, $guests[1]->getId()->value(),
+        $this->assertSame(self::GUEST_B_ID, $guests[1]->id->value(),
             'UUID неизменённого гостя должен остаться прежним');
     }
 
@@ -129,26 +132,26 @@ class OrderTicketToChangeTicketTest extends TestCase
         $emailMap = [self::GUEST_B_ID => 'boris-new@example.com'];
 
         $orderTicket = OrderTicket::toChangeTicket($dto, $valueMap, $emailMap);
-        $guests = $orderTicket->getTicket();
+        $guests = $orderTicket->guests();
 
         $this->assertCount(3, $guests);
 
         // A — без изменений
-        $this->assertSame('Анна', $guests[0]->getValue());
-        $this->assertSame('anna@example.com', $guests[0]->getEmail());
-        $this->assertSame(self::GUEST_A_ID, $guests[0]->getId()->value());
+        $this->assertSame('Анна', $guests[0]->value);
+        $this->assertSame('anna@example.com', $guests[0]->email);
+        $this->assertSame(self::GUEST_A_ID, $guests[0]->id->value());
 
         // B — изменён
-        $this->assertSame('Борис Новый', $guests[1]->getValue());
-        $this->assertSame('boris-new@example.com', $guests[1]->getEmail());
-        $this->assertNotSame(self::GUEST_B_ID, $guests[1]->getId()->value());
+        $this->assertSame('Борис Новый', $guests[1]->value);
+        $this->assertSame('boris-new@example.com', $guests[1]->email);
+        $this->assertNotSame(self::GUEST_B_ID, $guests[1]->id->value());
 
         // C — без изменений (тут раньше всё ломалось из-за висящей ссылки)
-        $this->assertSame('Виктор', $guests[2]->getValue(),
+        $this->assertSame('Виктор', $guests[2]->value,
             'Имя последнего гостя не должно затираться при изменении среднего');
-        $this->assertSame('viktor@example.com', $guests[2]->getEmail(),
+        $this->assertSame('viktor@example.com', $guests[2]->email,
             'Email последнего гостя не должен затираться при изменении среднего');
-        $this->assertSame(self::GUEST_C_ID, $guests[2]->getId()->value(),
+        $this->assertSame(self::GUEST_C_ID, $guests[2]->id->value(),
             'UUID последнего гостя должен остаться прежним');
     }
 
@@ -172,8 +175,8 @@ class OrderTicketToChangeTicketTest extends TestCase
         );
 
         $ids = array_map(
-            static fn ($g) => $g->getId()->value(),
-            $orderTicket->getTicket()
+            static fn ($g) => $g->id->value(),
+            $orderTicket->guests()
         );
 
         $this->assertSame(
@@ -249,7 +252,7 @@ class OrderTicketToChangeTicketTest extends TestCase
 
         // И этот новый ticketId должен совпадать с реальным новым id гостя B
         $this->assertSame(
-            $orderTicket->getTicket()[1]->getId()->value(),
+            $orderTicket->guests()[1]->id->value(),
             $ticketId,
             'ticketId в уведомлении должен совпадать с актуальным UUID изменённого гостя',
         );
@@ -320,9 +323,9 @@ class OrderTicketToChangeTicketTest extends TestCase
         $quests = $this->readPrivateArray($createEvent, 'quests');
         $this->assertCount(1, $quests, 'В создание билетов должен попасть только изменённый гость');
 
-        $this->assertSame('Анна Новая', $quests[0]->getValue());
-        $this->assertSame('anna-new@example.com', $quests[0]->getEmail());
-        $this->assertNotSame(self::GUEST_A_ID, $quests[0]->getId()->value(),
+        $this->assertSame('Анна Новая', $quests[0]->value);
+        $this->assertSame('anna-new@example.com', $quests[0]->email);
+        $this->assertNotSame(self::GUEST_A_ID, $quests[0]->id->value(),
             'У создаваемого билета должен быть НОВЫЙ UUID');
     }
 

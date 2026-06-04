@@ -30,11 +30,14 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderFilterQuery as OrderFilterQueryForLists;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Application\Pricing\Dto\RawGuestInput;
+use Tickets\Order\OrderTicket\Application\Pricing\OrderPriceCalculator;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
+use Tickets\Order\OrderTicket\Domain\ValueObject\MoneySnapshot;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
+use Shared\Domain\ValueObject\Money;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\PriceDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
-use Tickets\Order\OrderTicket\Service\PriceService;
 use Tickets\Ticket\CreateTickets\Application\ChangeTicket\ChangeTicket;
 use Tickets\Ticket\CreateTickets\Application\TicketApplication;
 use Tickets\Ticket\Live\Service\CheckLiveTicketService;
@@ -49,7 +52,7 @@ class OrderTickets extends Controller
         private CreateListOrder    $createListOrder,
         private GetTicketType      $getTicketType,
         private AccountApplication $accountApplication,
-        private PriceService       $priceService,
+        private OrderPriceCalculator $orderPriceCalculator,
         private GetOrder           $getOrder,
         private TotalNumber        $totalNumber,
         private ChangeStatus       $chanceStatus,
@@ -76,7 +79,7 @@ class OrderTickets extends Controller
         // Если заголовок передан, но токен не совпадает с конфигом — сразу 403.
         $autoPaymentHeader = $request->headers->get('AutoPayment');
         $autoPaymentToken  = config('services.auto_payment.token');
-        $isAutoPayment     = false || (new Uuid($createOrderTicketsRequest->get('ticket_type_id')))->equals(new Uuid('a8af4d68-c3c4-42e7-98b4-f56245033743'));
+        $isAutoPayment     = false;
 
         if ($autoPaymentHeader !== null) {
             if (empty($autoPaymentToken) || !hash_equals((string) $autoPaymentToken, $autoPaymentHeader)) {
@@ -89,37 +92,36 @@ class OrderTickets extends Controller
         }
 
         try {
-            // Создание или получение пользователя по email
+            // Создание или получение пользователя-получателя по email (покупатель).
+            // В формате v2.6.0 покупатель — обычный гость в guests[] со своим ticket_type_id,
+            // поэтому prepend поля name больше нет (name идёт только в аккаунт).
             $userId = new Uuid($this->accountApplication->creatingOrGetAccountId(
                 AccountDto::fromState($createOrderTicketsRequest->toArray())
             )->value());
-            $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
-            $guests = $createOrderTicketsRequest->guests;
-            if ($createOrderTicketsRequest->name) {
-                array_unshift($guests, [
-                    'value' => $createOrderTicketsRequest->name,
-                    'email' => $createOrderTicketsRequest->email,
-                ]);
-            }
 
-            // Получение цены
-            $priceDto = $this->priceService->getPriceDto(
-                $ticketTypeId,
-                count($guests),
-                $createOrderTicketsRequest->promo_code
+            $festivalId = new Uuid($createOrderTicketsRequest->festival_id);
+
+            // Цена считается на бэке per-guest: волна + опции + промокод (OrderPriceCalculator).
+            $rawGuests = array_map(
+                static fn (array $guest): RawGuestInput => RawGuestInput::fromState($guest),
+                $createOrderTicketsRequest->guests,
             );
-
-            $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
+            $lines = $this->orderPriceCalculator->calculateLines($festivalId, $rawGuests);
 
             $data = $createOrderTicketsRequest->toArray();
-            $data['guests'] = $guests;
-
-            $orderTicketDto = OrderTicketDto::fromState(
-                $data,
-                $userId,
-                $priceDto,
-                $ticketType->isLiveTicket(),
+            $data['guests'] = array_map(
+                static fn (OrderGuestLine $line): array => $line->toArray(),
+                $lines,
             );
+
+            $orderTicketDto = OrderTicketDto::fromState($data, $userId);
+
+            // Спец-кейс авто-оплаты по типу билета (исторически — без заголовка).
+            if (!$isAutoPayment
+                && $orderTicketDto->firstTicketTypeId() !== null
+                && $orderTicketDto->firstTicketTypeId()->equals(new Uuid('a8af4d68-c3c4-42e7-98b4-f56245033743'))) {
+                $isAutoPayment = true;
+            }
 
             if ($createOrderTicketsRequest->invite !== 'undefined' &&
                 $createOrderTicketsRequest->invite !== null) {
@@ -182,36 +184,53 @@ class OrderTickets extends Controller
     ): JsonResponse
     {
         try {
-            // Создание или получение пользователя по email
+            // Friendly создаёт пушер; цену задаёт он сам (request.price), Calculator не используется.
             $userId = new Uuid(Auth::id());
             $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
+            $festivalId = new Uuid($createOrderTicketsRequest->festival_id);
             $guests = $createOrderTicketsRequest->guests;
-            $priceDto = new PriceDto(
-                (int)$createOrderTicketsRequest->price,
-                count($guests),
-                0
-            );
 
             $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
+            $isLive = $ticketType->isLiveTicket();
 
-            $data = $createOrderTicketsRequest->toArray();
-            $data['guests'] = $guests;
-            if ($ticketType->isLiveTicket()) {
+            if ($isLive) {
                 foreach ($guests as $guest) {
                     if ($checkLiveTicketService->checkLiveNumber($guest['number'])) {
                         throw new \DomainException("Номер билета " . $guest['number'] . " уже выдан ");
                     }
                 }
             }
-            $data['status'] = $ticketType->isLiveTicket() ? Status::LIVE_TICKET_ISSUED : Status::PAID;
+
+            // Ручная цена пушера → price_snapshot каждой строки (base = price, без опций и скидки).
+            $basePrice = Money::fromFloat((float) $createOrderTicketsRequest->price);
+            $lines = array_map(
+                static fn (array $guest): OrderGuestLine => new OrderGuestLine(
+                    id: Uuid::random(),
+                    value: $guest['value'],
+                    email: $guest['email'] ?? null,
+                    number: isset($guest['number']) ? (int) $guest['number'] : null,
+                    festivalId: $festivalId,
+                    ticketTypeId: $ticketTypeId,
+                    options: [],
+                    promoCode: null,
+                    price: new MoneySnapshot($basePrice, Money::zero(), Money::zero()),
+                    isLiveTicket: $isLive,
+                ),
+                $guests,
+            );
+
+            $data = $createOrderTicketsRequest->toArray();
+            $data['guests'] = array_map(
+                static fn (OrderGuestLine $line): array => $line->toArray(),
+                $lines,
+            );
+            $data['status'] = $isLive ? Status::LIVE_TICKET_ISSUED : Status::PAID;
             $data['types_of_payment_id'] = '613d6bb9-a3a0-480e-ade8-05625fc19544';
             Log::info('Создание заказа ', $data);
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
                 $userId,
-                $priceDto,
-                $ticketType->isLiveTicket(),
-                $userId
+                $userId,
             );
 
             $this->createOrder->createAndSaveForFriendly($orderTicketDto);

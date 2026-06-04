@@ -19,7 +19,7 @@ use Tickets\Order\OrderTicket\Application\AddOrderInInvite\AddOrderInInviteComma
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderIdQuery;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForUser\OrderItemQueryHandler;
 use Tickets\Order\OrderTicket\Domain\OrderTicket;
-use Tickets\Order\OrderTicket\Dto\OrderTicket\GuestsDto;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\OrderTicketItemResponse;
 
@@ -119,7 +119,7 @@ final class CreateOrder
             if (!$orderTicketDto->isIsLiveTicket()) {
                 $orderTicket = OrderTicket::toPaidFriendly($orderTicketDto);
             } else {
-                $orderTicket = OrderTicket::toLiveIssued($orderTicketDto, $this->getLiveTicketByFriendly($orderTicketDto->getTicket()));
+                $orderTicket = OrderTicket::toLiveIssued($orderTicketDto, $this->getLiveTicketByFriendly($orderTicketDto->getGuests()));
             }
 
             $domainEvents = $orderTicket->pullDomainEvents();
@@ -146,7 +146,7 @@ final class CreateOrder
 
 
     /**
-     * @param GuestsDto[] $ticket
+     * @param OrderGuestLine[] $ticket
      * @return array
      */
     private function getLiveTicketByFriendly(array $ticket): array
@@ -154,7 +154,7 @@ final class CreateOrder
         $result = [];
 
         foreach ($ticket as $item) {
-            $result[$item->getId()->value()] = $item->getNumber();
+            $result[$item->id->value()] = $item->number;
         }
 
         return $result;

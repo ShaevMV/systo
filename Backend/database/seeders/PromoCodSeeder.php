@@ -29,7 +29,10 @@ class PromoCodSeeder extends Seeder
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
             'active' => true,
-            'ticket_type_id' => TypeTicketsPriceSeeder::ID_FOR_WAVE
+            // Привязка к типу билета (ticket_type.id), а не к волне цены (ticket_type_price.id).
+            // Поиск промокода в `InMemoryMySqlPromoCode::find()` идёт по
+            // `promo_code.ticket_type_id = <id типа билета>`, поэтому ссылаемся на FIRST_WAVE.
+            'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE
         ]);
 
         DB::table('promo_code')->insert([

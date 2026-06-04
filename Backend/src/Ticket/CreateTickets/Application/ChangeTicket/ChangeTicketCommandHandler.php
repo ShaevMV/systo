@@ -49,7 +49,7 @@ class ChangeTicketCommandHandler implements CommandHandler
 
         $this->orderTicketRepository->updateGuests(
             $command->getOrderId(),
-            $orderTicket->getTicket(),
+            $orderTicket->guests(),
         );
 
         $this->bus::chain($list)->dispatch();

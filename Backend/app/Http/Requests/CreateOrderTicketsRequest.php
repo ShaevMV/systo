@@ -7,9 +7,16 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
+ * Запрос создания заказа (формат v2.6.0 — per-guest).
+ *
+ * Каждый элемент `guests[]` несёт свой `ticket_type_id`, `options[]`, `promo_code`.
+ * Глубокая валидация одного гостя — в {@see \Tickets\Order\OrderTicket\Application\Pricing\Dto\RawGuestInput::fromState()}
+ * (граница Application-слоя), поэтому здесь правила намеренно лёгкие: общий контракт заказа.
+ *
+ * Этот же FormRequest используется в `createFriendly` (пушер задаёт цену вручную, тип билета —
+ * на уровне заказа), поэтому per-guest поля не делаем `required` на уровне FormRequest.
+ *
  * @property string|null $email
- * @property string $date
- * @property string $id_buy
  * @property string $festival_id
  * @property string $phone
  * @property string|null $name
@@ -18,8 +25,6 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property string $price
  * @property string|null $comment
  * @property array $guests
- * @property string|null $promo_code
- * @property string $ticket_type_id
  * @property string $types_of_payment_id
  */
 class CreateOrderTicketsRequest extends FormRequest
@@ -35,8 +40,8 @@ class CreateOrderTicketsRequest extends FormRequest
             'email' => 'required|email',
             'phone' => 'required',
             'city' => 'required',
-            'guests' => 'array',
-            'ticket_type_id' => 'exists:App\Models\Ordering\InfoForOrder\TicketTypesModel,id',
+            'festival_id' => 'required',
+            'guests' => 'required|array|min:1',
             'types_of_payment_id' => 'exists:App\Models\Ordering\InfoForOrder\TypesOfPaymentModel,id',
         ];
     }
@@ -53,7 +58,9 @@ class CreateOrderTicketsRequest extends FormRequest
             '*.email' => 'Поле должно быть email',
             '*.numeric' => 'Поле должно быть числом',
             '*.exists' => 'Такой записи нет системе',
-            '*.before' => 'Дата платежа не может быть в будущем'
+            '*.before' => 'Дата платежа не может быть в будущем',
+            'guests.required' => 'Не передан ни один гость',
+            'guests.min' => 'В заказе должен быть хотя бы один гость',
         ];
     }
 }
