@@ -149,6 +149,19 @@
         </div>
       </template>
 
+      <!-- Номер живого билета (только Friendly + live-тип) -->
+      <div class="form-group" v-if="showLiveNumber">
+        <label class="font-weight-bold">Номер живого билета (конверта): *</label>
+        <input
+            type="number"
+            class="form-control"
+            placeholder="Номер без нулей в начале"
+            :value="modelValue.number"
+            @input="updateField('number', $event.target.value)"
+        />
+        <small class="form-text text-muted">Номер конверта живого билета (без нулей в начале).</small>
+      </div>
+
       <!-- Промокод гостя -->
       <div class="form-group">
         <label class="font-weight-bold">Промокод (необязательно):</label>
@@ -187,6 +200,8 @@ const props = defineProps({
   priceLine: { type: Object, default: null },
   // Тип билета (live/non-live), на который заблокирован весь заказ. null — свободно.
   lockedLiveMode: { type: Object, default: null },
+  // Показывать поле «номер живого билета» для live-типов (только Friendly-форма выдаёт номера сразу).
+  allowLiveNumber: { type: Boolean, default: false },
 });
 
 const emit = defineEmits(['update:modelValue', 'select-ticket-type', 'remove']);
@@ -199,6 +214,14 @@ const selectedTicketType = computed(() =>
 );
 
 const isParking = computed(() => selectedTicketType.value?.isParking === true);
+
+/**
+ * Показывать ввод номера живого билета: только когда форма это разрешает (Friendly)
+ * и выбранный тип — живой билет.
+ */
+const showLiveNumber = computed(
+    () => props.allowLiveNumber && selectedTicketType.value?.isLiveTicket === true,
+);
 
 /**
  * Блокировка смешивания live + non-live в одном заказе.

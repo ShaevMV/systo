@@ -12,7 +12,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
@@ -35,6 +34,7 @@ use Tickets\Order\OrderTicket\Application\Pricing\OrderPriceCalculator;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
 use Tickets\Order\OrderTicket\Domain\ValueObject\MoneySnapshot;
 use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
+use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestOption;
 use Shared\Domain\ValueObject\Money;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Responses\ListResponse;
@@ -231,40 +231,53 @@ class OrderTickets extends Controller
     ): JsonResponse
     {
         try {
-            // Friendly создаёт пушер; цену задаёт он сам (request.price), Calculator не используется.
+            // Friendly создаёт пушер. Формат v2.6.0 — per-guest: у каждого гостя свой
+            // тип билета / опции / промокод (как в обычной форме). НО итоговую цену задаёт
+            // сам пушер вручную (одно число на весь заказ, «за вычетом комиссии»),
+            // и мы распределяем её поровну по гостям — рассчитанную калькулятором цену
+            // не используем.
             $userId = new Uuid(Auth::id());
-            $ticketTypeId = new Uuid($createOrderTicketsRequest->ticket_type_id);
             $festivalId = new Uuid($createOrderTicketsRequest->festival_id);
             $guests = $createOrderTicketsRequest->guests;
 
-            $ticketType = $this->getTicketType->getTicketsTypeByUuid($ticketTypeId);
-            $isLive = $ticketType->isLiveTicket();
+            // Калькулятор валидирует состав заказа (тип существует и принадлежит фестивалю,
+            // опции активны, live/non-live не смешаны) и собирает снимки имён опций.
+            // Его цена нам не нужна — итог вводит пушер.
+            $rawGuests = array_map(
+                static fn (array $guest): RawGuestInput => RawGuestInput::fromState($guest),
+                $guests,
+            );
+            $calculatedLines = $this->orderPriceCalculator->calculateLines($festivalId, $rawGuests);
 
+            // Все строки одного режима (калькулятор не даст смешать live + обычные) — флаг по первой.
+            $isLive = $calculatedLines[0]->isLive();
+
+            // Для живых билетов проверяем уникальность номеров, введённых пушером.
             if ($isLive) {
                 foreach ($guests as $guest) {
-                    if ($checkLiveTicketService->checkLiveNumber($guest['number'])) {
-                        throw new \DomainException("Номер билета " . $guest['number'] . " уже выдан ");
+                    $number = $guest['number'] ?? null;
+                    if ($number !== null && $number !== '' && $checkLiveTicketService->checkLiveNumber((int) $number)) {
+                        throw new \DomainException('Номер билета ' . $number . ' уже выдан ');
                     }
                 }
             }
 
-            // Ручная цена пушера → price_snapshot каждой строки (base = price, без опций и скидки).
-            $basePrice = Money::fromFloat((float) $createOrderTicketsRequest->price);
-            $lines = array_map(
-                static fn (array $guest): OrderGuestLine => new OrderGuestLine(
-                    id: Uuid::random(),
-                    value: $guest['value'],
-                    email: $guest['email'] ?? null,
-                    number: isset($guest['number']) ? (int) $guest['number'] : null,
-                    festivalId: $festivalId,
-                    ticketTypeId: $ticketTypeId,
-                    options: [],
-                    promoCode: null,
-                    price: new MoneySnapshot($basePrice, Money::zero(), Money::zero()),
-                    isLiveTicket: $isLive,
-                ),
-                $guests,
+            // Ручной итог распределяем поровну по гостям (остаток — первому гостю),
+            // чтобы сумма долей точно равнялась введённой пушером сумме.
+            $shares = $this->distributeManualTotal(
+                Money::fromFloat((float) $createOrderTicketsRequest->price),
+                count($calculatedLines),
             );
+
+            $lines = [];
+            foreach ($calculatedLines as $idx => $calculated) {
+                $number = $guests[$idx]['number'] ?? null;
+                $lines[] = $this->toFriendlyLine(
+                    $calculated,
+                    $shares[$idx],
+                    ($number !== null && $number !== '') ? (int) $number : null,
+                );
+            }
 
             $data = $createOrderTicketsRequest->toArray();
             $data['guests'] = array_map(
@@ -273,7 +286,6 @@ class OrderTickets extends Controller
             );
             $data['status'] = $isLive ? Status::LIVE_TICKET_ISSUED : Status::PAID;
             $data['types_of_payment_id'] = '613d6bb9-a3a0-480e-ade8-05625fc19544';
-            Log::info('Создание заказа ', $data);
             $orderTicketDto = OrderTicketDto::fromState(
                 $data,
                 $userId,
@@ -304,6 +316,62 @@ class OrderTickets extends Controller
                 'file' => $exception->getFile(),
             ]);
         }
+    }
+
+    /**
+     * Распределить ручной итог Friendly-заказа поровну по $count гостям (целые рубли).
+     *
+     * Остаток от целочисленного деления добавляется первому гостю, поэтому сумма долей
+     * точно равна введённой пушером сумме (никаких потерь рубля при делении 9000 / 3 и т.п.).
+     *
+     * @return Money[] массив из $count долей в порядке гостей
+     */
+    private function distributeManualTotal(Money $total, int $count): array
+    {
+        $amount = $total->amount();
+        $base = intdiv($amount, $count);
+        $remainder = $amount - $base * $count;
+
+        $shares = [];
+        for ($i = 0; $i < $count; $i++) {
+            $shares[$i] = Money::fromInteger($base + ($i === 0 ? $remainder : 0));
+        }
+
+        return $shares;
+    }
+
+    /**
+     * Собрать Friendly-строку заказа из рассчитанной калькулятором строки.
+     *
+     * Отличия Friendly от обычного заказа:
+     * - цена строки = доля ручного итога пушера (база), опции и скидка обнулены —
+     *   итог уже учитывает всё («за вычетом комиссии»), двойного счёта быть не должно;
+     * - имена выбранных опций сохраняются (нужны для выдачи/анкеты), но их цена в снимке = 0;
+     * - номер живого билета проставляется из ввода пушера (калькулятор всегда ставит null).
+     */
+    private function toFriendlyLine(OrderGuestLine $calculated, Money $share, ?int $number): OrderGuestLine
+    {
+        $options = array_map(
+            static fn (OrderGuestOption $option): OrderGuestOption => new OrderGuestOption(
+                optionId: $option->optionId,
+                nameSnapshot: $option->nameSnapshot,
+                priceSnapshot: Money::zero(),
+            ),
+            $calculated->options,
+        );
+
+        return new OrderGuestLine(
+            id: $calculated->id,
+            value: $calculated->value,
+            email: $calculated->email,
+            number: $number,
+            festivalId: $calculated->festivalId,
+            ticketTypeId: $calculated->ticketTypeId,
+            options: $options,
+            promoCode: $calculated->promoCode,
+            price: new MoneySnapshot($share, Money::zero(), Money::zero()),
+            isLiveTicket: $calculated->isLiveTicket,
+        );
     }
 
 

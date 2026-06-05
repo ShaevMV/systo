@@ -15,6 +15,14 @@ class TypesOfPaymentSeeder extends Seeder
     public const ID_FOR_YANDEX = '3fcded69-4aef-4c4a-a041-52c91e5afd90';
 
     /**
+     * Способ оплаты для Friendly-заказов. Хардкодится в
+     * {@see \App\Http\Controllers\TicketsOrder\OrderTickets::createFriendly()}
+     * — seed нужен, чтобы FormRequest-валидация `types_of_payment_id|exists`
+     * проходила в тестовых сценариях Friendly.
+     */
+    public const ID_FOR_FRIENDLY = '613d6bb9-a3a0-480e-ade8-05625fc19544';
+
+    /**
      * Run the database seeds.
      *
      * @return void
@@ -36,6 +44,12 @@ class TypesOfPaymentSeeder extends Seeder
         DB::table('types_of_payment')->insert([
             'id' => self::ID_FOR_YANDEX,
             'name' => 'ЮMoney (Яндекс.Деньги) 410012835840761',
+            'created_at' => new Carbon(),
+            'updated_at' => new Carbon(),
+        ]);
+        DB::table('types_of_payment')->insert([
+            'id' => self::ID_FOR_FRIENDLY,
+            'name' => 'Friendly (оплата у пушера)',
             'created_at' => new Carbon(),
             'updated_at' => new Carbon(),
         ]);

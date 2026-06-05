@@ -82,14 +82,27 @@ export const loadOptionsForTicketType = (context, payload) => {
 }
 
 
+/**
+ * Создать Friendly-заказ (формат v2.6.0 — per-guest корзина + ручной итог пушера).
+ *
+ * payload.body — тело запроса (email/phone/city/name/festival_id/comment/invite/price/guests[]).
+ * payload.callback(success, message) — колбэк результата. Колбэк на бэк не уходит.
+ */
 export const goToCreateFrendlyOrderTicket = (context, payload) => {
-    let promise = axios.post(API_ORDER + '/createFriendly', payload);
+    let promise = axios.post(API_ORDER + '/createFriendly', payload.body);
     promise.then(function (response) {
-        console.log(response.data.success);
-        payload.callback(response.data.success, response.data.message);
+        if (response.data.success) {
+            context.commit('setError', []);
+        }
+        if (payload.callback) {
+            payload.callback(response.data.success, response.data.message);
+        }
     }).catch(function (error) {
         console.error(error);
-        context.commit('setError', error.response.data.errors);
+        context.commit('setError', error.response?.data?.errors ?? []);
+        if (payload.callback) {
+            payload.callback(false, error.response?.data?.message ?? 'Ошибка создания заказа');
+        }
     });
 }
 
