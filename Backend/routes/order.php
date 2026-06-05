@@ -12,6 +12,9 @@ Route::prefix('v1/order')->group(static function (): void {
     Route::post('/create',
         [OrderTickets::class, 'create']);
 
+    // live-расчёт цены заказа без сохранения (для формы покупки, per-guest)
+    Route::post('/calculatePrice', [OrderTickets::class, 'calculatePrice']);
+
     Route::post('/createFriendly',[OrderTickets::class, 'createFriendly'])
         ->middleware('auth:api')
         ->middleware('role:pusher,pusher_curator');

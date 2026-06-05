@@ -238,6 +238,9 @@ jobs:
       - name: Build frontend (npm ci + npm run build)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          # Чистим прошлый dist под root: после `chown deploy` на хосте файлы прошлой сборки
+          # внутри контейнера принадлежат чужому UID → vue-cli падает с EACCES при unlink.
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-staging sh -c "rm -rf dist"
           docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci --include=dev && npm run build"
 
       - name: Up containers
@@ -278,9 +281,14 @@ jobs:
             done
           done
 
+          # Каталог PDF билетов + симлинк public/storage (иначе билеты 404, даже если сгенерены).
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging     chown -R www-data:www-data storage bootstrap/cache
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root phpbaza-staging chown -R www-data:www-data storage bootstrap/cache
-          echo "✓ storage и bootstrap/cache принадлежат www-data"
+          # Воркер бежит под `user` (он в группе www-data) — делаем storage group-writable
+          # + setgid на каталогах, чтобы новые файлы (PDF/логи/views) наследовали группу www-data.
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging sh -c "chmod -R g+rwX storage bootstrap/cache && find storage bootstrap/cache -type d -exec chmod g+s {} +"
+          echo "✓ storage и bootstrap/cache: владелец www-data, группа с правом записи (для воркера)"
 
       # Если БД `baza` ещё не создана (например, MySQL был инициализирован до
       # появления init-скрипта Docker/mysql/init/01-create-baza.sql) — создаём её
