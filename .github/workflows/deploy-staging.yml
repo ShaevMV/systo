@@ -238,6 +238,9 @@ jobs:
       - name: Build frontend (npm ci + npm run build)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          # Чистим прошлый dist под root: после `chown deploy` на хосте файлы прошлой сборки
+          # внутри контейнера принадлежат чужому UID → vue-cli падает с EACCES при unlink.
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-staging sh -c "rm -rf dist"
           docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci --include=dev && npm run build"
 
       - name: Up containers
