@@ -174,6 +174,53 @@ class OrderTickets extends Controller
 
 
     /**
+     * Live-расчёт цены заказа без сохранения (per-guest) — для формы покупки.
+     *
+     * Принимает тот же per-guest payload, что и create (`festival_id` + `guests[]` с
+     * `ticket_type_id`/`options`/`promo_code`), считает цену на бэке через `OrderPriceCalculator`
+     * и возвращает разбивку по строкам + итог. Ничего не сохраняет, события/историю не пишет.
+     */
+    public function calculatePrice(Request $request): JsonResponse
+    {
+        try {
+            $festivalId = new Uuid((string) $request->input('festival_id'));
+
+            $rawGuests = array_map(
+                static fn (array $guest): RawGuestInput => RawGuestInput::fromState($guest),
+                $request->input('guests', []),
+            );
+
+            $lines = $this->orderPriceCalculator->calculateLines($festivalId, $rawGuests);
+
+            $total = 0;
+            $resultLines = [];
+            foreach ($lines as $line) {
+                $snapshot = $line->price;
+                $lineTotal = $line->total()->amount();
+                $resultLines[] = [
+                    'basePrice' => $snapshot->basePrice->amount(),
+                    'optionsSum' => $snapshot->optionsSum->amount(),
+                    'discount' => $snapshot->discount->amount(),
+                    'total' => $lineTotal,
+                ];
+                $total += $lineTotal;
+            }
+
+            return response()->json([
+                'success' => true,
+                'lines' => $resultLines,
+                'totalPrice' => $total,
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+
+    /**
      * Создать заказ
      *
      * @throws Throwable

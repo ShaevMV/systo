@@ -3,20 +3,82 @@ import axios from 'axios';
 const API_ORDER = '/api/v1/order'
 const API_INVITE = '/api/v1/invite'
 /**
- * Отправить данные на создание билета
+ * Отправить данные на создание заказа (формат v2.6.0 — per-guest корзина).
+ *
+ * payload.body — тело запроса (email/phone/city/name/festival_id/types_of_payment_id/comment/invite/guests[]).
+ * payload.callback(success, message, link) — колбэк результата.
+ *
+ * callback не уходит на бэк — формируем чистое тело из payload.body.
  *
  * @param context
  * @param payload
  */
 export const goToCreateOrderTicket = (context, payload) => {
-    let promise = axios.post(API_ORDER + '/create', payload);
+    let promise = axios.post(API_ORDER + '/create', payload.body);
     promise.then(function (response) {
-        console.log(response.data.success);
-        payload.callback(response.data.success, response.data.message, response.data.link ?? null);
+        if (response.data.success) {
+            // На успешном ответе ошибки прошлой попытки сбрасываем
+            context.commit('setError', []);
+        }
+        if (payload.callback) {
+            payload.callback(response.data.success, response.data.message, response.data.link ?? null);
+        }
     }).catch(function (error) {
         console.error(error);
-        context.commit('setError', error.response.data.errors);
+        context.commit('setError', error.response?.data?.errors ?? []);
+        if (payload.callback) {
+            payload.callback(false, error.response?.data?.message ?? 'Ошибка создания заказа', null);
+        }
     });
+}
+
+/**
+ * Live-расчёт цены заказа без сохранения (per-guest) — формат v2.6.0.
+ *
+ * payload.body — { festival_id, guests[] }.
+ * Возвращает Promise<{ success, lines[], totalPrice }>.
+ * lines[] в том же порядке, что guests[]: { basePrice, optionsSum, discount, total } (целые рубли).
+ *
+ * @param context
+ * @param payload
+ */
+export const calculatePrice = (context, payload) => {
+    return axios.post(API_ORDER + '/calculatePrice', payload.body)
+        .then(function (response) {
+            return response.data;
+        })
+        .catch(function (error) {
+            console.error(error);
+            return {
+                success: false,
+                lines: [],
+                totalPrice: null,
+                message: error.response?.data?.message ?? 'Не удалось рассчитать стоимость',
+            };
+        });
+}
+
+/**
+ * Загрузить активные опции для типа билета (read-модель формы покупки).
+ *
+ * payload.ticketTypeId — UUID типа билета.
+ * Возвращает Promise<Array> со списком { id, name, price, description, active }.
+ *
+ * Грузим inline здесь (не в OptionModule), чтобы у каждой карточки гостя был свой
+ * независимый список опций — в OptionModule хранится только один общий слот.
+ *
+ * @param context
+ * @param payload
+ */
+export const loadOptionsForTicketType = (context, payload) => {
+    return axios.get('/api/v1/option/getActiveForTicketType/' + payload.ticketTypeId)
+        .then(function (response) {
+            return response.data.list ?? [];
+        })
+        .catch(function (error) {
+            console.error(error);
+            return [];
+        });
 }
 
 
