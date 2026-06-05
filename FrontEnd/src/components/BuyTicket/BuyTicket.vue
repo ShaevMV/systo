@@ -259,12 +259,14 @@
 
               <!-- Согласие + сабмит -->
               <div class="row" style="justify-content: center">
-                <div class="form-check" id="check-check">
-                  <input class="form-check-input" type="checkbox" v-model="confirm" id="defaultCheck1" />
-                  <label class="form-check-label" for="defaultCheck1">
-                    Регистрируя добровольный оргвзнос, ты соглашаешься с&nbsp;<a href="/conditions" target="_blank"><b>Правилами и условиями участия в туристическом слёте</b></a>
-                    и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
-                  </label>
+                <div class="col-12 mb-3">
+                  <div class="form-check" id="check-check">
+                    <input class="form-check-input" type="checkbox" v-model="confirm" id="defaultCheck1" />
+                    <label class="form-check-label" for="defaultCheck1">
+                      Регистрируя добровольный оргвзнос, ты соглашаешься с&nbsp;<a href="/conditions" target="_blank"><b>Правилами и условиями участия в туристическом слёте</b></a>
+                      и <a href="/private" target="_blank"><b>Политикой обработки персональных данных.</b></a>
+                    </label>
+                  </div>
                 </div>
                 <div class="col-12">
                   <button
@@ -687,5 +689,16 @@ label {
 .card {
   margin-left: 10px;
   margin-right: 10px;
+}
+
+/* Согласие + кнопка: гарантируем нормальный поток (без наложения кнопки на текст) */
+#check-check {
+  position: static;
+  text-align: left;
+}
+
+.reg-btn {
+  position: static;
+  margin-top: 0.5rem;
 }
 </style>

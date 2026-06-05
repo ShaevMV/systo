@@ -281,6 +281,8 @@ jobs:
             done
           done
 
+          # Каталог PDF билетов + симлинк public/storage (иначе билеты 404, даже если сгенерены).
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root php-staging     chown -R www-data:www-data storage bootstrap/cache
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T -u root phpbaza-staging chown -R www-data:www-data storage bootstrap/cache
           echo "✓ storage и bootstrap/cache принадлежат www-data"
