@@ -40,8 +40,11 @@ class OrderGuestsBackupService
 
         // Проверка: если по случайности уже есть таблица с таким именем — не перезаписываем,
         // лучше сразу падать. Это маловероятно (timestamp до секунды), но дёшевая защита.
+        // Через information_schema (а не `SHOW TABLES LIKE ?`): MySQL/PDO не поддерживает
+        // плейсхолдеры в `SHOW TABLES` → биндинг падает с syntax error near '?'.
         $exists = $this->db->select(
-            'SHOW TABLES LIKE ?',
+            'SELECT table_name FROM information_schema.tables
+             WHERE table_schema = DATABASE() AND table_name = ?',
             [$backupTable],
         );
         if (! empty($exists)) {
