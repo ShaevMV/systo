@@ -41,6 +41,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 #
 RUN useradd -m user
+# Воркер бежит под `user`, но пишет в storage (владелец www-data). Членство в группе
+# www-data + group-writable storage (deploy: chmod g+w) даёт право писать логи/PDF/views.
+RUN usermod -aG www-data user
 RUN chown -R user:user /var/www/html
 RUN chgrp -R user /var/www/html
 
