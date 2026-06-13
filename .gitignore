@@ -10,6 +10,7 @@
 /Docker/mysqlFriendly/db/
 /Docker/mysqlFriendly/log/
 /Docker/mysql/db/
+/Docker/rabbitmq/data/
 /Friendly/bootstrap/cache/
 /Backend/bootstrap/cache/
 /Baza/bootstrap/cache/

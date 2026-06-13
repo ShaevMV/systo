@@ -84,6 +84,30 @@ services:
     networks:
       - backend
 
+  # RabbitMQ — шина между независимыми системами (qr ↔ org ↔ BAZA).
+  # ВНИМАНИЕ: в staging/prod брокер на ОТДЕЛЬНОМ сервере (RABBITMQ_HOST + RABBITMQ_SSL=true).
+  # Этот контейнер — ТОЛЬКО для локального дева/прототипа (plain, без TLS). Management UI на :15672.
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-solarSysto
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-systo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-systo}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - ./Docker/rabbitmq/data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
   mysql:
     image: mysql:8
     restart: unless-stopped
