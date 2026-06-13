@@ -56,7 +56,7 @@
 
 - **CQRS** через Symfony Messenger: `Command → CommandBus → CommandHandler → Repository`
 - **DDD**: AggregateRoot, Value Objects, Domain Events, Repository Pattern
-- **Event Sourcing** (частичный): RabbitMQ (primary) → MySQL Outbox (failover)
+- **Очереди/события:** сейчас на **MySQL** (Laravel `database` queue + `failed_jobs`). RabbitMQ в проде **НЕ запущен** (контейнера нет, классы `RabbitMq*` в Shared — неподключённая заготовка). Целевое направление (R&D, см. `.claude/meetings/2026-06-13/`): RabbitMQ как шина между независимыми системами **qr ↔ org ↔ BAZA** (выбрано владельцем для разворота архитектуры; на входе фестиваля BAZA остаётся автономной — брокер не runtime-зависимость)
 
 ### Структура модуля Backend
 
