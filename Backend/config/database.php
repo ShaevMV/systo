@@ -66,11 +66,15 @@ return [
         'mysqlBaza' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => 'database',
+            'host' => env('DB_BAZA_HOST', 'database'),
             'port' => env('DB_PORT', '3306'),
-            'database' => 'baza',
-            'username' => 'root',
-            'password' => 'common404',
+            'database' => env('DB_BAZA_DATABASE', 'baza'),
+            // Креды вынесены в env (раньше были захардкожены root/common404 в git — компрометация).
+            // Fallback оставлен временно, чтобы не сломать существующие окружения. ПОЛНОЕ закрытие:
+            // ротация пароля BAZA + проставить DB_BAZA_PASSWORD в .env всех окружений (devops),
+            // после чего убрать fallback. См. .claude/specs/qr-integration/CONTRACT_RFC_v0.md (security).
+            'username' => env('DB_BAZA_USERNAME', 'root'),
+            'password' => env('DB_BAZA_PASSWORD', 'common404'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
