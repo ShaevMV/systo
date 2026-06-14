@@ -36,4 +36,19 @@ final class QrOrderApplication
     {
         return $this->repository->findById($id);
     }
+
+    /**
+     * Сменить статус принятого заказа (API №2, шаг 2a).
+     * Возвращает false, если заказа с таким id нет.
+     *
+     * TODO(2b): при переходе в «оплачен»/выдать — запустить выдачу билетов (PDF/письма).
+     */
+    public function changeStatus(Uuid $id, string $status): bool
+    {
+        if (! $this->repository->existsById($id)) {
+            return false;
+        }
+
+        return $this->repository->changeStatus($id, $status);
+    }
 }
