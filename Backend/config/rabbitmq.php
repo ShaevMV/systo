@@ -25,6 +25,9 @@ return [
     // Topic-exchange, в который публикуются доменные события.
     'exchange' => env('RABBITMQ_EXCHANGE', 'systo.events'),
 
+    // Очередь приёма заказов от внешней витрины qr (qr → org), binding `order.created`.
+    'qr_orders_queue' => env('RABBITMQ_QR_ORDERS_QUEUE', 'org.qr-orders'),
+
     // Общий секрет HMAC-подписи сообщений между системами. ОБЯЗАТЕЛЬНО задать в .env.
     // Должен совпадать на стороне org, BAZA и qr.
     'signing_secret' => env('RABBITMQ_SIGNING_SECRET', ''),
