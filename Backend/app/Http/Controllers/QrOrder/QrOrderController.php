@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\History\Dto\DomainHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\QrOrderApplication;
 use Tickets\QrOrder\Dto\QrOrderDto;
 
@@ -86,5 +88,27 @@ class QrOrderController extends Controller
             'item' => $application->getItem(new Uuid($id))?->toArray(),
             'message' => 'Статус обновлён',
         ]);
+    }
+
+    /**
+     * История заказа qr (таймлайн для админа org): created → status_changed → issued.
+     * Actor — ActorType::QR (S2S-канал, не человек).
+     */
+    public function getHistory(
+        string $id,
+        HistoryRepositoryInterface $history,
+    ): JsonResponse {
+        $items = array_map(
+            static fn (DomainHistoryDto $h): array => [
+                'event_name' => $h->eventName,
+                'aggregate_type' => $h->aggregateType,
+                'payload' => $h->payload,
+                'actor_type' => $h->actorType,
+                'occurred_at' => $h->occurredAt->toIso8601String(),
+            ],
+            $history->getByAggregateId($id),
+        );
+
+        return response()->json(['success' => true, 'history' => $items]);
     }
 }

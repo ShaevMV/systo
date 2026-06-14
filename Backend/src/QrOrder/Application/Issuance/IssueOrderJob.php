@@ -12,8 +12,12 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\History\Domain\ActorType;
+use Tickets\History\Dto\SaveHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\Step\PipelineStepInterface;
 use Tickets\QrOrder\Application\Support\PipelineLog;
+use Tickets\QrOrder\Domain\QrOrderHistoryEvent;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 
 /**
@@ -47,6 +51,7 @@ final class IssueOrderJob implements ShouldQueue
         QrOrderRepositoryInterface $repository,
         IssuanceStrategyRegistry $registry,
         Container $container,
+        HistoryRepositoryInterface $history,
     ): void {
         $log = PipelineLog::logger();
         $order = $repository->findById(new Uuid($this->orderId));
@@ -85,6 +90,13 @@ final class IssueOrderJob implements ShouldQueue
         }
 
         $log->info('pipeline.done', ['order_id' => $this->orderId]);
+
+        $history->save(new SaveHistoryDto(
+            $this->orderId,
+            new QrOrderHistoryEvent('issued', ['strategy' => $strategy->typeOrder()]),
+            null,
+            ActorType::QR,
+        ));
     }
 
     /**
