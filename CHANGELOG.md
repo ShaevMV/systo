@@ -11,7 +11,40 @@
 
 ## [Unreleased]
 
-_(пока пусто — все изменения вошли в [2.5.1])_
+_(пока пусто)_
+
+---
+
+## [2.6.0] — 2026-06-05
+
+**Минорный релиз с ломающим изменением формата заказа.** Подготовка к старту продаж осеннего фестиваля: опции к билетам и переход на **per-guest** формат заказа (тип билета, промокод и опции — на уровне каждого гостя). Источник: спецификации `.claude/specs/{ticket-options,order-format-architecture}.md`.
+
+> Релиз зафиксирован тегом ретроспективно (работа влита в master через PR #61–#73, 2026-06-04…05).
+
+### Added (Добавлено)
+
+- **Опции к билетам** — сущность `Option` (модуль `Backend/src/Option/`) с волнами цен и админ-UI; связь many-to-many с типами билетов, snapshot цены/имени на момент покупки (#61).
+- **Money VO** (`Shared/Domain/ValueObject/Money.php`) — денежные суммы в целых рублях, banker's rounding, защита от NaN/INF (#62).
+- **Domain VO нового формата заказа** (#66) + **`OrderPriceCalculator`** (Application-сервис расчёта цены) + Query/Handler (#68).
+- **Per-guest форма покупки** на фронте: каждый гость — карточка с типом билета, опциями и промокодом, live-расчёт цены (#73).
+- Сидер `UserSeeder` под 7 ролей (#67).
+
+### Changed (Изменено) — BREAKING
+
+- **Формат заказа переведён на per-guest**: `ticket_type_id`, `promo_code` и новое `options[]` уехали с уровня заказа на уровень гостя (`guests[].*`). Контроллеры `order/create` и `order/createFriendly` принимают новый формат; legacy-формат **не поддерживается** (#72).
+- Расчёт цены полностью в `OrderPriceCalculator`: промокод процентный считается только от базового билета, кратность опций — через `qty`.
+
+### Migration (Миграция данных)
+
+- Идемпотентная миграция `order_tickets.guests` в формат v2.6.0 — распределение `ticket_type_id`/`promo_code` родителя на каждого гостя в JSON, с бэкапом (#70).
+
+### Fixed / Infra
+
+- Инфра-фиксы staging: добавлены домены в CORS-whitelist, генерация `JWT_SECRET` в деплое, правки nginx, сидеры в 4 режимах (auto/force/fresh/skip) (#59, #60, #63, #64).
+
+### Breaking Changes
+
+- Старый (pre-guest) формат заказа в API больше не принимается — все клиенты должны слать per-guest формат (одновременное обновление клиентов).
 
 ---
 
@@ -153,6 +186,7 @@ make test          # все тесты
 
 ---
 
-[Unreleased]: https://github.com/ShaevMV/systo/compare/v2.5.1...HEAD
+[Unreleased]: https://github.com/ShaevMV/systo/compare/v2.6.0...HEAD
+[2.6.0]: https://github.com/ShaevMV/systo/releases/tag/v2.6.0
 [2.5.1]: https://github.com/ShaevMV/systo/releases/tag/v2.5.1
 [2.5.0]: https://github.com/ShaevMV/systo/releases/tag/v2.5.0
