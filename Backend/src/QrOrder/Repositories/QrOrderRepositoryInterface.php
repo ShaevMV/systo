@@ -22,4 +22,7 @@ interface QrOrderRepositoryInterface
 
     /** Отметить заказ как выданный (билеты созданы) — защита от повторной выдачи. */
     public function markIssued(Uuid $id, Carbon $issuedAt): bool;
+
+    /** Снять отметку выдачи (issued_at = null) — при сбое выдачи, чтобы заказ можно было выдать повторно. */
+    public function clearIssued(Uuid $id): bool;
 }

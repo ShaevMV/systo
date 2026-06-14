@@ -19,8 +19,8 @@ use Tickets\QrOrder\Dto\QrOrderDto;
  * API №1 — создание заказа: принимает расширенный JSON-контракт и сохраняет его в qr_orders
  * (payload as-is + проекция для фильтров). id заказа qr == id заказа org.
  *
- * TODO(безопасность): эндпоинт create — server-to-server от qr. Сейчас публичный (как order/create).
- * Механизм аутентификации канала (service-token / подпись) — отдельное решение владельца.
+ * Аутентификация канала: create/changeStatus закрыты Sanctum-токеном со scope qr:ingest
+ * (auth:sanctum + abilities:qr:ingest, см. routes/qrOrder.php). getItem — JWT + admin (ПДн).
  */
 class QrOrderController extends Controller
 {

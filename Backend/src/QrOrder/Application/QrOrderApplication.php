@@ -6,6 +6,7 @@ namespace Tickets\QrOrder\Application;
 
 use Carbon\Carbon;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 
@@ -20,7 +21,6 @@ final class QrOrderApplication
 
     public function __construct(
         private readonly QrOrderRepositoryInterface $repository,
-        private readonly QrOrderIssuer $issuer,
     ) {
     }
 
@@ -58,9 +58,10 @@ final class QrOrderApplication
         $this->repository->changeStatus($id, $status);
 
         if ($this->isPaid($status) && $order->getIssuedAt() === null) {
-            // Перечитываем заказ с новым статусом для выдачи.
-            $this->issuer->issue($this->repository->findById($id) ?? $order);
+            // Помечаем выданным ДО постановки задачи — защита от повторного запуска при
+            // повторном «оплачен» (qr-ретраи). Сама выдача — асинхронно, вне HTTP-запроса qr.
             $this->repository->markIssued($id, Carbon::now());
+            IssueOrderJob::dispatch($id);
         }
 
         return true;

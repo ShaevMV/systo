@@ -70,6 +70,15 @@ return [
             'days' => 14,
         ],
 
+        // Канал pipeline выдачи билетов по заказам qr (структурированный JSON, без ПДн). См. TD-10.
+        'qr_pipeline' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/qr_pipeline.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
