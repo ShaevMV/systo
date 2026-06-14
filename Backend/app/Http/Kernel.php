@@ -71,5 +71,7 @@ class Kernel extends HttpKernel
         'admin' => IsAdmin::class,
         'role' => \App\Http\Middleware\CheckRole::class,
         'bot' => Bot::class,
+        // Проверка scope (ability) Sanctum-токена — для S2S-канала qr→org.
+        'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
     ];
 }

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature\QrOrder;
 
 use App\Models\QrOrder\QrOrderModel;
+use App\Models\User;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
@@ -14,6 +16,13 @@ use Tests\TestCase;
  */
 class QrOrderCreateApiTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // S2S-канал защищён: аутентифицируем сервис-токеном со scope qr:ingest.
+        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+    }
+
     private function contract(string $orderId = '11111111-1111-1111-1111-111111111111'): array
     {
         return [

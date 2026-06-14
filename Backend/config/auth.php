@@ -47,6 +47,13 @@ return [
             'provider' => 'users',
         ],
 
+        // Отдельный guard для S2S-канала qr→org (Bearer-токены Sanctum).
+        // Не трогает основной api(jwt) — используется только на /qrOrder/{create,changeStatus}.
+        'sanctum' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+
     ],
 
     /*

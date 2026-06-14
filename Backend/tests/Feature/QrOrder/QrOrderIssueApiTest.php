@@ -6,9 +6,11 @@ namespace Tests\Feature\QrOrder;
 
 use App\Mail\OrderToPaid;
 use App\Models\Tickets\TicketModel;
+use App\Models\User;
 use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
@@ -21,6 +23,13 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
 class QrOrderIssueApiTest extends TestCase
 {
     private const ORDER_ID = '11111111-1111-1111-1111-111111111111';
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // S2S-канал защищён: аутентифицируем сервис-токеном со scope qr:ingest.
+        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+    }
 
     private function contract(): array
     {
