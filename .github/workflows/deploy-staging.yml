@@ -145,6 +145,21 @@ jobs:
             echo "✓ Backend/.env уже существует — пропускаю"
           fi
 
+      # Подключение к БД Baza (el_tickets и пр.) добавляем идемпотентно: на уже
+      # существующем Backend/.env bootstrap пропускается, а DB_BAZA_* могли там
+      # ещё отсутствовать (введены вместе с записью qr-билетов в Baza).
+      - name: Ensure Backend/.env has Baza connection vars
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          DB_PWD="$(grep ^MYSQL_PASSWORD .env.staging | cut -d= -f2)"
+          add_kv() { grep -qE "^$1=" Backend/.env || echo "$1=$2" >> Backend/.env; }
+          add_kv DB_BAZA_HOST mysql-staging
+          add_kv DB_BAZA_PORT 3306
+          add_kv DB_BAZA_DATABASE baza
+          add_kv DB_BAZA_USERNAME systo
+          add_kv DB_BAZA_PASSWORD "$DB_PWD"
+          echo "✓ DB_BAZA_* присутствуют в Backend/.env (Baza доступна со staging)"
+
       - name: Bootstrap Baza/.env (first deploy)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
