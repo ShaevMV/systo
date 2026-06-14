@@ -426,3 +426,12 @@ jobs:
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           docker compose -f docker-compose.staging.yml --env-file .env.staging ps
+
+      # Освобождаем место: docker build cache раздувается до гигабайт (TD-8).
+      # Чистим только висячий кэш/образы — рабочие контейнеры и их образы не трогаются.
+      - name: Cleanup docker cache (TD-8)
+        run: |
+          echo "До чистки:"; df -h / | tail -1
+          docker builder prune -f >/dev/null 2>&1 || true
+          docker image prune -f   >/dev/null 2>&1 || true
+          echo "После чистки:"; df -h / | tail -1
