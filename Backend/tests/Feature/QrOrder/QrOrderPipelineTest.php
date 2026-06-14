@@ -16,6 +16,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
+use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
 
@@ -73,6 +74,9 @@ class QrOrderPipelineTest extends TestCase
         // PDF/QR поставлен в очередь; письмо со всеми PDF отправлено ровно одно.
         Queue::assertPushed(ProcessCreatingQRCode::class);
         Mail::assertSent(OrderToPaid::class, 1);
+
+        // Запись билета в Baza — отдельной изолированной задачей (на каждый билет).
+        Queue::assertPushed(PushTicketToBazaJob::class, 1);
     }
 
     public function test_failed_job_resets_issued_at_for_retry(): void

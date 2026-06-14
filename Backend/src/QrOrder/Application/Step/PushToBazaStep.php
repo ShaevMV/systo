@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tickets\QrOrder\Application\Step;
+
+use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
+use Tickets\QrOrder\Application\Support\PipelineLog;
+use Tickets\QrOrder\Dto\QrOrderDto;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
+
+/**
+ * Шаг 3: запись билетов заказа в Baza (el_tickets). На каждый билет ставит ИЗОЛИРОВАННУЮ
+ * задачу PushTicketToBazaJob (свои ретраи, идемпотентно) — сбой Baza не валит выдачу/письмо.
+ *
+ * Билеты без type_ticket_id в Baza не пишутся (нечего записать) — как в классическом флоу
+ * (PushTicketsCommandHandler пропускает такие). Шаг сам никогда не бросает: только ставит задачи.
+ */
+final class PushToBazaStep implements PipelineStepInterface
+{
+    public function name(): string
+    {
+        return 'push_to_baza';
+    }
+
+    public function handle(QrOrderDto $order, array $carry): array
+    {
+        /** @var TicketResponse[] $responses */
+        $responses = $carry['responses'] ?? [];
+        $log = PipelineLog::logger();
+        $queued = 0;
+
+        foreach ($responses as $response) {
+            if ($response->getTypeTicketId() === null) {
+                $log->warning('push_to_baza.skip_no_type', [
+                    'order_id' => $order->getId()->value(),
+                    'ticket_id' => $response->getId()->value(),
+                ]);
+
+                continue;
+            }
+
+            PushTicketToBazaJob::dispatch($response);
+            $queued++;
+        }
+
+        $log->info('push_to_baza.queued', [
+            'order_id' => $order->getId()->value(),
+            'count' => $queued,
+        ]);
+
+        return $carry;
+    }
+}
