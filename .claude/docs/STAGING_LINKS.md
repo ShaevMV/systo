@@ -12,7 +12,8 @@
 
 | URL | Что это | Где проверять |
 |-----|---------|---------------|
-| **https://staging.spaceofjoy.ru** | Фронт SPA (Vue 3) | Покупка билетов, формы заказа, личный кабинет, админ-UI (после логина) |
+| **https://staging.spaceofjoy.ru** | Фронт SPA (Vue 3, старый `FrontEnd/`, Vue CLI/webpack) | Покупка билетов, формы заказа, личный кабинет, админ-UI (после логина) |
+| **https://staging.spaceofjoy.ru/new-admin/** | Новая админка org (`AdminFront/`, Vite + PrimeVue Sakai) — PoC | Превью новой admin-only системы. Пока один экран: QR-заказы (read-only). Сборка `--base=/new-admin/`, dist раздаётся nginx-staging (location `/new-admin/`) |
 | **https://api.staging.spaceofjoy.ru** | Backend API (Laravel) | Endpoint'ы `/api/v1/*` — через `curl`/Postman/DevTools браузера. Healthcheck: `GET /` → 200 |
 | **https://vhod.staging.spaceofjoy.ru** | Baza (аутентификация) | Регистрация, логин, восстановление пароля |
 | **https://pma.staging.spaceofjoy.ru** | phpMyAdmin → MySQL | Просмотр/правка БД `systo`, `baza`. **Basic auth + MySQL логин** (см. §«Креды») |
@@ -27,6 +28,7 @@
 | Новый/изменённый эндпоинт API | `https://api.staging.spaceofjoy.ru/api/v1/...` |
 | UI заказа / форма покупки билетов | `https://staging.spaceofjoy.ru` → переход на покупку |
 | Админ-UI (CRUD типов билетов / опций / промокодов / локаций) | `https://staging.spaceofjoy.ru` → логин админа → нужный раздел |
+| Новая админка (AdminFront, Vite + Sakai) / экран QR-заказов | `https://staging.spaceofjoy.ru/new-admin/` |
 | Регистрация / логин / пароль / роли | `https://vhod.staging.spaceofjoy.ru` |
 | Миграция БД, новая таблица, поле | `https://pma.staging.spaceofjoy.ru` → таблица → SHOW COLUMNS |
 | Письма (оплата заказа / отмена / анкета / Friendly / список) | `https://mail.staging.spaceofjoy.ru` |
@@ -71,6 +73,15 @@ ssh deploy@77.222.32.244 'docker exec mysql-staging sh -c '"'"'mysql -uroot -p"$
 
 ---
 
+## Новая админка `/new-admin/` (AdminFront)
+
+- **Сервис:** `node-admin-staging` (build `Docker/node`, bind `./AdminFront:/var/www/admin`, env `VITE_API_URL=https://api.staging.spaceofjoy.ru/`).
+- **Сборка:** шаг `Build admin frontend (Vite, /new-admin/)` в `deploy-staging.yml` — под root: `run --rm node-admin-staging sh -c "rm -rf dist && npm ci --include=dev && npm run build -- --base=/new-admin/"` (свежий bind-каталог, дефолтный юзер контейнера не может писать в чужой UID).
+- **Раздача:** nginx-staging, location `/new-admin/` (`Docker/nginx/default.staging.conf`), `try_files … /new-admin/index.html` (SPA-fallback).
+- Старый фронт (`https://staging.spaceofjoy.ru`) собирается отдельным шагом (`node-staging`) и продолжает работать — переезд по Strangler.
+
+---
+
 ## Использование агентами
 
 Этот файл — справочник для:
@@ -88,3 +99,4 @@ ssh deploy@77.222.32.244 'docker exec mysql-staging sh -c '"'"'mysql -uroot -p"$
 | Дата | Изменение |
 |------|-----------|
 | 2026-06-01 | Создан документ — единый источник ссылок на стенд для агентов |
+| 2026-06-14 | Добавлена новая админка `/new-admin/` (AdminFront, Vite + PrimeVue Sakai): URL, инфра-сервис `node-admin-staging`, nginx-location, шаг Vite-сборки в workflow |

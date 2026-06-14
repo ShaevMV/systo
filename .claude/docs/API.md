@@ -429,6 +429,116 @@
 
 ---
 
+## 3.1. QR-заказы (приём от витрины qr.spaceofjoy.ru)
+
+Префикс: **`/api/v1/qrOrder`**
+
+Канал приёма заказов от внешней витрины **qr.spaceofjoy.ru** (отдельный сервис/репозиторий). Заказ сохраняется в таблицу `qr_orders` (payload as-is + проекция для фильтров). **`id` заказа qr == `id` заказа org** (идемпотентность приёма).
+
+- **`type_order`** ∈ `regular` / `friendly` / `list` / `live`
+- **`status`** — строки от qr (например `создан` / `оплачен` / `отменён`), не enum
+- `total_price` — целые рубли (int)
+- В `domain_history.actor_type` для всех событий qr-заказа пишется `qr` (S2S-канал, не человек)
+
+### POST `/api/v1/qrOrder/create`
+**Middleware:** `auth:sanctum` + `abilities:qr:ingest` (S2S, токен сервис-аккаунта qr)
+
+**Описание:** приём заказа от витрины (API №1). Идемпотентно: повторный приём заказа с тем же `id` не создаёт дубль. Токен выпускается `php artisan qr:issue-token` и шлётся заголовком `Authorization: Bearer <token>`.
+
+**Request:** расширенный JSON-контракт qr (`order_id`, `user`, `price`, `order_data`, `guests[]`, см. `.claude/specs/admin-qr-orders-prompt.md §2`).
+
+**Response 200:** `{ "success": true, "order_id": "UUID", "message": "Заказ принят" }`
+**Response 422:** `{ "success": false, "message": "..." }` (невалидный контракт)
+
+---
+
+### POST `/api/v1/qrOrder/changeStatus/{id}`
+**Middleware:** `auth:sanctum` + `abilities:qr:ingest` (S2S)
+
+**Описание:** смена статуса принятого заказа (API №2). При переходе в `оплачен`/`paid` запускается выдача билетов (PDF/письма) — **один раз** (защита по `issued_at`: повторный «оплачен» не выдаёт билеты снова).
+
+**Request:** `{ "status": "string (required)" }`
+
+**Response 200:** `{ "success": true, "item": {...}, "message": "Статус обновлён" }`
+**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
+**Response 422:** `{ "success": false, "message": "Не передан status" }`
+
+---
+
+### POST `/api/v1/qrOrder/getList`
+**Middleware:** `auth:api` + `admin` (read-only, содержит ПДн)
+
+**Описание:** список принятых qr-заказов для админки org. Только просмотр — заказы не создаются/не меняются отсюда (это S2S-канал витрины). Паттерн `Location`: `QrOrderGetListQuery` → `QrOrderGetListQueryHandler` через QueryBus, БД только в репозитории (`getList` + `countList` через Shared `FilterBuilder`/`Order`).
+
+**Request (фильтр + пагинация):**
+```json
+{
+  "filter": {
+    "email": "string? (LIKE)",
+    "city": "string? (LIKE)",
+    "status": "string? (EQUAL)",
+    "festival_id": "UUID? (EQUAL)",
+    "type_order": "string? (EQUAL: regular/friendly/list/live)"
+  },
+  "orderBy": { "created_at": "asc|desc" },
+  "page": 1,
+  "perPage": 20
+}
+```
+- Фильтр — **whitelist** (только перечисленные поля попадают в `WHERE`)
+- `page` зажат снизу к 1; `perPage` — диапазон 1..100, иначе fallback на 20
+- `orderBy.*` допускает только `asc`/`desc`; кривое значение → `Order::none()` (запрос не падает)
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "list": [
+    {
+      "id": "UUID", "email": "...", "status": "оплачен",
+      "festival_id": "UUID", "type_order": "regular", "city": "...",
+      "phone": "...", "total_price": 4200,
+      "issued_at": "ISO8601|null", "created_at": "ISO8601"
+    }
+  ],
+  "totalNumber": { "totalCount": 42 }
+}
+```
+- Проекция списка — `QrOrderItemForListResponse` (snake_case, **без `payload`** — он тяжёлый, отдаётся только в `getItem`)
+
+---
+
+### GET `/api/v1/qrOrder/getItem/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response 200:** `{ "success": true, "item": {...} }` — полный заказ, включая `payload` (гости/цены/локация)
+**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
+
+---
+
+### GET `/api/v1/qrOrder/getHistory/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** таймлайн истории qr-заказа (`created` → `status_changed` → `issued`). `actor_type` для всех событий — `qr`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "history": [
+    {
+      "event_name": "created|status_changed|issued",
+      "aggregate_type": "qr_order",
+      "payload": { "from": "...", "to": "..." },
+      "actor_type": "qr",
+      "occurred_at": "ISO8601"
+    }
+  ]
+}
+```
+
+---
+
 ## 4. Билеты
 
 Префикс: **`/api/v1/ticket`**
@@ -721,6 +831,8 @@
 |------------|-------|----------|
 | **CORS** | global | Проверяет Origin против белого списка |
 | **Authenticate** | `auth:api` | JWT через `php-open-source-saver/jwt-auth` |
+| **Sanctum** | `auth:sanctum` | Токен сервис-аккаунта (S2S-канал qr→org) |
+| **Abilities** | `abilities:qr:ingest` | Scope токена Sanctum для приёма qr-заказов |
 | **IsAdmin** | `admin` | Проверка `is_admin = true` или `role = 'admin'` |
 | **CheckRole** | `role:role1,role2` | Проверка роли пользователя |
 | **Bot** | `bot` | Заголовок `auth-token` == `PCf4yeeM8prVGee3zbArQGQP2eGpPHsV` |
@@ -740,3 +852,20 @@
 | **role: admin,manager** | order/getListsList |
 | **role: seller,admin,pusher,manager** | order/toChangeStatus (для list-статусов внутри проверка admin/manager) |
 | **bot** | promoCode/savePromoCodeForBot |
+| **sanctum + abilities:qr:ingest** | qrOrder/create, qrOrder/changeStatus (S2S от витрины qr) |
+| **admin** (qr) | qrOrder/getList, qrOrder/getItem, qrOrder/getHistory |
+
+---
+
+## ⚠️ Кандидаты на вынос (org → admin-only, переезд на qr.spaceofjoy.ru)
+
+> **Контекст:** org становится **внутренней admin-only системой** (создание билетов + контроль доставки в Baza). Публичная часть — продажа билетов, публичные формы/витрина — переезжает на **qr.spaceofjoy.ru**. Эндпоинты ниже **НЕ удалять сейчас** — пометить и удалить **в релизе после cutover** на qr. Если для эндпоинта остаётся внутреннее (admin) применение — он сохраняется.
+
+| Эндпоинт | Статус | Примечание |
+|----------|--------|------------|
+| `POST /api/v1/order/create` (публичный) | ⚠️ DEPRECATED → qr.spaceofjoy.ru | Публичное оформление заказа уезжает на витрину qr. На org остаётся приём через `qrOrder/create` (S2S). Удалить в релизе после cutover. |
+| `ANY /api/v1/order/succes` (webhook платёжки) | ⚠️ Кандидат на вынос (уточнить) | Биллинг/оплата — ценность витрины qr. Webhook, вероятно, уезжает на qr. Уточнить, не остаётся ли часть оплаты на org. |
+| `GET /api/v1/festival/load`, `loadByTicketType`, `getListPrice`, `getFestivalList` (публичные) | ⚠️ Кандидат на вынос (уточнить) | Питают **публичную витрину покупки**. Каталог фестивалей/типов/цен остаётся мастером на org (см. pivot), но публичные read-эндпоинты витрины могут переехать на qr или стать read-каналом для qr. Уточнить перед удалением. |
+| `POST /api/v1/questionnaire/send`, `sendNewUser`, `getByOrderTicket`, `getQuestionnaireTypeByOrderTicket` (публичные) | ⚠️ Кандидат на вынос (уточнить) | Публичное заполнение анкет гостями. Может уехать на qr вместе с публичным flow заказа. Уточнить. |
+
+**НЕ кандидаты на вынос** (остаются на org как admin-only): весь `qrOrder/*`, admin-CRUD (`ticketType`, `promoCode`, `location`, `ticketTypePrice`, `account`, `questionnaire/load|approve|get`), `order/getList|getListsList|getCuratorList|toChangeStatus|getHistory`, `qrOrder/getList|getItem|getHistory`.
