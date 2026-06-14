@@ -46,7 +46,9 @@ use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
+use Tickets\QrOrder\Repositories\InMemoryMySqlQrIssuanceRepository;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrOrderRepository;
+use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 
 class TicketsProvider extends ServiceProvider
@@ -79,7 +81,8 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(OptionRepositoryInterface::class, InMemoryMySqlOptionRepository::class);
         $this->app->bind(OptionPriceRepositoryInterface::class, InMemoryMySqlOptionPriceRepository::class);
         $this->app->bind(AutoRepositoryInterface::class, InMemoryMySqlAutoRepository::class);
-        // Приём заказов от витрины qr (API №1)
+        // Приём заказов от витрины qr (API №1) + выдача билетов (API №2b)
         $this->app->bind(QrOrderRepositoryInterface::class, InMemoryMySqlQrOrderRepository::class);
+        $this->app->bind(QrIssuanceRepositoryInterface::class, InMemoryMySqlQrIssuanceRepository::class);
     }
 }
