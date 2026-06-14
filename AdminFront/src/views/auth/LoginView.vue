@@ -59,8 +59,13 @@ function onSubmit() {
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, transparent 30%)">
                 <div class="w-full bg-surface-0 dark:bg-surface-800 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
-                        <img src="/img/logo-solarsysto-2026.webp" alt="Solar Systo" class="login-logo mx-auto mb-5" />
-                        <div class="font-display text-surface-900 dark:text-surface-0 text-3xl mb-2">SOLAR SYSTO</div>
+                        <!-- Лого-знак белый → на светлой карточке без подложки пропадает.
+                             Заворачиваем в брендовый «чип» (тёмно-сливовый кружок), на котором
+                             белые линии планеты читаются. В тёмной теме чип прозрачный. -->
+                        <span class="login-logo-chip mx-auto mb-5">
+                            <img src="/img/logo-solarsysto-2026.webp" alt="Solar Systo" class="login-logo" />
+                        </span>
+                        <div class="login-wordmark font-display text-3xl mb-2">SOLAR SYSTO</div>
                         <div class="text-muted-color text-lg mb-4">Админка</div>
                         <span class="text-muted-color font-medium">Войдите для продолжения</span>
                     </div>
@@ -87,10 +92,33 @@ function onSubmit() {
 </template>
 
 <style scoped>
+/* Брендовый «чип» под лого: тёмно-сливовый круг.
+   Белые линии знака планеты читаются на нём и на светлой, и на тёмной карточке. */
+.login-logo-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 6.5rem;
+    height: 6.5rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 38%, #4a3b58 0%, #33263f 70%, #241a30 100%);
+    box-shadow: 0 6px 18px rgba(51, 38, 63, 0.28);
+}
+
 .login-logo {
     width: auto;
     height: 4.5rem;
     object-fit: contain;
+}
+
+/* Вордмарк — брендовым тёмно-сливовым на светлой теме (чёткий контраст),
+   почти белым на тёмной. */
+.login-wordmark {
+    color: #33263f;
+}
+
+:global(.app-dark) .login-wordmark {
+    color: rgba(255, 255, 255, 0.95);
 }
 
 .login-screen {
@@ -98,19 +126,24 @@ function onSubmit() {
 }
 
 /* Брендовый декор: тонкие фоновые акценты по углам.
-   pointer-events: none — клики проходят сквозь, форму не перекрывают. */
+   pointer-events: none — клики проходят сквозь, форму не перекрывают.
+   Знаки белые → на СВЕТЛОМ фоне без обработки исчезнут. Поэтому в светлой теме
+   перекрашиваем их в брендовый оранжево-сливовый через CSS-фильтр. */
 .brand-decor {
     position: absolute;
     pointer-events: none;
     user-select: none;
     z-index: 0;
-    opacity: 0.12;
-    filter: grayscale(0.2);
+    opacity: 0.3;
+    /* Светлая тема: белый знак → насыщенный брендовый оранжевый (#ff7900).
+       brightness(0) делает силуэт чёрным, далее перекрашиваем в оранжевый. */
+    filter: brightness(0) saturate(100%) invert(52%) sepia(89%) saturate(1850%) hue-rotate(360deg) brightness(101%) contrast(106%);
 }
 
-/* В тёмной теме декор белый и заметнее, в светлой — приглушаем сильнее. */
+/* В тёмной теме декор остаётся белым и деликатным — фильтр снимаем. */
 :global(.app-dark) .brand-decor {
     opacity: 0.16;
+    filter: grayscale(0.2);
 }
 
 .brand-decor--sputnik {

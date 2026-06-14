@@ -7,6 +7,10 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
       <link rel="apple-touch-icon" href="/apple-touch-icon.png">
       <meta name="theme-color" content="#ff7900">
+      <!-- Явно объявляем светлую цветовую схему: говорим браузеру, что приложение
+           само управляет темой. Без этого Chrome с включённой системной тёмной темой
+           принудительно «затемняет» (auto dark mode) светлый интерфейс в грязно-тёмный. -->
+      <meta name="color-scheme" content="light">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Solar Systo · Админка</title>
 </head>

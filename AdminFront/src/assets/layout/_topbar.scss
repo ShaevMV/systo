@@ -32,11 +32,17 @@
             width: 3rem;
         }
 
+        // Лого-знак белый. На светлом топбаре он пропадает, поэтому в светлой теме
+        // подкладываем тёмно-сливовый «чип» (круглую подложку) под картинку.
         .layout-topbar-logo-img {
             width: auto;
             height: 2.25rem;
             object-fit: contain;
             display: block;
+            background: radial-gradient(circle at 50% 40%, #4a3b58 0%, #33263f 72%, #241a30 100%);
+            border-radius: 50%;
+            padding: 0.25rem;
+            box-shadow: 0 2px 6px rgba(51, 38, 63, 0.22);
         }
 
         .layout-topbar-logo-text {
@@ -108,6 +114,13 @@
         display: flex;
         gap: 1rem;
     }
+}
+
+// В тёмной теме топбар сам тёмный — подложка под лого не нужна, убираем чип.
+.app-dark .layout-topbar .layout-topbar-logo .layout-topbar-logo-img {
+    background: none;
+    padding: 0;
+    box-shadow: none;
 }
 
 @media (max-width: 991px) {
