@@ -8,12 +8,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
+use Tickets\QrOrder\Application\GetList\QrOrderGetListQuery;
 use Tickets\QrOrder\Application\QrOrderApplication;
 use Tickets\QrOrder\Dto\QrOrderDto;
+use Tickets\QrOrder\Responses\QrOrderItemForListResponse;
 
 /**
  * API приёма заказов от витрины qr.spaceofjoy.ru.
@@ -50,6 +53,42 @@ class QrOrderController extends Controller
                 'message' => $exception->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Список принятых qr-заказов для админки org (read-only): фильтры + пагинация + total.
+     * Заказы НЕ редактируются отсюда — создание/смена статуса идут S2S-каналом от витрины qr.
+     */
+    public function getList(
+        Request $request,
+        QrOrderApplication $application,
+    ): JsonResponse {
+        $data = $request->toArray();
+
+        // OrderType кидает InvalidArgumentException на чужих значениях (не asc/desc/none) —
+        // оборачиваем, чтобы кривой orderBy не ронял запрос (как в TicketTypePriceController).
+        try {
+            $orderBy = Order::fromState($data['orderBy'] ?? []);
+        } catch (InvalidArgumentException) {
+            $orderBy = Order::none();
+        }
+
+        $page = max(1, (int) ($data['page'] ?? 1));
+        $perPage = (int) ($data['perPage'] ?? 20);
+        $perPage = ($perPage > 0 && $perPage <= 100) ? $perPage : 20;
+
+        $response = $application->getList(
+            new QrOrderGetListQuery($data['filter'] ?? [], $orderBy, $page, $perPage),
+        );
+
+        return response()->json([
+            'success' => true,
+            'list' => $response->getCollection()
+                ->map(fn (QrOrderItemForListResponse $dto) => $dto->toArray())
+                ->values()
+                ->all(),
+            'totalNumber' => ['totalCount' => $response->getTotalCount()],
+        ]);
     }
 
     public function getItem(
