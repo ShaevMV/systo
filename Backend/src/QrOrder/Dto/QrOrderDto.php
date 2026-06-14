@@ -64,6 +64,10 @@ class QrOrderDto extends AbstractionEntity implements Response
      * Сборка из расширенного JSON-контракта витрины qr (см. CONTRACT JSON в задаче).
      * Проекционные поля денормализуются из вложенных секций, весь JSON кладётся в payload.
      *
+     * Поле `guests[].telegram` (per-guest): обязательно на стороне qr, на org валидируется мягко
+     * (пустое — пропускается). Используется шагом SendTelegramStep для уведомления в бот;
+     * хранится в payload, в проекцию qr_orders НЕ выносится (по нему не фильтруем).
+     *
      * @param array<string, mixed> $json
      * @throws InvalidArgumentException при отсутствии обязательных полей
      */

@@ -8,12 +8,12 @@ use Tickets\QrOrder\Application\Issuance\IssuanceStrategyInterface;
 use Tickets\QrOrder\Application\Step\CreateTicketsStep;
 use Tickets\QrOrder\Application\Step\PushToBazaStep;
 use Tickets\QrOrder\Application\Step\SendOrderEmailStep;
+use Tickets\QrOrder\Application\Step\SendTelegramStep;
 use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 
 /**
- * Обычный заказ: создать билеты + PDF/QR → одно письмо со всеми PDF → запись в Baza (el_tickets).
- *
- * Фаза 3 добавит сюда SendTelegramStep.
+ * Обычный заказ: создать билеты + PDF/QR → одно письмо со всеми PDF → запись в Baza (el_tickets)
+ * → уведомление гостей в Telegram.
  */
 final class RegularIssuanceStrategy implements IssuanceStrategyInterface
 {
@@ -28,6 +28,7 @@ final class RegularIssuanceStrategy implements IssuanceStrategyInterface
             CreateTicketsStep::class,
             SendOrderEmailStep::class,
             PushToBazaStep::class,
+            SendTelegramStep::class,
         ];
     }
 }
