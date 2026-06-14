@@ -90,6 +90,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/ticket.php'));
 
+            // приём заказов от витрины qr.spaceofjoy.ru
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/qrOrder.php'));
+
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
