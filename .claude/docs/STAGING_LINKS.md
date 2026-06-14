@@ -18,6 +18,7 @@
 | **https://vhod.staging.spaceofjoy.ru** | Baza (аутентификация) | Регистрация, логин, восстановление пароля |
 | **https://pma.staging.spaceofjoy.ru** | phpMyAdmin → MySQL | Просмотр/правка БД `systo`, `baza`. **Basic auth + MySQL логин** (см. §«Креды») |
 | **https://mail.staging.spaceofjoy.ru** | Mailpit (email-catcher) | Письма от Backend на тестовый адрес — ничего не уходит наружу. **Basic auth** |
+| **https://staging.spaceofjoy.ru/rabbitmq/** | RabbitMQ Management UI | Брокер сообщений (транспорт для интеграции qr→org). Очереди, обмены, сообщения. На под-пути основного домена (без отдельного сабдомена). **Basic auth + логин RabbitMQ** (см. §«Креды»). AMQP (5672) наружу не торчит — только внутри docker-сети staging |
 
 ---
 
@@ -32,6 +33,7 @@
 | Регистрация / логин / пароль / роли | `https://vhod.staging.spaceofjoy.ru` |
 | Миграция БД, новая таблица, поле | `https://pma.staging.spaceofjoy.ru` → таблица → SHOW COLUMNS |
 | Письма (оплата заказа / отмена / анкета / Friendly / список) | `https://mail.staging.spaceofjoy.ru` |
+| Очереди/сообщения RabbitMQ (интеграция qr→org) | `https://staging.spaceofjoy.ru/rabbitmq/` |
 | Расчёт цены, скидка промокодом | `https://staging.spaceofjoy.ru` → форма покупки → сравнить с ожиданием |
 | Логи Backend (ошибки) | `ssh deploy@77.222.32.244 'docker logs --tail=200 php-staging'` |
 
@@ -41,9 +43,9 @@
 
 **В этом файле паролей НЕТ** — только инструкция как достать.
 
-### Basic auth (pma + mail)
+### Basic auth (pma + mail + rabbit)
 
-Логин задавался вручную через `infra/staging/setup-basic-auth.sh` (хеш bcrypt в `/etc/nginx/auth/staging-tools.htpasswd`).
+Логин задавался вручную через `infra/staging/setup-basic-auth.sh` (хеш bcrypt в `/etc/nginx/auth/staging-tools.htpasswd`). Один и тот же htpasswd защищает phpMyAdmin, Mailpit и RabbitMQ UI.
 
 Сбросить пароль / добавить нового юзера:
 ```bash
@@ -58,6 +60,14 @@ ssh deploy@77.222.32.244 'grep -E "^(MYSQL_ROOT_PASSWORD|MYSQL_PASSWORD)" /var/w
 ```
 
 База: **`systo`** (основное приложение) или **`baza`** (аутентификация).
+
+### RabbitMQ (логин в Management UI)
+
+Пользователь/пароль генерируются автоматически при деплое (`openssl rand -hex 16`) и лежат в `/var/www/systo/.env.staging`. Достать:
+```bash
+ssh deploy@77.222.32.244 'grep -E "^RABBITMQ_DEFAULT_(USER|PASS|VHOST)" /var/www/systo/.env.staging'
+```
+Сначала basic auth nginx (как pma/mail), затем — этот логин в самой UI.
 
 ### Подробности — `.claude/docs/process/RELEASES.md §9`
 
