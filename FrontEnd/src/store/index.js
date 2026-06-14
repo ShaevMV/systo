@@ -13,6 +13,7 @@ import appLocation from './modules/LocationModule/index';
 import appTicketTypePrice from './modules/TicketTypePriceModule/index';
 import appOption from './modules/OptionModule/index';
 import appOptionPrice from './modules/OptionPriceModule/index';
+import appQrOrder from './modules/QrOrderModule/index';
 
 export default createStore({
     state: {
@@ -50,5 +51,6 @@ export default createStore({
         'appTicketTypePrice': appTicketTypePrice,
         'appOption': appOption,
         'appOptionPrice': appOptionPrice,
+        'appQrOrder': appQrOrder,
     }
 })

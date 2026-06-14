@@ -5,6 +5,9 @@ import store from './store'
 import axios from 'axios';
 import 'v-calendar/dist/style.css';
 import VCalendar from 'v-calendar';
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura';
+import 'primeicons/primeicons.css';
 
 window.store = store;
 
@@ -80,4 +83,15 @@ createApp(App)
     .use(store)
     .use(router)
     .use(VCalendar)
+    // cssLayer: true — Aura кладёт стили в CSS-слой, чтобы не конфликтовать с Bootstrap-вёрсткой проекта.
+    .use(PrimeVue, {
+        theme: {
+            preset: Aura,
+            options: {
+                prefix: 'p',
+                darkModeSelector: '.dark',
+                cssLayer: true,
+            },
+        },
+    })
     .mount('#app')
