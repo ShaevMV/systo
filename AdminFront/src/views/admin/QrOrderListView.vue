@@ -187,6 +187,9 @@ onMounted(() => {
                     :sort-order="sortOrder"
                     data-key="id"
                     striped-rows
+                    scrollable
+                    scroll-height="flex"
+                    class="qr-data-table"
                     paginator-template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
                     current-page-report-template="{first}–{last} из {totalRecords}"
                     @page="onLazy"
@@ -199,26 +202,26 @@ onMounted(() => {
                         </div>
                     </template>
 
-                    <Column field="created_at" header="Создан" sortable>
+                    <Column field="created_at" header="Создан" sortable :style="{ minWidth: '9rem' }">
                         <template #body="{ data }">{{ formatDate(data.created_at) }}</template>
                     </Column>
-                    <Column field="email" header="Email" />
-                    <Column field="status" header="Статус">
+                    <Column field="email" header="Email" :style="{ minWidth: '13rem' }" />
+                    <Column field="status" header="Статус" :style="{ minWidth: '8rem' }">
                         <template #body="{ data }">
                             <Tag :value="data.status" :severity="statusSeverity(data.status)" />
                         </template>
                     </Column>
-                    <Column field="type_order" header="Тип">
+                    <Column field="type_order" header="Тип" :style="{ minWidth: '7rem' }">
                         <template #body="{ data }">{{ typeOrderLabel(data.type_order) }}</template>
                     </Column>
-                    <Column field="festival_id" header="Фестиваль">
+                    <Column field="festival_id" header="Фестиваль" :style="{ minWidth: '10rem' }">
                         <template #body="{ data }">{{ festivalName(data.festival_id) }}</template>
                     </Column>
-                    <Column field="city" header="Город" />
-                    <Column field="total_price" header="Сумма" sortable>
+                    <Column field="city" header="Город" :style="{ minWidth: '8rem' }" />
+                    <Column field="total_price" header="Сумма" sortable :style="{ minWidth: '7rem' }">
                         <template #body="{ data }">{{ formatPrice(data.total_price) }}</template>
                     </Column>
-                    <Column header="" :style="{ width: '6rem' }">
+                    <Column header="" frozen align-frozen="right" :style="{ minWidth: '6rem' }">
                         <template #body="{ data }">
                             <Button label="Детали" icon="pi pi-eye" size="small" text @click="openDetails(data)" />
                         </template>
@@ -228,7 +231,7 @@ onMounted(() => {
         </Card>
 
         <!-- Детали заказа + история -->
-        <Dialog v-model:visible="detailsVisible" modal :header="'Заказ ' + (item.id || '')" :style="{ width: '60rem' }" :breakpoints="{ '960px': '95vw' }">
+        <Dialog v-model:visible="detailsVisible" modal :header="'Заказ ' + (item.id || '')" class="qr-details-dialog" :style="{ width: '60rem' }" :breakpoints="{ '960px': '90vw', '640px': '100vw' }">
             <div class="qr-details">
                 <div class="qr-details-grid">
                     <div>
@@ -257,17 +260,17 @@ onMounted(() => {
 
                 <!-- Гости -->
                 <h3 class="qr-section-title">Гости ({{ guests.length }})</h3>
-                <DataTable :value="guests" striped-rows class="qr-guests">
+                <DataTable :value="guests" striped-rows scrollable class="qr-guests">
                     <template #empty><div class="qr-empty">Нет гостей</div></template>
-                    <Column field="name" header="Имя" />
-                    <Column field="email" header="Email" />
-                    <Column header="Telegram">
+                    <Column field="name" header="Имя" :style="{ minWidth: '10rem' }" />
+                    <Column field="email" header="Email" :style="{ minWidth: '12rem' }" />
+                    <Column header="Telegram" :style="{ minWidth: '8rem' }">
                         <template #body="{ data }">{{ data.telegram || '—' }}</template>
                     </Column>
-                    <Column header="Номер">
+                    <Column header="Номер" :style="{ minWidth: '6rem' }">
                         <template #body="{ data }">{{ data.number ?? '—' }}</template>
                     </Column>
-                    <Column header="Билет">
+                    <Column header="Билет" :style="{ minWidth: '9rem' }">
                         <template #body="{ data }">{{ data.type_ticket?.title || '—' }}</template>
                     </Column>
                 </DataTable>
@@ -294,6 +297,17 @@ onMounted(() => {
     padding: 1.5rem;
     max-width: 1280px;
     margin: 0 auto;
+    /* min-width:0 — позволяет внутренней таблице скроллиться, а не растягивать страницу. */
+    min-width: 0;
+}
+
+/* Таблица никогда не шире своей карточки: лишнее уходит в горизонтальный скролл. */
+.qr-data-table {
+    max-width: 100%;
+}
+
+.qr-data-table :deep(.p-datatable-table-container) {
+    overflow-x: auto;
 }
 
 .qr-orders-header h1 {
@@ -400,5 +414,50 @@ onMounted(() => {
 
 :global(.app-dark) .qr-empty-illustration {
     opacity: 0.45;
+}
+
+/* ============================================================
+   Мобильная адаптация (≤ 767px).
+   Главная боль проекта — таблицы не влезают в экран. Решаем:
+   - DataTable горизонтально скроллится (scrollable + min-width колонок),
+     столбец «Детали» заморожен справа → всегда под рукой.
+   - Карточки/вью ужимают внутренние отступы, чтобы дать таблице ширину.
+   - Фильтры уже в одну колонку (auto-fit minmax(180px)).
+   - Диалог деталей — почти во весь экран (breakpoints выше).
+   ============================================================ */
+@media (max-width: 767px) {
+    .qr-orders-view {
+        padding: 0.75rem 0;
+    }
+
+    .qr-orders-header h1 {
+        font-size: 1.35rem;
+    }
+
+    /* Ужимаем внутренний padding карточек PrimeVue — больше места под контент. */
+    .qr-filter-card :deep(.p-card-body),
+    .qr-table-card :deep(.p-card-body) {
+        padding: 0.85rem;
+    }
+
+    /* Кнопки фильтра растягиваем на всю ширину — удобнее тачем. */
+    .qr-field-actions {
+        flex-direction: column;
+    }
+
+    .qr-field-actions :deep(.p-button) {
+        width: 100%;
+    }
+
+    /* Детали заказа: сетка в одну колонку, ничего не вылезает. */
+    .qr-details-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Диалог деталей на телефоне — фактически полноэкранный (см. :breakpoints).
+   Контент диалога тоже не должен ловить горизонтальный разрыв. */
+.qr-details-dialog :deep(.p-dialog-content) {
+    overflow-x: hidden;
 }
 </style>

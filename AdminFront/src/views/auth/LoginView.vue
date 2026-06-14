@@ -51,13 +51,13 @@ function onSubmit() {
 
 <template>
     <FloatingConfigurator />
-    <div class="login-screen bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+    <div class="login-screen bg-surface-50 dark:bg-surface-900 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
         <!-- Брендовый декор: спутник и НЛО лёгкими акцентами по углам, не мешают форме -->
         <img src="/img/brand/sputnik.webp" alt="" aria-hidden="true" class="brand-decor brand-decor--sputnik" />
         <img src="/img/brand/ufo.webp" alt="" aria-hidden="true" class="brand-decor brand-decor--ufo" />
         <div class="flex flex-col items-center justify-center relative z-10">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, transparent 30%)">
-                <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+                <div class="w-full bg-surface-0 dark:bg-surface-800 py-20 px-8 sm:px-20" style="border-radius: 53px">
                     <div class="text-center mb-8">
                         <img src="/img/logo-solarsysto-2026.webp" alt="Solar Systo" class="login-logo mx-auto mb-5" />
                         <div class="font-display text-surface-900 dark:text-surface-0 text-3xl mb-2">SOLAR SYSTO</div>
