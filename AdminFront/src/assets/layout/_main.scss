@@ -5,9 +5,20 @@
     justify-content: space-between;
     padding: 6rem 2rem 0 2rem;
     transition: margin-left var(--layout-section-transition-duration);
+    // На мобильных контент часто шире экрана (таблицы) — даём горизонтально
+    // прокручивать ВНУТРЕННИЕ области (DataTable), но не разрывать саму страницу.
+    min-width: 0;
 }
 
 .layout-main {
     flex: 1 1 auto;
     padding-bottom: 2rem;
+    min-width: 0;
+}
+
+// На узких экранах ужимаем боковые отступы — больше места под контент/таблицы.
+@media (max-width: 767px) {
+    .layout-main-container {
+        padding: 5.5rem 1rem 0 1rem;
+    }
 }

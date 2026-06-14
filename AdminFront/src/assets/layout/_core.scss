@@ -11,6 +11,10 @@ body {
     margin: 0;
     padding: 0;
     min-height: 100%;
+    // Страница целиком не должна иметь горизонтального скролла на мобильных
+    // (off-canvas сайдбар спрятан за translateX, декор — pointer-events:none).
+    // Горизонтально скроллятся только внутренние области (DataTable).
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
