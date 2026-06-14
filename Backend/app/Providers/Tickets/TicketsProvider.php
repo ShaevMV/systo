@@ -49,6 +49,7 @@ use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 use Tickets\QrOrder\Application\Issuance\IssuanceStrategyRegistry;
 use Tickets\QrOrder\Application\Issuance\Strategy\FriendlyIssuanceStrategy;
 use Tickets\QrOrder\Application\Issuance\Strategy\ListIssuanceStrategy;
+use Tickets\QrOrder\Application\Issuance\Strategy\LiveIssuanceStrategy;
 use Tickets\QrOrder\Application\Issuance\Strategy\RegularIssuanceStrategy;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrIssuanceRepository;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrOrderRepository;
@@ -96,6 +97,7 @@ class TicketsProvider extends ServiceProvider
                 $app->make(RegularIssuanceStrategy::class),
                 $app->make(FriendlyIssuanceStrategy::class),
                 $app->make(ListIssuanceStrategy::class),
+                $app->make(LiveIssuanceStrategy::class),
             ]);
         });
     }
