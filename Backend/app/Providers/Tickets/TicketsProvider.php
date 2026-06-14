@@ -46,6 +46,8 @@ use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
+use Tickets\QrOrder\Application\Issuance\IssuanceStrategyRegistry;
+use Tickets\QrOrder\Application\Issuance\Strategy\RegularIssuanceStrategy;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrIssuanceRepository;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrOrderRepository;
 use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
@@ -84,5 +86,13 @@ class TicketsProvider extends ServiceProvider
         // Приём заказов от витрины qr (API №1) + выдача билетов (API №2b)
         $this->app->bind(QrOrderRepositoryInterface::class, InMemoryMySqlQrOrderRepository::class);
         $this->app->bind(QrIssuanceRepositoryInterface::class, InMemoryMySqlQrIssuanceRepository::class);
+
+        // Реестр стратегий выдачи билетов по qr-заказу (type_order → стратегия).
+        // Новая стратегия (friendly/список/live) добавляется одной строкой здесь.
+        $this->app->singleton(IssuanceStrategyRegistry::class, static function ($app): IssuanceStrategyRegistry {
+            return new IssuanceStrategyRegistry([
+                $app->make(RegularIssuanceStrategy::class),
+            ]);
+        });
     }
 }

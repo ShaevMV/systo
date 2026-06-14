@@ -53,4 +53,9 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
     {
         return (bool) $this->model::whereId($id->value())->update(['issued_at' => $issuedAt]);
     }
+
+    public function clearIssued(Uuid $id): bool
+    {
+        return (bool) $this->model::whereId($id->value())->update(['issued_at' => null]);
+    }
 }
