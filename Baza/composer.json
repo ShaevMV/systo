@@ -10,22 +10,22 @@
         "guzzlehttp/guzzle": "^7.2",
         "endroid/qr-code": "^4.7",
         "lambdish/phunctional": "^2.1",
-        "laravel/framework": "^9.19",
-        "laravel/sanctum": "^3.0",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7",
-        "sentry/sentry-laravel": "^3.2",
-        "symfony/messenger": "^6.0",
+        "sentry/sentry-laravel": "^4.0",
+        "symfony/messenger": "^7.0",
         "ext-openssl": "*"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.13",
+        "barryvdh/laravel-ide-helper": "^3.0",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "^6.1",
-        "phpunit/phpunit": "^9.5.10",
-        "spatie/laravel-ignition": "^1.0"
+        "nunomaduro/collision": "^8.0",
+        "phpunit/phpunit": "^10.5",
+        "spatie/laravel-ignition": "^2.0"
     },
     "autoload": {
         "psr-4": {
@@ -65,15 +65,21 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform": {
+            "php": "8.2.31",
+            "ext-gd": "8.2.31",
+            "ext-iconv": "8.2.31",
+            "ext-mysqli": "8.2.31",
+            "ext-pdo_mysql": "8.2.31",
+            "ext-pdo_sqlite": "8.2.31",
+            "ext-soap": "8.2.31",
+            "ext-sockets": "8.2.31",
+            "ext-sodium": "8.2.31",
+            "ext-sqlite3": "8.2.31"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
-        },
-        "audit": {
-            "ignore": {
-                "PKSA-8qx3-n5y5-vvnd": "Laravel 9 — миграция на 11 запланирована после 1 июня 2026 (см. TECH_DEBT.md)",
-                "PKSA-w7xr-vk7n-rstm": "Laravel 9 — миграция на 11 запланирована после 1 июня 2026 (см. TECH_DEBT.md)"
-            }
         }
     },
     "minimum-stability": "stable",
