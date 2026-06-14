@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\QrOrder;
 
 use App\Mail\OrderToPaid;
+use App\Mail\OrderToPaidFriendly;
 use App\Models\Tickets\TicketModel;
 use App\Models\User;
 use Database\Seeders\TypeTicketsSeeder;
@@ -43,7 +44,7 @@ class QrOrderPipelineTest extends TestCase
             'user' => ['name' => 'Иван', 'city' => 'Москва', 'phone' => '+70000000000'],
             'price' => ['total' => 4200],
             'order_data' => [
-                'type_order' => 'обычный',
+                'type_order' => 'regular',
                 'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
                 'status' => 'создан',
                 'email' => 'buyer@example.com',
@@ -94,7 +95,7 @@ class QrOrderPipelineTest extends TestCase
             'user' => ['name' => 'Без ТГ', 'city' => 'Тверь', 'phone' => '+70000000001'],
             'price' => ['total' => 4200],
             'order_data' => [
-                'type_order' => 'обычный',
+                'type_order' => 'regular',
                 'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
                 'status' => 'создан',
                 'email' => 'notg@example.com',
@@ -124,5 +125,39 @@ class QrOrderPipelineTest extends TestCase
 
         // issued_at сброшен → повторный «оплачен» от qr сможет переподнять выдачу (нет «выдан без билетов»).
         $this->assertDatabaseHas('qr_orders', ['id' => self::ORDER_ID, 'issued_at' => null]);
+    }
+
+    public function test_friendly_order_sends_friendly_email(): void
+    {
+        Mail::fake();
+        Queue::fake();
+
+        $oid = '66666666-6666-6666-6666-666666666666';
+        $contract = [
+            'order_id' => $oid,
+            'user' => ['name' => 'Френд', 'city' => 'Пермь', 'phone' => '+70000000002'],
+            'price' => ['total' => 4200],
+            'order_data' => [
+                'type_order' => 'friendly',
+                'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
+                'status' => 'создан',
+                'email' => 'friend@example.com',
+            ],
+            'guests' => [
+                ['name' => 'Френд Гость', 'email' => 'friend@example.com',
+                 'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
+            ],
+        ];
+        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+
+        app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
+
+        // Friendly-заказ → friendly-письмо; обычное OrderToPaid НЕ отправляется.
+        Mail::assertSent(OrderToPaidFriendly::class, 1);
+        Mail::assertNotSent(OrderToPaid::class);
+
+        // Билет всё равно создаётся и пишется в Baza.
+        self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
+        Queue::assertPushed(PushTicketToBazaJob::class, 1);
     }
 }

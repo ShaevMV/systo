@@ -35,7 +35,7 @@ class QrOrderIssueApiTest extends TestCase
             'user' => ['user_id' => '22222222-2222-2222-2222-222222222222', 'name' => 'Иван', 'city' => 'Москва', 'phone' => '+70000000000'],
             'price' => ['price' => 4200, 'discount' => 0, 'total' => 4200],
             'order_data' => [
-                'type_order' => 'обычный',
+                'type_order' => 'regular',
                 'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
                 'types_of_payment' => ['title' => 'СБП', 'id' => '33333333-3333-3333-3333-333333333333'],
                 'comment' => null,
