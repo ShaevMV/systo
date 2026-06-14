@@ -30,7 +30,7 @@ class QrOrderCreateApiTest extends TestCase
             'user' => ['user_id' => '22222222-2222-2222-2222-222222222222', 'name' => 'Иван', 'city' => 'Москва', 'phone' => '+70000000000'],
             'price' => ['price' => 4200, 'discount' => 200, 'total' => 4000],
             'order_data' => [
-                'type_order' => 'обычный',
+                'type_order' => 'regular',
                 'festival' => ['id' => '55555555-5555-5555-5555-555555555555', 'title' => 'Систо 2026'],
                 'types_of_payment' => ['title' => 'СБП', 'id' => '33333333-3333-3333-3333-333333333333'],
                 'comment' => 'коммент',
@@ -55,7 +55,7 @@ class QrOrderCreateApiTest extends TestCase
             'id' => '11111111-1111-1111-1111-111111111111',
             'email' => 'buyer@example.com',
             'status' => 'оплачен',
-            'type_order' => 'обычный',
+            'type_order' => 'regular',
             'festival_id' => '55555555-5555-5555-5555-555555555555',
             'city' => 'Москва',
             'total_price' => 4000,

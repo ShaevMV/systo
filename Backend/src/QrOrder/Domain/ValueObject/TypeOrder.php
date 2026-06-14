@@ -7,14 +7,14 @@ namespace Tickets\QrOrder\Domain\ValueObject;
 /**
  * Тип заказа из контракта qr (order_data.type_order). Определяет стратегию выдачи билета.
  *
- * Значение 'обычный' подтверждено контрактом; friendly/список/live — заготовки под фазу 4
- * (точные строки от qr уточняются). Неизвестный/пустой тип → fallback на REGULAR в реестре.
+ * Контракт (английские строки): regular / friendly / list / live.
+ * Неизвестный/пустой тип → fallback на REGULAR в реестре стратегий.
  */
 final class TypeOrder
 {
-    public const REGULAR = 'обычный';
+    public const REGULAR = 'regular';
     public const FRIENDLY = 'friendly';
-    public const LIST = 'список';
+    public const LIST = 'list';
     public const LIVE = 'live';
 
     /** Нормализует значение из контракта для сопоставления со стратегией в реестре. */

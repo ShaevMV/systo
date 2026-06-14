@@ -24,7 +24,7 @@ class QrOrderAuthApiTest extends TestCase
             'user' => ['city' => 'Москва', 'phone' => '+70000000000'],
             'price' => ['total' => 4000],
             'order_data' => [
-                'type_order' => 'обычный',
+                'type_order' => 'regular',
                 'festival' => ['id' => '55555555-5555-5555-5555-555555555555', 'title' => 'Систо'],
                 'status' => 'создан',
                 'email' => 'buyer@example.com',

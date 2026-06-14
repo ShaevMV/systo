@@ -47,6 +47,7 @@ use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
 use Tickets\QrOrder\Application\Issuance\IssuanceStrategyRegistry;
+use Tickets\QrOrder\Application\Issuance\Strategy\FriendlyIssuanceStrategy;
 use Tickets\QrOrder\Application\Issuance\Strategy\RegularIssuanceStrategy;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrIssuanceRepository;
 use Tickets\QrOrder\Repositories\InMemoryMySqlQrOrderRepository;
@@ -92,6 +93,7 @@ class TicketsProvider extends ServiceProvider
         $this->app->singleton(IssuanceStrategyRegistry::class, static function ($app): IssuanceStrategyRegistry {
             return new IssuanceStrategyRegistry([
                 $app->make(RegularIssuanceStrategy::class),
+                $app->make(FriendlyIssuanceStrategy::class),
             ]);
         });
     }
