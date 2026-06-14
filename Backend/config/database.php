@@ -66,11 +66,13 @@ return [
         'mysqlBaza' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => 'database',
-            'port' => env('DB_PORT', '3306'),
-            'database' => 'baza',
-            'username' => 'root',
-            'password' => 'common404',
+            // Дефолты = dev/prod docker-сервис `database` (root/common404) — поведение не меняется.
+            // На staging переопределяется через DB_BAZA_* (host mysql-staging, пользователь systo).
+            'host' => env('DB_BAZA_HOST', 'database'),
+            'port' => env('DB_BAZA_PORT', env('DB_PORT', '3306')),
+            'database' => env('DB_BAZA_DATABASE', 'baza'),
+            'username' => env('DB_BAZA_USERNAME', 'root'),
+            'password' => env('DB_BAZA_PASSWORD', 'common404'),
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
