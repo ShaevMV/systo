@@ -46,8 +46,19 @@ final class CreateTicketsStep implements PipelineStepInterface
         }
 
         $payload = $order->getPayload();
+        $orderData = is_array($payload['order_data'] ?? null) ? $payload['order_data'] : [];
         $guests = is_array($payload['guests'] ?? null) ? $payload['guests'] : [];
-        $comment = $payload['order_data']['comment'] ?? null;
+        $comment = $orderData['comment'] ?? null;
+
+        // Поля заказа-списка. Для regular/friendly отсутствуют → null → TicketResponse::isList()
+        // вернёт false → билет уйдёт в el_tickets. Для list — заполнены → spisok_tickets.
+        $curator = is_array($orderData['curator'] ?? null) ? $orderData['curator'] : [];
+        $location = is_array($orderData['location'] ?? null) ? $orderData['location'] : [];
+        $curatorId = empty($curator['id']) ? null : new Uuid((string) $curator['id']);
+        $curatorEmail = isset($curator['email']) ? (string) $curator['email'] : null;
+        $curatorName = isset($curator['name']) ? (string) $curator['name'] : null;
+        $project = isset($orderData['project']) ? (string) $orderData['project'] : null;
+        $locationId = empty($location['id']) ? null : new Uuid((string) $location['id']);
 
         /** @var TicketResponse[] $responses */
         $responses = [];
@@ -97,6 +108,11 @@ final class CreateTicketsStep implements PipelineStepInterface
                 type_ticket_id: $ticketTypeId,
                 type_ticket: isset($guest['type_ticket']['title']) ? (string) $guest['type_ticket']['title'] : null,
                 order_id: $order->getId(),
+                curator_id: $curatorId,
+                curator_email: $curatorEmail,
+                curator_name: $curatorName,
+                project: $project,
+                location_id: $locationId,
             );
 
             // 4. Сохраняем PDF/QR (для скачивания) — очередь.
