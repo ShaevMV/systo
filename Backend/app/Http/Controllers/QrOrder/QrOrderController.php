@@ -62,4 +62,29 @@ class QrOrderController extends Controller
 
         return response()->json(['success' => true, 'item' => $item->toArray()]);
     }
+
+    /**
+     * API №2 — смена статуса принятого заказа.
+     * Шаг 2a: обновляет статус. Шаг 2b: при «оплачен» запустит выдачу билетов.
+     */
+    public function changeStatus(
+        string $id,
+        Request $request,
+        QrOrderApplication $application,
+    ): JsonResponse {
+        $status = (string) $request->input('status', '');
+        if ($status === '') {
+            return response()->json(['success' => false, 'message' => 'Не передан status'], 422);
+        }
+
+        if (! $application->changeStatus(new Uuid($id), $status)) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'item' => $application->getItem(new Uuid($id))?->toArray(),
+            'message' => 'Статус обновлён',
+        ]);
+    }
 }

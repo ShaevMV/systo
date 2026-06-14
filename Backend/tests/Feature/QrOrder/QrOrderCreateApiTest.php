@@ -76,4 +76,26 @@ class QrOrderCreateApiTest extends TestCase
         $this->postJson('/api/v1/qrOrder/create', $contract)->assertStatus(422);
         $this->assertDatabaseMissing('qr_orders', ['id' => '11111111-1111-1111-1111-111111111111']);
     }
+
+    public function test_change_status_updates_accepted_order(): void
+    {
+        // API №2 (шаг 2a): смена статуса обновляет колонку status принятого заказа.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
+
+        $this->postJson('/api/v1/qrOrder/changeStatus/11111111-1111-1111-1111-111111111111', ['status' => 'отменён'])
+            ->assertOk()
+            ->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('qr_orders', [
+            'id' => '11111111-1111-1111-1111-111111111111',
+            'status' => 'отменён',
+        ]);
+    }
+
+    public function test_change_status_404_for_unknown_order(): void
+    {
+        // Смена статуса несуществующего заказа → 404.
+        $this->postJson('/api/v1/qrOrder/changeStatus/99999999-9999-9999-9999-999999999999', ['status' => 'оплачен'])
+            ->assertStatus(404);
+    }
 }
