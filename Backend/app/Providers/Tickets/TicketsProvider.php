@@ -46,7 +46,7 @@ use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
-use Tickets\Integration\Qr\LoggingQrOrderIngestor;
+use Tickets\Integration\Qr\OrderTicketQrIngestor;
 use Tickets\Integration\Qr\QrOrderIngestorInterface;
 use Tickets\Integration\Qr\Repositories\InMemoryMySqlProcessedMessageRepository;
 use Tickets\Integration\Qr\Repositories\ProcessedMessageRepositoryInterface;
@@ -84,7 +84,7 @@ class TicketsProvider extends ServiceProvider
 
         // Интеграция qr → org (приём заказов внешней витрины, CONTRACT_RFC_v0.md)
         $this->app->bind(ProcessedMessageRepositoryInterface::class, InMemoryMySqlProcessedMessageRepository::class);
-        // Ф1: ингестор-заглушка (только логирует). Ф2/Ф3 переключат на боевую реализацию.
-        $this->app->bind(QrOrderIngestorInterface::class, LoggingQrOrderIngestor::class);
+        // Ф3: боевой приём заказа qr → org (создание заказа через фабрики OrderTicket).
+        $this->app->bind(QrOrderIngestorInterface::class, OrderTicketQrIngestor::class);
     }
 }

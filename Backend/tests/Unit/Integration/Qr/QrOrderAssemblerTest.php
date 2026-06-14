@@ -72,6 +72,8 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_assembles_valid_regular_order(): void
     {
+        // Полный обычный заказ: проверяем маппинг шапки (тип, фестиваль, получатель, оплата,
+        // итоговая цена) и первого гостя (ФИО, email, тип билета, промокод, опции, цена).
         $order = $this->assembler->assemble($this->envelope($this->regularPayload()));
 
         self::assertSame(QrOrderType::REGULAR, $order->type->value);
@@ -98,6 +100,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_assembles_friendly_order_with_pusher_fallback(): void
     {
+        // Дружеский заказ без блока friendly, но с pusher: friendly_id берётся из pusher.id (fallback).
         $payload = $this->regularPayload();
         $payload['order']['type_order'] = 'friendly';
         $payload['order']['pusher'] = ['id' => '44444444-4444-4444-4444-444444444444', 'name' => 'Пушер'];
@@ -110,6 +113,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_assembles_list_order_without_ticket_type_or_price(): void
     {
+        // Заказ-список: куратор+локация обязательны, оплаты/типа билета/цены нет (списки бесплатны).
         $payload = [
             'order' => [
                 'qr_order_id' => 'qr-list-1',
@@ -138,6 +142,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_live_order_carries_number_and_type(): void
     {
+        // Живой билет: тип live распознан, номер живого билета и тип билета донесены до гостя.
         $payload = $this->regularPayload();
         $payload['order']['type_order'] = 'live';
         $payload['guests'][0]['number'] = '777';
@@ -151,6 +156,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_rejects_unknown_type_order(): void
     {
+        // Русский текст вместо машинного кода типа → отказ (qr обязан слать regular/friendly/live/list).
         $payload = $this->regularPayload();
         $payload['order']['type_order'] = 'оплачен';
 
@@ -160,6 +166,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_rejects_missing_festival_id(): void
     {
+        // Нет festival_id на уровне заказа → отказ (без него заказ в org не создать).
         $payload = $this->regularPayload();
         unset($payload['order']['festival_id']);
 
@@ -169,6 +176,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_rejects_invalid_guest_email(): void
     {
+        // Невалидный email гостя → отказ (на email уходит анкета, пустой/битый недопустим).
         $payload = $this->regularPayload();
         $payload['guests'][0]['email'] = 'не-email';
 
@@ -178,6 +186,7 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_rejects_empty_guests(): void
     {
+        // Пустой массив гостей → отказ (заказ без гостей бессмысленен).
         $payload = $this->regularPayload();
         $payload['guests'] = [];
 
@@ -187,19 +196,20 @@ class QrOrderAssemblerTest extends TestCase
 
     public function test_rejects_bad_option_qty(): void
     {
+        // Некорректный qty опции (0): RawGuestOptionInput бросает InvalidArgumentException (qty<1),
+        // а ассемблер оборачивает её в перманентный QrOrderRejectedException.
         $payload = $this->regularPayload();
         $payload['guests'][0]['ticket_type']['options'] = [
             ['option_id' => '33333333-3333-3333-3333-333333333333', 'qty' => 0],
         ];
 
-        // RawGuestOptionInput бросает InvalidArgumentException (qty<1) → ассемблер
-        // оборачивает в перманентный QrOrderRejectedException.
         $this->expectException(QrOrderRejectedException::class);
         $this->assembler->assemble($this->envelope($payload));
     }
 
     public function test_rejects_non_list_order_without_ticket_type(): void
     {
+        // Для не-списочного заказа тип билета у гостя обязателен → без него отказ.
         $payload = $this->regularPayload();
         unset($payload['guests'][0]['ticket_type']);
 

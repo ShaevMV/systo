@@ -83,6 +83,8 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_valid_order_is_ingested_and_marked_processed(): void
     {
+        // Корректное событие order.created: ингестор вызван один раз,
+        // ключ идемпотентности записан в processed_messages, возврат true (ack).
         $ingestor = $this->fakeIngestor();
         $consumer = $this->consumerWith($ingestor);
 
@@ -100,6 +102,8 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_duplicate_is_acked_without_reingest(): void
     {
+        // Повторная доставка того же события (тот же idempotency_key) не должна
+        // повторно создавать заказ: ингестор вызывается один раз, в БД одна запись.
         $ingestor = $this->fakeIngestor();
         $consumer = $this->consumerWith($ingestor);
 
@@ -114,6 +118,8 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_unsupported_schema_major_is_rejected(): void
     {
+        // Несовместимая мажорная версия схемы → reject без requeue (мы не понимаем формат),
+        // ингестор не вызывается, ключ идемпотентности не занимается.
         $ingestor = $this->fakeIngestor();
         $consumer = $this->consumerWith($ingestor);
 
@@ -126,6 +132,7 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_unknown_event_type_is_acked_and_skipped(): void
     {
+        // Чужой тип события (не order.created) → ack без обработки, чтобы не зациклить очередь.
         $ingestor = $this->fakeIngestor();
         $consumer = $this->consumerWith($ingestor);
 
@@ -140,6 +147,7 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_invalid_shape_is_rejected(): void
     {
+        // Битая форма payload (пустой guests[]) → reject без requeue, ингестор не вызывается.
         $ingestor = $this->fakeIngestor();
         $consumer = $this->consumerWith($ingestor);
 
@@ -153,6 +161,8 @@ class QrOrderConsumerTest extends TestCase
 
     public function test_business_rejection_rolls_back_mark(): void
     {
+        // Бизнес-отказ ингестора → транзакция откатывается: ключ идемпотентности НЕ занят,
+        // значит событие можно прислать заново (reject без requeue для текущего сообщения).
         $ingestor = $this->fakeIngestor(reject: true);
         $consumer = $this->consumerWith($ingestor);
 
