@@ -1,17 +1,18 @@
 import { computed, reactive } from 'vue';
 
-// Бренд Solar Systo тёмный → тёмная тема включена по умолчанию.
+// По умолчанию — СВЕТЛАЯ тема (владелец просил светлый, читаемый интерфейс).
+// Тёмная тема остаётся доступной через переключатель в топбаре/конфигураторе.
 const layoutConfig = reactive({
     preset: 'Aura',
     primary: 'orange',
     surface: null,
-    darkTheme: true,
+    darkTheme: false,
     menuMode: 'static'
 });
 
 // Синхронизируем класс .app-dark на <html> с начальным состоянием конфига.
-// Делается один раз при загрузке модуля (до маунта приложения),
-// чтобы не было «вспышки» светлой темы. Переключатель light/dark остаётся рабочим.
+// Делается один раз при загрузке модуля (до маунта приложения).
+// darkTheme:false → класс снимается, остаётся светлая тема. Переключатель light/dark рабочий.
 if (typeof document !== 'undefined') {
     document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
 }
