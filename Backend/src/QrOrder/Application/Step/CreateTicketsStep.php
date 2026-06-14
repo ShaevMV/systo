@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Tickets\QrOrder\Application;
+namespace Tickets\QrOrder\Application\Step;
 
-use App\Mail\OrderToPaid;
 use Carbon\Carbon;
 use InvalidArgumentException;
-use Illuminate\Support\Facades\Mail;
-use Psr\Log\LoggerInterface;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\QrOrder\Application\Support\PipelineLog;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
@@ -18,23 +16,29 @@ use Tickets\Ticket\CreateTickets\Dto\TicketDto;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 /**
- * Автономная выдача билетов по qr-заказу (API №2b, решение B — без order_tickets).
+ * Шаг 1: на каждого гостя создаёт билет в tickets (order_ticket_id == id qr-заказа),
+ * читает kilter, собирает TicketResponse (шаблоны из ticket_type_festival по festival + type
+ * билета гостя, минуя getTicket с JOIN на order_tickets) и ставит PDF/QR в очередь
+ * (ProcessCreatingQRCode). Собранные TicketResponse кладутся в carry['responses'] для шага письма.
  *
- * На каждого гостя: вставляем билет в tickets (order_ticket_id == id qr-заказа), читаем kilter,
- * собираем TicketResponse ВРУЧНУЮ (шаблоны PDF/email — из ticket_type_festival по
- * festival_id + type_ticket гостя, минуя getTicket с JOIN на order_tickets), генерируем PDF/QR
- * (ProcessCreatingQRCode) и шлём письмо с билетами (OrderToPaid). См. CONTRACT_RFC §6/§7.
+ * Поведение «всё или ничего» (как в старом синхронном flow): любая ошибка пробрасывается →
+ * оркестратор валит задачу → IssueOrderJob::failed() снимет issued_at, заказ можно выдать повторно.
+ * (Per-guest изоляция вернётся позже — с per-guest шагами и отслеживанием частичного состояния.)
  */
-final class QrOrderIssuer
+final class CreateTicketsStep implements PipelineStepInterface
 {
     public function __construct(
         private readonly TicketsRepositoryInterface $ticketsRepository,
         private readonly QrIssuanceRepositoryInterface $issuanceRepository,
-        private readonly LoggerInterface $logger,
     ) {
     }
 
-    public function issue(QrOrderDto $order): void
+    public function name(): string
+    {
+        return 'create_tickets';
+    }
+
+    public function handle(QrOrderDto $order, array $carry): array
     {
         $festivalId = $order->getFestivalId();
         if ($festivalId === null) {
@@ -48,11 +52,13 @@ final class QrOrderIssuer
         /** @var TicketResponse[] $responses */
         $responses = [];
         $firstTicketTypeId = null;
+        $log = PipelineLog::logger();
 
-        foreach ($guests as $guest) {
+        foreach ($guests as $index => $guest) {
             if (! is_array($guest)) {
                 continue;
             }
+
             $ticketTypeId = $this->guestTicketTypeId($guest);
             $firstTicketTypeId ??= $ticketTypeId;
 
@@ -97,26 +103,24 @@ final class QrOrderIssuer
             ProcessCreatingQRCode::dispatch($response);
 
             $responses[] = $response;
+
+            $log->info('create_tickets.guest_ok', [
+                'order_id' => $order->getId()->value(),
+                'guest_index' => $index,
+                'kilter' => $kilter,
+                'email' => PipelineLog::maskEmail($email),
+            ]);
         }
 
         if ($responses === []) {
-            $this->logger->warning('[qr-issue] Нет гостей для выдачи', ['order_id' => $order->getId()->value()]);
-
-            return;
+            $log->warning('create_tickets.no_guests', ['order_id' => $order->getId()->value()]);
         }
 
-        // 5. Письмо получателю с PDF-билетами (PDF рендерится в самом письме).
-        Mail::to($order->getEmail())->send(new OrderToPaid(
-            $responses,
-            $firstTicketTypeId ?? Uuid::random(),
-            $comment,
-            null,
-        ));
+        $carry['responses'] = $responses;
+        $carry['firstTicketTypeId'] = $firstTicketTypeId;
+        $carry['comment'] = $comment;
 
-        $this->logger->info('[qr-issue] Билеты выданы', [
-            'order_id' => $order->getId()->value(),
-            'tickets' => count($responses),
-        ]);
+        return $carry;
     }
 
     /**
