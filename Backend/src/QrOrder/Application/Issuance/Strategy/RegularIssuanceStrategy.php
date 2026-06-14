@@ -6,13 +6,14 @@ namespace Tickets\QrOrder\Application\Issuance\Strategy;
 
 use Tickets\QrOrder\Application\Issuance\IssuanceStrategyInterface;
 use Tickets\QrOrder\Application\Step\CreateTicketsStep;
+use Tickets\QrOrder\Application\Step\PushToBazaStep;
 use Tickets\QrOrder\Application\Step\SendOrderEmailStep;
 use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 
 /**
- * Обычный заказ: создать билеты + PDF/QR → одно письмо со всеми PDF.
+ * Обычный заказ: создать билеты + PDF/QR → одно письмо со всеми PDF → запись в Baza (el_tickets).
  *
- * Фаза 2 добавит сюда PushToBazaStep (запись в Baza), фаза 3 — SendTelegramStep.
+ * Фаза 3 добавит сюда SendTelegramStep.
  */
 final class RegularIssuanceStrategy implements IssuanceStrategyInterface
 {
@@ -26,6 +27,7 @@ final class RegularIssuanceStrategy implements IssuanceStrategyInterface
         return [
             CreateTicketsStep::class,
             SendOrderEmailStep::class,
+            PushToBazaStep::class,
         ];
     }
 }
