@@ -38,6 +38,7 @@ services:
       - ./Docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./Backend:/var/www/org
       - ./FrontEnd:/var/www/app
+      - ./AdminFront:/var/www/admin
       - ./Shared:/var/www/Shared
       - ./Baza:/var/www/vhod
     networks:
@@ -110,6 +111,26 @@ services:
       - NODE_ENV=production
       - VUE_APP_API_URL=https://api.staging.spaceofjoy.ru/
       - VUE_APP_BAZA_URL=https://vhod.staging.spaceofjoy.ru/
+    restart: unless-stopped
+
+  # ═══ ADMIN FRONTEND (новый Vite + Sakai, preview на /new-admin/) ═══════════
+  # Build: `docker compose run --rm node-admin-staging sh -c "npm ci --include=dev
+  # && npm run build -- --base=/new-admin/"` — в workflow перед `up -d`. dist
+  # раздаётся nginx-staging по location /new-admin/ (см. default.staging.conf).
+  # VITE_API_URL Vite читает из process.env (VITE_-префикс) при сборке.
+  node-admin-staging:
+    build:
+      context: ./Docker/node
+    container_name: node-admin-staging
+    working_dir: /var/www/admin
+    volumes:
+      - ./AdminFront:/var/www/admin
+    command: tail -f /dev/null
+    networks:
+      - staging
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=https://api.staging.spaceofjoy.ru/
     restart: unless-stopped
 
   # ═══ MYSQL 8 (internal, persistent volume) ═════════════════════════════════
