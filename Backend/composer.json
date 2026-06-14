@@ -11,15 +11,15 @@
         "endroid/qr-code": "^4.7",
         "guzzlehttp/guzzle": "^7.5",
         "lambdish/phunctional": "^2.1",
-        "laravel/framework": "^10.0",
-        "laravel/sanctum": "^3.0.1",
+        "laravel/framework": "^11.0",
+        "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.7.3",
         "php-open-source-saver/jwt-auth": "^2.0",
         "sentry/sentry-laravel": "^4.0",
-        "symfony/messenger": "^6.0.16"
+        "symfony/messenger": "^7.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.12.3",
+        "barryvdh/laravel-ide-helper": "^3.0",
         "codeception/codeception": "^5.0",
         "codeception/module-asserts": "^3.0",
         "codeception/module-phpbrowser": "^3.0",
@@ -28,10 +28,10 @@
         "laravel/pint": "^1.2.1",
         "laravel/sail": "^1.16.3",
         "mockery/mockery": "^1.5.1",
-        "nunomaduro/collision": "^7.0",
-        "phpunit/phpunit": "^9.5.26",
+        "nunomaduro/collision": "^8.0",
+        "phpunit/phpunit": "^10.5",
         "spatie/laravel-ignition": "^2.0",
-        "worksome/request-factories": "^2.5"
+        "worksome/request-factories": "^3.0"
     },
     "autoload": {
         "psr-4": {
