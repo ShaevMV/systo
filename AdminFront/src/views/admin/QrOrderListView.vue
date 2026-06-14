@@ -193,7 +193,10 @@ onMounted(() => {
                     @sort="onLazy"
                 >
                     <template #empty>
-                        <div class="qr-empty">Заказы не найдены</div>
+                        <div class="qr-empty qr-empty--illustrated">
+                            <img src="/img/brand/sputnik.webp" alt="" aria-hidden="true" class="qr-empty-illustration" />
+                            <span>Заказы не найдены</span>
+                        </div>
                     </template>
 
                     <Column field="created_at" header="Создан" sortable>
@@ -377,5 +380,25 @@ onMounted(() => {
     text-align: center;
     padding: 1rem;
     color: var(--p-text-muted-color, #9ca3af);
+}
+
+/* Пустое состояние с брендовым акцентом (спутник) — деликатно, монохромно. */
+.qr-empty--illustrated {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2.5rem 1rem;
+}
+
+.qr-empty-illustration {
+    width: 56px;
+    height: auto;
+    opacity: 0.35;
+    filter: grayscale(1);
+}
+
+:global(.app-dark) .qr-empty-illustration {
+    opacity: 0.45;
 }
 </style>
