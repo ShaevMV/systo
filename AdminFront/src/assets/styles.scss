@@ -2,3 +2,51 @@
 @use 'primeicons/primeicons.css';
 @use '@/assets/layout/layout.scss';
 @use '@/assets/demo/demo.scss';
+
+/* ============================================================
+   Брендовые шрифты Solar Systo
+   - Geometria — основной геометрик-санс для body/таблиц/форм
+   - TDCharodey (revard) — ДИСПЛЕЙНЫЙ, только для вордмарка/крупных заголовков
+   ============================================================ */
+
+@font-face {
+    font-family: 'Geometria';
+    src: url('@/assets/fonts/geometria.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Geometria';
+    src: url('@/assets/fonts/geometria-b.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'TDCharodey';
+    src: url('@/assets/fonts/revard.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Geometria — основной шрифт интерфейса. Системные шрифты как fallback. */
+:root {
+    --font-family: 'Geometria', 'Inter', 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    --font-family-display: 'TDCharodey', 'Geometria', system-ui, sans-serif;
+}
+
+html,
+body {
+    font-family: var(--font-family);
+}
+
+/* Дисплейный шрифт — ТОЛЬКО для вордмарка/крупных брендовых заголовков.
+   Не применять к данным/таблицам — нечитаем в мелком кегле. */
+.font-display {
+    font-family: var(--font-family-display);
+    letter-spacing: 0.02em;
+}

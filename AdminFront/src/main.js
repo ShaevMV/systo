@@ -4,10 +4,10 @@ import router from './router';
 import store from './store';
 import axios from 'axios';
 
-import Aura from '@primeuix/themes/aura';
 import PrimeVue from 'primevue/config';
 import ConfirmationService from 'primevue/confirmationservice';
 import ToastService from 'primevue/toastservice';
+import SolarSystoPreset from '@/theme/solar-preset';
 
 import '@/assets/tailwind.css';
 import '@/assets/styles.scss';
@@ -91,7 +91,7 @@ app.use(store);
 app.use(router);
 app.use(PrimeVue, {
     theme: {
-        preset: Aura,
+        preset: SolarSystoPreset,
         options: {
             darkModeSelector: '.app-dark'
         }
