@@ -42,4 +42,9 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
 
         return $row === null ? null : QrOrderDto::fromState($row->toArray());
     }
+
+    public function changeStatus(Uuid $id, string $status): bool
+    {
+        return (bool) $this->model::whereId($id->value())->update(['status' => $status]);
+    }
 }

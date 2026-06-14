@@ -15,4 +15,7 @@ interface QrOrderRepositoryInterface
     public function existsById(Uuid $id): bool;
 
     public function findById(Uuid $id): ?QrOrderDto;
+
+    /** Сменить статус принятого заказа (API №2). */
+    public function changeStatus(Uuid $id, string $status): bool;
 }
