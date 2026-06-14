@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace Tickets\QrOrder\Application;
 
+use Carbon\Carbon;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 
 /**
- * Приём заказов от витрины qr (API №1) + чтение принятого заказа.
+ * Приём заказов от витрины qr (API №1) + смена статуса с выдачей билетов (API №2).
  * Тонкий слой над репозиторием (БД — только в репозитории, правило №1).
  */
 final class QrOrderApplication
 {
+    /** Статусы контракта qr, означающие «оплачено» → запускают выдачу билетов. */
+    private const PAID_STATUSES = ['оплачен', 'paid'];
+
     public function __construct(
         private readonly QrOrderRepositoryInterface $repository,
+        private readonly QrOrderIssuer $issuer,
     ) {
     }
 
@@ -38,17 +43,31 @@ final class QrOrderApplication
     }
 
     /**
-     * Сменить статус принятого заказа (API №2, шаг 2a).
-     * Возвращает false, если заказа с таким id нет.
+     * Сменить статус принятого заказа (API №2). Возвращает false, если заказа нет.
      *
-     * TODO(2b): при переходе в «оплачен»/выдать — запустить выдачу билетов (PDF/письма).
+     * При переходе в «оплачен» запускается выдача билетов (PDF/письма) — один раз
+     * (защита по issued_at: повторный «оплачен» не выдаёт билеты снова).
      */
     public function changeStatus(Uuid $id, string $status): bool
     {
-        if (! $this->repository->existsById($id)) {
+        $order = $this->repository->findById($id);
+        if ($order === null) {
             return false;
         }
 
-        return $this->repository->changeStatus($id, $status);
+        $this->repository->changeStatus($id, $status);
+
+        if ($this->isPaid($status) && $order->getIssuedAt() === null) {
+            // Перечитываем заказ с новым статусом для выдачи.
+            $this->issuer->issue($this->repository->findById($id) ?? $order);
+            $this->repository->markIssued($id, Carbon::now());
+        }
+
+        return true;
+    }
+
+    private function isPaid(string $status): bool
+    {
+        return in_array(mb_strtolower(trim($status)), self::PAID_STATUSES, true);
     }
 }

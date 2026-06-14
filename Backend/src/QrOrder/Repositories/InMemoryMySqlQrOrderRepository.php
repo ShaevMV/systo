@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\QrOrder\Repositories;
 
 use App\Models\QrOrder\QrOrderModel;
+use Carbon\Carbon;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Dto\QrOrderDto;
 
@@ -46,5 +47,10 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
     public function changeStatus(Uuid $id, string $status): bool
     {
         return (bool) $this->model::whereId($id->value())->update(['status' => $status]);
+    }
+
+    public function markIssued(Uuid $id, Carbon $issuedAt): bool
+    {
+        return (bool) $this->model::whereId($id->value())->update(['issued_at' => $issuedAt]);
     }
 }
