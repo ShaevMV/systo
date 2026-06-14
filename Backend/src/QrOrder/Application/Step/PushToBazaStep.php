@@ -31,7 +31,9 @@ final class PushToBazaStep implements PipelineStepInterface
         $queued = 0;
 
         foreach ($responses as $response) {
-            if ($response->getTypeTicketId() === null) {
+            // el_tickets-билету нужен type_ticket_id (как в классике). Списочный билет (isList)
+            // пишется в spisok_tickets и в типе билета не нуждается.
+            if (! $response->isList() && $response->getTypeTicketId() === null) {
                 $log->warning('push_to_baza.skip_no_type', [
                     'order_id' => $order->getId()->value(),
                     'ticket_id' => $response->getId()->value(),

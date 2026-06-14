@@ -40,11 +40,16 @@ final class PushTicketToBazaJob implements ShouldQueue
     public function handle(TicketsRepositoryInterface $ticketsRepository): void
     {
         $log = PipelineLog::logger();
+        $isList = $this->ticket->isList();
 
-        // setInBaza уже логирует причину сбоя и возвращает false. Бросаем для ретрая —
-        // upsert по uuid гарантирует, что повтор не создаст дубль.
-        if (! $ticketsRepository->setInBaza($this->ticket)) {
-            $log->error('push_baza.fail', ['ticket_id' => $this->ticket->getId()->value()]);
+        // Маршрутизация как в классике (PushTicketsCommandHandler): списочный билет → spisok_tickets,
+        // обычный → el_tickets. Оба идемпотентны (upsert по uuid/ticket_uuid). На false — ретрай.
+        $ok = $isList
+            ? $ticketsRepository->setInBazaList($this->ticket)
+            : $ticketsRepository->setInBaza($this->ticket);
+
+        if (! $ok) {
+            $log->error('push_baza.fail', ['ticket_id' => $this->ticket->getId()->value(), 'list' => $isList]);
 
             throw new RuntimeException('Не удалось записать билет в Baza: ' . $this->ticket->getId()->value());
         }
@@ -52,6 +57,7 @@ final class PushTicketToBazaJob implements ShouldQueue
         $log->info('push_baza.ok', [
             'ticket_id' => $this->ticket->getId()->value(),
             'kilter' => $this->ticket->getKilter(),
+            'list' => $isList,
         ]);
     }
 }
