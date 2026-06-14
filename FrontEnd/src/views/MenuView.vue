@@ -221,6 +221,11 @@
         </router-link>
       </li>
       <li class="nav-item">
+        <router-link class="nav-link" active-class="active" :to="{ name: 'AdminQrOrders' }">
+          QR-заказы
+        </router-link>
+      </li>
+      <li class="nav-item">
         <router-link class="nav-link" active-class="active" :to="{ name: 'QuestionnaireList' }">
           Все анкеты
         </router-link>
