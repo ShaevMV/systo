@@ -1,0 +1,229 @@
+import axios from 'axios';
+
+/**
+ * Авторизоваться
+ *
+ * @param context
+ * @param payload
+ */
+export const toLogin = (context, payload) => {
+    let promise = axios.post('/api/login', payload);
+    promise
+        .then(async function (response) {
+            if (response.data.status === 'success') {
+                context.commit('setToken', response.data.authorisation);
+                context.commit('setUserInfo', response.data.user);
+                payload.callback(response.data.user.role);
+            }
+        })
+        .catch(function (error) {
+            if (error.response.data.errors === undefined) {
+                context.commit('setError', {
+                    main: error.response.data.message
+                });
+            } else {
+                context.commit('setError', error.response.data.errors);
+            }
+        });
+};
+
+/**
+ * Регистрация
+ *
+ * @param context
+ * @param payload
+ */
+export const toRegistration = (context, payload) => {
+    let promise = axios.post('/api/register', payload);
+    promise
+        .then(async function (response) {
+            if (response.data.status === 'success') {
+                context.commit('setToken', response.data.authorisation);
+                context.commit('setUserInfo', response.data.user);
+                payload.callback();
+            }
+        })
+        .catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+        });
+};
+
+/**
+ * Регистрация куратора (создаёт аккаунт с ролью curator).
+ *
+ * @param context
+ * @param payload
+ */
+export const toRegistrationCurator = (context, payload) => {
+    let promise = axios.post('/api/registerCurator', payload);
+    promise
+        .then(async function (response) {
+            if (response.data.status === 'success') {
+                context.commit('setToken', response.data.authorisation);
+                context.commit('setUserInfo', response.data.user);
+                payload.callback();
+            }
+        })
+        .catch(function (error) {
+            context.commit('setError', error.response.data.errors);
+        });
+};
+
+/**
+ * Восстановления пароля
+ *
+ * @param context
+ * @param payload
+ */
+export const toForgotPassword = (context, payload) => {
+    context.commit('setError', []);
+    let promise = axios.post('/api/forgot-password', {
+        email: payload.email
+    });
+    promise
+        .then(async function (response) {
+            payload.callback(response.data.message);
+        })
+        .catch(function (error) {
+            payload.callback(error.response.data.errors.email);
+        });
+};
+
+/**
+ * Сменить данные пользователя
+ *
+ * @param context
+ * @param payload
+ */
+export const editProfile = (context, payload) => {
+    let promise = axios.post('/api/editProfile', {
+        city: payload.city,
+        phone: payload.phone,
+        name: payload.name
+    });
+    promise
+        .then(async function (response) {
+            payload.callback(response.data.message);
+        })
+        .catch(function (error) {
+            payload.callback(error.response.data.errors);
+        });
+};
+
+/**
+ * Получить данные о пользователе
+ *
+ * @param context
+ */
+export const loadUserData = (context, payload) => {
+    let promise = axios.get('/api/user');
+    promise
+        .then(async function (response) {
+            context.commit('setUserData', response.data);
+            if (payload.callback !== undefined) {
+                payload.callback(response.data);
+            }
+        })
+        .catch(function (error) {
+            console.error(error);
+        });
+};
+
+/**
+ * Пересобрать токен — возвращает Promise с новым токеном для Axios interceptor
+ *
+ * @param context
+ * @returns {Promise<string>}
+ */
+export const tokenRefresh = (context) => {
+    return axios.post('/api/refresh').then(function (response) {
+        if (response.data.status === 'success') {
+            context.commit('setToken', response.data.authorisation);
+            context.commit('setUserInfo', response.data.user);
+            return response.data.authorisation.type + ' ' + response.data.authorisation.token;
+        }
+        return Promise.reject(new Error('Refresh failed'));
+    });
+};
+
+/**
+ * Сменить пароль
+ *
+ * @param context
+ * @param payload
+ */
+export const changePassword = (context, payload) => {
+    let promise = axios.post('/api/resetPassword', {
+        token: payload.token,
+        password: payload.password,
+        password_confirmation: payload.password_confirmation
+    });
+    promise
+        .then(async function (response) {
+            if (response.data.status === 'success') {
+                context.commit('setToken', response.data.authorisation);
+                context.commit('setUserInfo', response.data.user);
+                payload.callback();
+            }
+        })
+        .catch(function (error) {
+            if (error.response.status === 401) {
+                context.dispatch('logOut').then((r) => console.log(r));
+            }
+            context.commit('setError', error.response.data.errors);
+        });
+};
+
+/**
+ * Проверить доступ
+ *
+ * @param context
+ * @param payload
+ * @returns {Promise<axios.AxiosResponse<any>>}
+ */
+export const isCorrectRole = (context, payload) => {
+    return axios.post('/api/isCorrectRole', payload);
+};
+
+/**
+ * Сменить пароль
+ *
+ * @param context
+ * @param payload
+ */
+export const editPassword = (context, payload) => {
+    let promise = axios.post('/api/editPassword', {
+        password: payload.password,
+        password_confirmation: payload.password_confirmation
+    });
+    promise
+        .then(async function (response) {
+            payload.callback(response.data.message);
+        })
+        .catch(function (error) {
+            console.error(error.response.data);
+            payload.callback(error.response.data.message);
+        });
+};
+
+/**
+ * Разлогиниться
+ *
+ * @param context
+ */
+export const logOut = (context) => {
+    let promise = axios.post('/api/logout');
+    promise
+        .then(async function () {
+            context.commit('removeToken');
+            location.href = '/';
+        })
+        .catch(function (error) {
+            console.error(error);
+            context.commit('removeToken');
+        });
+};
+
+export const clearError = (context) => {
+    context.commit('setError', []);
+};
