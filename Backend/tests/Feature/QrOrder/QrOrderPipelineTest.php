@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\QrOrder;
 
+use App\Mail\OrderListApproved;
 use App\Mail\OrderToPaid;
 use App\Mail\OrderToPaidFriendly;
 use App\Models\Tickets\TicketModel;
@@ -157,6 +158,41 @@ class QrOrderPipelineTest extends TestCase
         Mail::assertNotSent(OrderToPaid::class);
 
         // Билет всё равно создаётся и пишется в Baza.
+        self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
+        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+    }
+
+    public function test_list_order_sends_list_email_and_creates_ticket(): void
+    {
+        Mail::fake();
+        Queue::fake();
+
+        $oid = '77777777-7777-7777-7777-777777777777';
+        $contract = [
+            'order_id' => $oid,
+            'user' => ['name' => 'Получатель', 'city' => 'Сочи', 'phone' => '+70000000003'],
+            // цены нет
+            'order_data' => [
+                'type_order' => 'list',
+                'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
+                'curator' => ['id' => '88888888-8888-8888-8888-888888888888', 'email' => 'curator@example.com', 'name' => 'Иван Куратор'],
+                'location' => ['id' => '99999999-9999-9999-9999-999999999999', 'name' => 'Сцена А'],
+                'project' => 'Смена 1',
+                'status' => 'создан',
+                'email' => 'recipient@example.com',
+            ],
+            'guests' => [
+                ['name' => 'Гость Списка', 'email' => 'g.list@example.com',
+                 'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
+            ],
+        ];
+        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+
+        app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
+
+        // Список → письмо OrderListApproved (а не OrderToPaid), билет создан, Baza-задача поставлена.
+        Mail::assertSent(OrderListApproved::class, 1);
+        Mail::assertNotSent(OrderToPaid::class);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
         Queue::assertPushed(PushTicketToBazaJob::class, 1);
     }
