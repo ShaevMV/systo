@@ -123,12 +123,34 @@ jobs:
             cp .env.staging.example .env.staging
             ROOT_PWD="$(openssl rand -hex 16)"
             DB_PWD="$(openssl rand -hex 16)"
-            sed -i "s/staging_root_secret_CHANGE_ME/$ROOT_PWD/g" .env.staging
-            sed -i "s/staging_secret_CHANGE_ME/$DB_PWD/g"        .env.staging
+            RABBIT_PWD="$(openssl rand -hex 16)"
+            sed -i "s/staging_root_secret_CHANGE_ME/$ROOT_PWD/g"   .env.staging
+            sed -i "s/staging_secret_CHANGE_ME/$DB_PWD/g"          .env.staging
+            sed -i "s/staging_rabbit_secret_CHANGE_ME/$RABBIT_PWD/g" .env.staging
             chmod 600 .env.staging
             echo "::notice::.env.staging создан. Пароли сгенерированы автоматически."
           else
             echo "✓ .env.staging уже существует — пропускаю"
+          fi
+
+      # На уже забутстрапленном сервере .env.staging существует, а креды RabbitMQ
+      # могли там ещё отсутствовать (введены позже). Дописываем идемпотентно,
+      # пароль генерим один раз и больше не трогаем (стабилен между деплоями).
+      - name: Ensure RabbitMQ creds in .env.staging
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE '^RABBITMQ_DEFAULT_PASS=' .env.staging \
+             || grep -q 'staging_rabbit_secret_CHANGE_ME' .env.staging; then
+            RABBIT_PWD="$(openssl rand -hex 16)"
+            sed -i '/^RABBITMQ_DEFAULT_USER=/d;/^RABBITMQ_DEFAULT_PASS=/d;/^RABBITMQ_DEFAULT_VHOST=/d' .env.staging
+            {
+              echo "RABBITMQ_DEFAULT_USER=systo"
+              echo "RABBITMQ_DEFAULT_PASS=$RABBIT_PWD"
+              echo "RABBITMQ_DEFAULT_VHOST=systo"
+            } >> .env.staging
+            echo "::notice::RabbitMQ creds добавлены в .env.staging (пароль сгенерирован)"
+          else
+            echo "✓ RabbitMQ creds уже есть в .env.staging"
           fi
 
       - name: Bootstrap Backend/.env (first deploy)

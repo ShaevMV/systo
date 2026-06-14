@@ -216,9 +216,42 @@ services:
       - staging
     restart: unless-stopped
 
+  # ═══ RABBITMQ (брокер сообщений + management UI) ═══════════════════════════
+  # Транспорт для будущей интеграции qr→org (см. project_qr_pivot_2026_06_13).
+  # AMQP (5672) — ТОЛЬКО внутри сети staging (host не пробрасываем).
+  # Management UI (15672) → 127.0.0.1:8085, наружу через host-nginx + basic-auth
+  # на под-пути https://staging.spaceofjoy.ru/rabbitmq/ (path_prefix в rabbitmq.conf).
+  # restart: unless-stopped — Docker сам держит
+  # контейнер включённым (роль «супервизора»), параллельно остальному стейджу.
+  rabbitmq-staging:
+    image: rabbitmq:3.13-management-alpine
+    container_name: rabbitmq-staging
+    # Стабильное имя ноды rabbit@rabbitmq-staging — иначе при пересоздании
+    # контейнера mnesia-данные «теряются» (нода стартует под новым hostname).
+    hostname: rabbitmq-staging
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-systo}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-staging_rabbit_secret}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-systo}
+    ports:
+      - "127.0.0.1:8085:15672"
+    volumes:
+      - rabbitmq-staging-data:/var/lib/rabbitmq
+      - ./Docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - staging
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    restart: unless-stopped
+
 volumes:
   mysql-staging-data:
   redis-staging-data:
+  rabbitmq-staging-data:
 
 networks:
   staging:
