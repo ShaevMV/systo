@@ -71,6 +71,7 @@
     .layout-wrapper {
         .layout-main-container {
             margin-left: 0;
+            // На планшетах (768–991px) держим 2rem, на телефонах ужимается в _main.scss.
             padding-left: 2rem;
         }
 
@@ -105,6 +106,17 @@
             .layout-mask {
                 display: block;
             }
+        }
+    }
+}
+
+// Телефоны: ужимаем боковые отступы контейнера, чтобы таблицы/карточки
+// получили максимум ширины. Идёт ПОСЛЕ правила 991px → перекрывает padding-left.
+@media (max-width: 767px) {
+    .layout-wrapper {
+        .layout-main-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
         }
     }
 }
