@@ -5,14 +5,19 @@ declare(strict_types=1);
 namespace Tickets\QrOrder\Application;
 
 use Carbon\Carbon;
+use Shared\Domain\Bus\Query\QueryBus;
 use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\History\Domain\ActorType;
 use Tickets\History\Dto\SaveHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
+use Tickets\QrOrder\Application\GetList\QrOrderGetListQuery;
+use Tickets\QrOrder\Application\GetList\QrOrderGetListQueryHandler;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
 use Tickets\QrOrder\Domain\QrOrderHistoryEvent;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
+use Tickets\QrOrder\Responses\QrOrderGetListResponse;
 
 /**
  * Приём заказов от витрины qr (API №1) + смена статуса с выдачей билетов (API №2).
@@ -23,10 +28,17 @@ final class QrOrderApplication
     /** Статусы контракта qr, означающие «оплачено» → запускают выдачу билетов. */
     private const PAID_STATUSES = ['оплачен', 'paid'];
 
+    /** Чтение списка для админки идёт через QueryBus (как Location); запись — тонким слоем. */
+    private readonly QueryBus $queryBus;
+
     public function __construct(
         private readonly QrOrderRepositoryInterface $repository,
         private readonly HistoryRepositoryInterface $history,
+        QrOrderGetListQueryHandler $getListQueryHandler,
     ) {
+        $this->queryBus = new InMemorySymfonyQueryBus([
+            QrOrderGetListQuery::class => $getListQueryHandler,
+        ]);
     }
 
     /**
@@ -59,6 +71,15 @@ final class QrOrderApplication
     public function getItem(Uuid $id): ?QrOrderDto
     {
         return $this->repository->findById($id);
+    }
+
+    /** Список qr-заказов для админки (read-only): фильтры + пагинация + total. */
+    public function getList(QrOrderGetListQuery $query): QrOrderGetListResponse
+    {
+        /** @var QrOrderGetListResponse $result */
+        $result = $this->queryBus->ask($query);
+
+        return $result;
     }
 
     /**

@@ -17,6 +17,11 @@ Route::prefix('v1/qrOrder')->group(static function (): void {
         Route::post('/changeStatus/{id}', [QrOrderController::class, 'changeStatus']);
     });
 
+    // Список принятых заказов для админки org (read-only): фильтры + пагинация. Содержит ПДн.
+    Route::post('/getList', [QrOrderController::class, 'getList'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
     // Чтение принятого заказа — только админ org (JWT), содержит ПДн.
     Route::get('/getItem/{id}', [QrOrderController::class, 'getItem'])
         ->middleware('auth:api')
