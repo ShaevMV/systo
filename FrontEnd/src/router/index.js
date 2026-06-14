@@ -292,6 +292,16 @@ const routes = [
             'role': ['admin']
         }
     },
+    // Админка: qr-заказы (read-only). Lazy — раздел редкий, не тянем в основной бандл.
+    {
+        path: '/admin/qr-orders',
+        name: 'AdminQrOrders',
+        component: () => import('@/views/admin/QrOrderListView.vue'),
+        meta: {
+            'requiresAuth': true,
+            'role': ['admin']
+        }
+    },
     {
         path: '/promo-codes',
         name: 'PromoCodes',
