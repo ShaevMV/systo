@@ -85,6 +85,13 @@ class QrOrderPipelineTest extends TestCase
 
         // Уведомление гостя в Telegram — отдельной задачей (у гостя задан telegram).
         Queue::assertPushed(ProcessTelegramSend::class, 1);
+
+        // История: при выдаче записано событие issued (actor=qr).
+        $this->assertDatabaseHas('domain_history', [
+            'aggregate_id' => self::ORDER_ID,
+            'event_name' => 'issued',
+            'actor_type' => 'qr',
+        ]);
     }
 
     public function test_skips_telegram_when_guest_has_none(): void
@@ -230,5 +237,20 @@ class QrOrderPipelineTest extends TestCase
         Queue::assertNotPushed(ProcessCreatingQRCode::class);
         Queue::assertNotPushed(PushTicketToBazaJob::class);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
+    }
+
+    public function test_rerun_does_not_duplicate_tickets(): void
+    {
+        Mail::fake();
+        Queue::fake();
+        $this->persistOrder();
+
+        // Двойной прогон оркестратора (имитация ретрая/переотправки «оплачен» после сбоя).
+        app()->call([new IssueOrderJob(new Uuid(self::ORDER_ID)), 'handle']);
+        app()->call([new IssueOrderJob(new Uuid(self::ORDER_ID)), 'handle']);
+
+        // Билет не задублировался (детерминированный id), PDF поставлен один раз (только для нового).
+        self::assertSame(1, TicketModel::where('order_ticket_id', self::ORDER_ID)->count());
+        Queue::assertPushed(ProcessCreatingQRCode::class, 1);
     }
 }

@@ -107,4 +107,23 @@ class QrOrderCreateApiTest extends TestCase
         $this->postJson('/api/v1/qrOrder/changeStatus/99999999-9999-9999-9999-999999999999', ['status' => 'оплачен'])
             ->assertStatus(404);
     }
+
+    public function test_create_and_status_change_record_history(): void
+    {
+        // История пишется с actor=qr: created при приёме, status_changed при смене статуса.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
+        $this->postJson('/api/v1/qrOrder/changeStatus/11111111-1111-1111-1111-111111111111', ['status' => 'отменён'])->assertOk();
+
+        $this->assertDatabaseHas('domain_history', [
+            'aggregate_id' => '11111111-1111-1111-1111-111111111111',
+            'aggregate_type' => 'qr_order',
+            'event_name' => 'created',
+            'actor_type' => 'qr',
+        ]);
+        $this->assertDatabaseHas('domain_history', [
+            'aggregate_id' => '11111111-1111-1111-1111-111111111111',
+            'event_name' => 'status_changed',
+            'actor_type' => 'qr',
+        ]);
+    }
 }
