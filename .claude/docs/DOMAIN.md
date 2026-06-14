@@ -248,6 +248,15 @@ class Questionnaire extends AggregateRoot {
 - `system` — системное действие (фоновые задачи, события)
 - `artisan` — действие из artisan-команды (CLI)
 - `auto_payment` — авто-одобрение заказа на `POST /api/v1/order/create` по валидному заголовку `AutoPayment` (`actorId` пишется `null`)
+- `qr` — действия по заказам, пришедшим от витрины qr.spaceofjoy.ru (S2S-канал, не человек; `actorId` пишется `null`)
+
+### QrOrder Module
+
+| DTO | Файл | Поля |
+|-----|------|------|
+| **QrOrderDto** | `QrOrder/Dto/` | `id` (Uuid, == id заказа qr/org), `email`, `status`, `festivalId` (?Uuid), `typeOrder` (?string: regular/friendly/list/live), `city`, `phone`, `totalPrice` (int, рубли), `payload` (array — весь контракт qr), `issuedAt`. Фабрики: `fromState($row)` (из строки БД), `fromQrContract($json)` (из контракта витрины) |
+| **QrOrderItemForListResponse** | `QrOrder/Responses/` | Облегчённая проекция для списка админки (snake_case, **без `payload`**): `id`, `email`, `status`, `festival_id`, `type_order`, `city`, `phone`, `total_price`, `issued_at`, `created_at` |
+| **QrOrderGetListResponse** | `QrOrder/Responses/` | `collection` (Collection<QrOrderItemForListResponse>) + `totalCount` (int) — страница + total для пагинации |
 
 ---
 
@@ -426,6 +435,26 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 |-------|----------|
 | `save(SaveHistoryDto): void` | Сохранить событие истории |
 | `getByAggregateId(string): DomainHistoryDto[]` | Получить всю историю агрегата по ID |
+
+### QrOrderRepositoryInterface
+
+**Путь:** `Backend/src/QrOrder/Repositories/QrOrderRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlQrOrderRepository` (таблица `qr_orders`)
+
+Приём заказов от витрины qr (S2S) + чтение для админки org. Модуль без AggregateRoot — пассивная сущность (как `Location`). Чтение списка идёт через QueryBus (`QrOrderGetListQuery` + `QrOrderGetListQueryHandler`, паттерн `Location`), запись — тонким слоем `QrOrderApplication`.
+
+| Метод | Описание |
+|-------|----------|
+| `create(QrOrderDto): bool` | Принять заказ (идемпотентно по `id`) |
+| `getList(Filters, Order, int page, int perPage): Collection` | Страница списка для админки (проекции `QrOrderItemForListResponse`, без payload) |
+| `countList(Filters): int` | Общее число заказов под фильтрами (для `totalNumber`) |
+| `existsById(Uuid): bool` | Заказ уже принят (`id` == id заказа qr/org → идемпотентность) |
+| `findById(Uuid): ?QrOrderDto` | Полный заказ по ID (с payload) |
+| `changeStatus(Uuid, string): bool` | Сменить статус (API №2) |
+| `markIssued(Uuid, Carbon): bool` | Отметить выданным (защита от повторной выдачи) |
+| `clearIssued(Uuid): bool` | Снять отметку выдачи (при сбое — выдать повторно) |
+
+**Whitelist фильтров `getList`** (в `QrOrderGetListQueryHandler`): `email` (LIKE), `city` (LIKE), `status` (EQUAL), `festival_id` (EQUAL), `type_order` (EQUAL). Сортировка через `Order` (`Order::none()` на кривом `orderBy`). Пагинация `forPage(page, perPage)`, total — `count()` под теми же фильтрами.
 
 ---
 
