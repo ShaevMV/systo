@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\QrOrder;
 
 use App\Mail\OrderListApproved;
+use App\Mail\OrderToLiveTicketIssued;
 use App\Mail\OrderToPaid;
 use App\Mail\OrderToPaidFriendly;
 use App\Models\Tickets\TicketModel;
@@ -18,6 +19,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
+use Tickets\QrOrder\Application\Job\LinkLiveTicketJob;
 use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramSend;
@@ -195,5 +197,38 @@ class QrOrderPipelineTest extends TestCase
         Mail::assertNotSent(OrderToPaid::class);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
         Queue::assertPushed(PushTicketToBazaJob::class, 1);
+    }
+
+    public function test_live_order_no_pdf_links_and_sends_live_email(): void
+    {
+        Mail::fake();
+        Queue::fake();
+
+        $oid = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
+        $contract = [
+            'order_id' => $oid,
+            'user' => ['name' => 'Лайв', 'city' => 'Уфа', 'phone' => '+70000000004'],
+            'order_data' => [
+                'type_order' => 'live',
+                'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
+                'status' => 'создан',
+                'email' => 'live.recipient@example.com',
+            ],
+            'guests' => [
+                ['name' => 'Лайв Гость', 'email' => 'g.live@example.com', 'number' => 777,
+                 'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Живой', 'options' => []]],
+            ],
+        ];
+        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+
+        app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
+
+        // Живой: письмо о выдаче (без PDF), связка с live_tickets поставлена;
+        // PDF (ProcessCreatingQRCode) и el_tickets (PushTicketToBazaJob) НЕ задействованы.
+        Mail::assertSent(OrderToLiveTicketIssued::class, 1);
+        Queue::assertPushed(LinkLiveTicketJob::class, 1);
+        Queue::assertNotPushed(ProcessCreatingQRCode::class);
+        Queue::assertNotPushed(PushTicketToBazaJob::class);
+        self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
     }
 }
