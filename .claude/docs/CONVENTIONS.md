@@ -86,6 +86,7 @@ src/ModuleName/
 - `PromoCode/Application/` — содержит `CreatePromoCode`, `GetPromoCodes`, `SearchPromoCode`, `ExternalPromocode`
 - `Ticket/Live/` — содержит `Aplication` и `Service` (без Domain)
 - `Festival/` — содержит `Application`, `DTO`, `Repositories`, `Response` (без Domain)
+- `QrOrder/` — пассивная сущность без AggregateRoot (как `Location`): `Application` (тонкий слой `QrOrderApplication` + `GetList/` через QueryBus + `Issuance/`/`Step/` пайплайн выдачи), `Dto`, `Repositories`, `Responses`, `Domain/ValueObject`. Чтение списка для админки — по паттерну `Location` (`getList` через `Filters`/`Order`/`FilterBuilder`, БД только в репозитории)
 
 ### Именование классов
 
