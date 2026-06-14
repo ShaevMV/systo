@@ -21,4 +21,9 @@ Route::prefix('v1/qrOrder')->group(static function (): void {
     Route::get('/getItem/{id}', [QrOrderController::class, 'getItem'])
         ->middleware('auth:api')
         ->middleware('admin');
+
+    // История заказа (created/status_changed/issued, actor=qr) — только админ org.
+    Route::get('/getHistory/{id}', [QrOrderController::class, 'getHistory'])
+        ->middleware('auth:api')
+        ->middleware('admin');
 });

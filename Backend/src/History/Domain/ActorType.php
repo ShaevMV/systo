@@ -11,4 +11,6 @@ final class ActorType
     public const ARTISAN      = 'artisan';
     // Автоматическое одобрение заказа по заголовку AutoPayment на /api/v1/order/create
     public const AUTO_PAYMENT = 'auto_payment';
+    // Действия по заказам, пришедшим от витрины qr (S2S-канал, не человек)
+    public const QR           = 'qr';
 }

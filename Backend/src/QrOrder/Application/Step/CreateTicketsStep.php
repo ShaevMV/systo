@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use InvalidArgumentException;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Application\Support\PipelineLog;
+use Tickets\QrOrder\Application\Support\QrTicketId;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
@@ -73,20 +74,25 @@ final class CreateTicketsStep implements PipelineStepInterface
             $ticketTypeId = $this->guestTicketTypeId($guest);
             $firstTicketTypeId ??= $ticketTypeId;
 
-            $ticketId = Uuid::random();
+            // Детерминированный id → идемпотентность: повтор выдачи не создаст дубль билета.
+            $ticketId = QrTicketId::forGuest($order->getId(), $index);
             $email = (string) ($guest['email'] ?? $order->getEmail());
 
-            // 1. Создаём строку билета (kilter — auto-increment в БД).
-            $this->ticketsRepository->createTickets(new TicketDto(
-                $order->getId(),
-                (string) ($guest['name'] ?? ''),
-                $festivalId,
-                $ticketId,
-                email: $email,
-            ));
+            // 1. Создаём строку билета, только если её ещё нет (kilter — auto-increment в БД).
+            $existingKilter = $this->issuanceRepository->getKilter($ticketId);
+            $isNew = $existingKilter === null;
+            if ($isNew) {
+                $this->ticketsRepository->createTickets(new TicketDto(
+                    $order->getId(),
+                    (string) ($guest['name'] ?? ''),
+                    $festivalId,
+                    $ticketId,
+                    email: $email,
+                ));
+            }
 
             // 2. Читаем kilter + шаблоны под тип билета гостя.
-            $kilter = $this->issuanceRepository->getKilter($ticketId) ?? 0;
+            $kilter = $existingKilter ?? $this->issuanceRepository->getKilter($ticketId) ?? 0;
             $template = $ticketTypeId !== null
                 ? $this->issuanceRepository->findTemplate($festivalId, $ticketTypeId)
                 : null;
@@ -115,12 +121,14 @@ final class CreateTicketsStep implements PipelineStepInterface
                 location_id: $locationId,
             );
 
-            // 4. Сохраняем PDF/QR (для скачивания) — очередь.
-            ProcessCreatingQRCode::dispatch($response);
+            // 4. PDF/QR — только для новых билетов (повторная выдача не перегенерирует).
+            if ($isNew) {
+                ProcessCreatingQRCode::dispatch($response);
+            }
 
             $responses[] = $response;
 
-            $log->info('create_tickets.guest_ok', [
+            $log->info($isNew ? 'create_tickets.guest_ok' : 'create_tickets.guest_reused', [
                 'order_id' => $order->getId()->value(),
                 'guest_index' => $index,
                 'kilter' => $kilter,

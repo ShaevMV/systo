@@ -6,7 +6,11 @@ namespace Tickets\QrOrder\Application;
 
 use Carbon\Carbon;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\History\Domain\ActorType;
+use Tickets\History\Dto\SaveHistoryDto;
+use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
+use Tickets\QrOrder\Domain\QrOrderHistoryEvent;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 
@@ -21,6 +25,7 @@ final class QrOrderApplication
 
     public function __construct(
         private readonly QrOrderRepositoryInterface $repository,
+        private readonly HistoryRepositoryInterface $history,
     ) {
     }
 
@@ -34,7 +39,21 @@ final class QrOrderApplication
             return true;
         }
 
-        return $this->repository->create($dto);
+        $created = $this->repository->create($dto);
+
+        if ($created) {
+            $this->history->save(new SaveHistoryDto(
+                $dto->getId()->value(),
+                new QrOrderHistoryEvent('created', [
+                    'status' => $dto->getStatus(),
+                    'type_order' => $dto->getTypeOrder(),
+                ]),
+                null,
+                ActorType::QR,
+            ));
+        }
+
+        return $created;
     }
 
     public function getItem(Uuid $id): ?QrOrderDto
@@ -56,6 +75,16 @@ final class QrOrderApplication
         }
 
         $this->repository->changeStatus($id, $status);
+
+        $this->history->save(new SaveHistoryDto(
+            $id->value(),
+            new QrOrderHistoryEvent('status_changed', [
+                'from' => $order->getStatus(),
+                'to' => $status,
+            ]),
+            null,
+            ActorType::QR,
+        ));
 
         if ($this->isPaid($status) && $order->getIssuedAt() === null) {
             // Помечаем выданным ДО постановки задачи — защита от повторного запуска при

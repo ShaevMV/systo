@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use InvalidArgumentException;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Application\Support\PipelineLog;
+use Tickets\QrOrder\Application\Support\QrTicketId;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
@@ -61,18 +62,22 @@ final class CreateLiveTicketsStep implements PipelineStepInterface
             $firstTicketTypeId ??= $ticketTypeId;
             $number = isset($guest['number']) ? (int) $guest['number'] : null;
 
-            $ticketId = Uuid::random();
+            // Детерминированный id → идемпотентность: повтор выдачи не создаст дубль билета.
+            $ticketId = QrTicketId::forGuest($order->getId(), $index);
             $email = (string) ($guest['email'] ?? $order->getEmail());
 
-            $this->ticketsRepository->createTickets(new TicketDto(
-                $order->getId(),
-                (string) ($guest['name'] ?? ''),
-                $festivalId,
-                $ticketId,
-                email: $email,
-            ));
+            $existingKilter = $this->issuanceRepository->getKilter($ticketId);
+            if ($existingKilter === null) {
+                $this->ticketsRepository->createTickets(new TicketDto(
+                    $order->getId(),
+                    (string) ($guest['name'] ?? ''),
+                    $festivalId,
+                    $ticketId,
+                    email: $email,
+                ));
+            }
 
-            $kilter = $this->issuanceRepository->getKilter($ticketId) ?? 0;
+            $kilter = $existingKilter ?? $this->issuanceRepository->getKilter($ticketId) ?? 0;
 
             // Живой билет — без PDF: festivalView=null (письмо не прикрепит PDF), QR не генерим.
             $responses[] = new TicketResponse(
