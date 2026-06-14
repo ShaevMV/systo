@@ -18,6 +18,7 @@ use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
 use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
+use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramSend;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
 
 /**
@@ -48,7 +49,7 @@ class QrOrderPipelineTest extends TestCase
                 'email' => 'buyer@example.com',
             ],
             'guests' => [
-                ['name' => 'Иван Гость', 'email' => 'guest@example.com',
+                ['name' => 'Иван Гость', 'email' => 'guest@example.com', 'telegram' => 'ivan_guest',
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
@@ -76,6 +77,39 @@ class QrOrderPipelineTest extends TestCase
         Mail::assertSent(OrderToPaid::class, 1);
 
         // Запись билета в Baza — отдельной изолированной задачей (на каждый билет).
+        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+
+        // Уведомление гостя в Telegram — отдельной задачей (у гостя задан telegram).
+        Queue::assertPushed(ProcessTelegramSend::class, 1);
+    }
+
+    public function test_skips_telegram_when_guest_has_none(): void
+    {
+        Mail::fake();
+        Queue::fake();
+
+        $oid = '55555555-5555-5555-5555-555555555555';
+        $contract = [
+            'order_id' => $oid,
+            'user' => ['name' => 'Без ТГ', 'city' => 'Тверь', 'phone' => '+70000000001'],
+            'price' => ['total' => 4200],
+            'order_data' => [
+                'type_order' => 'обычный',
+                'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
+                'status' => 'создан',
+                'email' => 'notg@example.com',
+            ],
+            'guests' => [
+                ['name' => 'Гость Без ТГ', 'email' => 'notg@example.com',
+                 'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
+            ],
+        ];
+        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+
+        app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
+
+        // Нет telegram у гостя → задача в бот не ставится (мягкая валидация), остальное работает.
+        Queue::assertNotPushed(ProcessTelegramSend::class);
         Queue::assertPushed(PushTicketToBazaJob::class, 1);
     }
 
