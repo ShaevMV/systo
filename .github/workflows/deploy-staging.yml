@@ -260,11 +260,12 @@ jobs:
 
       # Превью новой админки (Vite + Sakai) — собирается с base=/new-admin/,
       # VITE_API_URL берётся из environment сервиса node-admin-staging.
+      # Под root: AdminFront — свежий bind-каталог, его node_modules ещё нет, а
+      # дефолтный юзер контейнера не может mkdir в каталоге чужого UID (EACCES).
       - name: Build admin frontend (Vite, /new-admin/)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-admin-staging sh -c "rm -rf dist"
-          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-admin-staging sh -c "npm ci --include=dev && npm run build -- --base=/new-admin/"
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-admin-staging sh -c "rm -rf dist && npm ci --include=dev && npm run build -- --base=/new-admin/"
 
       - name: Up containers
         working-directory: ${{ env.PROJECT_DIR }}
