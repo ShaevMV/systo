@@ -6,8 +6,13 @@ namespace Tickets\QrOrder\Repositories;
 
 use App\Models\QrOrder\QrOrderModel;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Criteria\Order;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Dto\QrOrderDto;
+use Tickets\QrOrder\Responses\QrOrderItemForListResponse;
 
 final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
 {
@@ -30,6 +35,27 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
             'total_price' => $dto->getTotalPrice(),
             'payload' => $dto->getPayload(),
         ]);
+    }
+
+    public function getList(Filters $filters, Order $orderBy, int $page, int $perPage): Collection
+    {
+        $build = FilterBuilder::build($this->model::query(), $filters);
+
+        if ($orderBy->orderBy()->value()) {
+            $build = $build->orderBy(
+                $orderBy->orderBy()->value(),
+                $orderBy->orderType()->value(),
+            );
+        }
+
+        return $build->forPage($page, $perPage)
+            ->get()
+            ->map(fn (QrOrderModel $model) => QrOrderItemForListResponse::fromState($model->toArray()));
+    }
+
+    public function countList(Filters $filters): int
+    {
+        return FilterBuilder::build($this->model::query(), $filters)->count();
     }
 
     public function existsById(Uuid $id): bool
