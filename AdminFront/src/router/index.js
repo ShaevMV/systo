@@ -49,6 +49,15 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/template-bindings',
+                    name: 'templateBindings',
+                    component: () => import('@/views/admin/TemplateBindingListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },
