@@ -26,6 +26,20 @@ interface QrOrderRepositoryInterface
     /** Общее число заказов под теми же фильтрами (для пагинации totalNumber). */
     public function countList(Filters $filters): int;
 
+    /**
+     * Сводные агрегаты для дашборда (read-only): заказы + выручка, всего и в разрезах
+     * (по статусу, по типу заказа, по дням). Деньги — целые рубли (как total_price).
+     *
+     * @param array{festival_id?: ?string, date_from?: ?string, date_to?: ?string} $filter
+     * @return array{
+     *     totals: array{orders: int, revenue: int},
+     *     byStatus: array<int, array{status: string, orders: int, revenue: int}>,
+     *     byType: array<int, array{type_order: ?string, orders: int, revenue: int}>,
+     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>
+     * }
+     */
+    public function aggregateStats(array $filter): array;
+
     /** Заказ qr с таким id уже принят (id == id заказа org → идемпотентность приёма). */
     public function existsById(Uuid $id): bool;
 

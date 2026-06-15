@@ -14,10 +14,13 @@ use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\GetList\QrOrderGetListQuery;
 use Tickets\QrOrder\Application\GetList\QrOrderGetListQueryHandler;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
+use Tickets\QrOrder\Application\Stats\QrOrderStatsQuery;
+use Tickets\QrOrder\Application\Stats\QrOrderStatsQueryHandler;
 use Tickets\QrOrder\Domain\QrOrderHistoryEvent;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 use Tickets\QrOrder\Responses\QrOrderGetListResponse;
+use Tickets\QrOrder\Responses\QrOrderStatsResponse;
 
 /**
  * Приём заказов от витрины qr (API №1) + смена статуса с выдачей билетов (API №2).
@@ -35,9 +38,11 @@ final class QrOrderApplication
         private readonly QrOrderRepositoryInterface $repository,
         private readonly HistoryRepositoryInterface $history,
         QrOrderGetListQueryHandler $getListQueryHandler,
+        QrOrderStatsQueryHandler $statsQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             QrOrderGetListQuery::class => $getListQueryHandler,
+            QrOrderStatsQuery::class => $statsQueryHandler,
         ]);
     }
 
@@ -77,6 +82,15 @@ final class QrOrderApplication
     public function getList(QrOrderGetListQuery $query): QrOrderGetListResponse
     {
         /** @var QrOrderGetListResponse $result */
+        $result = $this->queryBus->ask($query);
+
+        return $result;
+    }
+
+    /** Сводные метрики qr-заказов для дашборда (read-only): заказы + выручка в разрезах. */
+    public function getStats(QrOrderStatsQuery $query): QrOrderStatsResponse
+    {
+        /** @var QrOrderStatsResponse $result */
         $result = $this->queryBus->ask($query);
 
         return $result;

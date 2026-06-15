@@ -58,6 +58,85 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
         return FilterBuilder::build($this->model::query(), $filters)->count();
     }
 
+    /**
+     * Сводные агрегаты для дашборда. Считаем на стороне БД (COUNT/SUM/GROUP BY) —
+     * без загрузки строк в PHP. Фильтр — festival_id + диапазон дат created_at.
+     *
+     * @param array{festival_id?: ?string, date_from?: ?string, date_to?: ?string} $filter
+     * @return array{
+     *     totals: array{orders: int, revenue: int},
+     *     byStatus: array<int, array{status: string, orders: int, revenue: int}>,
+     *     byType: array<int, array{type_order: ?string, orders: int, revenue: int}>,
+     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>
+     * }
+     */
+    public function aggregateStats(array $filter): array
+    {
+        // Замыкание навешивает одни и те же условия на каждый из 4 агрегирующих запросов.
+        $scoped = function () use ($filter) {
+            $query = $this->model::query();
+
+            if (! empty($filter['festival_id'])) {
+                $query->where(QrOrderModel::TABLE . '.festival_id', $filter['festival_id']);
+            }
+            if (! empty($filter['date_from'])) {
+                $query->whereDate(QrOrderModel::TABLE . '.created_at', '>=', $filter['date_from']);
+            }
+            if (! empty($filter['date_to'])) {
+                $query->whereDate(QrOrderModel::TABLE . '.created_at', '<=', $filter['date_to']);
+            }
+
+            return $query;
+        };
+
+        $totals = $scoped()
+            ->selectRaw('COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue')
+            ->first();
+
+        $byStatus = $scoped()
+            ->selectRaw('status, COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue')
+            ->groupBy('status')
+            ->orderByDesc('orders')
+            ->get()
+            ->map(static fn ($row) => [
+                'status' => (string) $row->status,
+                'orders' => (int) $row->orders,
+                'revenue' => (int) $row->revenue,
+            ])->all();
+
+        $byType = $scoped()
+            ->selectRaw('type_order, COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue')
+            ->groupBy('type_order')
+            ->orderByDesc('orders')
+            ->get()
+            ->map(static fn ($row) => [
+                'type_order' => $row->type_order,
+                'orders' => (int) $row->orders,
+                'revenue' => (int) $row->revenue,
+            ])->all();
+
+        $timeseries = $scoped()
+            ->selectRaw('DATE(created_at) as date, COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue')
+            ->groupByRaw('DATE(created_at)')
+            ->orderByRaw('DATE(created_at)')
+            ->get()
+            ->map(static fn ($row) => [
+                'date' => (string) $row->date,
+                'orders' => (int) $row->orders,
+                'revenue' => (int) $row->revenue,
+            ])->all();
+
+        return [
+            'totals' => [
+                'orders' => (int) ($totals->orders ?? 0),
+                'revenue' => (int) ($totals->revenue ?? 0),
+            ],
+            'byStatus' => $byStatus,
+            'byType' => $byType,
+            'timeseries' => $timeseries,
+        ];
+    }
+
     public function existsById(Uuid $id): bool
     {
         return $this->model::whereId($id->value())->exists();
