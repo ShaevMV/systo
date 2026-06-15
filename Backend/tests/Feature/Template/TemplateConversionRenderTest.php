@@ -30,6 +30,9 @@ class TemplateConversionRenderTest extends TestCase
             'name' => 'Аня Тест',
             'email' => 'anya@example.com',
             'url' => 'data:image/png;base64,AAA==',
+            'link' => 'https://pay.example/abc',
+            'login' => 'guest@example.com',
+            'password' => 'Secret123',
             'locationName' => 'Главная поляна',
             'changes' => [
                 ['oldName' => 'Старое Имя', 'newName' => 'Новое Имя'],
@@ -135,6 +138,22 @@ class TemplateConversionRenderTest extends TestCase
         // year подставлен.
         $this->assertStringContainsString('2026', $html);
         $this->assertStringContainsString('ID: E-7', $html);
+    }
+
+    /** Auth/анкетные письма: простые подстановки link/login/password. */
+    public function test_auth_emails_substitute_vars(): void
+    {
+        $renderer = app(TemplateRenderer::class);
+        $ctx = $this->richContext();
+
+        $html = $renderer->render($this->tpl('newUser.email'), $ctx);
+        $this->assertStringContainsString('guest@example.com', $html);
+        $this->assertStringContainsString('Secret123', $html);
+
+        foreach (['passwordResets.email', 'invate.email', 'questionnaire.email'] as $slug) {
+            $html = $renderer->render($this->tpl($slug), $ctx);
+            $this->assertStringContainsString('https://pay.example/abc', $html, "Нет ссылки в {$slug}");
+        }
     }
 
     private function tpl(string $name): string
