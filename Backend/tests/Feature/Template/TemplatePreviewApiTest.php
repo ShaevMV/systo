@@ -83,4 +83,34 @@ class TemplatePreviewApiTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('success', false);
     }
+
+    public function test_variables_palette_email(): void
+    {
+        $this->actingAsAdmin();
+
+        $response = $this->getJson('/api/v1/template/variables/orderToPaid?kind=email')
+            ->assertStatus(200)
+            ->assertJsonPath('kind', TemplateKind::EMAIL);
+
+        $groups = collect($response->json('variables'))->pluck('group');
+        $this->assertTrue($groups->contains('Письмо'));
+        $this->assertFalse($groups->contains('PDF'));
+    }
+
+    public function test_variables_palette_pdf_has_qr(): void
+    {
+        $this->actingAsAdmin();
+
+        $groups = collect(
+            $this->getJson('/api/v1/template/variables/pdf?kind=pdf')->assertStatus(200)->json('variables')
+        )->pluck('group');
+
+        $this->assertTrue($groups->contains('PDF'));
+    }
+
+    public function test_variables_requires_admin(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'seller']), 'api');
+        $this->getJson('/api/v1/template/variables/pdf?kind=pdf')->assertStatus(403);
+    }
 }

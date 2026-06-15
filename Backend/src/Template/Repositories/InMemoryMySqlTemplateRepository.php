@@ -5,17 +5,22 @@ declare(strict_types=1);
 namespace Tickets\Template\Repositories;
 
 use App\Models\Template\TemplateModel;
+use App\Models\Template\TemplateVersionModel;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Shared\Domain\Criteria\Filters;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Template\Dto\TemplateDto;
+use Tickets\Template\Dto\TemplateVersionDto;
 
 class InMemoryMySqlTemplateRepository implements TemplateRepositoryInterface
 {
     public function __construct(
         private TemplateModel $model,
+        private TemplateVersionModel $versionModel,
     ) {
     }
 
@@ -82,5 +87,53 @@ class InMemoryMySqlTemplateRepository implements TemplateRepositoryInterface
     public function activate(Uuid $id, bool $active): bool
     {
         return (bool) $this->model::whereId($id->value())->update(['active' => $active]);
+    }
+
+    public function saveDraft(Uuid $id, string $draftBody): bool
+    {
+        return (bool) $this->model::whereId($id->value())->update(['draft_body' => $draftBody]);
+    }
+
+    public function publish(Uuid $id, string $body, ?string $authorId, ?string $comment): bool
+    {
+        return (bool) DB::transaction(function () use ($id, $body, $authorId, $comment) {
+            $this->model::whereId($id->value())->update([
+                'body' => $body,
+                'draft_body' => null,
+            ]);
+
+            $this->versionModel::create([
+                'id' => Uuid::random()->value(),
+                'template_id' => $id->value(),
+                'body' => $body,
+                'comment' => $comment,
+                'author_id' => $authorId,
+                'created_at' => (string) Carbon::now(),
+            ]);
+
+            return true;
+        });
+    }
+
+    public function getVersions(Uuid $id): Collection
+    {
+        return $this->versionModel::whereTemplateId($id->value())
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn (TemplateVersionModel $model) => TemplateVersionDto::fromState($model->toArray()));
+    }
+
+    public function rollback(Uuid $templateId, Uuid $versionId, ?string $authorId): bool
+    {
+        $version = $this->versionModel::whereId($versionId->value())
+            ->whereTemplateId($templateId->value())
+            ->first();
+
+        if ($version === null) {
+            throw new \DomainException('Версия шаблона не найдена ' . $versionId->value());
+        }
+
+        // Откат = публикация старого body как новой версии (история append-only).
+        return $this->publish($templateId, $version->body, $authorId, 'Откат к версии от ' . $version->created_at);
     }
 }

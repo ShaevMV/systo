@@ -70,4 +70,34 @@ class TemplateApplication
     {
         return $this->repository->activate($id, $active);
     }
+
+    public function saveDraft(Uuid $id, string $draftBody): bool
+    {
+        return $this->repository->saveDraft($id, $draftBody);
+    }
+
+    public function publish(Uuid $id, string $body, ?string $authorId, ?string $comment): bool
+    {
+        return $this->repository->publish($id, $body, $authorId, $comment);
+    }
+
+    public function getVersions(Uuid $id): \Illuminate\Support\Collection
+    {
+        return $this->repository->getVersions($id);
+    }
+
+    public function rollback(Uuid $templateId, Uuid $versionId, ?string $authorId): bool
+    {
+        return $this->repository->rollback($templateId, $versionId, $authorId);
+    }
+
+    /**
+     * Палитра плейсхолдеров для редактора (без БД — фиксированный контракт).
+     *
+     * @return array<int, array{group: string, items: array<int, array{label: string, insert: string}>}>
+     */
+    public function getVariables(string $kind, string $slug): array
+    {
+        return \Tickets\Template\Domain\PlaceholderCatalog::variables($kind, $slug);
+    }
 }
