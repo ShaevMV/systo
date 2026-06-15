@@ -30,6 +30,16 @@ class InMemoryMySqlTemplateRepository implements TemplateRepositoryInterface
         return $row === null ? null : TemplateDto::fromState($row->toArray());
     }
 
+    public function findBySlugKind(string $slug, string $kind): ?TemplateDto
+    {
+        $row = $this->model::query()
+            ->whereSlug($slug)
+            ->whereKind($kind)
+            ->first();
+
+        return $row === null ? null : TemplateDto::fromState($row->toArray());
+    }
+
     public function getList(Filters $filters, Order $orderBy): Collection
     {
         $build = FilterBuilder::build($this->model::query(), $filters);

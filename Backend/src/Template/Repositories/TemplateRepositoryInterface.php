@@ -18,6 +18,9 @@ interface TemplateRepositoryInterface
      */
     public function findActive(string $slug, string $kind): ?TemplateDto;
 
+    /** Шаблон по (slug, kind) независимо от active. Для идемпотентного импорта blade. */
+    public function findBySlugKind(string $slug, string $kind): ?TemplateDto;
+
     /** @return Collection<int, TemplateDto> Список для админки (фильтры + сортировка). */
     public function getList(Filters $filters, Order $orderBy): Collection;
 
