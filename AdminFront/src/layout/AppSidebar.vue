@@ -94,8 +94,11 @@ onBeforeUnmount(() => {
     opacity: 0.7;
 }
 
-/* Знак белый — в светлой теме подкрашиваем в тёмный, чтобы был виден. */
-:global(html:not(.app-dark)) .layout-sidebar-brand-icon {
+/* Знак белый — в светлой теме подкрашиваем в тёмный, чтобы был виден.
+   ВАЖНО: весь селектор внутри :global(...). Иначе Vue scoped-CSS неправильно
+   компилирует ":global(html:not(.app-dark)) .icon" — отбрасывает потомка и вешает
+   filter:invert на ВЕСЬ <html> (вся страница инвертируется в чёрное). */
+:global(html:not(.app-dark) .layout-sidebar-brand-icon) {
     filter: invert(1) brightness(0.45);
 }
 </style>
