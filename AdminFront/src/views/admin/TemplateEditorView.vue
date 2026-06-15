@@ -28,14 +28,8 @@ const kindOptions = [
     { label: 'Письмо', value: 'email' },
     { label: 'PDF-билет', value: 'pdf' }
 ];
-const engineOptions = computed(() =>
-    kind.value === 'pdf'
-        ? [{ label: 'HTML', value: 'html' }]
-        : [
-              { label: 'HTML', value: 'html' },
-              { label: 'MJML', value: 'mjml' }
-          ]
-);
+// MJML пока не реализован (нет компиляции) → только HTML, чтобы не сохранить битый движок.
+const engineOptions = [{ label: 'HTML', value: 'html' }];
 
 const variables = computed(() => store.getters['appTemplate/getVariables']);
 const versions = computed(() => store.getters['appTemplate/getVersions']);
@@ -284,7 +278,7 @@ onMounted(load);
                             </div>
                             <div v-if="previewError" class="ed-preview-error">{{ previewError }}</div>
                             <div class="ed-preview-box">
-                                <iframe v-if="previewMode === 'email'" :srcdoc="previewHtml" class="ed-iframe" title="preview-email"></iframe>
+                                <iframe v-if="previewMode === 'email'" :srcdoc="previewHtml" class="ed-iframe" sandbox title="preview-email"></iframe>
                                 <iframe v-else-if="previewMode === 'pdf'" :src="previewPdfUrl" class="ed-iframe" title="preview-pdf"></iframe>
                                 <div v-else class="ed-muted ed-preview-empty">Нажмите «Обновить превью» — рендер на тестовых данных</div>
                             </div>

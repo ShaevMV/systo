@@ -40,7 +40,7 @@
 |----|------|--------|------------------------|----------------|-------------|
 | **AF-1** | **Продолжение переезда админки на Vite+Sakai** — каркас AdminLayout, UI-фундамент (`DataTablePage`/`useCrud`), перенос существующих CRUD-экранов | L (дробится по экранам) | Фазы 0–3 | v2.7.0 → v2.9.0 | — |
 | **AF-2** | **Дашборды со сводными графиками** в админке — продажи + количество билетов (НЕ замена Grafana, сводные графики внутри админки) | M | Фаза 4 (дашборд) | v2.8.0 | данные продаж (qr-заказы + заказы org) |
-| **AF-3** | **Универсальный генератор шаблонов** — единый редактор шаблонов для письма и PDF-билета | L | вне базовых фаз (новый модуль) | v2.8.0–v2.9.0 | согласовать модель шаблонов с backend |
+| **AF-3** | **Универсальный генератор шаблонов** — единый редактор шаблонов для письма и PDF-билета. **Фазы 1–4 done** (на стенде, e2e доказан): модуль `Backend/src/Template/` (Mustache + сущность `Template` + `template_versions`), рендер писем (11 Mailable через трейт `RendersDbTemplate`) и PDF из БД с fallback на blade, импорт blade (`templates:import-blade`), admin-CRUD API `/api/v1/template/*` (превью/версии/откат/палитра), экран редактора в AdminFront. **Фаза 5** (конвертация ~35 blade → Mustache + активация по одному + MJML) — итеративно. Спека: `.claude/specs/template-system.md` | L | новый модуль | v2.8.0–v2.9.0 | ✅ модель шаблонов согласована |
 | **AF-4** | **Подтверждение доставки билета в baza** — экран/статус «билет доставлен в baza» + ручной retry застрявших | M | Фаза 4 | v2.8.0 | ⚠️ **бэкенд-эндпоинт** статуса sync + retry (открытый вопрос спеки) |
 | **AF-5** | **S3-хранилище билетов/PDF** — хранить билеты/PDF в S3-совместимом хранилище отдельно от приложения | M | вне фаз фронта (инфра+backend) | v2.8.0–v2.9.0 | ⚙️ **devops** (выбор S3, ресурсы) + backend (драйвер storage) |
 | **AF-6** | **Подтверждение доставки билета на email** — сейчас «слепой SMTP» (лог `sent` = принято SMTP, не доказывает доставку). Переход на транзакционный провайдер с вебхуками (`delivered`/`bounced`/`opened`) + таблица статусов писем + экран «Доставка на почту» + повторная отправка. Парная к AF-4 («билет реально дошёл» = baza + email). | M | вне базовых фаз (backend + админ-экран) | v2.8.0 | ⚙️ аккаунт транзакц. провайдера (под РФ/152-ФЗ: UniOne/Unisender, SendPulse, Mailopost) + backend (драйвер + вебхук-эндпоинт + таблица статусов) |
@@ -89,6 +89,25 @@
 ---
 
 ## ✅ Сделано
+
+### 2026-06-15 — Система шаблонов писем и PDF (AF-3, фазы 1–4)
+
+**Единый редактор писем и PDF-билетов: admin меняет оформление без правки кода и деплоя. На стенде, e2e доказан. Фаза 5 (конвертация blade) — итеративно.**
+
+- 🌿 Ветка: `feat/admin-qr-orders`
+- 📜 Спека: `.claude/specs/template-system.md`
+
+**Что вошло (фазы 1–4):**
+- **Backend `Backend/src/Template/`** — движок **Mustache** (logic-less, RCE-безопасен), сущность `Template` + таблицы `templates`/`template_versions`. Рендер писем И PDF из БД с **fallback на blade** (неактивный шаблон → рендерится blade). `slug` = имени blade → нулевая миграция привязки.
+- **Импорт** текущих blade в БД — artisan `templates:import-blade` (неактивные системные черновики).
+- **Письма** — трейт `App\Mail\Concerns\RendersDbTemplate` на **11** order/list-Mailable (оба канала: legacy `order_tickets` + qr-пайплайн).
+- **PDF** — `CreatingQrCodeService::createPdf()` рендерит из БД с fallback.
+- **API** (все `auth:api` + `admin`): `/api/v1/template/getList`, `getItem`, `create`, `edit`, `activate`, `saveDraft`, `publish`, `versions`, `rollback`, `variables/{slug}`, `preview` (throttle 20/мин). Превью: email → `{html}`, pdf → `application/pdf` через DomPDF, ошибка синтаксиса → 422.
+- **Версии/откат** — `publish` снапшотит `body` в `template_versions` (append-only), `rollback` восстанавливает.
+- **Палитра переменных** — `PlaceholderCatalog` (sample-фикстуры для превью без ПДн).
+- **AdminFront** — Vuex `appTemplate` + `TemplateListView` + `TemplateEditorView` (код + вставка плейсхолдеров кликом + iframe-превью + черновик/публикация + версии).
+
+**Осталось (фаза 5, итеративно):** конвертация ~35 blade в Mustache по одному + активация после сверки + MJML/кэш `compiled_html`. blade — safety net ≥1 фестиваль.
 
 ### 2026-06-14 — Разворот org → admin-only + qr-заказы + PoC новой админки
 

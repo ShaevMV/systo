@@ -72,7 +72,6 @@ class OrderToPaidFriendly extends Mailable
         }
 
         $this->subject('Ваш билет на Систо 2026 оформлен');
-        \Log::info('Friendly шаблон: ' . $friendlyView);
         // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
         $mail = $this->renderDbOrView($friendlyView, [
             'festivalName' => $festivalName,

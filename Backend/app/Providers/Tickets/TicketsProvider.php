@@ -44,6 +44,7 @@ use Tickets\OptionPrice\Repositories\InMemoryMySqlOptionPriceRepository;
 use Tickets\OptionPrice\Repositories\OptionPriceRepositoryInterface;
 use Tickets\Template\Repositories\InMemoryMySqlTemplateRepository;
 use Tickets\Template\Repositories\TemplateRepositoryInterface;
+use Tickets\Template\Service\TemplateRenderer;
 use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
@@ -85,6 +86,8 @@ class TicketsProvider extends ServiceProvider
         $this->app->bind(HistoryRepositoryInterface::class, InMemoryMySqlHistoryRepository::class);
         $this->app->bind(LocationRepositoryInterface::class, InMemoryMySqlLocationRepository::class);
         $this->app->bind(TemplateRepositoryInterface::class, InMemoryMySqlTemplateRepository::class);
+        // singleton: Mustache\Engine кеширует токенайзинг; на заказ из N гостей createPdf не плодит N движков.
+        $this->app->singleton(TemplateRenderer::class);
         $this->app->bind(TicketTypePriceRepositoryInterface::class, InMemoryMySqlTicketTypePriceRepository::class);
         $this->app->bind(OptionRepositoryInterface::class, InMemoryMySqlOptionRepository::class);
         $this->app->bind(OptionPriceRepositoryInterface::class, InMemoryMySqlOptionPriceRepository::class);
