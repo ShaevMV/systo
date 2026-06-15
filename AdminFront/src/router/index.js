@@ -31,6 +31,24 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/templates',
+                    name: 'templates',
+                    component: () => import('@/views/admin/TemplateListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/templates/:id',
+                    name: 'templateEditor',
+                    component: () => import('@/views/admin/TemplateEditorView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },
