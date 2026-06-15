@@ -42,6 +42,8 @@ use Tickets\Option\Repositories\InMemoryMySqlOptionRepository;
 use Tickets\Option\Repositories\OptionRepositoryInterface;
 use Tickets\OptionPrice\Repositories\InMemoryMySqlOptionPriceRepository;
 use Tickets\OptionPrice\Repositories\OptionPriceRepositoryInterface;
+use Tickets\Template\Repositories\InMemoryMySqlTemplateRepository;
+use Tickets\Template\Repositories\TemplateRepositoryInterface;
 use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
@@ -82,6 +84,7 @@ class TicketsProvider extends ServiceProvider
         $this->app->singleton(QuestionnaireValidationService::class, QuestionnaireValidationService::class);
         $this->app->bind(HistoryRepositoryInterface::class, InMemoryMySqlHistoryRepository::class);
         $this->app->bind(LocationRepositoryInterface::class, InMemoryMySqlLocationRepository::class);
+        $this->app->bind(TemplateRepositoryInterface::class, InMemoryMySqlTemplateRepository::class);
         $this->app->bind(TicketTypePriceRepositoryInterface::class, InMemoryMySqlTicketTypePriceRepository::class);
         $this->app->bind(OptionRepositoryInterface::class, InMemoryMySqlOptionRepository::class);
         $this->app->bind(OptionPriceRepositoryInterface::class, InMemoryMySqlOptionPriceRepository::class);
