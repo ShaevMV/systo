@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Tickets\TemplateBinding\Application;
 
+use DomainException;
 use Illuminate\Support\Collection;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Template\Domain\TemplateKind;
+use Tickets\Template\Repositories\TemplateRepositoryInterface;
 use Tickets\TemplateBinding\Domain\TemplateBindingResolver;
 use Tickets\TemplateBinding\Dto\TemplateBindingDto;
 use Tickets\TemplateBinding\Repositories\TemplateBindingRepositoryInterface;
@@ -19,6 +22,7 @@ class TemplateBindingApplication
     public function __construct(
         private readonly TemplateBindingRepositoryInterface $repository,
         private readonly TemplateBindingResolver $resolver,
+        private readonly TemplateRepositoryInterface $templateRepository,
     ) {
     }
 
@@ -50,6 +54,36 @@ class TemplateBindingApplication
     public function hasActiveDefault(?string $excludeId = null): bool
     {
         return $this->repository->hasActiveDefault($excludeId);
+    }
+
+    /**
+     * Кросс-проверка типа шаблона: email_template_id обязан ссылаться на email-шаблон,
+     * pdf_template_id — на pdf. Возвращает текст ошибки или null (валидно).
+     */
+    public function templateKindError(?string $emailTemplateId, ?string $pdfTemplateId): ?string
+    {
+        $checks = [
+            [$emailTemplateId, TemplateKind::EMAIL, 'письма'],
+            [$pdfTemplateId, TemplateKind::PDF, 'PDF-билета'],
+        ];
+
+        foreach ($checks as [$id, $expectedKind, $label]) {
+            if (empty($id)) {
+                continue;
+            }
+
+            try {
+                $template = $this->templateRepository->getItem(new Uuid($id));
+            } catch (DomainException) {
+                return "Шаблон {$label} не найден";
+            }
+
+            if ($template->getKind() !== $expectedKind) {
+                return "Выбранный шаблон {$label} имеет другой тип ({$template->getKind()})";
+            }
+        }
+
+        return null;
     }
 
     /**

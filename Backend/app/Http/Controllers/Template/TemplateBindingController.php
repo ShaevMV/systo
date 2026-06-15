@@ -95,6 +95,11 @@ class TemplateBindingController extends Controller
             return 'Укажите хотя бы один шаблон (письма или PDF)';
         }
 
+        // Кросс-проверка типа: в слот письма — только email-шаблон, в слот PDF — только pdf.
+        if ($kindError = $application->templateKindError($data['email_template_id'] ?? null, $data['pdf_template_id'] ?? null)) {
+            return $kindError;
+        }
+
         $isDefault = (bool) ($data['is_default'] ?? false);
         $active = (bool) ($data['active'] ?? true);
         if ($isDefault && $active && $application->hasActiveDefault($excludeId)) {

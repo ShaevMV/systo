@@ -86,6 +86,26 @@ class TemplateBindingApiTest extends TestCase
         $this->postJson('/api/v1/templateBinding/getList')->assertJsonCount(0, 'list');
     }
 
+    public function test_wrong_kind_template_returns_422(): void
+    {
+        $this->actingAsAdmin();
+        $pdfId = TemplateModel::create([
+            'id' => RamseyUuid::uuid4()->toString(),
+            'slug' => 'pdf',
+            'kind' => TemplateKind::PDF,
+            'engine' => 'html',
+            'title' => 'PDF',
+            'body' => 'B',
+            'active' => true,
+            'is_system' => false,
+        ])->id;
+
+        // PDF-шаблон в слоте письма → 422 (кросс-проверка типа).
+        $this->postJson('/api/v1/templateBinding/create', ['data' => ['order_type' => 'regular', 'email_template_id' => $pdfId]])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false);
+    }
+
     public function test_requires_admin(): void
     {
         $this->actingAs(User::factory()->create(['role' => 'seller']), 'api');
