@@ -6,14 +6,14 @@ const layoutConfig = reactive({
     preset: 'Aura',
     primary: 'orange',
     surface: null,
-    // По умолчанию — ТЁМНАЯ фестивальная тема (фирменный плам-космос + оранжевый акцент,
-    // в тонах 2026.solarsysto.ru). Переключатель в топбаре переводит в светлую.
-    darkTheme: true,
+    // По умолчанию — СВЕТЛАЯ тема (владелец просил светлый, читаемый интерфейс).
+    // Тёмная фестивальная (плам-космос, тона 2026.solarsysto.ru) — по переключателю в топбаре.
+    darkTheme: false,
     menuMode: 'static'
 });
 
 // Синхронизируем класс .app-dark на <html> с начальным состоянием конфига (до маунта).
-// darkTheme:true → класс вешается, стартуем в тёмной фестивальной теме.
+// darkTheme:false → класс снят, стартуем в светлой теме. Переключатель light/dark — в топбаре.
 if (typeof document !== 'undefined') {
     document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
 }
