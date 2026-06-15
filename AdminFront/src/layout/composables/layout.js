@@ -10,11 +10,10 @@ const layoutConfig = reactive({
     menuMode: 'static'
 });
 
-// Синхронизируем класс .app-dark на <html> с начальным состоянием конфига.
-// Делается один раз при загрузке модуля (до маунта приложения).
-// darkTheme:false → класс снимается, остаётся светлая тема. Переключатель light/dark рабочий.
+// Тёмная тема удалена — приложение ВСЕГДА светлое (владелец просил светлый интерфейс).
+// Гарантируем, что класс .app-dark снят с <html> (на случай старого состояния в кеше).
 if (typeof document !== 'undefined') {
-    document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
+    document.documentElement.classList.remove('app-dark');
 }
 
 const layoutState = reactive({
@@ -29,15 +28,6 @@ const layoutState = reactive({
 });
 
 export function useLayout() {
-    // Без document.startViewTransition: на экранах с canvas (графики дашборда) и iframe
-    // (превью редактора шаблонов) снимок View-Transition залипает и оставляет замороженный
-    // светлый кадр поверх уже тёмной страницы — «дымка пропадает» и держится до перезагрузки.
-    // Мгновенное переключение класса надёжно на всех экранах.
-    const toggleDarkMode = () => {
-        layoutConfig.darkTheme = !layoutConfig.darkTheme;
-        document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
-    };
-
     const toggleMenu = () => {
         if (isDesktop()) {
             if (layoutConfig.menuMode === 'static') {
@@ -78,7 +68,6 @@ export function useLayout() {
         layoutConfig,
         layoutState,
         isDarkTheme,
-        toggleDarkMode,
         toggleConfigSidebar,
         toggleMenu,
         hideMobileMenu,
