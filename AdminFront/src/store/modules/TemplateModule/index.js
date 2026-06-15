@@ -10,6 +10,7 @@ export default {
         list: [],
         item: {},
         versions: [],
+        history: [],
         variables: [],
         filter: {},
         isLoading: false,

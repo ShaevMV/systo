@@ -10,6 +10,10 @@ export const setVersions = (state, payload) => {
     state.versions = payload;
 };
 
+export const setHistory = (state, payload) => {
+    state.history = payload;
+};
+
 export const setVariables = (state, payload) => {
     state.variables = payload;
 };
