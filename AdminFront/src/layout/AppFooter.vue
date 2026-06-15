@@ -66,8 +66,10 @@ const socials = [
     display: block;
 }
 
-/* Соц-иконки белые. В светлой теме инвертируем в тёмный, в тёмной оставляем белыми. */
-:global(html:not(.app-dark)) .layout-footer-social img {
+/* Соц-иконки белые. В светлой теме инвертируем в тёмный.
+   ВАЖНО: весь селектор внутри :global(...) — иначе Vue scoped-CSS вешает
+   filter:invert на весь <html> (см. аналогичный фикс в AppSidebar.vue). */
+:global(html:not(.app-dark) .layout-footer-social img) {
     filter: invert(1) brightness(0.35);
 }
 </style>
