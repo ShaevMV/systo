@@ -4,6 +4,8 @@ export const getItem = (state) => state.item;
 
 export const getVersions = (state) => state.versions;
 
+export const getHistory = (state) => state.history;
+
 export const getVariables = (state) => state.variables;
 
 export const getFilter = (state) => state.filter;

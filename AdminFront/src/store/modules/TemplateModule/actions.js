@@ -73,6 +73,14 @@ export const loadVersions = (context, payload) => {
     });
 };
 
+/** Журнал изменений шаблона (domain_history): кто/что/когда. */
+export const loadHistory = (context, payload) => {
+    return axios.get(API + '/history/' + payload.id).then((r) => {
+        context.commit('setHistory', r.data.history ?? []);
+        return r.data.history ?? [];
+    });
+};
+
 export const rollback = (context, payload) => {
     return axios.post(API + '/rollback/' + payload.id + '/' + payload.versionId).then((r) => {
         if (r.data.item) context.commit('setItem', r.data.item);

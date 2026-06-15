@@ -33,6 +33,7 @@ const engineOptions = [{ label: 'HTML', value: 'html' }];
 
 const variables = computed(() => store.getters['appTemplate/getVariables']);
 const versions = computed(() => store.getters['appTemplate/getVersions']);
+const history = computed(() => store.getters['appTemplate/getHistory']);
 const isLoading = computed(() => store.getters['appTemplate/getIsLoading']);
 
 // Превью
@@ -43,6 +44,7 @@ const previewPdfUrl = ref('');
 const previewError = ref('');
 const statusMsg = ref('');
 const showVersions = ref(false);
+const showHistory = ref(false);
 const codePlaceholder = 'HTML с плейсхолдерами в стиле {{ name }} — вставляйте переменные кликом из палитры справа';
 
 function flash(msg) {
@@ -162,6 +164,34 @@ async function toggleVersions() {
     }
 }
 
+// Журнал изменений (кто/что/когда — из domain_history, aggregate_type=template).
+const HISTORY_LABELS = {
+    template_created: 'Создан',
+    template_edited: 'Изменён',
+    template_activated: 'Переключена активность',
+    template_published: 'Опубликован',
+    template_rolled_back: 'Откат к версии'
+};
+function eventLabel(name) {
+    return HISTORY_LABELS[name] || name;
+}
+function historyDetail(row) {
+    const p = row.payload || {};
+    if (row.event_name === 'template_edited' && Array.isArray(p.changed)) return 'поля: ' + p.changed.join(', ');
+    if (row.event_name === 'template_activated') return p.active ? 'включён' : 'выключен';
+    if (row.event_name === 'template_published' && p.comment) return p.comment;
+    return '';
+}
+function actorLabel(row) {
+    return row.actor_name || row.actor_email || (row.actor_type === 'artisan' ? 'система (CLI)' : '—');
+}
+async function toggleHistory() {
+    showHistory.value = !showHistory.value;
+    if (showHistory.value && !isNew.value) {
+        await store.dispatch('appTemplate/loadHistory', { id: id.value });
+    }
+}
+
 async function onRollback(versionId) {
     if (!window.confirm('Откатить шаблон к этой версии?')) return;
     const r = await store.dispatch('appTemplate/rollback', { id: id.value, versionId });
@@ -235,7 +265,8 @@ onMounted(load);
                             <Button label="Сохранить черновик" icon="pi pi-save" severity="secondary" outlined @click="onSaveDraft" />
                             <Button label="Опубликовать" icon="pi pi-upload" @click="onPublish" />
                             <Button :label="active ? 'Деактивировать' : 'Активировать'" :icon="active ? 'pi pi-pause' : 'pi pi-play'" :severity="active ? 'warn' : 'success'" outlined @click="onActivate" />
-                            <Button label="История" icon="pi pi-history" text @click="toggleVersions" />
+                            <Button label="Версии" icon="pi pi-history" text @click="toggleVersions" />
+                            <Button label="Журнал" icon="pi pi-list" text @click="toggleHistory" />
                         </template>
                     </div>
 
@@ -249,6 +280,20 @@ onMounted(load);
                                 <span v-if="v.comment" class="ed-muted"> · {{ v.comment }}</span>
                             </div>
                             <Button label="Откатить" icon="pi pi-replay" size="small" text @click="onRollback(v.id)" />
+                        </div>
+                    </div>
+
+                    <!-- Журнал изменений (кто/что/когда — аудит действий админа) -->
+                    <div v-if="showHistory && !isNew" class="ed-versions">
+                        <h4>Журнал изменений</h4>
+                        <div v-if="!history.length" class="ed-muted">Пока нет записей</div>
+                        <div v-for="(h, i) in history" :key="i" class="ed-version-row">
+                            <div>
+                                <span class="ed-version-date">{{ formatDate(h.occurred_at) }}</span>
+                                <span> · {{ eventLabel(h.event_name) }}</span>
+                                <span v-if="historyDetail(h)" class="ed-muted"> · {{ historyDetail(h) }}</span>
+                            </div>
+                            <span class="ed-muted">{{ actorLabel(h) }}</span>
                         </div>
                     </div>
                 </template>
