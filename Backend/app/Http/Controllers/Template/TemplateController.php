@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\Template\Application\GetList\TemplateGetListQuery;
 use Tickets\Template\Application\Preview\PreviewTemplateQuery;
 use Tickets\Template\Application\TemplateApplication;
@@ -116,7 +117,7 @@ class TemplateController extends Controller
         $data = TemplateDto::fromState($request->toArray()['data']);
 
         return response()->json([
-            'success' => $application->create($data),
+            'success' => $application->create($data, $this->authorId()),
             'item' => $application->getItem($data->getId())->toArray(),
             'message' => 'Шаблон создан',
         ]);
@@ -135,6 +136,7 @@ class TemplateController extends Controller
                 'success' => $application->edit(
                     new Uuid($id),
                     TemplateDto::fromState($request->toArray()['data']),
+                    $this->authorId(),
                 ),
                 'item' => $application->getItem(new Uuid($id))->toArray(),
                 'message' => 'Шаблон сохранён',
@@ -156,7 +158,7 @@ class TemplateController extends Controller
 
         try {
             return response()->json([
-                'success' => $application->activate(new Uuid($id), $active),
+                'success' => $application->activate(new Uuid($id), $active, $this->authorId()),
                 'item' => $application->getItem(new Uuid($id))->toArray(),
                 'message' => $active ? 'Шаблон активирован' : 'Шаблон деактивирован',
             ]);
@@ -250,6 +252,26 @@ class TemplateController extends Controller
                 ->map(fn (TemplateVersionDto $dto) => $dto->toArray())
                 ->values()
                 ->all(),
+        ]);
+    }
+
+    /** История изменений шаблона (журнал действий из domain_history, по возрастанию occurred_at). */
+    public function getHistory(
+        string $id,
+        TemplateApplication $application,
+    ): JsonResponse {
+        return response()->json([
+            'success' => true,
+            'history' => array_map(static fn (DomainHistoryDto $item): array => [
+                'event_name' => $item->eventName,
+                'aggregate_type' => $item->aggregateType,
+                'payload' => $item->payload,
+                'actor_id' => $item->actorRealId ?? $item->actorId,
+                'actor_type' => $item->actorType,
+                'actor_name' => $item->actorName,
+                'actor_email' => $item->actorEmail,
+                'occurred_at' => $item->occurredAt->toIso8601String(),
+            ], $application->getHistory(new Uuid($id))),
         ]);
     }
 

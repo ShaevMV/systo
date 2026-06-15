@@ -144,7 +144,7 @@ class LocationDto extends AbstractionEntity {
 
 ### Template (AF-3)
 
-**Путь:** `Backend/src/Template/` (модуль без AggregateRoot — пассивная сущность, как `Location`/`QrOrder`). Спека: `.claude/specs/template-system.md`.
+**Путь:** `Backend/src/Template/`. **AggregateRoot** `Template` (`Domain/Template.php`) + trait `HasHistory` (как `OrderTicket`): действия `create`/`edit`/`activate`/`publish`/`rollback` пишут события в `domain_history` (`aggregate_type='template'`, actor = админ/`Auth::id()`, `ActorType::USER`). 5 событий в `History/Domain/Event/Template*Event.php` (`template_created`/`edited`/`activated`/`published`/`rolled_back`); `saveDraft` и artisan-bulk (`import-blade`/`sync-converted`) историю НЕ пишут. Журнал — `GET /api/v1/template/history/{id}` + вкладка «Журнал» в редакторе. `template_versions` (снапшоты тела для отката) и `domain_history` (аудит действий) — разное. Спеки: `.claude/specs/template-system.md`, `.claude/specs/template-aggregate-and-bindings.md`.
 
 Редактируемые из админки шаблоны **писем и PDF-билетов**. Движок рендера — **Mustache** (logic-less, RCE-безопасен by design: нет PHP/blade-директив, `{{ x }}` авто-экранирует HTML, `{{{ raw }}}` — whitelist для QR data-URI). Рендер из БД с **fallback на blade**: пока активной записи нет — рендерится старый blade-файл (поведение без изменений). `slug` = имени blade-файла → нулевая миграция привязки.
 

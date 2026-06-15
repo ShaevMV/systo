@@ -792,8 +792,9 @@
 | POST | `/activate/{id}` | Включить/выключить шаблон (`{ "active": bool }`) — деактивация = откат на blade |
 | POST | `/saveDraft/{id}` | Сохранить черновик (`draft_body`) — прод (`body`) не затрагивается |
 | POST | `/publish/{id}` | Опубликовать `body` + снапшот в `template_versions` |
-| GET | `/versions/{id}` | История версий (новые сверху) |
+| GET | `/versions/{id}` | История версий тела (снапшоты, новые сверху) |
 | POST | `/rollback/{id}/{versionId}` | Откат `body` к версии (создаёт новую версию-«откат») |
+| GET | `/history/{id}` | Журнал изменений шаблона (`domain_history`, `aggregate_type=template`): кто/что/когда — `template_created`/`edited`/`activated`/`published`/`rolled_back` |
 | GET | `/variables/{slug}?kind=email\|pdf` | Палитра плейсхолдеров для редактора |
 | POST | `/preview` | Предпросмотр на тестовых данных (`throttle:20,1`) |
 
@@ -895,7 +896,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, variables, preview) |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
