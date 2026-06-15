@@ -24,6 +24,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
+use Tickets\TemplateBinding\Domain\TemplateBindingResolver;
+use Tickets\TemplateBinding\Repositories\TemplateBindingRepositoryInterface;
 
 class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 {
@@ -164,6 +166,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
+                OrderTicketModel::TABLE . '.friendly_id',
                 OrderTicketModel::TABLE . '.id as order_id',
                 OrderTicketModel::TABLE . '.curator_id',
                 OrderTicketModel::TABLE . '.location_id',
@@ -175,6 +178,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 User::TABLE . '.email as email_user',
                 User::TABLE . '.city',
                 TicketTypesModel::TABLE . '.name as name_type',
+                TicketTypesModel::TABLE . '.is_live_ticket',
             ])->selectSub($this->getSubQueryLastComment(), 'last_comment');
 
         \Log::info('Билет ' . $ticketId->value() . ' : ' . $result->toSql());
@@ -182,6 +186,21 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         if (is_null($result)) {
             throw new DomainException("Билет {$ticketId->value()} не найден");
         }
+
+        // Базовые slug (старое поведение): ticket_type_festival / location / types_of_payment.
+        // Для list-заказов: TicketTypeFestivalModel.pdf = null, берём location.pdf_template (или null → 'pdf').
+        $pdfSlug = $result['pdf'] ?: ($result['location_pdf_template'] ?: null);
+        $emailSlug = $result['emailPayView'] ?? $result['emailView'];
+
+        // Привязки шаблонов (Часть B): настроенная привязка ПЕРЕОПРЕДЕЛЯЕТ slug по ключу
+        // (festival, order_type, ticket_type); нет привязки → остаётся старый slug (обратная совместимость).
+        $bindings = app(TemplateBindingRepositoryInterface::class)->getActiveForResolve();
+        $resolver = app(TemplateBindingResolver::class);
+        $orderType = $this->deriveOrderType($result);
+        $festivalId = $result['festival_id'] ?? null;
+        $ticketTypeId = $result['ticket_type_id'] ?? null;
+        $pdfSlug = $resolver->resolve($bindings, 'pdf', $festivalId, $orderType, $ticketTypeId) ?? $pdfSlug;
+        $emailSlug = $resolver->resolve($bindings, 'email', $festivalId, $orderType, $ticketTypeId) ?? $emailSlug;
 
         return new TicketResponse(
             $result['name'],
@@ -193,9 +212,8 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             $result['city'] ?? '',
             $result['last_comment'],
             Carbon::parse($result['created_at']),
-            // Для list-заказов: TicketTypeFestivalModel.pdf = null, берём location.pdf_template (или null → 'pdf' по умолчанию)
-            $result['pdf'] ?: ($result['location_pdf_template'] ?: null),
-            $result['emailPayView'] ?? $result['emailView'],
+            $pdfSlug,
+            $emailSlug,
             new Uuid($result['festival_id']),
             in_array($result['ticket_type_id'], (array)['222abc0c-fc8e-4a1d-a4b0-d345cafada10']),
             empty($result['ticket_type_id']) ? null : new Uuid($result['ticket_type_id']),
@@ -208,6 +226,22 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
             empty($result['location_id']) ? null : new Uuid($result['location_id']),
             !empty($result['ticket_deleted_at']),   // isDeleted — soft-deleted билет
         );
+    }
+
+    /** Тип заказа для резолва привязок шаблонов: list / friendly / live / regular. */
+    private function deriveOrderType(array $result): string
+    {
+        if (! empty($result['curator_id'])) {
+            return 'list';
+        }
+        if (! empty($result['friendly_id'])) {
+            return 'friendly';
+        }
+        if (! empty($result['is_live_ticket'])) {
+            return 'live';
+        }
+
+        return 'regular';
     }
 
     /**
