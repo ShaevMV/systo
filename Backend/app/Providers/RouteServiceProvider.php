@@ -78,6 +78,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/location.php'));
 
+            // шаблоны писем/PDF (admin-only CRUD)
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/template.php'));
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/option.php'));

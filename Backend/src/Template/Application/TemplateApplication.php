@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tickets\Template\Application;
+
+use Shared\Domain\Bus\Query\QueryBus;
+use Shared\Domain\ValueObject\Uuid;
+use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
+use Tickets\Template\Application\GetList\TemplateGetListQuery;
+use Tickets\Template\Application\GetList\TemplateGetListQueryHandler;
+use Tickets\Template\Dto\TemplateDto;
+use Tickets\Template\Repositories\TemplateRepositoryInterface;
+use Tickets\Template\Response\TemplateGetListResponse;
+
+/**
+ * Тонкий слой над репозиторием (БД — только в репозитории, правило №1). Чтение списка идёт через
+ * QueryBus (whitelist фильтров), остальное — прямые методы (паттерн QrOrderApplication).
+ */
+class TemplateApplication
+{
+    private QueryBus $queryBus;
+
+    public function __construct(
+        private readonly TemplateRepositoryInterface $repository,
+        TemplateGetListQueryHandler $getListQueryHandler,
+    ) {
+        $this->queryBus = new InMemorySymfonyQueryBus([
+            TemplateGetListQuery::class => $getListQueryHandler,
+        ]);
+    }
+
+    public function getList(TemplateGetListQuery $query): TemplateGetListResponse
+    {
+        /** @var TemplateGetListResponse $result */
+        $result = $this->queryBus->ask($query);
+
+        return $result;
+    }
+
+    public function getItem(Uuid $id): TemplateDto
+    {
+        return $this->repository->getItem($id);
+    }
+
+    public function create(TemplateDto $data): bool
+    {
+        return $this->repository->create($data);
+    }
+
+    public function edit(Uuid $id, TemplateDto $data): bool
+    {
+        return $this->repository->editItem($id, $data);
+    }
+
+    public function activate(Uuid $id, bool $active): bool
+    {
+        return $this->repository->activate($id, $active);
+    }
+}
