@@ -9,8 +9,11 @@ use Shared\Domain\ValueObject\Uuid;
 use Shared\Infrastructure\Bus\Query\InMemorySymfonyQueryBus;
 use Tickets\Template\Application\GetList\TemplateGetListQuery;
 use Tickets\Template\Application\GetList\TemplateGetListQueryHandler;
+use Tickets\Template\Application\Preview\PreviewTemplateQuery;
+use Tickets\Template\Application\Preview\PreviewTemplateQueryHandler;
 use Tickets\Template\Dto\TemplateDto;
 use Tickets\Template\Repositories\TemplateRepositoryInterface;
+use Tickets\Template\Response\PreviewTemplateResponse;
 use Tickets\Template\Response\TemplateGetListResponse;
 
 /**
@@ -24,15 +27,25 @@ class TemplateApplication
     public function __construct(
         private readonly TemplateRepositoryInterface $repository,
         TemplateGetListQueryHandler $getListQueryHandler,
+        PreviewTemplateQueryHandler $previewQueryHandler,
     ) {
         $this->queryBus = new InMemorySymfonyQueryBus([
             TemplateGetListQuery::class => $getListQueryHandler,
+            PreviewTemplateQuery::class => $previewQueryHandler,
         ]);
     }
 
     public function getList(TemplateGetListQuery $query): TemplateGetListResponse
     {
         /** @var TemplateGetListResponse $result */
+        $result = $this->queryBus->ask($query);
+
+        return $result;
+    }
+
+    public function getPreview(PreviewTemplateQuery $query): PreviewTemplateResponse
+    {
+        /** @var PreviewTemplateResponse $result */
         $result = $this->queryBus->ask($query);
 
         return $result;

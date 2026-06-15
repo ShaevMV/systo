@@ -12,4 +12,7 @@ Route::prefix('v1/template')->middleware(['auth:api', 'admin'])->group(static fu
     Route::post('/create', [TemplateController::class, 'create']);
     Route::post('/edit/{id}', [TemplateController::class, 'edit']);
     Route::post('/activate/{id}', [TemplateController::class, 'activate']);
+
+    // Предпросмотр на тестовых данных. DomPDF тяжёлый → отдельный тротлинг.
+    Route::post('/preview', [TemplateController::class, 'preview'])->middleware('throttle:20,1');
 });
