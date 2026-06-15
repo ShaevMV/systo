@@ -25,6 +25,11 @@ trait RendersDbTemplate
      */
     protected function renderDbOrView(string $slug, array $vars): static
     {
+        // Общие переменные для всех писем (в Mustache доступны как {{ year }}).
+        // В blade-шаблоне год берётся через date('Y'), поэтому для fallback безвредно
+        // (лишнюю переменную blade просто игнорирует). Mustache-шаблоны используют {{ year }}.
+        $vars = array_merge(['year' => (int) date('Y')], $vars);
+
         $template = app(TemplateRepositoryInterface::class)->findActive($slug, TemplateKind::EMAIL);
 
         if ($template !== null) {
