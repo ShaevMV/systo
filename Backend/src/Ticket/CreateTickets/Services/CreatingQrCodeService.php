@@ -49,6 +49,7 @@ class CreatingQrCodeService
             'name' => $dataInfoForPdf->getName(),
             'email' => $dataInfoForPdf->getEmail(),
             'kilter' => $dataInfoForPdf->getKilter(),
+            'year' => date('Y'), // в blade был {{date('Y')}}; Mustache не вызывает функции → даём переменной
         ];
 
         // Активный шаблон в БД → рендер из БД (admin меняет билет без деплоя).

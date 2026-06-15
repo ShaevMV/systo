@@ -30,6 +30,7 @@ final class PlaceholderCatalog
             'name' => 'Иван Иванов',
             'email' => 'ivan@example.com',
             'kilter' => 1234,
+            'year' => date('Y'),
             'comment' => 'Пример комментария к заказу',
             'promocode' => 'SUN10',
             'url' => self::SAMPLE_QR,
