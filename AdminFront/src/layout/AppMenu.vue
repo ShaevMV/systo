@@ -20,6 +20,11 @@ const model = ref([
                 label: 'Шаблоны',
                 icon: 'pi pi-fw pi-file-edit',
                 to: '/admin/templates'
+            },
+            {
+                label: 'Привязки шаблонов',
+                icon: 'pi pi-fw pi-link',
+                to: '/admin/template-bindings'
             }
         ]
     }
