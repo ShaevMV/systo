@@ -275,10 +275,10 @@ jobs:
       - name: Build frontend (npm ci + npm run build)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          # Чистим прошлый dist под root: после `chown deploy` на хосте файлы прошлой сборки
-          # внутри контейнера принадлежат чужому UID → vue-cli падает с EACCES при unlink.
-          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-staging sh -c "rm -rf dist"
-          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps node-staging sh -c "npm ci --include=dev && npm run build"
+          # Всё одной командой под root (как сборка админки ниже): иначе `rm -rf dist` под root
+          # создаёт файлы чужого UID, а следующий npm build под дефолтным юзером падает с EACCES
+          # при unlink — и роняет весь деплой (блокирует сборку админки + up -d).
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-staging sh -c "rm -rf dist && npm ci --include=dev && npm run build"
 
       # Превью новой админки (Vite + Sakai) — собирается с base=/new-admin/,
       # VITE_API_URL берётся из environment сервиса node-admin-staging.
