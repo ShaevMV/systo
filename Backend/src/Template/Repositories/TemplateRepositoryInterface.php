@@ -32,4 +32,19 @@ interface TemplateRepositoryInterface
 
     /** Включить/выключить шаблон (active). Деактивация = откат на blade-fallback. */
     public function activate(Uuid $id, bool $active): bool;
+
+    /** Сохранить черновик (draft_body) — прод (body) не затрагивается. */
+    public function saveDraft(Uuid $id, string $draftBody): bool;
+
+    /**
+     * Опубликовать: body ← $body, draft_body ← null, + снапшот опубликованного body в template_versions.
+     * Транзакционно. Следующее реальное письмо/билет рендерится новым body без деплоя.
+     */
+    public function publish(Uuid $id, string $body, ?string $authorId, ?string $comment): bool;
+
+    /** @return \Illuminate\Support\Collection<int, \Tickets\Template\Dto\TemplateVersionDto> Версии, новые сверху. */
+    public function getVersions(Uuid $id): \Illuminate\Support\Collection;
+
+    /** Откатить body к версии $versionId (+ новый снапшот «откат»). Кидает DomainException, если версии нет. */
+    public function rollback(Uuid $templateId, Uuid $versionId, ?string $authorId): bool;
 }

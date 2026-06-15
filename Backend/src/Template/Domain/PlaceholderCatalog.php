@@ -49,4 +49,43 @@ final class PlaceholderCatalog
             ],
         ];
     }
+
+    /**
+     * Палитра плейсхолдеров для редактора (вставка кликом). Группы → элементы со строкой вставки.
+     * Slug — задел под per-письмо фильтрацию (пока общий набор по kind).
+     *
+     * @return array<int, array{group: string, items: array<int, array{label: string, insert: string}>}>
+     */
+    public static function variables(string $kind, string $slug = ''): array
+    {
+        $groups = [
+            ['group' => 'Заказ', 'items' => [
+                ['label' => 'Название фестиваля', 'insert' => '{{ festivalName }}'],
+                ['label' => 'Комментарий', 'insert' => '{{ comment }}'],
+                ['label' => 'Промокод (секция)', 'insert' => '{{#promocode}} промокод {{ promocode }} {{/promocode}}'],
+            ]],
+            ['group' => 'Гость', 'items' => [
+                ['label' => 'Имя', 'insert' => '{{ name }}'],
+                ['label' => 'Email', 'insert' => '{{ email }}'],
+                ['label' => 'Номер билета', 'insert' => '{{ kilter }}'],
+            ]],
+            ['group' => 'Циклы', 'items' => [
+                ['label' => 'По гостям', 'insert' => "{{#guests}}\n  {{ name }} — {{ email }}\n{{/guests}}"],
+                ['label' => 'По билетам', 'insert' => "{{#tickets}}\n  {{ name }}\n{{/tickets}}"],
+            ]],
+        ];
+
+        if ($kind === TemplateKind::PDF) {
+            $groups[] = ['group' => 'PDF', 'items' => [
+                ['label' => 'QR-код (raw, без экранирования)', 'insert' => '{{{ url }}}'],
+            ]];
+        } else {
+            $groups[] = ['group' => 'Письмо', 'items' => [
+                ['label' => 'Локация', 'insert' => '{{ locationName }}'],
+                ['label' => 'Ссылки на анкеты (секция)', 'insert' => "{{#questionnaireLinks}}\n  {{ name }}: {{ url }}\n{{/questionnaireLinks}}"],
+            ]];
+        }
+
+        return $groups;
+    }
 }
