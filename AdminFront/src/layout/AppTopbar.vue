@@ -2,7 +2,7 @@
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
 
-const { toggleMenu } = useLayout();
+const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 </script>
 
 <template>
@@ -19,6 +19,9 @@ const { toggleMenu } = useLayout();
 
         <div class="layout-topbar-actions">
             <div class="layout-config-menu">
+                <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
+                    <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]"></i>
+                </button>
                 <div class="relative">
                     <button
                         v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'p-anchored-overlay-enter-active', leaveToClass: 'hidden', leaveActiveClass: 'p-anchored-overlay-leave-active', hideOnOutsideClick: true }"

@@ -6,14 +6,16 @@ const layoutConfig = reactive({
     preset: 'Aura',
     primary: 'orange',
     surface: null,
-    darkTheme: false,
+    // По умолчанию — ТЁМНАЯ фестивальная тема (фирменный плам-космос + оранжевый акцент,
+    // в тонах 2026.solarsysto.ru). Переключатель в топбаре переводит в светлую.
+    darkTheme: true,
     menuMode: 'static'
 });
 
-// Тёмная тема удалена — приложение ВСЕГДА светлое (владелец просил светлый интерфейс).
-// Гарантируем, что класс .app-dark снят с <html> (на случай старого состояния в кеше).
+// Синхронизируем класс .app-dark на <html> с начальным состоянием конфига (до маунта).
+// darkTheme:true → класс вешается, стартуем в тёмной фестивальной теме.
 if (typeof document !== 'undefined') {
-    document.documentElement.classList.remove('app-dark');
+    document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
 }
 
 const layoutState = reactive({
@@ -28,6 +30,12 @@ const layoutState = reactive({
 });
 
 export function useLayout() {
+    // Переключение светлая/тёмная: меняем флаг и класс .app-dark на <html>.
+    const toggleDarkMode = () => {
+        layoutConfig.darkTheme = !layoutConfig.darkTheme;
+        document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
+    };
+
     const toggleMenu = () => {
         if (isDesktop()) {
             if (layoutConfig.menuMode === 'static') {
@@ -68,6 +76,7 @@ export function useLayout() {
         layoutConfig,
         layoutState,
         isDarkTheme,
+        toggleDarkMode,
         toggleConfigSidebar,
         toggleMenu,
         hideMobileMenu,
