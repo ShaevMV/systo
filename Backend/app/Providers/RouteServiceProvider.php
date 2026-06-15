@@ -83,6 +83,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/template.php'));
 
+            // привязки шаблонов к (тип заказа + тип билета) + дефолт (admin-only)
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/templateBinding.php'));
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/option.php'));
