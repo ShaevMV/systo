@@ -12,7 +12,7 @@ use Tickets\TypesOfPayment\Repositories\TypesOfPaymentRepositoryInterface;
 
 class OrderToPaidLiveTicket extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private Uuid $ticketTypeId,
@@ -39,7 +39,7 @@ class OrderToPaidLiveTicket extends Mailable
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
         $template = empty(trim($typesOfPaymentDto->getEmail() ?? '')) ? 'orderToPaidLiveTicket' : $typesOfPaymentDto->getEmail();
         Log::info('Шаблон письма ' . 'email.' .$template);
-        $mail = $this->view('email.'.$template, [
+        $mail = $this->renderDbOrView($template, [
             'festivalName' => $festivalName,
             'kilter' => $this->kilter,
         ]);

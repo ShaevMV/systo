@@ -12,7 +12,7 @@ use Shared\Domain\ValueObject\Uuid;
 
 class OrderListDifficultiesArose extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private string $comment,
@@ -28,7 +28,7 @@ class OrderListDifficultiesArose extends Mailable
 
         $this->subject('Возникли трудности со списком на ' . $festivalName);
 
-        return $this->view('email.orderListDifficultiesArose', [
+        return $this->renderDbOrView('orderListDifficultiesArose', [
             'festivalName' => $festivalName,
             'comment'      => $this->comment,
         ]);

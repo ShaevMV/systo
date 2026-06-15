@@ -11,7 +11,7 @@ use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class OrderToCancel extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private Uuid $ticketTypeId,
@@ -33,6 +33,6 @@ class OrderToCancel extends Mailable
 
         $this->subject('Оргвзнос на ' . $festivalName . ' отменён');
 
-        return $this->view('email.orderToCancel');
+        return $this->renderDbOrView('orderToCancel', []);
     }
 }
