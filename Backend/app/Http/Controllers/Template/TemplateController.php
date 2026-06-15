@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Template;
 
 use App\Http\Controllers\Controller;
+use Barryvdh\DomPDF\Facade\Pdf;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use InvalidArgumentException;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Template\Application\GetList\TemplateGetListQuery;
+use Tickets\Template\Application\Preview\PreviewTemplateQuery;
 use Tickets\Template\Application\TemplateApplication;
+use Tickets\Template\Domain\TemplateKind;
 use Tickets\Template\Dto\TemplateDto;
 
 /**
@@ -42,6 +46,44 @@ class TemplateController extends Controller
         return response()->json([
             'success' => true,
             'list' => $collection->map(fn (TemplateDto $dto) => $dto->toArray())->values()->all(),
+        ]);
+    }
+
+    /**
+     * Предпросмотр шаблона на ТЕСТОВЫХ данных (без ПДн). Рендерит переданный body:
+     * email → JSON { html } (фронт в iframe), pdf → поток application/pdf (через DomPDF, как в проде).
+     * Ошибка синтаксиса Mustache → 422 (не 500).
+     */
+    public function preview(
+        Request $request,
+        TemplateApplication $application,
+    ): JsonResponse|HttpResponse {
+        $data = $request->toArray();
+        $kind = (($data['kind'] ?? '') === TemplateKind::PDF) ? TemplateKind::PDF : TemplateKind::EMAIL;
+        $slug = (string) ($data['slug'] ?? $kind);
+        $body = (string) ($data['body'] ?? '');
+
+        try {
+            $response = $application->getPreview(new PreviewTemplateQuery($kind, $slug, $body));
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ошибка рендера шаблона: ' . $exception->getMessage(),
+            ], 422);
+        }
+
+        if ($kind === TemplateKind::PDF) {
+            $pdf = Pdf::loadHTML($response->getHtml());
+
+            return response($pdf->output(), 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="preview.pdf"',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'html' => $response->getHtml(),
         ]);
     }
 
