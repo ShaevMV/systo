@@ -7,15 +7,11 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
       <link rel="apple-touch-icon" href="/apple-touch-icon.png">
       <meta name="theme-color" content="#ff7900">
-      <!-- Объявляем поддержку ОБЕИХ схем (light dark): сигнал браузеру «приложение само
-           управляет темой — НЕ применяй принудительное затемнение (Chrome Auto Dark Mode)».
-           Раньше тут было content="light" → Chrome при системной тёмной теме трактовал
-           страницу как «светлую» и накладывал свой force-dark фильтр (грязно-коричневая сепия).
-           Фильтр липнет на документ и при переключении light→dark стекается поверх уже-тёмной
-           темы → бурая «дымка» на всех экранах, снимается только жёсткой перезагрузкой.
-           Конкретную схему UA-контролов (скроллбары/формы) задаёт CSS, а не meta:
-           html{color-scheme:light} / .app-dark{color-scheme:dark} — см. _core.scss. -->
-      <meta name="color-scheme" content="light dark">
+      <!-- Приложение ТОЛЬКО светлое (тёмная тема удалена). Объявляем светлую схему —
+           браузер не подменяет цвета форм/скроллбаров под системную тёмную тему ОС.
+           NB: ручной флаг Chrome chrome://flags/#enable-force-dark игнорирует это
+           объявление и затемняет ЛЮБУЮ страницу — это настройка браузера, не баг приложения. -->
+      <meta name="color-scheme" content="light">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Solar Systo · Админка</title>
 </head>
