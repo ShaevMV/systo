@@ -12,7 +12,7 @@ use Shared\Domain\ValueObject\Uuid;
 
 class OrderListCancel extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private Uuid $festivalId,
@@ -27,7 +27,7 @@ class OrderListCancel extends Mailable
 
         $this->subject('Список на ' . $festivalName . ' отменён');
 
-        return $this->view('email.orderListCancel', [
+        return $this->renderDbOrView('orderListCancel', [
             'festivalName' => $festivalName,
         ]);
     }

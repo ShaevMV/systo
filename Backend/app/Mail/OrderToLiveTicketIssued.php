@@ -11,7 +11,7 @@ use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class OrderToLiveTicketIssued extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private Uuid $ticketTypeId
@@ -27,6 +27,6 @@ class OrderToLiveTicketIssued extends Mailable
      */
     public function build(): static
     {
-        return $this->view('email.orderToLiveTicketIssued');
+        return $this->renderDbOrView('orderToLiveTicketIssued', []);
     }
 }
