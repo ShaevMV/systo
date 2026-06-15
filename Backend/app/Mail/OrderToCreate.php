@@ -9,7 +9,7 @@ use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 
 class OrderToCreate extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private int  $kilter,
@@ -23,7 +23,7 @@ class OrderToCreate extends Mailable
     {
         $this->subject('Оргвзнос на '. $this->festivalName);
 
-        return $this->view('email.orderToCreate', [
+        return $this->renderDbOrView('orderToCreate', [
             'kilter' => $this->kilter,
             'festivalShortName' => FestivalHelper::getNameFestival(),
             'festivalName' => $this->festivalName,

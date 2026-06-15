@@ -13,7 +13,7 @@ use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class OrderToDifficultiesArose extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     public function __construct(
         private string $comment,
@@ -35,7 +35,7 @@ class OrderToDifficultiesArose extends Mailable
 
         $this->subject('Возникли трудности с подтверждением оргвзноса на ' . $festivalName);
 
-        return $this->view('email.orderToDifficultiesArose',[
+        return $this->renderDbOrView('orderToDifficultiesArose', [
             'comment' => $this->comment,
         ]);
     }

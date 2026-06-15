@@ -10,7 +10,7 @@ use Tickets\Order\OrderTicket\Service\FestivalService;
 
 class OrderToChangeTicket extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     /**
      * @param array $changes [{oldName: string, newName: string}]
@@ -36,7 +36,7 @@ class OrderToChangeTicket extends Mailable
 
         $this->subject('Изменены данные вашего заказа на ' . $festivalName);
 
-        return $this->view('email.orderToChangeTicket', [
+        return $this->renderDbOrView('orderToChangeTicket', [
             'changes' => $this->changes,
         ]);
     }
