@@ -22,6 +22,11 @@ Route::prefix('v1/qrOrder')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('admin');
 
+    // Сводные метрики для дашборда (read-only): заказы + выручка в разрезах. Только admin.
+    Route::post('/getStats', [QrOrderController::class, 'getStats'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
     // Чтение принятого заказа — только админ org (JWT), содержит ПДн.
     Route::get('/getItem/{id}', [QrOrderController::class, 'getItem'])
         ->middleware('auth:api')
