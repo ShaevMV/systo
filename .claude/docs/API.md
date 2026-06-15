@@ -777,6 +777,57 @@
 
 ---
 
+## 8.2. Шаблоны писем и PDF-билетов (AF-3)
+
+Префикс: **`/api/v1/template`** | **Middleware всех роутов:** `auth:api` + `admin`
+
+Редактируемые из админки шаблоны писем и PDF-билетов. Рендер из БД через **Mustache** (logic-less, RCE-безопасен) с **fallback на blade-файл** (пока активной записи нет — рендерится старый blade). `slug` = имени blade-файла → нулевая миграция привязки. Чтение списка — через QueryBus (whitelist фильтров), БД только в репозитории. Спека: `.claude/specs/template-system.md`.
+
+| Метод | Маршрут | Описание |
+|-------|---------|----------|
+| POST | `/getList` | Список шаблонов (фильтр: `kind`, `slug`, `active`; `orderBy`) |
+| GET | `/getItem/{id}` | Один шаблон (включая `body`/`draft_body`) |
+| POST | `/create` | Создать (UUID в `data.id` опционально) |
+| POST | `/edit/{id}` | Редактировать метаданные/тело |
+| POST | `/activate/{id}` | Включить/выключить шаблон (`{ "active": bool }`) — деактивация = откат на blade |
+| POST | `/saveDraft/{id}` | Сохранить черновик (`draft_body`) — прод (`body`) не затрагивается |
+| POST | `/publish/{id}` | Опубликовать `body` + снапшот в `template_versions` |
+| GET | `/versions/{id}` | История версий (новые сверху) |
+| POST | `/rollback/{id}/{versionId}` | Откат `body` к версии (создаёт новую версию-«откат») |
+| GET | `/variables/{slug}?kind=email\|pdf` | Палитра плейсхолдеров для редактора |
+| POST | `/preview` | Предпросмотр на тестовых данных (`throttle:20,1`) |
+
+**Тело шаблона (`data` в create/edit):**
+```json
+{
+  "id": "UUID?",
+  "slug": "string (= имени blade: pdf / orderToPaid / ...)",
+  "kind": "string (email | pdf)",
+  "engine": "string (html | mjml — mjml только для email, default html)",
+  "title": "string",
+  "body": "string (исходник Mustache)",
+  "draft_body": "string?",
+  "active": "bool (default true)",
+  "is_system": "bool (default false — импортирован из blade)"
+}
+```
+
+**preview Request:** `{ "kind": "email|pdf", "slug": "string?", "body": "string" }`
+- `kind=email` → `200 { "success": true, "html": "..." }` (фронт в `<iframe>`)
+- `kind=pdf` → `200` поток `application/pdf` (через тот же DomPDF, что в проде)
+- Ошибка синтаксиса Mustache → `422 { "success": false, "message": "Ошибка рендера шаблона: ..." }`
+- Рендерит **только фикстуры** (`PlaceholderCatalog::sample()`) — без ПДн реальных заказов
+
+**publish Request:** `{ "body": "string", "comment": "string?" }` (автор — из `Auth::id()`)
+
+**Response 200 (create/edit/activate/publish/rollback):**
+```json
+{ "success": true, "item": { ... }, "message": "Шаблон опубликован" }
+```
+**Response 404:** `{ "success": false, "message": "..." }` (шаблон не найден)
+
+---
+
 ## 9. Способы оплаты
 
 Префикс: **`/api/v1/typesOfPayment`**
@@ -844,7 +895,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete} |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, variables, preview) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |

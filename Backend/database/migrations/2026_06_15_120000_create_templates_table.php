@@ -32,7 +32,7 @@ return new class extends Migration
             $table->string('title');
             $table->mediumText('body');                  // опубликованный исходник
             $table->mediumText('draft_body')->nullable(); // черновик (не идёт в прод)
-            $table->mediumText('compiled_html')->nullable(); // кэш скомпилированного MJML (для html = body)
+            $table->mediumText('compiled_html')->nullable(); // кэш скомпилированного MJML; для html не используется (рендерится body)
 
             $table->boolean('active')->default(true);
             $table->boolean('is_system')->default(false); // импортирован из blade (системный)

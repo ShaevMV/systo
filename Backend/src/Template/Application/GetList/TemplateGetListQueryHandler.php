@@ -51,6 +51,8 @@ class TemplateGetListQueryHandler implements QueryHandler
                 'operator' => FilterOperator::LIKE,
                 'value' => $filter['title'] ?? null,
             ],
+            // NB: FilterBuilder отбрасывает значения через !empty() → active=false здесь НЕ отфильтрует
+            // (известный паттерн-баг билдера). Фильтр по статусу де-факто работает только для true.
             [
                 'field' => TemplateModel::TABLE . '.active',
                 'operator' => FilterOperator::EQUAL,

@@ -11,7 +11,38 @@
 
 ## [Unreleased]
 
-_(пока пусто — все изменения вошли в [2.5.1])_
+_(пусто — текущие изменения вошли в [2.7.0-alpha.2])_
+
+---
+
+## [2.7.0-alpha.2] — 2026-06-15
+
+**Staging-preview.** Срез работ поверх `v2.7.0-alpha.1` под разворот org → admin-only: дашборд продаж, брокер RabbitMQ на стенде и — главное — полностью рабочая **система шаблонов (AF-3)**: admin меняет письма и PDF-билеты без деплоя. Прод не затронут (всё на стенде; реальный рендер пока на blade-fallback, переключение пошаговое). Тег на `feat/admin-qr-orders`.
+
+### Added (Добавлено)
+
+- **Система шаблонов (AF-3), фазы 1–5** — единый редактор писем и PDF-билетов. Спека: `.claude/specs/template-system.md`.
+  - Движок **Mustache** (`mustache/mustache ^3.2`), logic-less → RCE-безопасен by design: исполнение PHP из пользовательского шаблона невозможно архитектурно. Кастомный escape `ENT_QUOTES`, raw `{{{ }}}` только для QR-data-URI.
+  - Сущность `Template` (модуль `Backend/src/Template/`) + таблицы `templates` / `template_versions`. `slug` = имени blade-файла → нулевая миграция привязки.
+  - Рендер **писем и PDF-билетов из БД** с fallback на blade-файл (нет активной записи → старый blade, нулевой риск). Точки интеграции: `CreatingQrCodeService::createPdf` (PDF) и трейт `RendersDbTemplate` на всех 11 order/list-Mailable (оба канала: legacy + qr).
+  - **admin-CRUD API** `/api/v1/template/*` (все `auth:api + admin`): getList/getItem/create/activate, черновик/публикация (`saveDraft`/`publish` со снапшотом версии), версии/откат (`versions`/`rollback`, append-only), палитра (`variables`), **предпросмотр** (`preview`, email → HTML, PDF → DomPDF, синтаксис → 422, только фикстуры без ПДн).
+  - **Экран редактора в новой админке** (`AdminFront`): список + редактор (исходник + вставка плейсхолдеров/сниппетов кликом + iframe-превью + черновик/публикация + история версий).
+  - Импорт текущих blade в БД (`artisan templates:import-blade`, неактивные черновики) + конвертация в Mustache (`artisan templates:sync-converted`, фаза 5 — конвертирован основной билет `pdf`).
+- **Дашборд продаж** — эндпоинт `POST /api/v1/qrOrder/getStats` (admin, агрегаты заказов/выручки по статусу/типу/дням) + экран дашборда в новой админке (карточки + графики chart.js).
+- **RabbitMQ на стенде** — брокер (`rabbitmq:3.13-management-alpine`, лимиты под маленький сервер) + management UI на `/rabbitmq/` за basic-auth (транспорт под будущую интеграцию qr→org). AMQP наружу не торчит.
+
+### Fixed (Исправлено)
+
+- **Деплой блокировался EACCES** — шаг сборки старого фронта (`rm -rf dist` под root, `npm build` под дефолтным юзером) падал и не давал собраться новой админке. Теперь одной командой под root.
+- **Тёмная тема в новой админке** — на экранах с canvas/iframe (дашборд, редактор) снимок View-Transition залипал и оставлял светлый кадр поверх тёмной страницы до перезагрузки. Убрана обёртка `startViewTransition` — переключение мгновенное и надёжное.
+
+### Security (Безопасность)
+
+- Рендер шаблонов logic-less (Mustache) — никакого RCE из пользовательского ввода. Все эндпоинты шаблонов — `auth:api + admin`, `preview` ещё под `throttle:20,1`. Превью рендерится только на тестовых фикстурах (без ПДн реальных заказов). Sandbox на iframe превью письма.
+
+### Breaking Changes
+
+Нет (pre-release, прод не затрагивается).
 
 ---
 

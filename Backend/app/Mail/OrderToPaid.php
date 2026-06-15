@@ -59,7 +59,6 @@ class OrderToPaid extends Mailable
         }
 
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
-        \Log::info('Шаблон  '. $emailView);
         // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
         $mail = $this->renderDbOrView(empty($emailView) ? 'orderToPaid' : $emailView, [
             'festivalName' => $festivalName,

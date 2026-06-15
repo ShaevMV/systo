@@ -7,19 +7,20 @@ namespace Tickets\Template\Domain;
 /**
  * Движок тела шаблона:
  *  - html — исходник как есть (Mustache-рендер по плейсхолдерам);
- *  - mjml — MJML компилируется в HTML на сохранении (только для писем), результат в compiled_html.
+ *  - mjml — БУДУЩАЯ работа: компиляция MJML→HTML на сохранении пока НЕ реализована, поэтому
+ *    из allowed-набора исключён (иначе активный mjml-шаблон ушёл бы как сырой MJML = битое письмо).
  *
- * В обоих случаях плейсхолдеры — Mustache (logic-less, без исполнения PHP).
+ * Плейсхолдеры в любом случае — Mustache (logic-less, без исполнения PHP).
  */
 final class TemplateEngine
 {
     public const HTML = 'html';
     public const MJML = 'mjml';
 
-    /** @return string[] */
+    /** Разрешённые движки. MJML добавится сюда, когда появится компиляция. */
     public static function all(): array
     {
-        return [self::HTML, self::MJML];
+        return [self::HTML];
     }
 
     public static function isValid(?string $value): bool

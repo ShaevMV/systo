@@ -105,4 +105,13 @@ class TemplateDto extends AbstractionEntity implements Response
     {
         return $this->compiled_html ?? $this->body;
     }
+
+    /** created_at/updated_at не шлём в create() — их ставит Eloquent (как TicketTypeDto и пр.). */
+    public function toArrayForCreate(): array
+    {
+        $result = $this->toArray();
+        unset($result['created_at'], $result['updated_at']);
+
+        return $result;
+    }
 }
