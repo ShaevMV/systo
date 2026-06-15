@@ -7,11 +7,10 @@
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
       <link rel="apple-touch-icon" href="/apple-touch-icon.png">
       <meta name="theme-color" content="#ff7900">
-      <!-- Приложение ТОЛЬКО светлое (тёмная тема удалена). Объявляем светлую схему —
-           браузер не подменяет цвета форм/скроллбаров под системную тёмную тему ОС.
-           NB: ручной флаг Chrome chrome://flags/#enable-force-dark игнорирует это
-           объявление и затемняет ЛЮБУЮ страницу — это настройка браузера, не баг приложения. -->
-      <meta name="color-scheme" content="light">
+      <!-- Приложение поддерживает обе схемы (по умолчанию — тёмная фестивальная).
+           content="light dark" — сигнал браузеру не применять авто-затемнение
+           (Chrome Auto Dark Mode): тему рисуем сами через класс .app-dark. -->
+      <meta name="color-scheme" content="light dark">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Solar Systo · Админка</title>
 </head>
