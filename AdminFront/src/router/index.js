@@ -8,12 +8,21 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            redirect: '/admin/qr-orders'
+            redirect: '/admin/dashboard'
         },
         {
             path: '/',
             component: AppLayout,
             children: [
+                {
+                    path: '/admin/dashboard',
+                    name: 'dashboard',
+                    component: () => import('@/views/admin/DashboardView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
                 {
                     path: '/admin/qr-orders',
                     name: 'qrOrders',
