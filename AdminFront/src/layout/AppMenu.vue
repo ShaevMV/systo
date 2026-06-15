@@ -7,6 +7,11 @@ const model = ref([
         label: 'Управление',
         items: [
             {
+                label: 'Дашборд',
+                icon: 'pi pi-fw pi-chart-bar',
+                to: '/admin/dashboard'
+            },
+            {
                 label: 'QR-заказы',
                 icon: 'pi pi-fw pi-qrcode',
                 to: '/admin/qr-orders'
