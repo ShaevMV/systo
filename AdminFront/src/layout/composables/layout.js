@@ -29,19 +29,13 @@ const layoutState = reactive({
 });
 
 export function useLayout() {
+    // Без document.startViewTransition: на экранах с canvas (графики дашборда) и iframe
+    // (превью редактора шаблонов) снимок View-Transition залипает и оставляет замороженный
+    // светлый кадр поверх уже тёмной страницы — «дымка пропадает» и держится до перезагрузки.
+    // Мгновенное переключение класса надёжно на всех экранах.
     const toggleDarkMode = () => {
-        if (!document.startViewTransition) {
-            executeDarkModeToggle();
-
-            return;
-        }
-
-        document.startViewTransition(() => executeDarkModeToggle(event));
-    };
-
-    const executeDarkModeToggle = () => {
         layoutConfig.darkTheme = !layoutConfig.darkTheme;
-        document.documentElement.classList.toggle('app-dark');
+        document.documentElement.classList.toggle('app-dark', layoutConfig.darkTheme);
     };
 
     const toggleMenu = () => {

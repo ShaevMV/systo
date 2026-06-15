@@ -142,6 +142,61 @@ class LocationDto extends AbstractionEntity {
 
 ---
 
+### Template (AF-3)
+
+**Путь:** `Backend/src/Template/` (модуль без AggregateRoot — пассивная сущность, как `Location`/`QrOrder`). Спека: `.claude/specs/template-system.md`.
+
+Редактируемые из админки шаблоны **писем и PDF-билетов**. Движок рендера — **Mustache** (logic-less, RCE-безопасен by design: нет PHP/blade-директив, `{{ x }}` авто-экранирует HTML, `{{{ raw }}}` — whitelist для QR data-URI). Рендер из БД с **fallback на blade**: пока активной записи нет — рендерится старый blade-файл (поведение без изменений). `slug` = имени blade-файла → нулевая миграция привязки.
+
+```php
+class TemplateDto extends AbstractionEntity implements Response {
+    Uuid    $id;
+    string  $slug;          // = имени blade ('pdf','orderToPaid','TypeTicketPdf1',...)
+    string  $kind;          // email | pdf (TemplateKind)
+    string  $engine;        // html | mjml (TemplateEngine, mjml только для email)
+    string  $title;
+    string  $body;          // опубликованный исходник
+    ?string $draft_body;    // черновик (не идёт в прод)
+    ?string $compiled_html; // кэш скомпилированного MJML (для html = body)
+    bool    $active;        // false → откат на blade-fallback
+    bool    $is_system;     // импортирован из blade
+    ?Carbon $created_at;
+    ?Carbon $updated_at;
+    // getRenderBody() → compiled_html ?? body
+}
+class TemplateVersionDto extends AbstractionEntity implements Response {
+    Uuid    $id;
+    Uuid    $template_id;
+    string  $body;          // снапшот опубликованного body
+    ?string $comment;
+    ?string $author_id;
+    ?Carbon $created_at;
+}
+```
+
+**Таблицы БД** (миграция `2026_06_15_120000_create_templates_table`):
+
+| Таблица | Поля |
+|---------|------|
+| `templates` | `id`, `slug`, `kind` (enum email/pdf), `engine` (enum html/mjml, default html), `title`, `body` (mediumText), `draft_body` (nullable), `compiled_html` (nullable), `active` (default true), `is_system` (default false), `created_at`/`updated_at`. UNIQUE `(slug, kind)`, INDEX `(kind, active)` |
+| `template_versions` | `id`, `template_id` (index), `body` (mediumText), `comment` (nullable), `author_id` (nullable), `created_at`. Append-only снапшоты при публикации/откате |
+
+> `body`/`compiled_html`/`draft_body` — обычные строковые колонки (без JSON-кастов). Timestamps — DB DEFAULT.
+
+**Application API (`TemplateApplication`):** `getList(TemplateGetListQuery)` / `getItem(Uuid)` / `create` / `edit` / `activate(Uuid, bool)` / `saveDraft(Uuid, body)` / `publish(Uuid, body, authorId, comment)` / `getVersions(Uuid)` / `rollback(Uuid, versionId, authorId)` / `getVariables(kind, slug)` / `getPreview(PreviewTemplateQuery)`. Чтение списка/превью — через QueryBus.
+
+**Домен:** `TemplateKind` (Enum email/pdf), `TemplateEngine` (Enum html/mjml), `PlaceholderCatalog` — единственный источник плейсхолдеров per `(kind, slug)` + `sample()` (фикстуры для превью без ПДн).
+
+**Сервисы:** `TemplateRenderer` (`Mustache::render(body, context)`), `TemplateService` (импорт/fallback). Импорт текущих blade в БД — artisan `templates:import-blade` (slug = имя файла, `updateOrCreate`, как **неактивные** системные черновики → нулевой риск).
+
+**Repository:** `TemplateRepositoryInterface` → `InMemoryMySqlTemplateRepository`. Bind в `Tickets/TicketsProvider`.
+
+**Точки интеграции рендера (2 точки, обе с fallback на blade):**
+- **PDF** — `CreatingQrCodeService::createPdf()` (`Backend/src/Ticket/CreateTickets/Services/`): `findActive($slug, pdf)` → `Pdf::loadHTML(render())`, иначе `Pdf::loadView($slug)`.
+- **Письма** — трейт `App\Mail\Concerns\RendersDbTemplate::renderDbOrView($slug, $vars)` на **11** order/list-Mailable: `findActive($slug, email)` → `$this->html(render())`, иначе `$this->view('email.'.$slug)`. Покрывает оба канала (legacy `order_tickets` + qr-пайплайн `QrOrder/Application/Step`), т.к. оба используют те же Mailable.
+
+---
+
 ### Questionnaire
 
 **Путь:** `Backend/src/Questionnaire/Domain/Questionnaire.php`
@@ -455,6 +510,27 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `clearIssued(Uuid): bool` | Снять отметку выдачи (при сбое — выдать повторно) |
 
 **Whitelist фильтров `getList`** (в `QrOrderGetListQueryHandler`): `email` (LIKE), `city` (LIKE), `status` (EQUAL), `festival_id` (EQUAL), `type_order` (EQUAL). Сортировка через `Order` (`Order::none()` на кривом `orderBy`). Пагинация `forPage(page, perPage)`, total — `count()` под теми же фильтрами.
+
+### TemplateRepositoryInterface (AF-3)
+
+**Путь:** `Backend/src/Template/Repositories/TemplateRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlTemplateRepository` (таблицы `templates` + `template_versions`)
+
+Шаблоны писем/PDF: резолв для рендера (с fallback на blade) + admin-CRUD/версии. Модуль без AggregateRoot (как `Location`/`QrOrder`). БД только здесь.
+
+| Метод | Описание |
+|-------|----------|
+| `findActive(slug, kind): ?TemplateDto` | Активный шаблон для рендера. `null` → нет/неактивна → fallback на blade. Точка резолва для PDF и писем |
+| `findBySlugKind(slug, kind): ?TemplateDto` | Шаблон по `(slug, kind)` независимо от `active` — для идемпотентного импорта blade |
+| `getList(Filters, Order): Collection` | Список для админки (фильтры + сортировка) |
+| `getItem(Uuid): TemplateDto` | По ID (с `body`/`draft_body`) |
+| `create(TemplateDto): bool` | Создать |
+| `editItem(Uuid, TemplateDto): bool` | Редактировать |
+| `activate(Uuid, bool): bool` | Включить/выключить (деактивация = откат на blade) |
+| `saveDraft(Uuid, draftBody): bool` | Сохранить черновик (`body` не затрагивается) |
+| `publish(Uuid, body, authorId, comment): bool` | Опубликовать `body` + снапшот в `template_versions` (транзакционно) |
+| `getVersions(Uuid): Collection` | Версии (новые сверху) |
+| `rollback(templateId, versionId, authorId): bool` | Откат `body` к версии (+ новый снапшот). `DomainException` если версии нет |
 
 ---
 
