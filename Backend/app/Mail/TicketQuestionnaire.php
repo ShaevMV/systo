@@ -2,13 +2,14 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\RendersDbTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class TicketQuestionnaire extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, RendersDbTemplate;
 
     public function __construct(
         private string $link,
@@ -25,7 +26,8 @@ class TicketQuestionnaire extends Mailable
     {
         $this->subject('Анкета участника Solar Systo Togathering');
 
-        return $this->view('email.questionnaire', [
+        // Активный DB-шаблон (Mustache) или fallback на blade email.questionnaire.
+        return $this->renderDbOrView('questionnaire', [
             'link' => $this->link,
         ]);
     }
