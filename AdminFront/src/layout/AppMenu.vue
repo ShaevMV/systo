@@ -15,6 +15,11 @@ const model = ref([
                 label: 'QR-заказы',
                 icon: 'pi pi-fw pi-qrcode',
                 to: '/admin/qr-orders'
+            },
+            {
+                label: 'Шаблоны',
+                icon: 'pi pi-fw pi-file-edit',
+                to: '/admin/templates'
             }
         ]
     }
