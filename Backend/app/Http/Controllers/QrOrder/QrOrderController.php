@@ -15,6 +15,7 @@ use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\GetList\QrOrderGetListQuery;
 use Tickets\QrOrder\Application\QrOrderApplication;
+use Tickets\QrOrder\Application\Stats\QrOrderStatsQuery;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Responses\QrOrderItemForListResponse;
 
@@ -88,6 +89,28 @@ class QrOrderController extends Controller
                 ->values()
                 ->all(),
             'totalNumber' => ['totalCount' => $response->getTotalCount()],
+        ]);
+    }
+
+    /**
+     * Сводные метрики qr-заказов для дашборда админки (read-only, только admin).
+     *
+     * Фильтр (опционально): festival_id, date_from, date_to (по created_at).
+     * Возвращает итоги (заказы + выручка) и разрезы по статусу, типу заказа и дням.
+     */
+    public function getStats(
+        Request $request,
+        QrOrderApplication $application,
+    ): JsonResponse {
+        $data = $request->toArray();
+
+        $response = $application->getStats(
+            new QrOrderStatsQuery($data['filter'] ?? []),
+        );
+
+        return response()->json([
+            'success' => true,
+            'stats' => $response->toArray(),
         ]);
     }
 
