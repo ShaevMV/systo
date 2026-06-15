@@ -24,7 +24,7 @@ use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
  */
 class OrderToPaidFriendly extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     /**
      * @param TicketResponse[] $tickets
@@ -73,7 +73,8 @@ class OrderToPaidFriendly extends Mailable
 
         $this->subject('Ваш билет на Систо 2026 оформлен');
         \Log::info('Friendly шаблон: ' . $friendlyView);
-        $mail = $this->view('email.' . $friendlyView, [
+        // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
+        $mail = $this->renderDbOrView($friendlyView, [
             'festivalName' => $festivalName,
             'comment' => $this->comment,
             'promocode' => $this->promocode,

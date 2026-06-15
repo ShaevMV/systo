@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Mail\Concerns\RendersDbTemplate;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -13,7 +14,7 @@ use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
 
 class OrderToPaid extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, RendersDbTemplate;
 
     /**
      * @param TicketResponse[] $tickets
@@ -59,7 +60,8 @@ class OrderToPaid extends Mailable
 
         $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
         \Log::info('Шаблон  '. $emailView);
-        $mail = $this->view('email.'. (empty($emailView) ? 'orderToPaid' : $emailView),[
+        // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
+        $mail = $this->renderDbOrView(empty($emailView) ? 'orderToPaid' : $emailView, [
             'festivalName' => $festivalName,
             'comment' => $this->comment,
             'promocode' => $this->promocode,

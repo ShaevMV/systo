@@ -23,7 +23,7 @@ use Tickets\Ticket\CreateTickets\Services\CreatingQrCodeService;
  */
 class OrderListApproved extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable, SerializesModels, \App\Mail\Concerns\RendersDbTemplate;
 
     /**
      * @param TicketResponse[] $tickets
@@ -57,7 +57,8 @@ class OrderListApproved extends Mailable
 
         // Передаём kilter и tickets чтобы сторонние шаблоны (через email_template) могли их использовать.
         $firstTicket = $this->tickets[0] ?? null;
-        $mail = $this->view('email.' . $emailView, [
+        // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
+        $mail = $this->renderDbOrView($emailView, [
             'festivalName' => $festivalName,
             'locationName' => $locationName,
             'kilter'       => $firstTicket?->getKilter(),
