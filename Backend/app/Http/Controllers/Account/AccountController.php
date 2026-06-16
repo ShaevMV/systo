@@ -28,12 +28,22 @@ class AccountController extends Controller
         AccountApplication $accountApplication,
     ): JsonResponse
     {
+        $data = $request->toArray();
+
+        // filter/orderBy могут отсутствовать в теле запроса → не падаем 500 (Undefined array key).
+        // Order::fromState кидает на кривых значениях orderBy — оборачиваем (как в TemplateController, TD-14).
+        try {
+            $orderBy = Order::fromState($data['orderBy'] ?? []);
+        } catch (\InvalidArgumentException) {
+            $orderBy = Order::none();
+        }
+
         return response()->json([
             'success' => true,
             'list' => $accountApplication->getList(
                 new AccountGetListQuery(
-                    AccountGetListFilter::fromState($request->toArray()['filter']),
-                    Order::fromState($request->toArray()['orderBy'])
+                    AccountGetListFilter::fromState($data['filter'] ?? []),
+                    $orderBy,
                 )
             )->toArray(),
         ]);
