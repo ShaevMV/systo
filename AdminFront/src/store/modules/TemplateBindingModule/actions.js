@@ -18,7 +18,7 @@ export const loadList = (context) => {
 export const loadRefs = (context) => {
     return Promise.all([
         axios.get('/api/v1/festival/getFestivalList').then((r) => r.data ?? []),
-        axios.post('/api/v1/ticketType/getList', { filter: {} }).then((r) => r.data.list ?? r.data ?? []),
+        axios.post('/api/v1/ticketType/getList', { filter: {}, orderBy: {} }).then((r) => r.data.list ?? r.data ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'email' } }).then((r) => r.data.list ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'pdf' } }).then((r) => r.data.list ?? [])
     ]).then(([festivals, ticketTypes, emailTemplates, pdfTemplates]) => {
