@@ -47,8 +47,12 @@ final class QrOrderApplication
     }
 
     /**
-     * Принять заказ. Идемпотентно: повторный приём заказа с тем же id (== id заказа qr/org)
-     * не создаёт дубль — возвращает true без повторной записи.
+     * Принять заказ от витрины qr. qr присылает заказ уже в финальном статусе: при «оплачен»
+     * org сразу выпускает билеты (PDF/письма/Telegram) — выдача в один запрос, без отдельного
+     * шага смены статуса.
+     *
+     * Идемпотентно: повторный приём заказа с тем же id (== id заказа qr/org) не создаёт дубль и
+     * не выпускает билеты повторно — возвращает true без повторной записи и без выдачи.
      */
     public function create(QrOrderDto $dto): bool
     {
@@ -68,6 +72,15 @@ final class QrOrderApplication
                 null,
                 ActorType::QR,
             ));
+
+            // qr присылает заказ уже оплаченным → сразу запускаем выдачу билетов.
+            // Помечаем issued_at ДО постановки задачи (защита от повторной выдачи при
+            // qr-ретраях) — повторный приём отсечёт existsById выше. Выдача — асинхронно,
+            // вне HTTP-запроса qr; событие issued в историю пишет сам IssueOrderJob.
+            if ($this->isPaid($dto->getStatus())) {
+                $this->repository->markIssued($dto->getId(), Carbon::now());
+                IssueOrderJob::dispatch($dto->getId());
+            }
         }
 
         return $created;

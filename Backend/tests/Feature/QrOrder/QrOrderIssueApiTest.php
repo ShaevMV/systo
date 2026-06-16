@@ -13,9 +13,10 @@ use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
 
 /**
- * API №2b — при переходе заказа в «оплачен» выдача запускается АСИНХРОННО:
- * ставится оркестратор IssueOrderJob (вне HTTP-запроса qr), заказ помечается issued_at,
- * повторный «оплачен» не ставит задачу снова, неоплаченный статус не запускает выдачу.
+ * Выдача при приёме оплаченного заказа (вариант «один запрос»): qr присылает заказ уже
+ * со status=«оплачен» → create ставит оркестратор IssueOrderJob АСИНХРОННО (вне HTTP qr) и
+ * помечает заказ issued_at. Повторный приём того же id задачу не дублирует; неоплаченный
+ * статус выдачу не запускает.
  */
 class QrOrderIssueApiTest extends TestCase
 {
@@ -28,7 +29,7 @@ class QrOrderIssueApiTest extends TestCase
         Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
     }
 
-    private function contract(): array
+    private function contract(string $status = 'оплачен'): array
     {
         return [
             'order_id' => self::ORDER_ID,
@@ -39,7 +40,7 @@ class QrOrderIssueApiTest extends TestCase
                 'festival' => ['id' => FestivalHelper::UUID_FESTIVAL, 'title' => 'Систо'],
                 'types_of_payment' => ['title' => 'СБП', 'id' => '33333333-3333-3333-3333-333333333333'],
                 'comment' => null,
-                'status' => 'создан',
+                'status' => $status,
                 'email' => 'buyer@example.com',
             ],
             'guests' => [
@@ -53,9 +54,8 @@ class QrOrderIssueApiTest extends TestCase
     {
         Queue::fake();
 
-        // Принимаем заказ, затем переводим в «оплачен» → должна встать задача выдачи.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-        $this->postJson('/api/v1/qrOrder/changeStatus/' . self::ORDER_ID, ['status' => 'оплачен'])->assertOk();
+        // qr присылает заказ уже оплаченным → приём сразу ставит задачу выдачи.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
 
         Queue::assertPushed(IssueOrderJob::class);
 
@@ -67,10 +67,10 @@ class QrOrderIssueApiTest extends TestCase
     {
         Queue::fake();
 
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-        $this->postJson('/api/v1/qrOrder/changeStatus/' . self::ORDER_ID, ['status' => 'оплачен'])->assertOk();
-        // Повторный «оплачен» не должен поставить вторую задачу выдачи (защита по issued_at).
-        $this->postJson('/api/v1/qrOrder/changeStatus/' . self::ORDER_ID, ['status' => 'оплачен'])->assertOk();
+        // Повторный приём того же оплаченного заказа (qr-ретрай) не ставит вторую задачу
+        // выдачи — отсекается existsById по id (== id заказа org).
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
 
         Queue::assertPushed(IssueOrderJob::class, 1);
     }
@@ -79,9 +79,8 @@ class QrOrderIssueApiTest extends TestCase
     {
         Queue::fake();
 
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-        // Статус «отменён» не запускает выдачу.
-        $this->postJson('/api/v1/qrOrder/changeStatus/' . self::ORDER_ID, ['status' => 'отменён'])->assertOk();
+        // Заказ в статусе «создан» (ещё не оплачен) — выдача не запускается.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('создан'))->assertOk();
 
         Queue::assertNotPushed(IssueOrderJob::class);
     }

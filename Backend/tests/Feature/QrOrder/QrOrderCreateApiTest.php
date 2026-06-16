@@ -6,6 +6,7 @@ namespace Tests\Feature\QrOrder;
 
 use App\Models\QrOrder\QrOrderModel;
 use App\Models\User;
+use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -21,6 +22,8 @@ class QrOrderCreateApiTest extends TestCase
         parent::setUp();
         // S2S-канал защищён: аутентифицируем сервис-токеном со scope qr:ingest.
         Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+        // Контракт приходит оплаченным → приём запускает выдачу; в тестах приёма её фейкаем.
+        Queue::fake();
     }
 
     private function contract(string $orderId = '11111111-1111-1111-1111-111111111111'): array
@@ -86,43 +89,15 @@ class QrOrderCreateApiTest extends TestCase
         $this->assertDatabaseMissing('qr_orders', ['id' => '11111111-1111-1111-1111-111111111111']);
     }
 
-    public function test_change_status_updates_accepted_order(): void
+    public function test_create_records_history(): void
     {
-        // API №2 (шаг 2a): смена статуса обновляет колонку status принятого заказа.
+        // История пишется с actor=qr: событие created при приёме заказа.
         $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-
-        $this->postJson('/api/v1/qrOrder/changeStatus/11111111-1111-1111-1111-111111111111', ['status' => 'отменён'])
-            ->assertOk()
-            ->assertJson(['success' => true]);
-
-        $this->assertDatabaseHas('qr_orders', [
-            'id' => '11111111-1111-1111-1111-111111111111',
-            'status' => 'отменён',
-        ]);
-    }
-
-    public function test_change_status_404_for_unknown_order(): void
-    {
-        // Смена статуса несуществующего заказа → 404.
-        $this->postJson('/api/v1/qrOrder/changeStatus/99999999-9999-9999-9999-999999999999', ['status' => 'оплачен'])
-            ->assertStatus(404);
-    }
-
-    public function test_create_and_status_change_record_history(): void
-    {
-        // История пишется с actor=qr: created при приёме, status_changed при смене статуса.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-        $this->postJson('/api/v1/qrOrder/changeStatus/11111111-1111-1111-1111-111111111111', ['status' => 'отменён'])->assertOk();
 
         $this->assertDatabaseHas('domain_history', [
             'aggregate_id' => '11111111-1111-1111-1111-111111111111',
             'aggregate_type' => 'qr_order',
             'event_name' => 'created',
-            'actor_type' => 'qr',
-        ]);
-        $this->assertDatabaseHas('domain_history', [
-            'aggregate_id' => '11111111-1111-1111-1111-111111111111',
-            'event_name' => 'status_changed',
             'actor_type' => 'qr',
         ]);
     }
