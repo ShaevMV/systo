@@ -17,7 +17,7 @@ export const loadList = (context) => {
 /** Справочники для формы: фестивали, типы билетов, шаблоны email/pdf. */
 export const loadRefs = (context) => {
     return Promise.all([
-        axios.get('/api/v1/festival/getFestivalList').then((r) => r.data ?? []),
+        axios.get('/api/v1/festival/getFestivalList').then((r) => r.data?.festivalDto ?? []),
         axios.post('/api/v1/ticketType/getList', { filter: {}, orderBy: {} }).then((r) => r.data.list ?? r.data ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'email' } }).then((r) => r.data.list ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'pdf' } }).then((r) => r.data.list ?? [])
