@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Tests\Feature\QrOrder;
 
-use App\Models\User;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
- * Защита S2S-канала qr→org: эндпоинт /qrOrder/create закрыт Sanctum-токеном со scope
- * (ability) "qr:ingest" — приём заказа выпускает билеты и хранит ПДн, публичным быть не должен.
- *  - без токена          → 401
- *  - токен без scope      → 403
- *  - токен с qr:ingest    → доступ есть (бизнес-логика отрабатывает)
+ * /qrOrder/create — публичный эндпоинт приёма заказов от витрины qr: авторизация отключена
+ * по решению владельца (qr шлёт уже оплаченный заказ, канал защищается вне приложения —
+ * сеть / shared-secret). Тест фиксирует публичность (защита от случайного возврата middleware).
  */
 class QrOrderAuthApiTest extends TestCase
 {
@@ -36,25 +32,9 @@ class QrOrderAuthApiTest extends TestCase
         ];
     }
 
-    public function test_create_requires_token(): void
+    public function test_create_is_public_no_token_required(): void
     {
-        // Без аутентификации канал закрыт.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertStatus(401);
-    }
-
-    public function test_create_rejects_token_without_ability(): void
-    {
-        // Валидный Sanctum-токен, но без scope qr:ingest → доступ запрещён (least privilege).
-        Sanctum::actingAs(User::factory()->create(), ['some:other']);
-
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertStatus(403);
-    }
-
-    public function test_create_accepts_token_with_ability(): void
-    {
-        // Токен со scope qr:ingest → канал открыт, заказ принят.
-        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
-
+        // Без токена канал открыт (не 401) — заказ принимается.
         $this->postJson('/api/v1/qrOrder/create', $this->contract())
             ->assertOk()
             ->assertJson(['success' => true]);
