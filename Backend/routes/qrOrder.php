@@ -6,13 +6,10 @@ use App\Http\Controllers\QrOrder\QrOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/qrOrder')->group(static function (): void {
-    // S2S-канал qr→org: Sanctum-токен сервис-аккаунта со scope (ability) "qr:ingest".
-    // Токен выпускается командой `php artisan qr:issue-token` и хранится в .env qr-сервера;
-    // qr шлёт его заголовком `Authorization: Bearer <token>`.
-    // Приём заказа: qr присылает его уже в статусе «оплачен» → org сразу выпускает билеты
-    // (см. QrOrderApplication::create). Эндпоинт выпускает билеты и хранит ПДн → НЕ публичный.
-    Route::post('/create', [QrOrderController::class, 'create'])
-        ->middleware(['auth:sanctum', 'abilities:qr:ingest']);
+    // Приём заказа от витрины qr: заказ приходит уже в статусе «оплачен» → org сразу выпускает
+    // билеты (см. QrOrderApplication::create). Авторизация отключена по решению владельца —
+    // канал защищается вне приложения (сеть / shared-secret). Эндпоинт хранит ПДн.
+    Route::post('/create', [QrOrderController::class, 'create']);
 
     // Список принятых заказов для админки org (read-only): фильтры + пагинация. Содержит ПДн.
     Route::post('/getList', [QrOrderController::class, 'getList'])
