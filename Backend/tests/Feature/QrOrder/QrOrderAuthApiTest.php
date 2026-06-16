@@ -9,8 +9,8 @@ use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
- * Защита S2S-канала qr→org: эндпоинты /qrOrder/create и /qrOrder/changeStatus
- * закрыты Sanctum-токеном со scope (ability) "qr:ingest".
+ * Защита S2S-канала qr→org: эндпоинт /qrOrder/create закрыт Sanctum-токеном со scope
+ * (ability) "qr:ingest" — приём заказа выпускает билеты и хранит ПДн, публичным быть не должен.
  *  - без токена          → 401
  *  - токен без scope      → 403
  *  - токен с qr:ingest    → доступ есть (бизнес-логика отрабатывает)
@@ -40,12 +40,6 @@ class QrOrderAuthApiTest extends TestCase
     {
         // Без аутентификации канал закрыт.
         $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertStatus(401);
-    }
-
-    public function test_change_status_requires_token(): void
-    {
-        $this->postJson('/api/v1/qrOrder/changeStatus/11111111-1111-1111-1111-111111111111', ['status' => 'оплачен'])
-            ->assertStatus(401);
     }
 
     public function test_create_rejects_token_without_ability(): void
