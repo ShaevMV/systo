@@ -25,12 +25,22 @@ class TicketTypeController extends Controller
         TicketTypeApplication $application,
     ): JsonResponse
     {
+        $data = $request->toArray();
+
+        // filter/orderBy могут отсутствовать в запросе → не падаем 500 (Undefined array key).
+        // Order::fromState кидает на кривых значениях orderBy — оборачиваем (как в TemplateController, TD-14).
+        try {
+            $orderBy = Order::fromState($data['orderBy'] ?? []);
+        } catch (\InvalidArgumentException) {
+            $orderBy = Order::none();
+        }
+
         return response()->json([
             'success' => true,
             'list' => $application->getList(
                 new TicketTypeGetListQuery(
-                    TicketTypeGetListFilter::fromState($request->toArray()['filter']),
-                    Order::fromState($request->toArray()['orderBy'])
+                    TicketTypeGetListFilter::fromState($data['filter'] ?? []),
+                    $orderBy,
                 ),
             )->getCollection()
                 ->toArray(),
