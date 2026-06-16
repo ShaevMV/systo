@@ -13,11 +13,16 @@ import Tag from 'primevue/tag';
 
 const store = useStore();
 
-const list = computed(() => store.getters['appTemplateBinding/getList'] || []);
-const festivals = computed(() => store.getters['appTemplateBinding/getFestivals'] || []);
-const ticketTypes = computed(() => store.getters['appTemplateBinding/getTicketTypes'] || []);
-const emailTemplates = computed(() => store.getters['appTemplateBinding/getEmailTemplates'] || []);
-const pdfTemplates = computed(() => store.getters['appTemplateBinding/getPdfTemplates'] || []);
+// Справочники приводим к массиву — защита от не-массивных ответов API (иначе спред/.map падает).
+const arr = (getter) => {
+    const v = store.getters[getter];
+    return Array.isArray(v) ? v : [];
+};
+const list = computed(() => arr('appTemplateBinding/getList'));
+const festivals = computed(() => arr('appTemplateBinding/getFestivals'));
+const ticketTypes = computed(() => arr('appTemplateBinding/getTicketTypes'));
+const emailTemplates = computed(() => arr('appTemplateBinding/getEmailTemplates'));
+const pdfTemplates = computed(() => arr('appTemplateBinding/getPdfTemplates'));
 const isLoading = computed(() => store.getters['appTemplateBinding/getIsLoading']);
 
 const ORDER_TYPES = [
