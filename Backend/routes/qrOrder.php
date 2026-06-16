@@ -9,14 +9,7 @@ Route::prefix('v1/qrOrder')->group(static function (): void {
     // S2S-канал qr→org: Sanctum-токен сервис-аккаунта со scope (ability) "qr:ingest".
     // Токен выпускается командой `php artisan qr:issue-token` и хранится в .env qr-сервера;
     // qr шлёт его заголовком `Authorization: Bearer <token>`.
-    Route::middleware(['auth:sanctum', 'abilities:qr:ingest'])->group(static function (): void {
-        // API №1 — приём заказа от витрины qr.
-        Route::post('/create', [QrOrderController::class, 'create']);
-
-        // API №2 — смена статуса заказа (шаг 2b при «оплачен» запускает выдачу билетов).
-        Route::post('/changeStatus/{id}', [QrOrderController::class, 'changeStatus']);
-    });
-
+    Route::post('/create', [QrOrderController::class, 'create']);
     // Список принятых заказов для админки org (read-only): фильтры + пагинация. Содержит ПДн.
     Route::post('/getList', [QrOrderController::class, 'getList'])
         ->middleware('auth:api')
