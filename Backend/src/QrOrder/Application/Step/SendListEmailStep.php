@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Tickets\QrOrder\Application\Step;
 
 use App\Mail\OrderListApproved;
-use Illuminate\Support\Facades\Mail;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 use Tickets\QrOrder\Application\Support\PipelineLog;
 use Tickets\QrOrder\Dto\QrOrderDto;
 
@@ -14,11 +17,16 @@ use Tickets\QrOrder\Dto\QrOrderDto;
  * Шаг письма для заказа-списка: одно письмо получателю (order.email) со всеми PDF-билетами —
  * Mailable OrderListApproved (берёт blade-шаблон письма из Location.email_template).
  *
- * Требует festival_id (обязателен) + location_id (из order_data.location.id). PDF рендерится
- * внутри письма из TicketResponse, поэтому шаг не зависит от завершения ProcessCreatingQRCode.
+ * Требует festival_id (обязателен) + location_id (из order_data.location.id). Отправка — через
+ * MailDispatcher (Ф2, трекинг + асинхронный SendEmailJob).
  */
 final class SendListEmailStep implements PipelineStepInterface
 {
+    public function __construct(
+        private readonly MailDispatcher $dispatcher,
+    ) {
+    }
+
     public function name(): string
     {
         return 'send_list_email';
@@ -47,13 +55,27 @@ final class SendListEmailStep implements PipelineStepInterface
             : [];
         $locationId = empty($location['id']) ? null : new Uuid((string) $location['id']);
 
-        Mail::to($order->getEmail())->send(new OrderListApproved($responses, $festivalId, $locationId));
+        $emailId = $this->dispatcher->send(
+            EmailEvent::LIST_APPROVED,
+            new EmailContext(
+                recipient: $order->getEmail(),
+                festivalId: $festivalId->value(),
+                orderType: $order->getTypeOrder(),
+                source: 'qr_pipeline',
+                actorType: ActorType::QR,
+                aggregateType: 'qr_order',
+                aggregateId: $order->getId()->value(),
+                meta: ['tickets' => count($responses), 'location_id' => $locationId?->value()],
+            ),
+            new OrderListApproved($responses, $festivalId, $locationId),
+        );
 
-        $log->info('send_list_email.sent', [
+        $log->info('send_list_email.dispatched', [
             'order_id' => $order->getId()->value(),
             'to' => PipelineLog::maskEmail($order->getEmail()),
             'tickets' => count($responses),
             'location_id' => $locationId?->value(),
+            'email_id' => $emailId->value(),
         ]);
 
         return $carry;

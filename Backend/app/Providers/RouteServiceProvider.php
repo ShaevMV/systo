@@ -88,6 +88,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/templateBinding.php'));
 
+            // контроль доставки писем (admin-only): список/деталь/повтор
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/emailDelivery.php'));
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/option.php'));

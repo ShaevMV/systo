@@ -96,6 +96,17 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        // Канал доставки писем (Ф2): постановка в очередь, отправка, сбой, прочтение — без ПДн.
+        'mail_delivery' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/mail_delivery.log'),
+            'level' => 'debug',
+            'days' => 30,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            // Сбой записи лога не должен ронять отправку письма (job).
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
