@@ -27,4 +27,7 @@ Route::prefix('v1/template')->middleware(['auth:api', 'admin'])->group(static fu
 
     // Предпросмотр на тестовых данных. DomPDF тяжёлый → отдельный тротлинг.
     Route::post('/preview', [TemplateController::class, 'preview'])->middleware('throttle:20,1');
+
+    // Загрузка картинки (фон PDF-билета / иллюстрации) → public storage, возвращает URL.
+    Route::post('/uploadImage', [TemplateController::class, 'uploadImage'])->middleware('throttle:20,1');
 });

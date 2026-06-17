@@ -69,6 +69,35 @@ function insertAtCursor(text) {
     });
 }
 
+// Загрузка картинки (фон PDF-билета / иллюстрации): файл → public storage → URL вставляется
+// в позицию курсора (админ ставит его в <img src="...">).
+const fileRef = ref(null);
+const uploading = ref(false);
+
+function triggerUpload() {
+    fileRef.value?.click();
+}
+
+async function onUploadImage(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    uploading.value = true;
+    try {
+        const r = await store.dispatch('appTemplate/uploadImage', { file });
+        if (r?.url) {
+            insertAtCursor(r.url);
+            flash('Картинка загружена — URL вставлен в позицию курсора');
+        } else {
+            flash('Не удалось загрузить картинку');
+        }
+    } catch (err) {
+        flash(err.response?.data?.message || 'Ошибка загрузки картинки');
+    } finally {
+        uploading.value = false;
+        e.target.value = ''; // сброс — чтобы можно было выбрать тот же файл повторно
+    }
+}
+
 async function loadVariables() {
     await store.dispatch('appTemplate/loadVariables', { kind: kind.value, slug: slug.value });
 }
@@ -258,6 +287,8 @@ onMounted(load);
                 <template #content>
                     <textarea ref="codeRef" v-model="editing" class="ed-code" spellcheck="false" :placeholder="codePlaceholder"></textarea>
                     <div class="ed-actions">
+                        <Button label="Загрузить картинку" icon="pi pi-image" severity="secondary" outlined :loading="uploading" @click="triggerUpload" />
+                        <input ref="fileRef" type="file" accept="image/*" style="display: none" @change="onUploadImage" />
                         <template v-if="isNew">
                             <Button label="Создать" icon="pi pi-check" :disabled="!slug || !editing" @click="onCreate" />
                         </template>
