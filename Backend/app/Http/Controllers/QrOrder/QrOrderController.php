@@ -14,6 +14,7 @@ use Throwable;
 use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
 use Tickets\QrOrder\Application\GetList\QrOrderGetListQuery;
+use Tickets\QrOrder\Application\Pipeline\QrOrderPipelineReader;
 use Tickets\QrOrder\Application\QrOrderApplication;
 use Tickets\QrOrder\Application\Stats\QrOrderStatsQuery;
 use Tickets\QrOrder\Dto\QrOrderDto;
@@ -176,5 +177,32 @@ class QrOrderController extends Controller
         );
 
         return response()->json(['success' => true, 'history' => $items]);
+    }
+
+    /**
+     * Ссылки на PDF билетов заказа (для скачивания из админки). Билеты лежат в
+     * storage/tickets/{ticketId}.pdf; пустой список — PDF ещё генерируется или билетов нет.
+     */
+    public function getTicketPdf(string $id, QrOrderPipelineReader $reader): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'listUrl' => $reader->ticketPdfUrls(new Uuid($id)),
+        ]);
+    }
+
+    /**
+     * Весь путь заказа (Ф5): приём → билеты (PDF) → письма (статусы доставки) → история шагов.
+     * Один ответ для экрана «видеть весь путь».
+     */
+    public function getPipeline(string $id, QrOrderPipelineReader $reader): JsonResponse
+    {
+        $pipeline = $reader->pipeline(new Uuid($id));
+
+        if ($pipeline === null) {
+            return response()->json(['success' => false, 'message' => 'Заказ не найден'], 404);
+        }
+
+        return response()->json(['success' => true] + $pipeline);
     }
 }

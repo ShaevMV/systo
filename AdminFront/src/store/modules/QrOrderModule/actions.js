@@ -83,6 +83,32 @@ export const loadHistory = (context, payload) => {
     });
 };
 
+/**
+ * Весь путь заказа (Ф5): заказ + история(шаги) + билеты(PDF) + письма(статусы) одним запросом.
+ */
+export const loadPipeline = (context, payload) => {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(API + '/getPipeline/' + payload.id)
+            .then((response) => {
+                context.commit('setItem', response.data.order ?? {});
+                context.commit('setHistory', response.data.history ?? []);
+                context.commit('setTickets', response.data.tickets ?? []);
+                context.commit('setEmails', response.data.emails ?? []);
+                resolve(response.data);
+            })
+            .catch((error) => {
+                context.commit('setError', error.response?.data?.errors ?? []);
+                reject(error);
+            });
+    });
+};
+
+/** Ссылки на PDF билетов заказа (для скачивания). Возвращает массив url. */
+export const downloadTickets = (context, payload) => {
+    return axios.get(API + '/getTicketPdf/' + payload.id).then((r) => r.data.listUrl ?? []);
+};
+
 export const setFilter = (context, payload) => {
     context.commit('setFilter', payload);
 };
