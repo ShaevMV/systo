@@ -13,6 +13,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 use Tickets\Questionnaire\Application\Questionnaire\ExistsByEmail\QuestionnaireExistsByEmailQuery;
 use Tickets\Questionnaire\Application\Questionnaire\ExistsByEmail\QuestionnaireExistsByEmailQueryHandler;
 
@@ -40,7 +44,16 @@ class ProcessGuestNotificationQuestionnaire implements ShouldQueue, DomainEvent
         Log::info('От правил письмо для анкетирования '  . $this->email,[
             $this->orderId, $this->ticketId
         ]);
-        \Mail::to($this->email)
-            ->send($mail);
+        app(MailDispatcher::class)->send(
+            EmailEvent::QUESTIONNAIRE,
+            new EmailContext(
+                recipient: $this->email,
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+                aggregateType: 'order_ticket',
+                aggregateId: $this->orderId,
+            ),
+            $mail,
+        );
     }
 }

@@ -10,13 +10,16 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Mail;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\Order\OrderTicket\Repositories\FestivalRepositoryInterface;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
 use App\Mail\SecondFestival\OrderToCreate as SecondOrderToCreate;
 use Tickets\Order\OrderTicket\Service\FestivalService;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 
 class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
 {
@@ -40,7 +43,17 @@ class ProcessUserNotificationNewOrderTicket implements ShouldQueue, DomainEvent
             $festivalService->getFestivalNameByTicketType($this->ticketTypeId),
         );
 
-        Mail::to($this->email)
-            ->send($mail);
+        app(MailDispatcher::class)->send(
+            EmailEvent::ORDER_CREATED,
+            new EmailContext(
+                recipient: $this->email,
+                ticketTypeId: $this->ticketTypeId->value(),
+                festivalId: $this->festival->value(),
+                orderType: 'regular',
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+            ),
+            $mail,
+        );
     }
 }

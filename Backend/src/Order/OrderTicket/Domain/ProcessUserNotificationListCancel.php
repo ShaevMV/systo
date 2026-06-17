@@ -10,9 +10,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 
 class ProcessUserNotificationListCancel implements ShouldQueue, DomainEvent
 {
@@ -26,6 +29,16 @@ class ProcessUserNotificationListCancel implements ShouldQueue, DomainEvent
 
     public function handle(): void
     {
-        Mail::to($this->email)->send(new OrderListCancel($this->festivalId));
+        app(MailDispatcher::class)->send(
+            EmailEvent::LIST_CANCEL,
+            new EmailContext(
+                recipient: $this->email,
+                festivalId: $this->festivalId->value(),
+                orderType: 'list',
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+            ),
+            new OrderListCancel($this->festivalId),
+        );
     }
 }

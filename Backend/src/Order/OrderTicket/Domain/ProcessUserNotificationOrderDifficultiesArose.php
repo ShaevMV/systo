@@ -8,10 +8,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 
 class ProcessUserNotificationOrderDifficultiesArose implements ShouldQueue, DomainEvent
 {
@@ -27,10 +29,20 @@ class ProcessUserNotificationOrderDifficultiesArose implements ShouldQueue, Doma
 
     public function handle(): void
     {
-        Mail::to($this->email)
-            ->send(new OrderToDifficultiesArose(
+        app(MailDispatcher::class)->send(
+            EmailEvent::ORDER_DIFFICULTIES,
+            new EmailContext(
+                recipient: $this->email,
+                ticketTypeId: $this->ticketTypeId->value(),
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+                aggregateType: 'order_ticket',
+                aggregateId: $this->orderId->value(),
+            ),
+            new OrderToDifficultiesArose(
                 $this->comment,
                 $this->ticketTypeId
-            ));
+            ),
+        );
     }
 }

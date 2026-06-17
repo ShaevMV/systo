@@ -10,9 +10,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use Mail;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 use Tickets\Order\OrderTicket\Domain\ValueObject\OrderGuestLine;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
@@ -43,13 +45,21 @@ class ProcessUserNotificationOrderPaid implements ShouldQueue, DomainEvent
         foreach ($this->tickets as $ticket) {
             $result[] = $repository->getTicket($ticket->id);
         }
-        $resultMail = Mail::to($this->email)->send(new OrderToPaid(
-            $result,
-            $this->ticketTypeId,
-            null,
-            $this->promocode,
-        ));
-
-        Log::info($resultMail->getDebug());
+        app(MailDispatcher::class)->send(
+            EmailEvent::ORDER_PAID,
+            new EmailContext(
+                recipient: $this->email,
+                ticketTypeId: $this->ticketTypeId->value(),
+                orderType: 'regular',
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+            ),
+            new OrderToPaid(
+                $result,
+                $this->ticketTypeId,
+                null,
+                $this->promocode,
+            ),
+        );
     }
 }
