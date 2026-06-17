@@ -24,4 +24,9 @@ Route::prefix('v1/festival')->group(static function (): void {
         ->middleware('admin');
     // получения списка всех фестивалей
     Route::get('/getFestivalList', [FestivalController::class, 'getFestivalList']);
+
+    // создание фестиваля (каталог — мастер на org), только admin
+    Route::post('/create', [FestivalController::class, 'create'])
+        ->middleware('auth:api')
+        ->middleware('admin');
 });

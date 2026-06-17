@@ -9,6 +9,8 @@ use Shared\Domain\ValueObject\Uuid;
 
 interface FestivalRepositoryInterface
 {
+    public function create(FestivalDto $dto): bool;
+
     public function get(Uuid $id): FestivalDto;
 
     /**

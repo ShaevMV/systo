@@ -42,4 +42,20 @@ class FestivalDto extends AbstractionEntity
     {
         return $this->id;
     }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /** Поля для записи в таблицу festivals (fillable: id/name/year/active). */
+    public function toArrayForCreate(): array
+    {
+        return [
+            'id' => $this->id->value(),
+            'name' => $this->name,
+            'year' => $this->year,
+            'active' => $this->active,
+        ];
+    }
 }
