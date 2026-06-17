@@ -23,6 +23,7 @@ const festivals = computed(() => arr('appTemplateBinding/getFestivals'));
 const ticketTypes = computed(() => arr('appTemplateBinding/getTicketTypes'));
 const emailTemplates = computed(() => arr('appTemplateBinding/getEmailTemplates'));
 const pdfTemplates = computed(() => arr('appTemplateBinding/getPdfTemplates'));
+const events = computed(() => arr('appTemplateBinding/getEvents'));
 const isLoading = computed(() => store.getters['appTemplateBinding/getIsLoading']);
 
 const ORDER_TYPES = [
@@ -36,7 +37,7 @@ const ORDER_TYPES = [
 const dialogVisible = ref(false);
 const saving = ref(false);
 const errorMsg = ref('');
-const blank = () => ({ id: null, festival_id: '', order_type: '', ticket_type_id: '', email_template_id: '', pdf_template_id: '', is_default: false, active: true });
+const blank = () => ({ id: null, festival_id: '', order_type: '', event: '', ticket_type_id: '', email_template_id: '', pdf_template_id: '', is_default: false, active: true });
 const form = ref(blank());
 
 // Отображение id → читаемое имя (из загруженных справочников).
@@ -47,8 +48,10 @@ const templateTitle = (id) => {
     return t ? t.title || t.slug : '—';
 };
 const orderTypeLabel = (v) => ORDER_TYPES.find((o) => o.value === (v || ''))?.label || v;
+const eventLabel = (v) => (v ? events.value.find((e) => e.value === v)?.label || v : 'Любое');
 
 // Опции селектов (с пунктом «Любой/—» = пустое значение).
+const eventOptions = computed(() => [{ label: 'Любое', value: '' }, ...events.value]);
 const festivalOptions = computed(() => [{ name: 'Любой', id: '' }, ...festivals.value]);
 const ticketTypeOptions = computed(() => [{ name: 'Любой', id: '' }, ...ticketTypes.value]);
 const emailOptions = computed(() => [{ title: '— нет —', id: '' }, ...emailTemplates.value.map((t) => ({ id: t.id, title: t.title || t.slug }))]);
@@ -65,6 +68,7 @@ function openEdit(row) {
         id: row.id,
         festival_id: row.festival_id || '',
         order_type: row.order_type || '',
+        event: row.event || '',
         ticket_type_id: row.ticket_type_id || '',
         email_template_id: row.email_template_id || '',
         pdf_template_id: row.pdf_template_id || '',
@@ -81,6 +85,7 @@ async function save() {
     const data = {
         festival_id: form.value.festival_id || null,
         order_type: form.value.order_type || null,
+        event: form.value.event || null,
         ticket_type_id: form.value.ticket_type_id || null,
         email_template_id: form.value.email_template_id || null,
         pdf_template_id: form.value.pdf_template_id || null,
@@ -120,7 +125,7 @@ onMounted(() => {
         <div class="tb-header">
             <div>
                 <h1>Привязки шаблонов</h1>
-                <p class="tb-subtitle">Какой шаблон письма и PDF-билета использовать для типа заказа и типа билета. Без подходящей привязки — поведение по умолчанию (как раньше).</p>
+                <p class="tb-subtitle">Какой шаблон письма и PDF-билета использовать для события (оплата/отмена/изменение/регистрация…), типа заказа и типа билета. Без подходящей привязки — поведение по умолчанию (как раньше).</p>
             </div>
             <Button label="Создать" icon="pi pi-plus" @click="openCreate" />
         </div>
@@ -129,6 +134,7 @@ onMounted(() => {
             <template #content>
                 <DataTable :value="list" :loading="isLoading" data-key="id" responsive-layout="scroll">
                     <Column header="Фестиваль"><template #body="{ data }">{{ festivalName(data.festival_id) }}</template></Column>
+                    <Column header="Событие"><template #body="{ data }">{{ eventLabel(data.event) }}</template></Column>
                     <Column header="Тип заказа"><template #body="{ data }">{{ orderTypeLabel(data.order_type) }}</template></Column>
                     <Column header="Тип билета"><template #body="{ data }">{{ ticketTypeName(data.ticket_type_id) }}</template></Column>
                     <Column header="Письмо"><template #body="{ data }">{{ data.email_template_id ? templateTitle(data.email_template_id) : '—' }}</template></Column>
@@ -151,6 +157,10 @@ onMounted(() => {
                 <div class="tb-field">
                     <label>Фестиваль</label>
                     <Select v-model="form.festival_id" :options="festivalOptions" option-label="name" option-value="id" placeholder="Любой" />
+                </div>
+                <div class="tb-field">
+                    <label>Событие</label>
+                    <Select v-model="form.event" :options="eventOptions" option-label="label" option-value="value" placeholder="Любое" filter />
                 </div>
                 <div class="tb-field">
                     <label>Тип заказа</label>

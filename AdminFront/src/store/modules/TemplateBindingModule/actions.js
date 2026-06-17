@@ -14,15 +14,16 @@ export const loadList = (context) => {
         .finally(() => context.commit('setIsLoading', false));
 };
 
-/** Справочники для формы: фестивали, типы билетов, шаблоны email/pdf. */
+/** Справочники для формы: фестивали, типы билетов, шаблоны email/pdf, события писем. */
 export const loadRefs = (context) => {
     return Promise.all([
         axios.get('/api/v1/festival/getFestivalList').then((r) => r.data?.festivalDto ?? []),
         axios.post('/api/v1/ticketType/getList', { filter: {}, orderBy: {} }).then((r) => r.data.list ?? r.data ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'email' } }).then((r) => r.data.list ?? []),
-        axios.post('/api/v1/template/getList', { filter: { kind: 'pdf' } }).then((r) => r.data.list ?? [])
-    ]).then(([festivals, ticketTypes, emailTemplates, pdfTemplates]) => {
-        context.commit('setRefs', { festivals, ticketTypes, emailTemplates, pdfTemplates });
+        axios.post('/api/v1/template/getList', { filter: { kind: 'pdf' } }).then((r) => r.data.list ?? []),
+        axios.get(API + '/events').then((r) => r.data.list ?? [])
+    ]).then(([festivals, ticketTypes, emailTemplates, pdfTemplates, events]) => {
+        context.commit('setRefs', { festivals, ticketTypes, emailTemplates, pdfTemplates, events });
     });
 };
 

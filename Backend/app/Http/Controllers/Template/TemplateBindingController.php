@@ -9,6 +9,7 @@ use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Domain\EmailEvent;
 use Tickets\TemplateBinding\Application\TemplateBindingApplication;
 use Tickets\TemplateBinding\Dto\TemplateBindingDto;
 
@@ -87,9 +88,22 @@ class TemplateBindingController extends Controller
         ]);
     }
 
-    /** Валидация: нужен хотя бы один шаблон; не больше одной активной дефолт-привязки. */
+    /** Каталог событий писем для селектора в форме привязки. */
+    public function events(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'list' => EmailEvent::catalog(),
+        ]);
+    }
+
+    /** Валидация: корректное событие; нужен хотя бы один шаблон; не больше одной активной дефолт-привязки. */
     private function validateBinding(array $data, TemplateBindingApplication $application, ?string $excludeId = null): ?string
     {
+        if (! empty($data['event']) && ! EmailEvent::isValid($data['event'])) {
+            return 'Неизвестное событие письма: ' . $data['event'];
+        }
+
         $hasTemplate = ! empty($data['email_template_id']) || ! empty($data['pdf_template_id']);
         if (! $hasTemplate) {
             return 'Укажите хотя бы один шаблон (письма или PDF)';

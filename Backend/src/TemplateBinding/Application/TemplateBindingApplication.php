@@ -87,14 +87,21 @@ class TemplateBindingApplication
     }
 
     /**
-     * Резолв slug'а шаблона по (festival, order_type, ticket_type) для нужного kind.
+     * Резолв slug'а шаблона по (event, festival, order_type, ticket_type) для нужного kind.
      * null → привязки нет, вызывающий использует старый slug (обратная совместимость).
+     * $event = null → событие не учитывается (подходят только привязки с event = null).
      */
-    public function resolveSlug(string $kind, ?string $festivalId, ?string $orderType, ?string $ticketTypeId): ?string
-    {
+    public function resolveSlug(
+        string $kind,
+        ?string $event,
+        ?string $festivalId,
+        ?string $orderType,
+        ?string $ticketTypeId,
+    ): ?string {
         return $this->resolver->resolve(
             $this->repository->getActiveForResolve(),
             $kind,
+            $event,
             $festivalId,
             $orderType,
             $ticketTypeId,
