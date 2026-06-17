@@ -58,6 +58,15 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/email-delivery',
+                    name: 'emailDelivery',
+                    component: () => import('@/views/admin/EmailDeliveryListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },
