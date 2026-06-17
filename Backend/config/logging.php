@@ -79,6 +79,19 @@ return [
             'formatter' => \Monolog\Formatter\JsonFormatter::class,
         ],
 
+        // Access-лог коннектов от витрины qr к каналу приёма заказов (qrOrder/create):
+        // каждый запрос — принятый и отклонённый (401) — с пометкой actor=qr (отделение от
+        // действий админов). Структурированный JSON, без ПДн и без самого ключа X-QR-Token.
+        'qr_access' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/qr_access.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 30,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            // Сбой записи лога не должен ронять приём заказа (второй барьер к try-catch в QrAccessLog).
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
