@@ -48,6 +48,8 @@ use Tickets\Template\Service\TemplateRenderer;
 use Tickets\TemplateBinding\Domain\TemplateBindingResolver;
 use Tickets\TemplateBinding\Repositories\InMemoryMySqlTemplateBindingRepository;
 use Tickets\TemplateBinding\Repositories\TemplateBindingRepositoryInterface;
+use Tickets\EmailDelivery\Repositories\EmailMessageRepositoryInterface;
+use Tickets\EmailDelivery\Repositories\InMemoryMySqlEmailMessageRepository;
 use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
@@ -94,6 +96,8 @@ class TicketsProvider extends ServiceProvider
         // Привязки шаблонов (Часть B): репозиторий + чистый резолвер (singleton — без состояния).
         $this->app->bind(TemplateBindingRepositoryInterface::class, InMemoryMySqlTemplateBindingRepository::class);
         $this->app->singleton(TemplateBindingResolver::class);
+        // Трекинг доставки писем (Ф2): репозиторий статусов писем.
+        $this->app->bind(EmailMessageRepositoryInterface::class, InMemoryMySqlEmailMessageRepository::class);
         $this->app->bind(TicketTypePriceRepositoryInterface::class, InMemoryMySqlTicketTypePriceRepository::class);
         $this->app->bind(OptionRepositoryInterface::class, InMemoryMySqlOptionRepository::class);
         $this->app->bind(OptionPriceRepositoryInterface::class, InMemoryMySqlOptionPriceRepository::class);

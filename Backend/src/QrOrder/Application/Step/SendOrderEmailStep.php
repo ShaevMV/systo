@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace Tickets\QrOrder\Application\Step;
 
-use Illuminate\Support\Facades\Mail;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 use Tickets\QrOrder\Application\Support\OrderEmailResolver;
 use Tickets\QrOrder\Application\Support\PipelineLog;
+use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 use Tickets\QrOrder\Dto\QrOrderDto;
 
 /**
  * Шаг 2: одно письмо получателю (order.email) со всеми PDF-билетами заказа.
  *
  * Mailable выбирается по type_order через OrderEmailResolver (regular → OrderToPaid,
- * friendly → OrderToPaidFriendly). PDF и blade-шаблон (парковка/детский) рендерятся внутри
- * письма из TicketResponse — шаг НЕ зависит от завершения ProcessCreatingQRCode.
+ * friendly → OrderToPaidFriendly). Отправка идёт через MailDispatcher (Ф2): письмо ставится
+ * в email_messages с трекингом и уходит асинхронным SendEmailJob — поэтому в пайплайне шаг
+ * лишь ставит письмо в очередь, а статус (sent/failed) виден в экране «Доставка писем».
  */
 final class SendOrderEmailStep implements PipelineStepInterface
 {
     public function __construct(
         private readonly OrderEmailResolver $emailResolver,
+        private readonly MailDispatcher $dispatcher,
     ) {
     }
 
@@ -46,14 +52,32 @@ final class SendOrderEmailStep implements PipelineStepInterface
             $carry['comment'] ?? null,
         );
 
-        Mail::to($order->getEmail())->send($mailable);
+        $event = TypeOrder::normalize($order->getTypeOrder()) === TypeOrder::FRIENDLY
+            ? EmailEvent::ORDER_PAID_FRIENDLY
+            : EmailEvent::ORDER_PAID;
 
-        $log->info('send_order_email.sent', [
+        $emailId = $this->dispatcher->send(
+            $event,
+            new EmailContext(
+                recipient: $order->getEmail(),
+                festivalId: $order->getFestivalId()?->value(),
+                orderType: $order->getTypeOrder(),
+                ticketTypeId: ($carry['firstTicketTypeId'] ?? null)?->value(),
+                source: 'qr_pipeline',
+                actorType: ActorType::QR,
+                aggregateType: 'qr_order',
+                aggregateId: $order->getId()->value(),
+                meta: ['tickets' => count($responses)],
+            ),
+            $mailable,
+        );
+
+        $log->info('send_order_email.dispatched', [
             'order_id' => $order->getId()->value(),
             'to' => PipelineLog::maskEmail($order->getEmail()),
             'tickets' => count($responses),
             'type_order' => $order->getTypeOrder(),
-            'mailable' => get_class($mailable),
+            'email_id' => $emailId->value(),
         ]);
 
         return $carry;

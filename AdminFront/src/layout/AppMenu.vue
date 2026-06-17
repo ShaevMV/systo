@@ -25,6 +25,11 @@ const model = ref([
                 label: 'Привязки шаблонов',
                 icon: 'pi pi-fw pi-link',
                 to: '/admin/template-bindings'
+            },
+            {
+                label: 'Доставка писем',
+                icon: 'pi pi-fw pi-send',
+                to: '/admin/email-delivery'
             }
         ]
     }

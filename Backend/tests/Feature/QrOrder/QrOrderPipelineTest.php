@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\QrOrder;
 
-use App\Mail\OrderListApproved;
-use App\Mail\OrderToLiveTicketIssued;
-use App\Mail\OrderToPaid;
-use App\Mail\OrderToPaidFriendly;
 use App\Models\Tickets\TicketModel;
 use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Support\Facades\Mail;
@@ -15,6 +11,7 @@ use Illuminate\Support\Facades\Queue;
 use RuntimeException;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
+use Tickets\EmailDelivery\Application\Job\SendEmailJob;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
 use Tickets\QrOrder\Application\Job\LinkLiveTicketJob;
@@ -77,9 +74,15 @@ class QrOrderPipelineTest extends TestCase
         ]);
         self::assertSame(1, TicketModel::where('order_ticket_id', self::ORDER_ID)->count());
 
-        // PDF/QR поставлен в очередь; письмо со всеми PDF отправлено ровно одно.
+        // PDF/QR поставлен в очередь; письмо со всеми PDF поставлено в очередь доставки (Ф2):
+        // трекаемая запись email_messages(queued) + асинхронный SendEmailJob (статус виден в админке).
         Queue::assertPushed(ProcessCreatingQRCode::class);
-        Mail::assertSent(OrderToPaid::class, 1);
+        Queue::assertPushed(SendEmailJob::class, 1);
+        $this->assertDatabaseHas('email_messages', [
+            'aggregate_id' => self::ORDER_ID,
+            'event' => 'order_paid',
+            'status' => 'queued',
+        ]);
 
         // Запись билета в Baza — отдельной изолированной задачей (на каждый билет).
         Queue::assertPushed(PushTicketToBazaJob::class, 1);
@@ -163,9 +166,10 @@ class QrOrderPipelineTest extends TestCase
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
-        // Friendly-заказ → friendly-письмо; обычное OrderToPaid НЕ отправляется.
-        Mail::assertSent(OrderToPaidFriendly::class, 1);
-        Mail::assertNotSent(OrderToPaid::class);
+        // Friendly-заказ → событие order_paid_friendly в очереди доставки; обычное order_paid НЕ ставится.
+        Queue::assertPushed(SendEmailJob::class, 1);
+        $this->assertDatabaseHas('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid_friendly', 'status' => 'queued']);
+        $this->assertDatabaseMissing('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid']);
 
         // Билет всё равно создаётся и пишется в Baza.
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
@@ -200,9 +204,10 @@ class QrOrderPipelineTest extends TestCase
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
-        // Список → письмо OrderListApproved (а не OrderToPaid), билет создан, Baza-задача поставлена.
-        Mail::assertSent(OrderListApproved::class, 1);
-        Mail::assertNotSent(OrderToPaid::class);
+        // Список → событие list_approved в очереди доставки (а не order_paid), билет создан, Baza-задача поставлена.
+        Queue::assertPushed(SendEmailJob::class, 1);
+        $this->assertDatabaseHas('email_messages', ['aggregate_id' => $oid, 'event' => 'list_approved', 'status' => 'queued']);
+        $this->assertDatabaseMissing('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid']);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
         Queue::assertPushed(PushTicketToBazaJob::class, 1);
     }
@@ -231,9 +236,10 @@ class QrOrderPipelineTest extends TestCase
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
-        // Живой: письмо о выдаче (без PDF), связка с live_tickets поставлена;
+        // Живой: событие order_paid_live в очереди доставки (письмо без PDF), связка с live_tickets поставлена;
         // PDF (ProcessCreatingQRCode) и el_tickets (PushTicketToBazaJob) НЕ задействованы.
-        Mail::assertSent(OrderToLiveTicketIssued::class, 1);
+        Queue::assertPushed(SendEmailJob::class, 1);
+        $this->assertDatabaseHas('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid_live', 'status' => 'queued']);
         Queue::assertPushed(LinkLiveTicketJob::class, 1);
         Queue::assertNotPushed(ProcessCreatingQRCode::class);
         Queue::assertNotPushed(PushTicketToBazaJob::class);
