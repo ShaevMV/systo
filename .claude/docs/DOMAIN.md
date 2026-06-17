@@ -197,6 +197,68 @@ class TemplateVersionDto extends AbstractionEntity implements Response {
 - **PDF** — `CreatingQrCodeService::createPdf()` (`Backend/src/Ticket/CreateTickets/Services/`): `findActive($slug, pdf)` → `Pdf::loadHTML(render())`, иначе `Pdf::loadView($slug)`.
 - **Письма** — трейт `App\Mail\Concerns\RendersDbTemplate::renderDbOrView($slug, $vars)` на **11** order/list-Mailable: `findActive($slug, email)` → `$this->html(render())`, иначе `$this->view('email.'.$slug)`. Покрывает оба канала (legacy `order_tickets` + qr-пайплайн `QrOrder/Application/Step`), т.к. оба используют те же Mailable.
 
+**Привязка по событию (поле `event`)** — добавлена ось `event` в `template_bindings` (миграция `2026_06_17_120000_add_event_to_template_bindings`, `string(40) nullable index after order_type`). Теперь привязка резолвится по `(event, festival, order_type, ticket_type)`. Каталог событий — `EmailEvent` (см. модуль EmailDelivery). `NULL` = wildcard «любое событие» → существующие привязки и резолв PDF/выдачи не меняются (обратная совместимость). В `TemplateBindingDto` появилось поле `event`; `specificity()` даёт `event` **вес 8** — сильнейший дискриминатор: **event > ticket_type > order_type > festival**. `create`/`edit` принимают `event` (валидируется `EmailEvent::isValid`); каталог для селектора — `GET /api/v1/templateBinding/events`.
+
+---
+
+### EmailDelivery (Ф1–Ф5)
+
+**Путь:** `Backend/src/EmailDelivery/` (модуль без AggregateRoot — пассивная сущность, как `QrOrder`/`Location`/`Template`; БД только в репозитории). Спека: `.claude/specs/email-delivery-system.md`.
+
+Контроль полного пути письма «дошло / где застряло»: `queued → sending → sent (передано на SMTP) → [delivered → opened] / failed (+текст ошибки)`. Повтор из админки; пиксель прочтения = «точно дошло» (за флагом, 152-ФЗ). `delivered`/`bounced` требуют транзакционного провайдера с вебхуками (AF-6). Все 5 фаз в коде, PHPUnit зелёный.
+
+**Домен:**
+
+- **`EmailEvent`** (`Domain/EmailEvent.php`) — канонический справочник **15 событий** писем → `defaultSlug()` (= текущий зашитый в Mailable slug) + `label`. Источник правды «какое письмо за каким событием». Маппинг event → defaultSlug:
+
+  | event | defaultSlug | label |
+  |-------|-------------|-------|
+  | `order_created` | `orderToCreate` | Заказ создан |
+  | `order_paid` | `orderToPaid` | Заказ оплачен |
+  | `order_paid_friendly` | `TypeTicketMailOrderToPaidFriendly1` | Заказ оплачен (Friendly) |
+  | `order_paid_live` | `orderToPaidLiveTicket` | Живой билет оплачен |
+  | `order_cancel` | `orderToCancel` | Заказ отменён |
+  | `order_changed` | `orderToChangeTicket` | Данные заказа изменены |
+  | `order_difficulties` | `orderToDifficultiesArose` | Трудности с заказом |
+  | `order_live_issued` | `orderToLiveTicketIssued` | Живой билет выдан |
+  | `list_approved` | `orderListApproved` | Список одобрен |
+  | `list_cancel` | `orderListCancel` | Список отменён |
+  | `list_difficulties` | `orderListDifficultiesArose` | Трудности со списком |
+  | `user_registered` | `newUser` | Регистрация пользователя |
+  | `password_reset` | `passwordResets` | Сброс пароля |
+  | `invite` | `invate` | Приглашение |
+  | `questionnaire` | `questionnaire` | Анкета гостя |
+
+  Методы: `all()`, `isValid()`, `defaultSlug()`, `catalog()` (для селектора `[{value, label}]`).
+
+- **`EmailStatus`** (`Domain/ValueObject/EmailStatus.php`) — VO статуса + машина переходов (provider-ready):
+
+  ```
+  queued ──► sending ──► sent ──► delivered ──► opened
+     │          │          │          │
+     └► failed ◄┘          └► bounced ◄┘     (failed/bounced ──► queued при ретрае)
+  ```
+
+  Переходы: `queued→{sending, failed}`; `sending→{sent, failed}`; `sent→{delivered, opened, bounced, failed}`; `delivered→{opened, bounced}`; `opened→{}` (финал); `failed→{queued}`; `bounced→{queued}`. `delivered`/`bounced` — только провайдер с вебхуками (AF-6); `opened` — пиксель. Методы: `value()`, `equals()`, `canTransitionTo()`, `isUnresolved()`, `all()`.
+
+- **`EmailLifecycleEvent`** (`Domain/EmailLifecycleEvent.php`) — `HistoryEventInterface`: `aggregate_type = 'email'`, `event_name = 'email_' . <status>` (`email_queued`/`email_sending`/`email_sent`/`email_failed`/`email_opened`). Payload без ПДн (статус/событие/ошибка, не email/ФИО).
+
+**Application:**
+
+- **`MailDispatcher`** (`Application/MailDispatcher.php`) — единая точка отправки: `send(event, EmailContext, Mailable): Uuid`. Создаёт `email_messages` (`queued`) + сериализует Mailable в колонку `mailable` (`base64(serialize)`) + пишет историю `email_queued` + `SendEmailJob::dispatch(id)`. Slug в записи — информативный (`EmailEvent::defaultSlug`).
+- **`EmailContext`** (`Application/EmailContext.php`) — контекст отправки: `recipient`, `festivalId?`, `orderType?`, `ticketTypeId?` (ключи привязки по событию), `source` (default `org_event`), `actorType` (default `system`), `aggregateType?`, `aggregateId?`, `meta[]`. vars/attachments не несёт — их уже несёт сам Mailable.
+- **`SendEmailJob`** (`Application/Job/SendEmailJob.php`, `ShouldQueue`) — асинхронная отправка: `queued → sending → sent / failed`. `tries = 3`, `backoff = [30, 120, 600]` сек. Mailable читается из БД по id → повтор = re-dispatch той же задачи. Идемпотентность: `sent`/`delivered`/`opened` повторно не шлёт. `failed()` (tries исчерпаны) → финальный `failed`. За флагом `mail_delivery.open_tracking` дописывает пиксель прочтения в HTML.
+- **`EmailDeliveryApplication`** (`Application/EmailDeliveryApplication.php`) — тонкий слой админ-чтения/управления: `getList(EmailMessageGetListQuery)` (через QueryBus, паттерн `Location`/`QrOrder`), `getItem(Uuid)`, `getByAggregate(type, id)`, `resend(Uuid, ?actorId)` (requeue + history `email_queued` action=resend + dispatch), `registerOpen(token)` (пиксель → `markOpened`, идемпотентно, только из `sent`/`delivered`).
+- **`MailDeliveryLog`** (`Application/Support/`) — канал логов `mail_delivery` (`config/logging.php`, `storage/logs/mail_delivery.log`), маскировка email.
+
+**Mailable:** `App\Mail\GenericTemplatedMail` (`slug` + `subject` + `vars[]`, трейт `RendersDbTemplate`) — для qr-канала уведомлений (S2S): не-заказные письма (регистрация/сброс пароля), инициированные на витрине qr.
+
+**Repository:** `EmailMessageRepositoryInterface` → `InMemoryMySqlEmailMessageRepository` (таблица `email_messages`). См. §Repository.
+
+**Источники писем (`source`):** `qr_pipeline` (выдача билетов в qr-пайплайне `QrOrder/Application/Step`), `qr_intake` (S2S-приём писем от витрины), `org_event` (старые org-события — по умолчанию).
+
+> **ОТЛОЖЕНО:** старые org-письма (отмена/изменение через `ProcessUserNotification*`) пока идут мимо диспетчера — будут подключены отдельно.
+
 ---
 
 ### Questionnaire
@@ -307,6 +369,10 @@ class Questionnaire extends AggregateRoot {
 - `auto_payment` — авто-одобрение заказа на `POST /api/v1/order/create` по валидному заголовку `AutoPayment` (`actorId` пишется `null`)
 - `qr` — действия по заказам, пришедшим от витрины qr.spaceofjoy.ru (S2S-канал, не человек; `actorId` пишется `null`)
 
+**Новые `aggregate_type` / `event_name` в `domain_history`:**
+- `aggregate_type = 'email'` (модуль EmailDelivery) — таймлайн письма: `email_queued` / `email_sending` / `email_sent` / `email_failed` / `email_opened`. `actor_type`: события писем от qr → `qr`, системные → `system`, повтор из админки → `user`.
+- Новые `event_name` для `aggregate_type = 'qr_order'` (шаги пайплайна выдачи, `'step_' . $step->name()`, payload `{status: ok|fail, error?}`): `step_create_tickets`, `step_send_order_email`, `step_push_to_baza`, `step_send_telegram`, `step_create_live_tickets`, `step_link_live`, `step_send_list_email`, `step_send_live_email`.
+
 ### QrOrder Module
 
 | DTO | Файл | Поля |
@@ -314,6 +380,16 @@ class Questionnaire extends AggregateRoot {
 | **QrOrderDto** | `QrOrder/Dto/` | `id` (Uuid, == id заказа qr/org), `email`, `status`, `festivalId` (?Uuid), `typeOrder` (?string: regular/friendly/list/live), `city`, `phone`, `totalPrice` (int, рубли), `payload` (array — весь контракт qr), `issuedAt`. Фабрики: `fromState($row)` (из строки БД), `fromQrContract($json)` (из контракта витрины) |
 | **QrOrderItemForListResponse** | `QrOrder/Responses/` | Облегчённая проекция для списка админки (snake_case, **без `payload`**): `id`, `email`, `status`, `festival_id`, `type_order`, `city`, `phone`, `total_price`, `issued_at`, `created_at` |
 | **QrOrderGetListResponse** | `QrOrder/Responses/` | `collection` (Collection<QrOrderItemForListResponse>) + `totalCount` (int) — страница + total для пагинации |
+
+### EmailDelivery Module
+
+| DTO | Файл | Поля |
+|-----|------|------|
+| **EmailMessageDto** | `EmailDelivery/Dto/` | `id` (Uuid), `event` (string, EmailEvent), `recipient`, `subject` (?), `template_slug` (?), `status` (string, EmailStatus), `attempts` (int), `error` (?), `source` (qr_pipeline/qr_intake/org_event), `aggregate_type` (?), `aggregate_id` (?), `festival_id` (?), `tracking_token`, `provider_message_id` (?), `meta` (array), `sent_at` (?Carbon), `opened_at` (?Carbon), `created_at`/`updated_at`. **Не несёт сериализованный Mailable** (он в отдельной колонке, тяжёлый) → DTO безопасен для admin-API. Фабрики: `queued($id, $event, EmailContext, $slug, $token)`, `fromState($row)` |
+| **EmailMessageItemForListResponse** | `EmailDelivery/Responses/` | Облегчённая проекция для списка «Доставка писем» (snake_case, **без `meta`/`mailable`**, но `error` включён — сразу видно «где застряло»): `id`, `event`, `recipient`, `subject`, `status`, `attempts`, `error`, `source`, `festival_id`, `aggregate_type`, `aggregate_id`, `sent_at`, `opened_at`, `created_at` |
+| **EmailMessageGetListResponse** | `EmailDelivery/Responses/` | `collection` (Collection<EmailMessageItemForListResponse>) + `totalCount` (int) — страница + total для пагинации |
+
+**Eloquent-модель:** `App\Models\EmailDelivery\EmailMessageModel` (таблица `email_messages`, миграция `2026_06_17_130000_create_email_messages_table`). Касты: `attempts` → integer, `meta` → array, `sent_at`/`opened_at` → datetime. Поля: `event`, `recipient`, `subject`, `template_slug`, `status`, `attempts`, `error`, `source`, `aggregate_type`, `aggregate_id`, `festival_id`, `tracking_token` (UNIQUE), `provider_message_id`, `meta` (json), `mailable` (longText, base64-serialize), `sent_at`, `opened_at`, timestamps. Индексы: `event`, `recipient`, `status`, `source`, `tracking_token` UNIQUE, `(status, created_at)`, `(aggregate_type, aggregate_id)`, `(festival_id, status)`.
 
 ---
 
@@ -533,6 +609,31 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `publish(Uuid, body, authorId, comment): bool` | Опубликовать `body` + снапшот в `template_versions` (транзакционно) |
 | `getVersions(Uuid): Collection` | Версии (новые сверху) |
 | `rollback(templateId, versionId, authorId): bool` | Откат `body` к версии (+ новый снапшот). `DomainException` если версии нет |
+
+### EmailMessageRepositoryInterface (Ф2)
+
+**Путь:** `Backend/src/EmailDelivery/Repositories/EmailMessageRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlEmailMessageRepository` (таблица `email_messages`)
+
+Трекинг отправки писем: текущий статус письма здесь, таймлайн событий — в `domain_history` (`aggregate_type='email'`). Модуль без AggregateRoot (как `Location`/`QrOrder`/`Template`). БД только здесь. Чтение списка — через QueryBus (`EmailMessageGetListQuery` + `EmailMessageGetListQueryHandler`, паттерн `Location`).
+
+| Метод | Описание |
+|-------|----------|
+| `create(EmailMessageDto, ?mailableBlob): bool` | Создать запись письма (`queued`) + сохранить `base64(serialize(Mailable))` для (повторной) отправки |
+| `findById(Uuid): ?EmailMessageDto` | Письмо по ID |
+| `findByToken(string): ?EmailMessageDto` | Письмо по токену пикселя прочтения (Ф3) |
+| `getMailableBlob(Uuid): ?string` | `base64(serialize(Mailable))` для отправки/повтора |
+| `markSending(Uuid): bool` | `status → sending`, `attempts++` |
+| `markSent(Uuid, ?providerMessageId): bool` | `status → sent`, `sent_at = now` |
+| `markFailed(Uuid, error): bool` | `status → failed`, `error = причина` |
+| `requeue(Uuid): bool` | `status → queued` (повтор из админки) |
+| `markOpened(Uuid): bool` | `status → opened`, `opened_at = now` (идемпотентно, только из `sent`/`delivered`, Ф3) |
+| `getList(Filters, Order, int page, int perPage): Collection` | Страница списка для админки (проекции `EmailMessageItemForListResponse`, без `meta`/`mailable`) |
+| `countList(Filters): int` | Общее число писем под фильтрами (для `totalNumber`) |
+| `getByAggregate(aggregateType, Uuid): Collection` | Письма агрегата (для экрана qr — «весь путь» заказа) |
+| `existsByExternalId(string): bool` | Идемпотентность S2S-приёма (Ф4): письмо с таким `external_id` уже принято |
+
+**Whitelist фильтров `getList`** (в `EmailMessageGetListQueryHandler`): `recipient` (LIKE), `status` (EQUAL), `event` (EQUAL), `source` (EQUAL), `festival_id` (EQUAL), `aggregate_id` (EQUAL). Сортировка через `Order` (`Order::none()` на кривом `orderBy`). Пагинация `forPage(page, perPage)` (`page` ≥ 1, `perPage` 1..100, иначе 20).
 
 ---
 

@@ -441,9 +441,9 @@
 - В `domain_history.actor_type` для всех событий qr-заказа пишется `qr` (S2S-канал, не человек)
 
 ### POST `/api/v1/qrOrder/create`
-**Middleware:** `auth:sanctum` + `abilities:qr:ingest` (S2S, токен сервис-аккаунта qr)
+**Middleware:** `qr.ingest` (S2S, заголовок `X-QR-Token`)
 
-**Описание:** приём заказа от витрины (API №1). Идемпотентно: повторный приём заказа с тем же `id` не создаёт дубль. Токен выпускается `php artisan qr:issue-token` и шлётся заголовком `Authorization: Bearer <token>`.
+**Описание:** приём заказа от витрины (API №1). Идемпотентно: повторный приём заказа с тем же `id` не создаёт дубль. Сервисный ключ qr предъявляется в заголовке `X-QR-Token` и сверяется со списком валидных ключей (`config services.qr_ingest.tokens`).
 
 **Request:** расширенный JSON-контракт qr (`order_id`, `user`, `price`, `order_data`, `guests[]`, см. `.claude/specs/admin-qr-orders-prompt.md §2`).
 
@@ -452,16 +452,9 @@
 
 ---
 
-### POST `/api/v1/qrOrder/changeStatus/{id}`
-**Middleware:** `auth:sanctum` + `abilities:qr:ingest` (S2S)
+### ~~POST `/api/v1/qrOrder/changeStatus/{id}`~~ (удалён)
 
-**Описание:** смена статуса принятого заказа (API №2). При переходе в `оплачен`/`paid` запускается выдача билетов (PDF/письма) — **один раз** (защита по `issued_at`: повторный «оплачен» не выдаёт билеты снова).
-
-**Request:** `{ "status": "string (required)" }`
-
-**Response 200:** `{ "success": true, "item": {...}, "message": "Статус обновлён" }`
-**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
-**Response 422:** `{ "success": false, "message": "Не передан status" }`
+**Удалён из `routes/qrOrder.php`.** Заказ от витрины приходит **уже в статусе «оплачен»**, и `qrOrder/create` сразу запускает выдачу билетов (PDF/письма) — **один раз** (защита по `issued_at`, повторный приём того же `id` не выдаёт билеты снова). Отдельной смены статуса (API №2) больше нет.
 
 ---
 
@@ -527,7 +520,7 @@
   "success": true,
   "history": [
     {
-      "event_name": "created|status_changed|issued",
+      "event_name": "created|status_changed|step_create_tickets|step_send_order_email|step_push_to_baza|step_send_telegram|step_create_live_tickets|step_link_live|step_send_list_email|step_send_live_email|issued",
       "aggregate_type": "qr_order",
       "payload": { "from": "...", "to": "..." },
       "actor_type": "qr",
@@ -536,6 +529,146 @@
   ]
 }
 ```
+- В таймлайн добавлены события шагов выдачи (`step_*`) — детальный путь заказа от приёма до выдачи (см. §3.4 «Система писем», `domain_history`)
+
+---
+
+### GET `/api/v1/qrOrder/getTicketPdf/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** ссылки на PDF билетов заказа (скачивание из админки). Файлы — `storage/tickets/{ticketId}.pdf`. Пустой список — PDF ещё генерируется или билетов нет.
+
+**Response 200:** `{ "success": true, "listUrl": ["https://.../storage/tickets/{ticketId}.pdf"] }`
+
+---
+
+### GET `/api/v1/qrOrder/getPipeline/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** весь путь заказа (Ф5 системы писем) в одном ответе для экрана «видеть весь путь»: приём → билеты (PDF) → письма (статусы доставки) → история шагов. Читается через `QrOrderPipelineReader` (БД только в репозиториях).
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "order": { "...полный заказ (как getItem)..." },
+  "tickets": [{ "ticket_id": "UUID", "pdf_url": "https://.../storage/tickets/{ticketId}.pdf" }],
+  "history": [{ "event_name": "...", "payload": {...}, "actor_type": "qr", "occurred_at": "ISO8601" }],
+  "emails": [{ "id": "UUID", "event": "...", "recipient": "...", "status": "...", "...": "..." }]
+}
+```
+**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
+
+---
+
+## 3.4. Доставка писем по шаблонам
+
+Префикс: **`/api/v1/emailDelivery`** (+ публичный пиксель `/api/v1/mail/open/...` + S2S `/api/v1/emailNotification/send`)
+
+Контроль пути письма «дошло / где застряло» (модуль `Backend/src/EmailDelivery/` — пассивная сущность, как `QrOrder`/`Location`, БД только в репозитории). Спека: `.claude/specs/email-delivery-system.md`.
+
+- **Статусы письма** (`EmailStatus`): `queued` → `sending` → `sent` (передано на SMTP) → `[delivered → opened]` / `failed` (+ текст ошибки = «где застряло»). `bounced` — отскок. Из `failed`/`bounced` — повтор в `queued`.
+- `delivered`/`bounced` требуют транзакционного провайдера с вебхуками (**AF-6**, ещё не подключён); `opened` ставится пикселем прочтения (Ф3).
+- **`source`** письма ∈ `qr_pipeline` (выдача билетов qr) / `qr_intake` (S2S-приём от витрины) / `org_event` (события org).
+- **Событие письма** (`EmailEvent`, 15 кодов) → дефолтный slug шаблона: `order_created`→`orderToCreate`, `order_paid`→`orderToPaid`, `order_paid_friendly`→`TypeTicketMailOrderToPaidFriendly1`, `order_paid_live`→`orderToPaidLiveTicket`, `order_cancel`→`orderToCancel`, `order_changed`→`orderToChangeTicket`, `order_difficulties`→`orderToDifficultiesArose`, `order_live_issued`→`orderToLiveTicketIssued`, `list_approved`→`orderListApproved`, `list_cancel`→`orderListCancel`, `list_difficulties`→`orderListDifficultiesArose`, `user_registered`→`newUser`, `password_reset`→`passwordResets`, `invite`→`invate`, `questionnaire`→`questionnaire`.
+- Slug выбирается привязкой шаблона по событию (`templateBinding`, см. §8.3) с fallback на дефолтный slug события.
+- В `domain_history` для писем — `aggregate_type='email'`, события `email_queued`/`email_sending`/`email_sent`/`email_failed`/`email_opened`. Письма от qr пишутся `actor_type=qr`, системные — `system`.
+
+### POST `/api/v1/emailDelivery/getList`
+**Middleware:** `auth:api` + `admin` (read-only, содержит ПДн)
+
+**Описание:** список писем для админки. Фильтр — **whitelist** (только перечисленные поля попадают в `WHERE`).
+
+**Request (фильтр + пагинация):**
+```json
+{
+  "filter": {
+    "recipient": "string? (LIKE)",
+    "status": "string? (EQUAL)",
+    "event": "string? (EQUAL)",
+    "source": "string? (EQUAL: qr_pipeline/qr_intake/org_event)",
+    "festival_id": "UUID? (EQUAL)",
+    "aggregate_id": "UUID? (EQUAL)"
+  },
+  "orderBy": { "created_at": "asc|desc" },
+  "page": 1,
+  "perPage": 20
+}
+```
+- `page` зажат снизу к 1; `perPage` — диапазон 1..100, иначе fallback на 20
+- `orderBy.*` допускает только `asc`/`desc`; кривое значение → `Order::none()`
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "list": [
+    {
+      "id": "UUID", "event": "order_paid", "recipient": "...",
+      "subject": "...", "status": "sent", "attempts": 1, "error": null,
+      "source": "qr_pipeline", "festival_id": "UUID",
+      "aggregate_type": "qr_order", "aggregate_id": "UUID",
+      "sent_at": "ISO8601|null", "opened_at": "ISO8601|null", "created_at": "ISO8601"
+    }
+  ],
+  "totalNumber": { "totalCount": 42 }
+}
+```
+- Проекция списка — `EmailMessageItemForListResponse` (snake_case, **без `meta`/`mailable`** — тяжёлые; `error` включён намеренно, чтобы сразу видеть «где застряло»)
+
+---
+
+### GET `/api/v1/emailDelivery/getItem/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response 200:** `{ "success": true, "item": {...}, "history": [ { "event_name": "email_sent", "payload": {...}, "actor_type": "qr|system", "occurred_at": "ISO8601" } ] }`
+**Response 404:** `{ "success": false, "message": "Письмо не найдено" }`
+
+---
+
+### POST `/api/v1/emailDelivery/resend/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** повторная отправка письма (re-dispatch `SendEmailJob` по `id`, Mailable читается из колонки `mailable`). Переводит письмо обратно в `queued`.
+
+**Response 200:** `{ "success": true, "message": "Письмо поставлено на повторную отправку" }`
+**Response 404:** `{ "success": false, "message": "Письмо не найдено" }`
+
+---
+
+### GET `/api/v1/mail/open/{token}.gif`
+**Middleware:** публичный + `throttle:120,1`
+
+**Описание:** пиксель прочтения письма (Ф3). Помечает письмо `opened` (идемпотентно, только из `sent`/`delivered`) и отдаёт прозрачный 1×1 GIF. `token` — случайный (`tracking_token`, ≠ `id`, паттерн `[A-Za-z0-9]+`) — заказы не перебрать. За флагом `config('mail_delivery.open_tracking')` (env `MAIL_OPEN_TRACKING`, default `false` — факт прочтения это ПДн, 152-ФЗ): при выключенном флаге `<img>`-пиксель в письмо не дописывается.
+
+**Response 200:** прозрачный 1×1 GIF (`Content-Type: image/gif`, `Cache-Control: no-store`)
+
+---
+
+### POST `/api/v1/emailNotification/send`
+**Middleware:** `qr.ingest` (S2S, заголовок `X-QR-Token`)
+
+**Описание:** S2S-приём писем от витрины qr (Ф4) — для не-заказных писем (регистрация, сброс пароля и т.п.), инициированных на витрине. Slug выбирается привязкой по событию (см. §8.3) с fallback на дефолтный slug события; письмо отслеживается через `MailDispatcher` (`source=qr_intake`). Идемпотентность по `external_id`.
+
+**Request:**
+```json
+{
+  "event": "string (required, EmailEvent::isValid)",
+  "email": "string (required, email получателя)",
+  "vars": { "...": "..." },
+  "festival_id": "UUID?",
+  "order_type": "string? (regular/friendly/list/live)",
+  "ticket_type_id": "UUID?",
+  "subject": "string?",
+  "aggregate_id": "UUID?",
+  "external_id": "string? (ключ идемпотентности)"
+}
+```
+
+**Response 200:** `{ "success": true, "email_id": "UUID", "message": "Письмо принято" }`
+**Response 200 (повтор по `external_id`):** `{ "success": true, "message": "Уже принято ранее (идемпотентно)" }`
+**Response 422:** `{ "success": false, "message": "Неизвестное событие письма" }` / `{ "success": false, "message": "Не передан email получателя" }`
+**Response 401:** без/с невалидным `X-QR-Token` (middleware `qr.ingest`)
 
 ---
 
@@ -829,6 +962,47 @@
 
 ---
 
+## 8.3. Привязки шаблонов (AF-3, Часть B)
+
+Префикс: **`/api/v1/templateBinding`** | **Middleware всех роутов:** `auth:api` + `admin`
+
+Маппинг `(event, festival_id, order_type, ticket_type_id)` → `email_template_id`/`pdf_template_id` + `is_default`. `NULL`-поля = wildcard. Резолвер выбирает самую специфичную привязку (`event` > `ticket_type` > `order_type` > `festival`); нет совпадения → `is_default`; нет дефолта → старый slug (обратная совместимость). Применяется при выдаче билетов (`InMemoryMySqlTicketsRepository::getTicket`) и при выборе slug в системе писем (см. §3.4). Спека: `.claude/specs/template-aggregate-and-bindings.md`.
+
+| Метод | Маршрут | Описание |
+|-------|---------|----------|
+| POST | `/getList` | Список всех привязок |
+| GET | `/events` | Каталог событий писем для селектора: `{ success, list: [{ value, label }] }` (15 событий из `EmailEvent`) |
+| GET | `/getItem/{id}` | Одна привязка (404 если нет) |
+| POST | `/create` | Создать (UUID в `data.id` опционально) |
+| POST | `/edit/{id}` | Редактировать |
+| DELETE | `/delete/{id}` | Удалить |
+
+**Тело привязки (`data` в create/edit):**
+```json
+{
+  "id": "UUID?",
+  "event": "string? (nullable=wildcard; валидируется EmailEvent::isValid)",
+  "festival_id": "UUID? (nullable=wildcard)",
+  "order_type": "string? (nullable=wildcard: regular/friendly/list/live)",
+  "ticket_type_id": "UUID? (nullable=wildcard)",
+  "email_template_id": "UUID?",
+  "pdf_template_id": "UUID?",
+  "is_default": "bool (default false)",
+  "active": "bool (default true)"
+}
+```
+
+**Валидация (422):**
+- `event` (если передан) — должен быть валидным событием → `{ "success": false, "message": "Неизвестное событие письма: ..." }`
+- Нужен хотя бы один шаблон (`email_template_id` или `pdf_template_id`) → `«Укажите хотя бы один шаблон (письма или PDF)»`
+- В слот письма — только email-шаблон, в слот PDF — только pdf-шаблон
+- Не больше одной активной дефолт-привязки → `«Активная привязка по умолчанию уже существует»`
+
+**Response 200 (create/edit):** `{ "success": true, "item": {...}, "message": "Привязка создана|сохранена" }`
+**Response 404 (edit/getItem):** `{ "success": false, "message": "..." }`
+
+---
+
 ## 9. Способы оплаты
 
 Префикс: **`/api/v1/typesOfPayment`**
@@ -883,8 +1057,7 @@
 |------------|-------|----------|
 | **CORS** | global | Проверяет Origin против белого списка |
 | **Authenticate** | `auth:api` | JWT через `php-open-source-saver/jwt-auth` |
-| **Sanctum** | `auth:sanctum` | Токен сервис-аккаунта (S2S-канал qr→org) |
-| **Abilities** | `abilities:qr:ingest` | Scope токена Sanctum для приёма qr-заказов |
+| **QrIngestAuth** | `qr.ingest` | S2S-канал qr→org: заголовок `X-QR-Token` сверяется со списком валидных ключей (`config services.qr_ingest.tokens`, env `QR_INGEST_TOKENS`). Закрывает `qrOrder/create` и `emailNotification/send`. Без/невалидный токен → 401 |
 | **IsAdmin** | `admin` | Проверка `is_admin = true` или `role = 'admin'` |
 | **CheckRole** | `role:role1,role2` | Проверка роли пользователя |
 | **Bot** | `bot` | Заголовок `auth-token` == `PCf4yeeM8prVGee3zbArQGQP2eGpPHsV` |
@@ -894,9 +1067,9 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview) |
+| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
@@ -904,8 +1077,8 @@
 | **role: admin,manager** | order/getListsList |
 | **role: seller,admin,pusher,manager** | order/toChangeStatus (для list-статусов внутри проверка admin/manager) |
 | **bot** | promoCode/savePromoCodeForBot |
-| **sanctum + abilities:qr:ingest** | qrOrder/create, qrOrder/changeStatus (S2S от витрины qr) |
-| **admin** (qr) | qrOrder/getList, qrOrder/getItem, qrOrder/getHistory |
+| **qr.ingest** (S2S, `X-QR-Token`) | qrOrder/create, emailNotification/send (от витрины qr) |
+| **admin** (qr) | qrOrder/getList, qrOrder/getStats, qrOrder/getItem, qrOrder/getHistory, qrOrder/getTicketPdf, qrOrder/getPipeline |
 
 ---
 

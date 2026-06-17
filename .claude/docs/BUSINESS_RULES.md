@@ -84,6 +84,31 @@
 - В историю всех событий qr-заказа пишется `actor_type = qr`, `actor_id = null`.
 - Просмотр (`getList`/`getItem`/`getHistory`) — **только admin** (JWT), read-only (содержит ПДн). Из админки org заказы НЕ редактируются.
 
+#### Пайплайн выдачи qr-заказа в истории (шаги)
+
+При выдаче билетов qr-заказ проходит через цепочку шагов, каждый из которых пишет событие в `domain_history` (`aggregate_type = qr_order`, `actor_type = qr`, `event_name = step_<имя_шага>` со статусом `ok`/`fail` + текст ошибки в `payload`):
+
+| Событие (`event_name`) | Шаг | Что делает |
+|------------------------|-----|------------|
+| `step_create_tickets` | `CreateTicketsStep` | Создаёт билеты обычного заказа |
+| `step_create_live_tickets` | `CreateLiveTicketsStep` | Создаёт живые билеты |
+| `step_link_live` | `LinkLiveStep` | Привязывает номера живых билетов |
+| `step_push_to_baza` | `PushToBazaStep` | Синхронизация билетов в Baza |
+| `step_send_order_email` | `SendOrderEmailStep` | Письмо с PDF-билетами получателю |
+| `step_send_list_email` | `SendListEmailStep` | Письмо по заказу-списку |
+| `step_send_live_email` | `SendLiveEmailStep` | Письмо по живому билету |
+| `step_send_telegram` | `SendTelegramStep` | Уведомление в Telegram |
+
+Полный путь заказа (приём → билеты(PDF) → письма → шаги) отдаётся одним эндпоинтом `GET /api/v1/qrOrder/getPipeline/{id}` (admin). PDF-ссылки заказа — `GET /api/v1/qrOrder/getTicketPdf/{id}` (admin).
+
+#### qr-канал писем (S2S, не-заказные письма)
+
+- Витрина qr может попросить org **отправить письмо**, не связанное с заказом (регистрация, сброс пароля и т.п.) — `POST /api/v1/emailNotification/send` (S2S-канал, заголовок `X-QR-Token`, middleware `qr.ingest`).
+- Контракт: `{ event, email, vars{}, festival_id?, order_type?, ticket_type_id?, subject?, aggregate_id?, external_id? }`.
+- `event` — код из каталога событий писем (`EmailEvent`, см. §13); неизвестное событие или пустой `email` → `422`, без токена → `401`.
+- **Идемпотентность по `external_id`** — повтор того же `external_id` не создаёт дубль письма.
+- Письмо отправляется через `GenericTemplatedMail` (рендер slug по событию + `vars`) и **отслеживается** диспетчером (см. §13). В истории — `actor_type = qr`, `source = qr_intake`.
+
 ---
 
 ## 2. Промокоды
@@ -440,6 +465,70 @@
 
 ---
 
+## 13. События писем и контроль доставки
+
+### Каталог событий писем (`EmailEvent`)
+
+Единый справочник «какое письмо за каким событием». Каждое событие → дефолтный slug шаблона (= текущий зашитый в Mailable, полная обратная совместимость) + человекочитаемая метка. Источник правды — `Backend/src/EmailDelivery/Domain/EmailEvent.php`. Каталог для селектора в админке — `GET /api/v1/templateBinding/events` (admin).
+
+| Событие (`event`) | Дефолтный slug | Метка |
+|-------------------|----------------|-------|
+| `order_created` | `orderToCreate` | Заказ создан |
+| `order_paid` | `orderToPaid` | Заказ оплачен |
+| `order_paid_friendly` | `TypeTicketMailOrderToPaidFriendly1` | Заказ оплачен (Friendly) |
+| `order_paid_live` | `orderToPaidLiveTicket` | Живой билет оплачен |
+| `order_cancel` | `orderToCancel` | Заказ отменён |
+| `order_changed` | `orderToChangeTicket` | Данные заказа изменены |
+| `order_difficulties` | `orderToDifficultiesArose` | Трудности с заказом |
+| `order_live_issued` | `orderToLiveTicketIssued` | Живой билет выдан |
+| `list_approved` | `orderListApproved` | Список одобрен |
+| `list_cancel` | `orderListCancel` | Список отменён |
+| `list_difficulties` | `orderListDifficultiesArose` | Трудности со списком |
+| `user_registered` | `newUser` | Регистрация пользователя |
+| `password_reset` | `passwordResets` | Сброс пароля |
+| `invite` | `invate` | Приглашение |
+| `questionnaire` | `questionnaire` | Анкета гостя |
+
+### Привязка шаблона по событию
+
+- Привязки шаблонов (`template_bindings`, см. DOMAIN/API §8.2 templateBinding) расширены осью **`event`** (nullable = «любое событие», wildcard). `create`/`edit` принимают поле `event` (валидируется `EmailEvent::isValid`).
+- Резолвер выбирает самую специфичную привязку по 4 осям: **`event` > `ticket_type` > `order_type` > `festival`** (вес `event` = 8 — сильнейший дискриминатор). Нет совпадения → привязка-дефолт на `kind` (`email`/`pdf`); нет дефолта → старый slug (обратная совместимость).
+- `event = null` в запросе → подходят только привязки с `event = null` (поведение PDF/выдачи **не меняется**).
+
+### Машина статусов письма (`EmailStatus`)
+
+Контроль полного пути письма «дошло / где застряло». Текущий статус хранится в `email_messages.status`, таймлайн — в `domain_history` (`aggregate_type = email`, `event_name = email_<статус>`).
+
+```
+queued ──→ sending ──→ sent ──→ delivered ──→ opened
+   │          │          │          │
+   └─ failed ◄┘          └─ bounced ◄┘     (failed / bounced ──→ queued при ретрае)
+```
+
+| Статус | Что значит |
+|--------|------------|
+| **queued** | Письмо поставлено в очередь (`MailDispatcher::send`) |
+| **sending** | Задача `SendEmailJob` начала отправку |
+| **sent** | Передано на SMTP-сервер (**НЕ** «доставлено в ящик») |
+| **delivered** | Доставлено почтовому серверу получателя — **только провайдер с вебхуками** (AF-6) |
+| **opened** | Сработал пиксель прочтения — письмо точно дошло и открыто |
+| **failed** | Сбой до/во время передачи на SMTP; причина = текст в `error` («где застряло») |
+| **bounced** | Отскок — **только провайдер с вебхуками** (AF-6) |
+
+- Отправка асинхронная: `SendEmailJob` (`tries = 3`, `backoff = [30, 120, 600]` сек). Финальный сбой → `failed()` фиксирует `failed`. Сам Mailable читается из БД (`email_messages.mailable`, base64-serialize) → **повторная отправка** = повторный dispatch той же задачи по `id`.
+- **Повтор из админки**: `POST /api/v1/emailDelivery/resend/{id}` (admin) — `failed`/`bounced` → `queued` (retry). Просмотр: `getList` (фильтр-whitelist `recipient`/`status`/`event`/`source`/`festival_id`/`aggregate_id` + пагинация), `getItem/{id}` (письмо + таймлайн `history`) — всё admin-only (содержит ПДн).
+- `source` письма ∈ `qr_pipeline` (выдача qr-заказа) / `qr_intake` (S2S-приём от витрины) / `org_event` (внутренние события org). В истории `actor_type = qr` для qr-источников, `system` — для системных.
+
+### Пиксель прочтения и 152-ФЗ
+
+- Трекинг прочтения — прозрачный 1×1 GIF `GET /api/v1/mail/open/{token}.gif` (**публичный**, `throttle:120,1`). Загрузка картинки в почтовом клиенте → статус `opened` (идемпотентно, только из `sent`/`delivered`). Токен случайный (≠ `id` заказа) — заказы по нему не перебрать.
+- **По умолчанию ВЫКЛЮЧЕН** за флагом `config('mail_delivery.open_tracking')` (env `MAIL_OPEN_TRACKING`, default `false`). Факт прочтения письма — обработка ПДн, поэтому включается только после ревью security-engineer (152-ФЗ).
+- `delivered`/`bounced` требуют транзакционного email-провайдера с вебхуками (фича **AF-6**) — текущий «слепой SMTP» даёт статус только до `sent`. Пиксель — единственный текущий способ подтвердить «дошло».
+
+> **ОТЛОЖЕНО:** старые org-письма (отмена/изменение через `ProcessUserNotification*`) пока идут **мимо** диспетчера (без трекинга) — будут подключены к `MailDispatcher` отдельно.
+
+---
+
 ## История изменений статусов
 
 | Дата | Что изменено | Файл |
@@ -448,6 +537,7 @@
 | 2026-04-12 | Добавлен `PAID_FOR_LIVE` в описание правил смены статуса | `.qwen/docs/BUSINESS_RULES.md` |
 | 2026-05-04 | Добавлены статусы списков: `NEW_LIST`, `APPROVE_LIST`, `CANCEL_LIST`, `DIFFICULTIES_AROSE_LIST` + матрица переходов. Роль `curator`. Сущность `Location`. | `Shared/Domain/ValueObject/Status.php`, `AccountRoleHelper.php`, миграции |
 | 2026-06-14 | Добавлен канал приёма qr-заказов (таблица `qr_orders`, `actor_type = qr`, выдача билетов при `оплачен`). | `Backend/src/QrOrder/`, `History/Domain/ActorType.php` |
+| 2026-06-17 | Система отправки писем по шаблонам: каталог событий `EmailEvent`, привязка шаблона по событию (ось `event` в `template_bindings`), машина статусов `EmailStatus` + контроль доставки (`email_messages`, история `aggregate_type=email`), qr-канал писем (S2S), пиксель прочтения за флагом (152-ФЗ), шаги пайплайна qr (`step_*` в истории). | `Backend/src/EmailDelivery/`, `template_bindings.event`, миграции `2026_06_17_*` |
 
 ---
 
