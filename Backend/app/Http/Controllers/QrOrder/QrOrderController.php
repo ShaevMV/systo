@@ -25,8 +25,9 @@ use Tickets\QrOrder\Responses\QrOrderItemForListResponse;
  * API №1 — создание заказа: принимает расширенный JSON-контракт и сохраняет его в qr_orders
  * (payload as-is + проекция для фильтров). id заказа qr == id заказа org.
  *
- * Аутентификация канала: create/changeStatus закрыты Sanctum-токеном со scope qr:ingest
- * (auth:sanctum + abilities:qr:ingest, см. routes/qrOrder.php). getItem — JWT + admin (ПДн).
+ * Аутентификация канала: create закрыт сервисным ключом qr (заголовок X-QR-Token,
+ * middleware qr.ingest, см. routes/qrOrder.php). Чтение (getList/getItem/getHistory/getStats) —
+ * JWT + admin (содержит ПДн).
  */
 class QrOrderController extends Controller
 {
@@ -49,9 +50,12 @@ class QrOrderController extends Controller
                 'message' => $exception->getMessage(),
             ], 422);
         } catch (Throwable $exception) {
+            // Детали ошибки — только в лог/Sentry, наружу не отдаём (утечка стека/SQL).
+            report($exception);
+
             return response()->json([
                 'success' => false,
-                'message' => $exception->getMessage(),
+                'message' => 'Внутренняя ошибка при приёме заказа',
             ], 500);
         }
     }

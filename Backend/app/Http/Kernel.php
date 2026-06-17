@@ -73,5 +73,7 @@ class Kernel extends HttpKernel
         'bot' => Bot::class,
         // Проверка scope (ability) Sanctum-токена — для S2S-канала qr→org.
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
+        // Аутентификация канала приёма заказов от витрины qr (заголовок X-QR-Token).
+        'qr.ingest' => \App\Http\Middleware\QrIngestAuth::class,
     ];
 }

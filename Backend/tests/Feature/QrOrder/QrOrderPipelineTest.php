@@ -9,11 +9,9 @@ use App\Mail\OrderToLiveTicketIssued;
 use App\Mail\OrderToPaid;
 use App\Mail\OrderToPaidFriendly;
 use App\Models\Tickets\TicketModel;
-use App\Models\User;
 use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
-use Laravel\Sanctum\Sanctum;
 use RuntimeException;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
@@ -32,12 +30,15 @@ use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
  */
 class QrOrderPipelineTest extends TestCase
 {
+    use WithQrIngestToken;
+
     private const ORDER_ID = '44444444-4444-4444-4444-444444444444';
 
     protected function setUp(): void
     {
         parent::setUp();
-        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+        // S2S-канал закрыт сервисным ключом qr (X-QR-Token) — настраиваем валидный ключ.
+        $this->configureQrIngestToken();
     }
 
     private function persistOrder(): void
@@ -57,7 +58,7 @@ class QrOrderPipelineTest extends TestCase
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertOk();
     }
 
     public function test_orchestrator_issues_tickets_and_sends_one_email(): void
@@ -115,7 +116,7 @@ class QrOrderPipelineTest extends TestCase
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertOk();
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
@@ -158,7 +159,7 @@ class QrOrderPipelineTest extends TestCase
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertOk();
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
@@ -195,7 +196,7 @@ class QrOrderPipelineTest extends TestCase
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertOk();
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
@@ -226,7 +227,7 @@ class QrOrderPipelineTest extends TestCase
                  'type_ticket' => ['id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE, 'title' => 'Живой', 'options' => []]],
             ],
         ];
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertOk();
 
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 

@@ -37,4 +37,15 @@ return [
         'token' => env('AUTO_PAYMENT_TOKEN'),
     ],
 
+    // Сервисные ключи S2S-канала приёма заказов от витрины qr.spaceofjoy.ru
+    // (POST /api/v1/qrOrder/create, заголовок "X-QR-Token").
+    // Список через запятую — на время ротации можно держать старый + новый ключ одновременно.
+    // Пустой список = канал закрыт (безопасный дефолт): без валидного ключа доступа нет.
+    'qr_ingest' => [
+        'tokens' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('QR_INGEST_TOKENS', '')),
+        ))),
+    ],
+
 ];

@@ -270,6 +270,32 @@ jobs:
             echo "✓ JWT_SECRET уже есть"
           fi
 
+      # QR_INGEST_TOKENS — сервисный ключ канала приёма заказов от витрины qr
+      # (заголовок X-QR-Token, middleware qr.ingest). Если пустой — канал ЗАКРЫТ
+      # (401 на qrOrder/create, безопасный дефолт). Генерируем случайный 64-символьный
+      # hex и пишем в Backend/.env. Достать ключ (для qr-стороны / проверки боем):
+      #   ssh deploy@<staging> 'grep "^QR_INGEST_TOKENS=" /var/www/systo/Backend/.env'
+      # ВАЖНО (как с JWT_SECRET): env_file читается при СОЗДАНИИ контейнера → если
+      # сгенерили после up, нужен force-recreate php-staging + worker-staging.
+      - name: Generate QR_INGEST_TOKENS for Backend (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if ! grep -qE "^QR_INGEST_TOKENS=.+" Backend/.env; then
+            echo "QR_INGEST_TOKENS пуст — генерирую…"
+            TOKEN="$(openssl rand -hex 32)"
+            if grep -qE "^QR_INGEST_TOKENS=" Backend/.env; then
+              sed -i "s|^QR_INGEST_TOKENS=.*|QR_INGEST_TOKENS=${TOKEN}|" Backend/.env
+            else
+              echo "QR_INGEST_TOKENS=${TOKEN}" >> Backend/.env
+            fi
+            if docker compose -f docker-compose.staging.yml --env-file .env.staging ps php-staging | grep -q "Up"; then
+              echo "Контейнеры уже запущены — пересоздаю php-staging и worker-staging чтобы подхватить QR_INGEST_TOKENS…"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --force-recreate --no-deps php-staging worker-staging
+            fi
+          else
+            echo "✓ QR_INGEST_TOKENS уже есть"
+          fi
+
       # NODE_ENV=production в compose заставляет `npm ci` пропустить devDependencies,
       # а vue-cli-service лежит как раз в devDependencies → нужен --include=dev для сборки.
       - name: Build frontend (npm ci + npm run build)
