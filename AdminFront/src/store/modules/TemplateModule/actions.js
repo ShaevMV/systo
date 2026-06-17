@@ -111,4 +111,11 @@ export const preview = (context, payload) => {
         .then((r) => ({ type: 'email', html: r.data.html }));
 };
 
+/** Загрузка картинки (фон/иллюстрация) → возвращает { success, url } с абсолютным URL. */
+export const uploadImage = (context, payload) => {
+    const fd = new FormData();
+    fd.append('image', payload.file);
+    return axios.post(API + '/uploadImage', fd, { headers: { 'Content-Type': 'multipart/form-data' } }).then((r) => r.data);
+};
+
 export const clearError = (context) => context.commit('setError', []);

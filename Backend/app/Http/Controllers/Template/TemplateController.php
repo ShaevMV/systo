@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
@@ -29,6 +30,25 @@ use Tickets\Template\Dto\TemplateVersionDto;
  */
 class TemplateController extends Controller
 {
+    /**
+     * Загрузка картинки для шаблона (например фон PDF-билета). Файл кладём в public storage
+     * (storage/app/public/template-images, отдаётся через symlink public/storage), возвращаем
+     * абсолютный URL — админ вставляет его в <img src="..."> шаблона (фон/иллюстрации).
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,jpg,png,gif,webp|max:5120',
+        ]);
+
+        $path = $request->file('image')->store('template-images', 'public');
+
+        return response()->json([
+            'success' => true,
+            'url' => asset('storage/'.$path),
+        ]);
+    }
+
     public function getList(
         Request $request,
         TemplateApplication $application,
