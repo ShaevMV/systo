@@ -12,8 +12,11 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Mail;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 
 class ProcessPasswordResets implements ShouldQueue, DomainEvent
 {
@@ -45,6 +48,14 @@ class ProcessPasswordResets implements ShouldQueue, DomainEvent
             'token' => $token
         ]);
 
-        Mail::to($this->user)->send(new UserPasswordResets($activationLink));
+        app(MailDispatcher::class)->send(
+            EmailEvent::PASSWORD_RESET,
+            new EmailContext(
+                recipient: $this->user->email,
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+            ),
+            new UserPasswordResets($activationLink),
+        );
     }
 }
