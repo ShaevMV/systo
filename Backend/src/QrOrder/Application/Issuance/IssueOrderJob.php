@@ -78,12 +78,25 @@ final class IssueOrderJob implements ShouldQueue
             try {
                 $carry = $step->handle($order, $carry);
                 $log->info('step.ok', ['order_id' => $this->orderId, 'step' => $step->name()]);
+                // Персист шага в историю заказа (Ф5: «видеть весь путь» в админке).
+                $history->save(new SaveHistoryDto(
+                    $this->orderId,
+                    new QrOrderHistoryEvent('step_' . $step->name(), ['status' => 'ok']),
+                    null,
+                    ActorType::QR,
+                ));
             } catch (Throwable $e) {
                 $log->error('step.fail', [
                     'order_id' => $this->orderId,
                     'step' => $step->name(),
                     'error' => $e->getMessage(),
                 ]);
+                $history->save(new SaveHistoryDto(
+                    $this->orderId,
+                    new QrOrderHistoryEvent('step_' . $step->name(), ['status' => 'fail', 'error' => $e->getMessage()]),
+                    null,
+                    ActorType::QR,
+                ));
 
                 throw $e;
             }

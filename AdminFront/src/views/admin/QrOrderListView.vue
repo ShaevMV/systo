@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -13,6 +14,7 @@ import Timeline from 'primevue/timeline';
 import Card from 'primevue/card';
 
 const store = useStore();
+const router = useRouter();
 
 const typeOrderOptions = [
     { label: 'Обычный', value: 'regular' },
@@ -36,6 +38,9 @@ const detailsVisible = ref(false);
 const list = computed(() => store.getters['appQrOrder/getList']);
 const item = computed(() => store.getters['appQrOrder/getItem']);
 const history = computed(() => store.getters['appQrOrder/getHistory']);
+const tickets = computed(() => store.getters['appQrOrder/getTickets'] || []);
+const emails = computed(() => store.getters['appQrOrder/getEmails'] || []);
+const downloadingTickets = ref(false);
 const pagination = computed(() => store.getters['appQrOrder/getPagination']);
 const isLoading = computed(() => store.getters['appQrOrder/getIsLoading']);
 
@@ -82,9 +87,57 @@ function resetFilter() {
 
 function openDetails(row) {
     detailsVisible.value = true;
-    store.dispatch('appQrOrder/loadItem', { id: row.id });
-    store.dispatch('appQrOrder/loadHistory', { id: row.id });
+    // Один запрос: заказ + история(шаги) + билеты(PDF) + письма(статусы доставки).
+    store.dispatch('appQrOrder/loadPipeline', { id: row.id });
 }
+
+async function downloadTickets() {
+    if (!item.value?.id) return;
+    downloadingTickets.value = true;
+    try {
+        const urls = await store.dispatch('appQrOrder/downloadTickets', { id: item.value.id });
+        if (!urls.length) {
+            window.alert('Билеты ещё не готовы (PDF генерируется) или отсутствуют');
+            return;
+        }
+        urls.forEach((u) => window.open(u, '_blank'));
+    } finally {
+        downloadingTickets.value = false;
+    }
+}
+
+function goToEmailDelivery() {
+    router.push('/admin/email-delivery');
+}
+
+const STEP_LABELS = {
+    step_create_tickets: 'Создание билетов',
+    step_create_live_tickets: 'Создание живых билетов',
+    step_send_order_email: 'Письмо с билетами',
+    step_send_list_email: 'Письмо (список)',
+    step_send_live_email: 'Письмо (живой билет)',
+    step_push_to_baza: 'Запись в Baza',
+    step_link_live: 'Связка живого билета',
+    step_send_telegram: 'Уведомление Telegram'
+};
+
+const EMAIL_STATUS = {
+    queued: { label: 'В очереди', severity: 'secondary' },
+    sending: { label: 'Отправляется', severity: 'info' },
+    sent: { label: 'Отправлено на SMTP', severity: 'info' },
+    delivered: { label: 'Доставлено', severity: 'success' },
+    opened: { label: 'Прочитано', severity: 'success' },
+    failed: { label: 'Ошибка', severity: 'danger' },
+    bounced: { label: 'Отскок', severity: 'danger' }
+};
+const EMAIL_EVENT_LABELS = {
+    order_paid: 'Оплата',
+    order_paid_friendly: 'Оплата (Friendly)',
+    order_paid_live: 'Живой билет',
+    list_approved: 'Список одобрен'
+};
+const emailStatusMeta = (s) => EMAIL_STATUS[s] || { label: s || '—', severity: 'secondary' };
+const emailEventLabel = (e) => EMAIL_EVENT_LABELS[e] || e || '—';
 
 // Резолв имени фестиваля по id из загруженного списка.
 function festivalName(id) {
@@ -106,7 +159,7 @@ function statusSeverity(status) {
 }
 
 function historyEventLabel(name) {
-    return { created: 'Создан', status_changed: 'Смена статуса', issued: 'Билеты выданы' }[name] || name;
+    return { created: 'Создан', status_changed: 'Смена статуса', issued: 'Билеты выданы', ...STEP_LABELS }[name] || name;
 }
 
 function formatPrice(value) {
@@ -275,8 +328,36 @@ onMounted(() => {
                     </Column>
                 </DataTable>
 
-                <!-- История -->
-                <h3 class="qr-section-title">История</h3>
+                <!-- Билеты + скачивание PDF -->
+                <div class="qr-section-row">
+                    <h3 class="qr-section-title">Билеты ({{ tickets.length }})</h3>
+                    <Button label="Скачать билеты (PDF)" icon="pi pi-download" size="small" :loading="downloadingTickets" :disabled="!tickets.length" @click="downloadTickets" />
+                </div>
+                <ul v-if="tickets.length" class="qr-tickets">
+                    <li v-for="t in tickets" :key="t.ticket_id">
+                        <a :href="t.pdf_url" target="_blank" rel="noopener">PDF · {{ String(t.ticket_id).slice(0, 8) }}…</a>
+                    </li>
+                </ul>
+                <div v-else class="qr-empty">Билеты ещё не созданы</div>
+
+                <!-- Письма (статусы доставки) -->
+                <div class="qr-section-row">
+                    <h3 class="qr-section-title">Письма ({{ emails.length }})</h3>
+                    <Button label="Открыть в «Доставке писем»" icon="pi pi-send" size="small" text @click="goToEmailDelivery" />
+                </div>
+                <DataTable :value="emails" striped-rows scrollable class="qr-guests">
+                    <template #empty><div class="qr-empty">Писем нет</div></template>
+                    <Column header="Событие" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ emailEventLabel(data.event) }}</template></Column>
+                    <Column header="Статус" :style="{ minWidth: '10rem' }">
+                        <template #body="{ data }"><Tag :value="emailStatusMeta(data.status).label" :severity="emailStatusMeta(data.status).severity" /></template>
+                    </Column>
+                    <Column header="Отправлено" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ formatDate(data.sent_at) }}</template></Column>
+                    <Column header="Прочитано" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ formatDate(data.opened_at) }}</template></Column>
+                    <Column header="Ошибка" :style="{ minWidth: '10rem' }"><template #body="{ data }">{{ data.error || '—' }}</template></Column>
+                </DataTable>
+
+                <!-- Путь заказа (история + шаги пайплайна) -->
+                <h3 class="qr-section-title">Путь заказа</h3>
                 <Timeline :value="history" class="qr-timeline">
                     <template #content="{ item: ev }">
                         <div class="qr-history-event">
@@ -373,6 +454,26 @@ onMounted(() => {
 .qr-section-title {
     margin: 1.25rem 0 0.5rem;
     font-size: 1.05rem;
+}
+
+.qr-section-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.qr-tickets {
+    margin: 0 0 0.5rem;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+}
+
+.qr-tickets li {
+    list-style: none;
 }
 
 .qr-history-event {

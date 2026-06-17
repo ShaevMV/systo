@@ -27,8 +27,18 @@ Route::prefix('v1/qrOrder')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('admin');
 
-    // История заказа (created/status_changed/issued, actor=qr) — только админ org.
+    // История заказа (created/status_changed/step_*/issued, actor=qr) — только админ org.
     Route::get('/getHistory/{id}', [QrOrderController::class, 'getHistory'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
+    // Ссылки на PDF билетов заказа (скачивание из админки) — только admin.
+    Route::get('/getTicketPdf/{id}', [QrOrderController::class, 'getTicketPdf'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
+    // Весь путь заказа: приём → билеты(PDF) → письма(статусы) → история шагов — только admin.
+    Route::get('/getPipeline/{id}', [QrOrderController::class, 'getPipeline'])
         ->middleware('auth:api')
         ->middleware('admin');
 });
