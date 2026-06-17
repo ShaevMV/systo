@@ -130,4 +130,9 @@ final class InMemoryMySqlEmailMessageRepository implements EmailMessageRepositor
             ->get()
             ->map(fn (EmailMessageModel $model) => EmailMessageItemForListResponse::fromState($model->toArray()));
     }
+
+    public function existsByExternalId(string $externalId): bool
+    {
+        return $this->model::query()->where('meta->external_id', $externalId)->exists();
+    }
 }

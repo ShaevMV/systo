@@ -77,4 +77,29 @@ final class EmailDeliveryApplication
 
         return true;
     }
+
+    /**
+     * Отметить письмо прочитанным по токену пикселя (Ф3). Открыть можно лишь отправленное/
+     * доставленное; идемпотентно (повторный пиксель не меняет opened_at и не плодит историю).
+     */
+    public function registerOpen(string $token): void
+    {
+        $message = $this->repository->findByToken($token);
+        if ($message === null) {
+            return;
+        }
+
+        if (! in_array($message->getStatus(), [EmailStatus::SENT, EmailStatus::DELIVERED], true)) {
+            return;
+        }
+
+        if ($this->repository->markOpened($message->getId())) {
+            $this->history->save(new SaveHistoryDto(
+                $message->getId()->value(),
+                new EmailLifecycleEvent(EmailStatus::OPENED),
+                null,
+                ActorType::SYSTEM,
+            ));
+        }
+    }
 }
