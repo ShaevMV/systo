@@ -10,6 +10,8 @@ export default {
         list: [],
         item: {},
         history: [],
+        tickets: [],
+        emails: [],
         filter: {},
         orderBy: { created_at: 'desc' },
         pagination: { page: 1, perPage: 20, total: 0 },

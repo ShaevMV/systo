@@ -10,6 +10,14 @@ export const setHistory = (state, payload) => {
     state.history = payload;
 };
 
+export const setTickets = (state, payload) => {
+    state.tickets = payload;
+};
+
+export const setEmails = (state, payload) => {
+    state.emails = payload;
+};
+
 export const setFilter = (state, payload) => {
     state.filter = payload;
 };

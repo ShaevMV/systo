@@ -4,6 +4,10 @@ export const getItem = (state) => state.item;
 
 export const getHistory = (state) => state.history;
 
+export const getTickets = (state) => state.tickets;
+
+export const getEmails = (state) => state.emails;
+
 export const getFilter = (state) => state.filter;
 
 export const getOrderBy = (state) => state.orderBy;
