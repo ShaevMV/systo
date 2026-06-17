@@ -20,6 +20,7 @@ class TemplateBindingDto extends AbstractionEntity implements Response
         protected Uuid $id,
         protected ?string $festival_id,
         protected ?string $order_type,
+        protected ?string $event,
         protected ?string $ticket_type_id,
         protected ?string $email_template_id,
         protected ?string $pdf_template_id,
@@ -36,6 +37,7 @@ class TemplateBindingDto extends AbstractionEntity implements Response
             empty($data['id']) ? Uuid::random() : new Uuid($data['id']),
             $data['festival_id'] ?? null,
             $data['order_type'] ?? null,
+            $data['event'] ?? null,
             $data['ticket_type_id'] ?? null,
             $data['email_template_id'] ?? null,
             $data['pdf_template_id'] ?? null,
@@ -59,6 +61,12 @@ class TemplateBindingDto extends AbstractionEntity implements Response
     public function getOrderType(): ?string
     {
         return $this->order_type;
+    }
+
+    /** Событие письма (EmailEvent) или null = «любое событие» (wildcard). */
+    public function getEvent(): ?string
+    {
+        return $this->event;
     }
 
     public function getTicketTypeId(): ?string
@@ -92,18 +100,23 @@ class TemplateBindingDto extends AbstractionEntity implements Response
         return $kind === 'pdf' ? $this->pdf_slug : $this->email_slug;
     }
 
-    /** Специфичность: чем больше непустых полей ключа, тем выше приоритет (ticket > order > festival). */
+    /**
+     * Специфичность: чем больше непустых полей ключа, тем выше приоритет.
+     * event — сильнейший дискриминатор (намерение письма): event > ticket > order > festival.
+     */
     public function specificity(): int
     {
-        return ($this->ticket_type_id !== null ? 4 : 0)
+        return ($this->event !== null ? 8 : 0)
+            + ($this->ticket_type_id !== null ? 4 : 0)
             + ($this->order_type !== null ? 2 : 0)
             + ($this->festival_id !== null ? 1 : 0);
     }
 
     /** Подходит ли привязка под запрос (NULL-поле = wildcard «любой»). */
-    public function matches(?string $festivalId, ?string $orderType, ?string $ticketTypeId): bool
+    public function matches(?string $event, ?string $festivalId, ?string $orderType, ?string $ticketTypeId): bool
     {
-        return ($this->festival_id === null || $this->festival_id === $festivalId)
+        return ($this->event === null || $this->event === $event)
+            && ($this->festival_id === null || $this->festival_id === $festivalId)
             && ($this->order_type === null || $this->order_type === $orderType)
             && ($this->ticket_type_id === null || $this->ticket_type_id === $ticketTypeId);
     }

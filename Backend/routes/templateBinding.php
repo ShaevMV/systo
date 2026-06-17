@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 // admin-only. Резолв применяется при выдаче билетов (InMemoryMySqlTicketsRepository::getTicket).
 Route::prefix('v1/templateBinding')->middleware(['auth:api', 'admin'])->group(static function (): void {
     Route::post('/getList', [TemplateBindingController::class, 'getList']);
+    Route::get('/events', [TemplateBindingController::class, 'events']); // каталог событий писем для селектора
     Route::get('/getItem/{id}', [TemplateBindingController::class, 'getItem']);
     Route::post('/create', [TemplateBindingController::class, 'create']);
     Route::post('/edit/{id}', [TemplateBindingController::class, 'edit']);
