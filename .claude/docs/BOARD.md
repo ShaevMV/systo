@@ -40,10 +40,10 @@
 |----|------|--------|------------------------|----------------|-------------|
 | **AF-1** | **Продолжение переезда админки на Vite+Sakai** — каркас AdminLayout, UI-фундамент (`DataTablePage`/`useCrud`), перенос существующих CRUD-экранов | L (дробится по экранам) | Фазы 0–3 | v2.7.0 → v2.9.0 | — |
 | **AF-2** | **Дашборды со сводными графиками** в админке — продажи + количество билетов (НЕ замена Grafana, сводные графики внутри админки) | M | Фаза 4 (дашборд) | v2.8.0 | данные продаж (qr-заказы + заказы org) |
-| **AF-3** | **Универсальный генератор шаблонов** — единый редактор шаблонов для письма и PDF-билета. **Фазы 1–4 done** (на стенде, e2e доказан): модуль `Backend/src/Template/` (Mustache + сущность `Template` + `template_versions`), рендер писем (11 Mailable через трейт `RendersDbTemplate`) и PDF из БД с fallback на blade, импорт blade (`templates:import-blade`), admin-CRUD API `/api/v1/template/*` (превью/версии/откат/палитра), экран редактора в AdminFront. **Фаза 5 почти готова:** **32 шаблона** (базовый `pdf` + 7 PDF-билетов + 20 order/list писем + 4 auth/анкетных) конвертированы в Mustache и **активны на стенде** (глубокий рендер-тест 154 assertions + e2e); остаётся только MJML/кэш `compiled_html`. Спека: `.claude/specs/template-system.md` | L | новый модуль | v2.8.0–v2.9.0 | ✅ модель шаблонов согласована |
+| **AF-3** | **Универсальный генератор шаблонов** — единый редактор шаблонов для письма и PDF-билета. **Фазы 1–4 done** (на стенде, e2e доказан): модуль `Backend/src/Template/` (Mustache + сущность `Template` + `template_versions`), рендер писем (11 Mailable через трейт `RendersDbTemplate`) и PDF из БД с fallback на blade, импорт blade (`templates:import-blade`), admin-CRUD API `/api/v1/template/*` (превью/версии/откат/палитра), экран редактора в AdminFront. **Фаза 5 почти готова:** **32 шаблона** (базовый `pdf` + 7 PDF-билетов + 20 order/list писем + 4 auth/анкетных) конвертированы в Mustache и **активны на стенде** (глубокий рендер-тест 154 assertions + e2e); остаётся только MJML/кэш `compiled_html`. **Привязки по событию done (2026-06-17, PR #77):** ось `event` в `template_bindings` (15 событий, каталог `EmailEvent`), резолвер учитывает событие (`event` > `ticket` > `order` > `festival`), эндпоинт `templateBinding/events`. Спеки: `.claude/specs/template-system.md`, `.claude/specs/email-delivery-system.md` (Часть 1) | L | новый модуль | v2.8.0–v2.9.0 | ✅ модель шаблонов согласована |
 | **AF-4** | **Подтверждение доставки билета в baza** — экран/статус «билет доставлен в baza» + ручной retry застрявших | M | Фаза 4 | v2.8.0 | ⚠️ **бэкенд-эндпоинт** статуса sync + retry (открытый вопрос спеки) |
 | **AF-5** | **S3-хранилище билетов/PDF** — хранить билеты/PDF в S3-совместимом хранилище отдельно от приложения | M | вне фаз фронта (инфра+backend) | v2.8.0–v2.9.0 | ⚙️ **devops** (выбор S3, ресурсы) + backend (драйвер storage) |
-| **AF-6** | **Подтверждение доставки билета на email** — сейчас «слепой SMTP» (лог `sent` = принято SMTP, не доказывает доставку). Переход на транзакционный провайдер с вебхуками (`delivered`/`bounced`/`opened`) + таблица статусов писем + экран «Доставка на почту» + повторная отправка. Парная к AF-4 («билет реально дошёл» = baza + email). | M | вне базовых фаз (backend + админ-экран) | v2.8.0 | ⚙️ аккаунт транзакц. провайдера (под РФ/152-ФЗ: UniOne/Unisender, SendPulse, Mailopost) + backend (драйвер + вебхук-эндпоинт + таблица статусов) |
+| **AF-6** | **Подтверждение доставки билета на email** — **частично закрыт (2026-06-17, PR #77):** есть таблица статусов писем (`email_messages`), внутренние статусы пути (`queued→sending→sent`/`failed` + `error` = «где застряло»), ретрай из админки (`emailDelivery/resend`), экран «Доставка писем» и пиксель прочтения (`opened`, за флагом `MAIL_OPEN_TRACKING`, 152-ФЗ). **Остаётся:** транзакционный провайдер с вебхуками для `delivered`/`bounced` (драйвер + вебхук-эндпоинт). Парная к AF-4 («билет реально дошёл» = baza + email). | M | вне базовых фаз (backend + админ-экран) | v2.8.0 | ⚙️ аккаунт транзакц. провайдера (под РФ/152-ФЗ: UniOne/Unisender, SendPulse, Mailopost) + backend (драйвер + вебхук-эндпоинт) |
 
 **Оценка S/M/L:** S ≈ до 1–2 дней, M ≈ 3–5 дней, L ≈ неделя+ (дробится на под-PR).
 
@@ -51,7 +51,7 @@
 
 - **AF-4** — нужен бэкенд-эндпоинт статуса доставки билет→baza + ручной retry (есть ли уже / проектировать). Блокер фазы 4.
 - **AF-5** — выбор S3-совместимого хранилища и ресурсы оцениваются параллельно с devops.
-- **AF-6** — сейчас отправка билетов = слепой SMTP без подтверждения доставки. Нужен транзакционный провайдер с вебхуками (RU — под 152-ФЗ) + аккаунт (биллинг владельца). Пара к AF-4.
+- **AF-6** — частично закрыт (PR #77): внутренние статусы письма (`queued→sending→sent`/`failed`), ретрай из админки и пиксель прочтения уже есть. Остаётся транзакционный провайдер с вебхуками (RU — под 152-ФЗ) для `delivered`/`bounced` + аккаунт (биллинг владельца). Пара к AF-4.
 - **AF-2** — источник данных для графиков: qr-заказы + заказы org (агрегаты по периодам). Не дублировать Grafana (та — для логов/инфры).
 - Всё дерево фаз AdminFront (PoC → 0..6) — в `.claude/specs/admin-frontend-vite-sakai.md §6`.
 
@@ -89,6 +89,27 @@
 ---
 
 ## ✅ Сделано
+
+### 2026-06-17 — Система отправки писем по шаблонам (AF-3 событийные привязки + AF-6 частично)
+
+**Привязка шаблона по событию + контроль пути письма «дошло / где застряло» + весь путь qr-заказа (приём → билеты → письма → история). PHPUnit 381 зелёный, на стенде.**
+
+- 🌿 Ветка: `feat/qr-order-pipeline-view` (несёт все 5 фаз)
+- 🔀 PR: #77 (`feat(email): система писем по шаблонам — привязки по событию, трекинг доставки, весь путь qr (Ф1–Ф5)`)
+- 📜 Спека: `.claude/specs/email-delivery-system.md`
+
+**Что вошло (Ф1–Ф5):**
+- **Ф1 — привязки шаблонов по событию.** Каталог из **15 событий** `Backend/src/EmailDelivery/Domain/EmailEvent.php` (`order_paid`, `order_cancel`, `list_approved`, `user_registered`, `password_reset`, `invite`, `questionnaire` и т.д. → `defaultSlug` + label). Поле `event` в `template_bindings` (миграция `2026_06_17_120000`, `NULL` = wildcard). Резолвер `TemplateBinding` учитывает ось `event` (вес специфичности 8; `event` > `ticket` > `order` > `festival`). Эндпоинт `GET /api/v1/templateBinding/events` (каталог для селектора), `create/edit` принимают `event` (валидация `EmailEvent::isValid`). Дефолт остаётся на kind (email/pdf).
+- **Ф2 — трекинг доставки.** Модуль `Backend/src/EmailDelivery/` (пассивная сущность, как `QrOrder`/`Location`, БД только в репозитории). Таблица `email_messages` (миграция `2026_06_17_130000`: `event`, `recipient`, `status`, `attempts`, `error`, `source` [`qr_pipeline`/`qr_intake`/`org_event`], `aggregate_type`/`aggregate_id`, `festival_id`, `tracking_token` UNIQUE, `provider_message_id`, `meta` json, `mailable` longtext, `sent_at`/`opened_at`). VO `EmailStatus` — машина `queued→sending→sent→delivered→opened`, `→failed`, `sent/delivered→bounced`, ретрай `failed/bounced→queued`. `MailDispatcher::send(event, EmailContext, Mailable): Uuid` → `email_messages(queued)` + history(`email_queued`) + `SendEmailJob::dispatch`. `SendEmailJob` (`tries=3`, `backoff [30,120,600]`): `queued→sending→sent/failed`, читает Mailable из БД (колонка `mailable`, base64+serialize) → повтор = re-dispatch по id. Канал логов `mail_delivery`. Админ-API `POST /api/v1/emailDelivery/getList` (whitelist `recipient`/`status`/`event`/`source`/`festival_id`/`aggregate_id` + пагинация), `getItem/{id}` (+ история), `resend/{id}` — все `auth:api` + admin (ПДн).
+- **Ф3 — пиксель прочтения.** `GET /api/v1/mail/open/{token}.gif` (публичный, `throttle:120,1`) → 200 image/gif, помечает `opened` (идемпотентно, только из `sent`/`delivered`). За флагом `config mail_delivery.open_tracking` (env `MAIL_OPEN_TRACKING`, default `false` — 152-ФЗ, ревью security).
+- **Ф4 — приём писем от витрины qr (S2S).** `POST /api/v1/emailNotification/send` (middleware `qr.ingest`, заголовок `X-QR-Token`) для не-заказных писем (регистрация/сброс пароля), инициированных на qr. Контракт `{event, email, vars{}, festival_id?, order_type?, ticket_type_id?, subject?, aggregate_id?, external_id?}`, идемпотентность по `external_id`. Mailable `App\Mail\GenericTemplatedMail` (slug + subject + vars, трейт `RendersDbTemplate`).
+- **Ф5 — весь путь qr-заказа.** `GET /api/v1/qrOrder/getTicketPdf/{id}` (ссылки на PDF билетов), `GET /api/v1/qrOrder/getPipeline/{id}` (заказ + билеты с pdf_url + история шагов + письма) — оба admin. Шаги пайплайна выдачи пишутся в `domain_history` как `step_<имя шага>` (`step_create_tickets`/`step_send_order_email`/`step_push_to_baza`/`step_send_telegram`/`step_create_live_tickets`/`step_link_live`/`step_send_list_email`/`step_send_live_email`).
+
+**История/акторы:** новый `aggregate_type='email'` в `domain_history` (`email_queued`/`email_sending`/`email_sent`/`email_failed`/`email_opened` через `EmailLifecycleEvent`). Письма от qr пишутся `actor_type=qr`, системные — `system`.
+
+**Проверка:** PHPUnit Backend **381 зелёный** (unit резолвера/`EmailStatus`/`EmailEvent`, feature dispatcher/job/resend, пиксель, S2S-идемпотентность, `getTicketPdf`/`getPipeline`).
+
+**Отложено:** старые org-письма (отмена/изменение через `ProcessUserNotification*`) пока идут **мимо** диспетчера — будут подключены отдельно. `delivered`/`bounced` требуют транзакционного провайдера с вебхуками (AF-6, остаётся).
 
 ### 2026-06-15 — Система шаблонов писем и PDF (AF-3, фазы 1–4)
 
