@@ -11,6 +11,10 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Shared\Domain\Bus\EventJobs\DomainEvent;
+use Tickets\EmailDelivery\Application\EmailContext;
+use Tickets\EmailDelivery\Application\MailDispatcher;
+use Tickets\EmailDelivery\Domain\EmailEvent;
+use Tickets\History\Domain\ActorType;
 
 class ProcessAccountNotification implements ShouldQueue, DomainEvent
 {
@@ -24,9 +28,17 @@ class ProcessAccountNotification implements ShouldQueue, DomainEvent
 
     public function handle(): void
     {
-        \Mail::to($this->email)->send(new CreateUser(
-            $this->email,
-            $this->password,
-        ));
+        app(MailDispatcher::class)->send(
+            EmailEvent::USER_REGISTERED,
+            new EmailContext(
+                recipient: $this->email,
+                source: 'org_event',
+                actorType: ActorType::SYSTEM,
+            ),
+            new CreateUser(
+                $this->email,
+                $this->password,
+            ),
+        );
     }
 }
