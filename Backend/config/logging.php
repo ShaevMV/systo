@@ -77,6 +77,8 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'days' => 30,
             'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            // Сбой записи лога не должен ронять выдачу билетов (job).
+            'ignore_exceptions' => true,
         ],
 
         // Access-лог коннектов от витрины qr к каналу приёма заказов (qrOrder/create):
@@ -85,7 +87,9 @@ return [
         'qr_access' => [
             'driver' => 'daily',
             'path' => storage_path('logs/qr_access.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
+            // Уровень фиксирован (НЕ из глобального LOG_LEVEL): иначе на проде с LOG_LEVEL=warning
+            // принятые коннекты (info) не записались бы — а нужен КАЖДЫЙ коннект (accepted + rejected).
+            'level' => 'debug',
             'days' => 30,
             'formatter' => \Monolog\Formatter\JsonFormatter::class,
             // Сбой записи лога не должен ронять приём заказа (второй барьер к try-catch в QrAccessLog).

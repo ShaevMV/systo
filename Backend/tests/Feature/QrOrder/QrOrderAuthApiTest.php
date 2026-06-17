@@ -127,6 +127,7 @@ class QrOrderAuthApiTest extends TestCase
         // Принятый коннект логируется в канал qr_access: connect.accepted + actor=qr + order_id.
         $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
 
+        self::assertFileExists($logFile, 'qr_access лог-файл должен быть создан');
         $contents = (string) @file_get_contents($logFile);
         self::assertStringContainsString('connect.accepted', $contents);
         self::assertStringContainsString('"actor":"qr"', $contents);
@@ -144,6 +145,7 @@ class QrOrderAuthApiTest extends TestCase
         $this->postJson('/api/v1/qrOrder/create', $this->contract(), ['X-QR-Token' => 'wrong-key'])
             ->assertStatus(401);
 
+        self::assertFileExists($logFile, 'qr_access лог-файл должен быть создан');
         $contents = (string) @file_get_contents($logFile);
         self::assertStringContainsString('connect.rejected', $contents);
         self::assertStringContainsString('"reason":"bad_token"', $contents);
