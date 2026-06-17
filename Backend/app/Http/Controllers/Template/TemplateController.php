@@ -11,7 +11,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
@@ -43,9 +42,16 @@ class TemplateController extends Controller
 
         $path = $request->file('image')->store('template-images', 'public');
 
+        $url = asset('storage/'.$path);
+        // Стенд/прод за TLS-прокси: APP_URL может быть http → отдаём https, чтобы DomPDF
+        // тянул картинку напрямую, без редиректа 301.
+        if (! app()->environment('local')) {
+            $url = preg_replace('#^http://#', 'https://', $url);
+        }
+
         return response()->json([
             'success' => true,
-            'url' => asset('storage/'.$path),
+            'url' => $url,
         ]);
     }
 
