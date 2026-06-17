@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\QrOrder;
 
-use App\Models\User;
 use Database\Seeders\TypeTicketsSeeder;
 use Illuminate\Support\Facades\Queue;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
@@ -20,13 +18,15 @@ use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
  */
 class QrOrderIssueApiTest extends TestCase
 {
+    use WithQrIngestToken;
+
     private const ORDER_ID = '11111111-1111-1111-1111-111111111111';
 
     protected function setUp(): void
     {
         parent::setUp();
-        // S2S-канал защищён: аутентифицируем сервис-токеном со scope qr:ingest.
-        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+        // S2S-канал закрыт сервисным ключом qr (X-QR-Token) — настраиваем валидный ключ.
+        $this->configureQrIngestToken();
     }
 
     private function contract(string $status = 'оплачен'): array
@@ -55,7 +55,7 @@ class QrOrderIssueApiTest extends TestCase
         Queue::fake();
 
         // qr присылает заказ уже оплаченным → приём сразу ставит задачу выдачи.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'), $this->qrIngestHeaders())->assertOk();
 
         Queue::assertPushed(IssueOrderJob::class);
 
@@ -69,8 +69,8 @@ class QrOrderIssueApiTest extends TestCase
 
         // Повторный приём того же оплаченного заказа (qr-ретрай) не ставит вторую задачу
         // выдачи — отсекается existsById по id (== id заказа org).
-        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
-        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'))->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'), $this->qrIngestHeaders())->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('оплачен'), $this->qrIngestHeaders())->assertOk();
 
         Queue::assertPushed(IssueOrderJob::class, 1);
     }
@@ -80,7 +80,7 @@ class QrOrderIssueApiTest extends TestCase
         Queue::fake();
 
         // Заказ в статусе «создан» (ещё не оплачен) — выдача не запускается.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract('создан'))->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract('создан'), $this->qrIngestHeaders())->assertOk();
 
         Queue::assertNotPushed(IssueOrderJob::class);
     }

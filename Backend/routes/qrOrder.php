@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/qrOrder')->group(static function (): void {
     // Приём заказа от витрины qr: заказ приходит уже в статусе «оплачен» → org сразу выпускает
-    // билеты (см. QrOrderApplication::create). Авторизация отключена по решению владельца —
-    // канал защищается вне приложения (сеть / shared-secret). Эндпоинт хранит ПДн.
-    Route::post('/create', [QrOrderController::class, 'create']);
+    // билеты (см. QrOrderApplication::create). Канал закрыт сервисным ключом qr (заголовок
+    // X-QR-Token, middleware qr.ingest) + опционально allowlist IP qr на nginx. Эндпоинт хранит ПДн.
+    Route::post('/create', [QrOrderController::class, 'create'])
+        ->middleware('qr.ingest');
 
     // Список принятых заказов для админки org (read-only): фильтры + пагинация. Содержит ПДн.
     Route::post('/getList', [QrOrderController::class, 'getList'])

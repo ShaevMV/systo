@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\QrOrder;
 
 use App\Models\QrOrder\QrOrderModel;
-use App\Models\User;
 use Illuminate\Support\Facades\Queue;
-use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
 /**
@@ -17,11 +15,13 @@ use Tests\TestCase;
  */
 class QrOrderCreateApiTest extends TestCase
 {
+    use WithQrIngestToken;
+
     protected function setUp(): void
     {
         parent::setUp();
-        // S2S-канал защищён: аутентифицируем сервис-токеном со scope qr:ingest.
-        Sanctum::actingAs(User::factory()->create(), ['qr:ingest']);
+        // S2S-канал закрыт сервисным ключом qr (X-QR-Token) — настраиваем валидный ключ.
+        $this->configureQrIngestToken();
         // Контракт приходит оплаченным → приём запускает выдачу; в тестах приёма её фейкаем.
         Queue::fake();
     }
@@ -50,7 +50,7 @@ class QrOrderCreateApiTest extends TestCase
     public function test_creates_qr_order_from_extended_json(): void
     {
         // Расширенный JSON → строка в qr_orders с заполненной проекцией под фильтры.
-        $response = $this->postJson('/api/v1/qrOrder/create', $this->contract());
+        $response = $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders());
 
         $response->assertOk()->assertJson(['success' => true]);
 
@@ -73,8 +73,8 @@ class QrOrderCreateApiTest extends TestCase
     public function test_create_is_idempotent_by_order_id(): void
     {
         // Повторный приём того же заказа (id == id заказа org) не создаёт дубль.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
 
         self::assertSame(1, QrOrderModel::whereId('11111111-1111-1111-1111-111111111111')->count());
     }
@@ -85,14 +85,14 @@ class QrOrderCreateApiTest extends TestCase
         $contract = $this->contract();
         unset($contract['order_data']['email']);
 
-        $this->postJson('/api/v1/qrOrder/create', $contract)->assertStatus(422);
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders())->assertStatus(422);
         $this->assertDatabaseMissing('qr_orders', ['id' => '11111111-1111-1111-1111-111111111111']);
     }
 
     public function test_create_records_history(): void
     {
         // История пишется с actor=qr: событие created при приёме заказа.
-        $this->postJson('/api/v1/qrOrder/create', $this->contract())->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
 
         $this->assertDatabaseHas('domain_history', [
             'aggregate_id' => '11111111-1111-1111-1111-111111111111',
