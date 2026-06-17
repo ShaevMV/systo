@@ -102,4 +102,85 @@ class QrOrderAuthApiTest extends TestCase
 
         $this->assertDatabaseMissing('qr_orders', ['id' => '11111111-1111-1111-1111-111111111111']);
     }
+
+    /** Перенаправляет канал qr_access в свежий тестовый файл и возвращает путь к нему. */
+    private function redirectQrAccessLogToFile(): string
+    {
+        $logFile = storage_path('logs/qr_access_test.log');
+        @unlink($logFile);
+        config([
+            'logging.channels.qr_access' => [
+                'driver' => 'single',
+                'path' => $logFile,
+                'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            ],
+        ]);
+
+        return $logFile;
+    }
+
+    public function test_logs_accepted_connect_to_qr_access_channel(): void
+    {
+        $this->configureQrIngestToken();
+        $logFile = $this->redirectQrAccessLogToFile();
+
+        // Принятый коннект логируется в канал qr_access: connect.accepted + actor=qr + order_id.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
+
+        $contents = (string) @file_get_contents($logFile);
+        self::assertStringContainsString('connect.accepted', $contents);
+        self::assertStringContainsString('"actor":"qr"', $contents);
+        self::assertStringContainsString('"sub":"qr-service"', $contents);
+        self::assertStringContainsString('11111111-1111-1111-1111-111111111111', $contents, 'order_id для корреляции');
+        @unlink($logFile);
+    }
+
+    public function test_logs_rejected_connect_with_reason(): void
+    {
+        $this->configureQrIngestToken();
+        $logFile = $this->redirectQrAccessLogToFile();
+
+        // Отклонённый коннект (неверный ключ) тоже логируется — видны попытки взлома, reason=bad_token.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), ['X-QR-Token' => 'wrong-key'])
+            ->assertStatus(401);
+
+        $contents = (string) @file_get_contents($logFile);
+        self::assertStringContainsString('connect.rejected', $contents);
+        self::assertStringContainsString('"reason":"bad_token"', $contents);
+        self::assertStringContainsString('"actor":"qr"', $contents);
+        @unlink($logFile);
+    }
+
+    public function test_logs_accepted_with_non_string_order_id_safely(): void
+    {
+        $this->configureQrIngestToken();
+        $logFile = $this->redirectQrAccessLogToFile();
+
+        // order_id не строка (массив) — приём упадёт на валидации (422), но коннект всё равно
+        // принят по ключу и залогирован: order_id безопасно становится null, лог не падает.
+        $contract = $this->contract();
+        $contract['order_id'] = ['nested' => 'oops'];
+        $this->postJson('/api/v1/qrOrder/create', $contract, $this->qrIngestHeaders());
+
+        $contents = (string) @file_get_contents($logFile);
+        self::assertStringContainsString('connect.accepted', $contents);
+        self::assertStringContainsString('"order_id":null', $contents);
+        @unlink($logFile);
+    }
+
+    public function test_qr_token_is_never_written_to_logs(): void
+    {
+        $secret = 'super-secret-key-must-not-leak';
+        config(['services.qr_ingest.tokens' => [$secret]]);
+        $logFile = $this->redirectQrAccessLogToFile();
+
+        // accepted (верный ключ) + rejected (неверный ключ) — сам ключ не должен попасть в лог.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), ['X-QR-Token' => $secret])->assertOk();
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), ['X-QR-Token' => 'bad-'.$secret])->assertStatus(401);
+
+        $contents = (string) @file_get_contents($logFile);
+        self::assertNotSame('', $contents, 'qr_access лог должен содержать записи коннектов');
+        self::assertStringNotContainsString($secret, $contents, 'Ключ X-QR-Token НЕ должен попадать в лог');
+        @unlink($logFile);
+    }
 }

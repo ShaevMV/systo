@@ -7,6 +7,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tickets\QrOrder\Application\Support\QrAccessLog;
 
 /**
  * Аутентификация S2S-канала приёма заказов от витрины qr.spaceofjoy.ru.
@@ -30,8 +31,13 @@ class QrIngestAuth
         $provided = (string) $request->headers->get(self::HEADER, '');
 
         if ($provided !== '' && $this->matchesKnownToken($provided)) {
+            QrAccessLog::accepted($request);
+
             return $next($request);
         }
+
+        // Отклонённый коннект логируем с причиной: нет заголовка vs неверный ключ.
+        QrAccessLog::rejected($request, $provided === '' ? 'no_token' : 'bad_token');
 
         return response()->json([
             'success' => false,

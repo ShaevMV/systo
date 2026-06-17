@@ -166,6 +166,30 @@ resp = requests.post(
 
 ---
 
+## 5.1. Лог коннектов (access-лог канала)
+
+Каждый коннект от qr к `/create` пишется в отдельный лог-канал **`qr_access`** (JSON, daily, retention 30 дней) — и **принятые**, и **отклонённые** (401). Так видно весь трафик канала и попытки с неверным ключом.
+
+| Поле записи | Пример | Назначение |
+|---|---|---|
+| `message` | `connect.accepted` / `connect.rejected` | исход коннекта |
+| `actor` / `sub` | `qr` / `qr-service` | **отделяет qr от действий админов** (админы сюда не пишут) |
+| `result` | `accepted` / `rejected` | — |
+| `reason` (только rejected) | `no_token` / `bad_token` | нет заголовка vs неверный ключ (видно брутфорс) |
+| `ip`, `method`, `path`, `ua` | — | аудит источника |
+| `order_id` (только accepted) | uuid | корреляция с логом выдачи `qr_pipeline` |
+
+**Что НЕ пишется:** сам ключ `X-QR-Token`, ПДн (email/гости — для них канал `qr_pipeline` с маскировкой). Тело отклонённого (недоверенного) запроса не парсится.
+
+**Надёжность:** логирование «мягкое» — сбой записи (диск/права) **не роняет приём заказа** (try-catch в `QrAccessLog` + `ignore_exceptions` на канале).
+
+**Файлы лога:**
+```bash
+ssh deploy@77.222.32.244 'tail -f /var/www/systo/Backend/storage/logs/qr_access-$(date +%F).log'
+```
+
+> ⚠️ **TrustProxies (техдолг, low).** За nginx `request->ip()` вернёт IP прокси, а не реальный IP qr, пока не настроены доверенные прокси (`app/Http/Middleware/TrustProxies.php`). Для точного IP в access-логе на проде — задать `$proxies` (IP nginx/балансировщика). Не блокер: на безопасность канала не влияет (защита — ключ + опц. allowlist), только на точность IP в аудите.
+
 ## 6. Провенанс (файлы кода)
 
 | Слой | Файл |
@@ -175,6 +199,7 @@ resp = requests.post(
 | Конфиг ключей | `Backend/config/services.php` (`qr_ingest.tokens`) |
 | Роут | `Backend/routes/qrOrder.php` (`/create` + `->middleware('qr.ingest')`) |
 | env | `Backend/.env.example` (`QR_INGEST_TOKENS`) |
-| Тесты | `Backend/tests/Feature/QrOrder/QrOrderAuthApiTest.php` (+ трейт `WithQrIngestToken`) |
+| Access-лог коннектов | `Backend/src/QrOrder/Application/Support/QrAccessLog.php` + канал `qr_access` в `Backend/config/logging.php` |
+| Тесты | `Backend/tests/Feature/QrOrder/QrOrderAuthApiTest.php` (аутентификация + логирование, + трейт `WithQrIngestToken`) |
 
 > Чтение (`getList`/`getItem`/`getHistory`/`getStats`) — отдельный канал, закрыт `auth:api + admin` (JWT админа org), его этот документ не касается.
