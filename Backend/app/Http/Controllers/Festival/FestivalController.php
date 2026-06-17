@@ -6,12 +6,14 @@ namespace App\Http\Controllers\Festival;
 
 use App\Http\Controllers\Controller;
 use DomainException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\OrderTicket\Application\GetFestivalList\FestivalApplication;
+use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 use Tickets\User\Account\Helpers\AccountRoleHelper;
 
 class FestivalController extends Controller
@@ -85,6 +87,35 @@ class FestivalController extends Controller
     public function getTicketTypeList(): array
     {
         return $this->allInfoForOrderingTicketsSearcher->getListTicketTypeDto(new Uuid('9d679bcf-b438-4ddb-ac04-023fa9bff4b8'))->toArray();
+    }
+
+    /**
+     * Создать фестиваль (admin). Каталог фестивалей — мастер на org.
+     *
+     * @throws \Throwable
+     */
+    public function create(Request $request): JsonResponse
+    {
+        $request->validate([
+            'data.name' => 'required|string|max:255',
+            'data.year' => 'required|integer|min:2000|max:2100',
+            'data.active' => 'boolean',
+        ]);
+
+        $dto = new FestivalDto(
+            Uuid::random(),
+            (string) $request->input('data.name'),
+            (int) $request->input('data.year'),
+            (bool) $request->input('data.active', false),
+        );
+
+        $this->festivalApplication->create($dto);
+
+        return response()->json([
+            'success' => true,
+            'item' => $dto->toArray(),
+            'message' => 'Фестиваль создан',
+        ]);
     }
 
 }

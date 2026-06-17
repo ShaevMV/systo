@@ -193,6 +193,27 @@
 
 ---
 
+### POST `/api/v1/festival/create`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** создать фестиваль (каталог фестивалей — мастер на org). CQRS: `FestivalController::create` → `FestivalApplication::create` → `CreateFestivalCommand`/`Handler` → `FestivalRepositoryInterface::create` (БД только в репозитории).
+
+**Request:**
+```json
+{
+  "data": {
+    "name": "string (required, max:255)",
+    "year": "int (required, 2000..2100)",
+    "active": "bool (default false)"
+  }
+}
+```
+
+**Response 200:** `{ "success": true, "item": { "id": "UUID", "name": "...", "year": 2026, "active": true }, "message": "Фестиваль создан" }`
+**Response 422:** `{ "errors": { "data.name": [...], "data.year": [...] } }` (нет name/year или год вне диапазона)
+
+---
+
 ## 3. Заказы
 
 Префикс: **`/api/v1/order`**
@@ -1069,7 +1090,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
+| **admin** | festival/getTicketTypeList, festival/create, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
