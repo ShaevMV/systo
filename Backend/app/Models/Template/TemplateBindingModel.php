@@ -16,6 +16,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property string $id
  * @property string|null $festival_id
  * @property string|null $order_type
+ * @property string|null $event
  * @property string|null $ticket_type_id
  * @property string|null $email_template_id
  * @property string|null $pdf_template_id
@@ -40,6 +41,7 @@ class TemplateBindingModel extends Model
         'id',
         'festival_id',
         'order_type',
+        'event',
         'ticket_type_id',
         'email_template_id',
         'pdf_template_id',

@@ -12,6 +12,7 @@ export default {
         ticketTypes: [],
         emailTemplates: [],
         pdfTemplates: [],
+        events: [],
         isLoading: false
     },
     getters,

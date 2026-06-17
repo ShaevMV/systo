@@ -24,6 +24,7 @@ use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
+use Tickets\EmailDelivery\Domain\EmailEvent;
 use Tickets\TemplateBinding\Domain\TemplateBindingResolver;
 use Tickets\TemplateBinding\Repositories\TemplateBindingRepositoryInterface;
 
@@ -197,10 +198,11 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $bindings = app(TemplateBindingRepositoryInterface::class)->getActiveForResolve();
         $resolver = app(TemplateBindingResolver::class);
         $orderType = $this->deriveOrderType($result);
+        $event = $this->deriveIssuanceEvent($orderType);
         $festivalId = $result['festival_id'] ?? null;
         $ticketTypeId = $result['ticket_type_id'] ?? null;
-        $pdfSlug = $resolver->resolve($bindings, 'pdf', $festivalId, $orderType, $ticketTypeId) ?? $pdfSlug;
-        $emailSlug = $resolver->resolve($bindings, 'email', $festivalId, $orderType, $ticketTypeId) ?? $emailSlug;
+        $pdfSlug = $resolver->resolve($bindings, 'pdf', $event, $festivalId, $orderType, $ticketTypeId) ?? $pdfSlug;
+        $emailSlug = $resolver->resolve($bindings, 'email', $event, $festivalId, $orderType, $ticketTypeId) ?? $emailSlug;
 
         return new TicketResponse(
             $result['name'],
@@ -242,6 +244,21 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         }
 
         return 'regular';
+    }
+
+    /**
+     * Событие письма для резолва привязок при ВЫДАЧЕ билета (оплата/одобрение). Здесь рендерится
+     * билет (PDF) и письмо об оплате/одобрении — поэтому событие соответствует типу заказа.
+     * Привязки с event = null продолжают подходить (wildcard) — обратная совместимость.
+     */
+    private function deriveIssuanceEvent(string $orderType): string
+    {
+        return match ($orderType) {
+            'list' => EmailEvent::LIST_APPROVED,
+            'friendly' => EmailEvent::ORDER_PAID_FRIENDLY,
+            'live' => EmailEvent::ORDER_PAID_LIVE,
+            default => EmailEvent::ORDER_PAID,
+        };
     }
 
     /**

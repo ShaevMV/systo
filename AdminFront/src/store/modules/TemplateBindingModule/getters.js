@@ -8,4 +8,6 @@ export const getEmailTemplates = (state) => state.emailTemplates;
 
 export const getPdfTemplates = (state) => state.pdfTemplates;
 
+export const getEvents = (state) => state.events;
+
 export const getIsLoading = (state) => state.isLoading;
