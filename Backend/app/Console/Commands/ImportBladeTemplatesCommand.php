@@ -30,8 +30,15 @@ class ImportBladeTemplatesCommand extends Command
         $created = 0;
         $skipped = 0;
 
-        // Письма: resources/views/email/*.blade.php
+        // Мёртвые blade — их не рендерит ни одно Mailable, а в Mustache их blade-синтаксис
+        // ({{$var}}) ломает превью редактора. Не тащим их в таблицу шаблонов.
+        $deadEmail = ['activate', 'notification', 'testingAnswers'];
+
+        // Письма: resources/views/email/*.blade.php (кроме мёртвых).
         foreach ($this->bladeFiles(resource_path('views/email')) as $slug => $path) {
+            if (in_array($slug, $deadEmail, true)) {
+                continue;
+            }
             [$c, $s] = $this->import($repository, $slug, TemplateKind::EMAIL, $path);
             $created += $c;
             $skipped += $s;
