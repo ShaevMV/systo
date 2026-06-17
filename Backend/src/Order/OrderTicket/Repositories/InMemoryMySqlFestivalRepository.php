@@ -16,6 +16,11 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
     {
     }
 
+    public function create(FestivalDto $dto): bool
+    {
+        return (bool) $this->model::create($dto->toArrayForCreate());
+    }
+
     public function get(Uuid $id): FestivalDto
     {
         $result = $this->model->find($id->value());
