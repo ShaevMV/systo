@@ -49,4 +49,7 @@ interface EmailMessageRepositoryInterface
 
     /** Письма агрегата (для экрана qr — «линк на данные по почтам заказа»). */
     public function getByAggregate(string $aggregateType, Uuid $aggregateId): Collection;
+
+    /** Идемпотентность S2S-приёма (Ф4): письмо с таким external_id уже принято. */
+    public function existsByExternalId(string $externalId): bool;
 }

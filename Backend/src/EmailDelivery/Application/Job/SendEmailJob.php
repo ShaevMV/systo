@@ -12,6 +12,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Shared\Domain\ValueObject\Uuid;
+use Symfony\Component\Mime\Email;
 use Throwable;
 use Tickets\EmailDelivery\Application\Support\MailDeliveryLog;
 use Tickets\EmailDelivery\Domain\EmailLifecycleEvent;
@@ -72,6 +73,8 @@ final class SendEmailJob implements ShouldQueue
         /** @var Mailable $mailable */
         $mailable = unserialize(base64_decode($blob));
 
+        $this->attachOpenPixel($mailable, $message->getTrackingToken());
+
         $repository->markSending($id);
         $this->recordHistory($history, $message, EmailStatus::SENDING);
 
@@ -104,6 +107,26 @@ final class SendEmailJob implements ShouldQueue
     public function failed(Throwable $e): void
     {
         app(EmailMessageRepositoryInterface::class)->markFailed(new Uuid($this->emailMessageId), $e->getMessage());
+    }
+
+    /**
+     * Дописать прозрачный 1×1 пиксель прочтения в HTML письма (Ф3, за флагом open_tracking).
+     * Срабатывает на готовом Symfony-сообщении (после рендера Mailable).
+     */
+    private function attachOpenPixel(Mailable $mailable, string $token): void
+    {
+        if (! config('mail_delivery.open_tracking')) {
+            return;
+        }
+
+        $pixelUrl = url('/api/v1/mail/open/' . $token . '.gif');
+
+        $mailable->withSymfonyMessage(static function (Email $message) use ($pixelUrl): void {
+            $html = $message->getHtmlBody();
+            if (is_string($html) && $html !== '') {
+                $message->html($html . '<img src="' . $pixelUrl . '" alt="" width="1" height="1" style="display:none">');
+            }
+        });
     }
 
     /**

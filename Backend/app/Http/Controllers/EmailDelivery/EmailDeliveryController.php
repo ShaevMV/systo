@@ -7,6 +7,7 @@ namespace App\Http\Controllers\EmailDelivery;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 use Shared\Domain\Criteria\Order;
@@ -88,5 +89,24 @@ class EmailDeliveryController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Письмо поставлено на повторную отправку']);
+    }
+
+    /**
+     * Пиксель прочтения письма (Ф3, публичный). Помечает письмо opened (идемпотентно) и
+     * отдаёт прозрачный 1×1 GIF. Токен случайный (≠ id) — заказы не перебрать.
+     */
+    public function openPixel(string $token, EmailDeliveryApplication $application): Response
+    {
+        $application->registerOpen($token);
+
+        // Прозрачный 1×1 GIF.
+        $gif = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+
+        return response($gif, 200, [
+            'Content-Type' => 'image/gif',
+            'Content-Length' => (string) strlen($gif),
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma' => 'no-cache',
+        ]);
     }
 }
