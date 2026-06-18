@@ -17,12 +17,30 @@ import { useToast } from 'primevue/usetoast';
 
 import { useCrud } from '@/composables/useCrud';
 import ConfirmDeleteButton from '@/components/ConfirmDeleteButton.vue';
+import FilterBar from '@/components/FilterBar.vue';
 
 // Локации (сцены) — справочник для заказов-списков. Бэкенд: /api/v1/location/* (admin).
 const { list, loading, saving, error, loadList, save, remove } = useCrud('/api/v1/location');
 const toast = useToast();
 
-// Справочники для селектов формы.
+// Фильтр (поля 1:1 со старым LocationFilter).
+const blankFilter = () => ({ name: '', festival_id: '', active: '' });
+const filter = ref(blankFilter());
+const ACTIVE_OPTIONS = [
+    { label: 'Все', value: '' },
+    { label: 'Активные', value: '1' },
+    { label: 'Неактивные', value: '0' }
+];
+
+function applyFilter() {
+    loadList({ filter: filter.value });
+}
+function resetFilter() {
+    filter.value = blankFilter();
+    loadList();
+}
+
+// Справочники для селектов формы и фильтра.
 const festivals = ref([]);
 const qTypes = ref([]);
 const emailBlades = ref([]);
@@ -87,7 +105,7 @@ async function submit() {
     if (res.ok) {
         dialogVisible.value = false;
         toast.add({ severity: 'success', summary: form.value.id ? 'Локация отредактирована' : 'Локация создана', life: 2500 });
-        await loadList();
+        await loadList({ filter: filter.value });
     }
 }
 
@@ -95,7 +113,7 @@ async function onDelete(row) {
     const ok = await remove(row.id);
     if (ok) {
         toast.add({ severity: 'success', summary: 'Локация удалена', life: 2500 });
-        await loadList();
+        await loadList({ filter: filter.value });
     } else {
         toast.add({ severity: 'error', summary: error.value || 'Не удалось удалить', life: 3500 });
     }
@@ -112,7 +130,8 @@ async function loadRefs() {
     }
 }
 
-// Опции селектов с пустым пунктом-дефолтом.
+// Опции селектов.
+const festivalFilterOptions = computed(() => [{ id: '', label: 'Все' }, ...festivals.value.map((f) => ({ id: f.id, label: `${f.name}${f.year ? ' ' + f.year : ''}` }))]);
 const festivalOptions = computed(() => festivals.value.map((f) => ({ id: f.id, label: `${f.name}${f.year ? ' ' + f.year : ''}` })));
 const qTypeOptions = computed(() => [{ id: '', name: '— без анкеты —' }, ...qTypes.value]);
 const emailOptions = computed(() => ['', ...emailBlades.value]);
@@ -134,26 +153,41 @@ onMounted(() => {
             <Button label="Создать" icon="pi pi-plus" @click="openCreate" />
         </div>
 
+        <FilterBar @apply="applyFilter" @reset="resetFilter">
+            <div class="fb-field">
+                <label>Название</label>
+                <InputText v-model="filter.name" placeholder="Название локации" @keyup.enter="applyFilter" />
+            </div>
+            <div class="fb-field">
+                <label>Фестиваль</label>
+                <Select v-model="filter.festival_id" :options="festivalFilterOptions" option-label="label" option-value="id" placeholder="Все" filter />
+            </div>
+            <div class="fb-field">
+                <label>Активность</label>
+                <Select v-model="filter.active" :options="ACTIVE_OPTIONS" option-label="label" option-value="value" />
+            </div>
+        </FilterBar>
+
         <Card>
             <template #content>
                 <DataTable :value="list" :loading="loading" data-key="id" responsive-layout="scroll" paginator :rows="20" :rows-per-page-options="[20, 50, 100]">
                     <Column header="Название" field="name" sortable />
-                    <Column header="Фестиваль"
-                        ><template #body="{ data }">{{ festivalName(data.festival_id) }}</template></Column
-                    >
-                    <Column header="Тип анкеты"
-                        ><template #body="{ data }">{{ qTypeName(data.questionnaire_type_id) }}</template></Column
-                    >
-                    <Column header="Письмо"
-                        ><template #body="{ data }">{{ data.email_template || '—' }}</template></Column
-                    >
-                    <Column header="PDF"
-                        ><template #body="{ data }">{{ data.pdf_template || '—' }}</template></Column
-                    >
-                    <Column header="Активна"
-                        ><template #body="{ data }"><Tag :value="data.active ? 'да' : 'нет'" :severity="data.active ? 'success' : 'secondary'" /></template
-                    ></Column>
-                    <Column header="">
+                    <Column header="Фестиваль">
+                        <template #body="{ data }">{{ festivalName(data.festival_id) }}</template>
+                    </Column>
+                    <Column header="Тип анкеты">
+                        <template #body="{ data }">{{ qTypeName(data.questionnaire_type_id) }}</template>
+                    </Column>
+                    <Column header="Письмо">
+                        <template #body="{ data }">{{ data.email_template || '—' }}</template>
+                    </Column>
+                    <Column header="PDF">
+                        <template #body="{ data }">{{ data.pdf_template || '—' }}</template>
+                    </Column>
+                    <Column header="Активна">
+                        <template #body="{ data }"><Tag :value="data.active ? 'да' : 'нет'" :severity="data.active ? 'success' : 'secondary'" /></template>
+                    </Column>
+                    <Column header="" :style="{ width: '110px' }">
                         <template #body="{ data }">
                             <Button icon="pi pi-pencil" text rounded aria-label="Изменить" @click="openEdit(data)" />
                             <ConfirmDeleteButton :message="`Удалить локацию «${data.name}»?`" @confirm="onDelete(data)" />
