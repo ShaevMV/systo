@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import store from '@/store';
 
 const router = createRouter({
-    // BASE_URL из vite --base: локально '/', на staging '/new-admin/'.
+    // BASE_URL из vite --base: локально '/', на staging '/admin/'.
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
         {

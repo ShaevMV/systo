@@ -113,10 +113,10 @@ services:
       - VUE_APP_BAZA_URL=https://vhod.staging.spaceofjoy.ru/
     restart: unless-stopped
 
-  # ═══ ADMIN FRONTEND (новый Vite + Sakai, preview на /new-admin/) ═══════════
+  # ═══ ADMIN FRONTEND (новый Vite + Sakai, на /admin/) ═══════════════════════
   # Build: `docker compose run --rm node-admin-staging sh -c "npm ci --include=dev
-  # && npm run build -- --base=/new-admin/"` — в workflow перед `up -d`. dist
-  # раздаётся nginx-staging по location /new-admin/ (см. default.staging.conf).
+  # && npm run build -- --base=/admin/"` — в workflow перед `up -d`. dist
+  # раздаётся nginx-staging по location /admin/ (см. default.staging.conf).
   # VITE_API_URL Vite читает из process.env (VITE_-префикс) при сборке.
   node-admin-staging:
     build:
