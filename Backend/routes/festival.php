@@ -42,4 +42,9 @@ Route::prefix('v1/festival')->group(static function (): void {
     Route::delete('/delete/{id}', [FestivalController::class, 'delete'])
         ->middleware('auth:api')
         ->middleware('admin');
+
+    // журнал изменений фестиваля (domain_history, aggregate_type=festival)
+    Route::get('/getHistory/{id}', [FestivalController::class, 'getHistory'])
+        ->middleware('auth:api')
+        ->middleware('admin');
 });

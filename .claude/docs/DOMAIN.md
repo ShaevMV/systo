@@ -142,6 +142,18 @@ class LocationDto extends AbstractionEntity {
 
 ---
 
+### Festival (AF-7)
+
+**Путь:** `Backend/src/Festival/Domain/Festival.php`. **AggregateRoot** + trait `HasHistory` (как `Template`/`OrderTicket`). Каталог фестивалей — мастер на org.
+
+Поднят из пассивной сущности (DTO + репозиторий) в AggregateRoot **ради записи истории**. Чистый домен: только идентичность (`Uuid $id`) + журнал доменных действий; состояние/персист — в репозитории (БД только там).
+
+**Фабричные методы:** `created(id, name, year, active)` → `FestivalCreatedEvent`; `existing(id)` (точка входа для действий); `edited(array $changed)` → `FestivalEditedEvent` (пусто → история не пишется); `deleted()` → `FestivalDeletedEvent`. Все события — `HistoryEventInterface` в `History/Domain/Event/`, `aggregate_type = 'festival'`.
+
+`FestivalApplication` (`Order/OrderTicket/Application/GetFestivalList/`) после каждого write (create/edit/delete через CommandBus) строит агрегат, `pullHistoryEvents()` → `HistoryRepositoryInterface::save` (`actor_type = user`, `actor_id = Auth::id()`). `getHistory(Uuid)` → `getByAggregateId`. CRUD/репозиторий пока остаются под `Order/OrderTicket/` (перенос в модуль `Festival/` — отдельный рефакторинг, см. `.claude/specs/festival-aggregate-payment-templates-plan.md`).
+
+---
+
 ### Template (AF-3)
 
 **Путь:** `Backend/src/Template/`. **AggregateRoot** `Template` (`Domain/Template.php`) + trait `HasHistory` (как `OrderTicket`): действия `create`/`edit`/`activate`/`publish`/`rollback` пишут события в `domain_history` (`aggregate_type='template'`, actor = админ/`Auth::id()`, `ActorType::USER`). 5 событий в `History/Domain/Event/Template*Event.php` (`template_created`/`edited`/`activated`/`published`/`rolled_back`); `saveDraft` и artisan-bulk (`import-blade`/`sync-converted`) историю НЕ пишут. Журнал — `GET /api/v1/template/history/{id}` + вкладка «Журнал» в редакторе. `template_versions` (снапшоты тела для отката) и `domain_history` (аудит действий) — разное. Спеки: `.claude/specs/template-system.md`, `.claude/specs/template-aggregate-and-bindings.md`.
@@ -372,6 +384,7 @@ class Questionnaire extends AggregateRoot {
 **Новые `aggregate_type` / `event_name` в `domain_history`:**
 - `aggregate_type = 'email'` (модуль EmailDelivery) — таймлайн письма: `email_queued` / `email_sending` / `email_sent` / `email_failed` / `email_opened`. `actor_type`: события писем от qr → `qr`, системные → `system`, повтор из админки → `user`.
 - Новые `event_name` для `aggregate_type = 'qr_order'` (шаги пайплайна выдачи, `'step_' . $step->name()`, payload `{status: ok|fail, error?}`): `step_create_tickets`, `step_send_order_email`, `step_push_to_baza`, `step_send_telegram`, `step_create_live_tickets`, `step_link_live`, `step_send_list_email`, `step_send_live_email`.
+- `aggregate_type = 'festival'` (AF-7, модуль `Festival`) — журнал каталога фестивалей: `festival_created` (payload `{name, year, active}`), `festival_edited` (payload `{changed: [...]}` — изменившиеся поля), `festival_deleted`. `actor_type = user` (`actor_id = Auth::id()`). Отдаётся `GET /api/v1/festival/getHistory/{id}` (admin).
 
 ### QrOrder Module
 

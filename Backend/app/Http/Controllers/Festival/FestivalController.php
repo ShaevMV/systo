@@ -14,6 +14,7 @@ use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
+use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\Order\OrderTicket\Application\GetFestivalList\FestivalApplication;
 use Tickets\Order\OrderTicket\Application\GetList\FestivalGetListQuery;
 use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
@@ -112,7 +113,7 @@ class FestivalController extends Controller
             (bool) $request->input('data.active', false),
         );
 
-        $this->festivalApplication->create($dto);
+        $this->festivalApplication->create($dto, $this->authorId());
 
         return response()->json([
             'success' => true,
@@ -197,7 +198,7 @@ class FestivalController extends Controller
             (bool) $request->input('data.active', false),
         );
 
-        $this->festivalApplication->edit($uuid, $dto);
+        $this->festivalApplication->edit($uuid, $dto, $this->authorId());
 
         return response()->json([
             'success' => true,
@@ -213,9 +214,50 @@ class FestivalController extends Controller
      */
     public function delete(string $id): JsonResponse
     {
+        $uuid = new Uuid($id);
+
+        if (null === $this->festivalApplication->getItem($uuid)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Фестиваль не найден',
+            ]);
+        }
+
         return response()->json([
-            'success' => $this->festivalApplication->delete(new Uuid($id)),
+            'success' => $this->festivalApplication->delete($uuid, $this->authorId()),
         ]);
+    }
+
+    /**
+     * Журнал изменений фестиваля (domain_history, aggregate_type=festival): кто/что/когда.
+     */
+    public function getHistory(string $id): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'history' => array_map(static fn (DomainHistoryDto $item): array => [
+                'event_name' => $item->eventName,
+                'aggregate_type' => $item->aggregateType,
+                'payload' => $item->payload,
+                'actor_id' => $item->actorRealId ?? $item->actorId,
+                'actor_type' => $item->actorType,
+                'actor_name' => $item->actorName,
+                'actor_email' => $item->actorEmail,
+                'occurred_at' => $item->occurredAt->toIso8601String(),
+            ], $this->festivalApplication->getHistory(new Uuid($id))),
+        ]);
+    }
+
+    /** Id текущего админа строкой (Auth::id() в проекте может вернуть Uuid VO). */
+    private function authorId(): ?string
+    {
+        $id = Auth::id();
+
+        if ($id === null) {
+            return null;
+        }
+
+        return $id instanceof Uuid ? $id->value() : (string) $id;
     }
 
 }

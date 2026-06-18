@@ -261,9 +261,36 @@
 ### DELETE `/api/v1/festival/delete/{id}`
 **Middleware:** `auth:api` + `admin`
 
-**Описание:** **soft delete** фестиваля (помечается `deleted_at`, данные не теряются — фестиваль связан с заказами/билетами/типами билетов/промокодами/локациями). CQRS: `FestivalController::delete` → `FestivalApplication::delete` → `FestivalDeleteCommand`/`Handler` → `FestivalRepositoryInterface::remove`.
+**Описание:** **soft delete** фестиваля (помечается `deleted_at`, данные не теряются — фестиваль связан с заказами/билетами/типами билетов/промокодами/локациями). CQRS: `FestivalController::delete` → `FestivalApplication::delete` → `FestivalDeleteCommand`/`Handler` → `FestivalRepositoryInterface::remove`. Пишет событие `festival_deleted` в `domain_history`.
 
-**Response 200:** `{ "success": true }` (или `false`, если фестиваля с таким `id` нет)
+**Response 200:** `{ "success": true }`
+**Response 200 (не найден):** `{ "success": false, "message": "Фестиваль не найден" }`
+
+---
+
+### GET `/api/v1/festival/getHistory/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** журнал изменений фестиваля (AF-7). `Festival` — **AggregateRoot** (`Backend/src/Festival/Domain/Festival.php`) с trait `HasHistory` (как `Template`/`OrderTicket`): действия `create`/`edit`/`delete` пишут события в `domain_history` (`aggregate_type = 'festival'`, `actor_type = user`, `actor_id = Auth::id()`). События: `festival_created` (payload `{name, year, active}`), `festival_edited` (payload `{changed: [...]}` — список изменившихся полей), `festival_deleted`.
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "history": [
+    {
+      "event_name": "festival_created",
+      "aggregate_type": "festival",
+      "payload": { "name": "...", "year": 2026, "active": true },
+      "actor_id": "uuid",
+      "actor_type": "user",
+      "actor_name": "...",
+      "actor_email": "...",
+      "occurred_at": "ISO8601"
+    }
+  ]
+}
+```
 
 ---
 
@@ -1143,7 +1170,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/* (кроме getTicketTypeList/create/edit/delete), festival/getList, festival/getItem, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
+| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, festival/getHistory, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
