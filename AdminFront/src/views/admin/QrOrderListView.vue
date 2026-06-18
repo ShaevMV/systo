@@ -23,7 +23,14 @@ const typeOrderOptions = [
     { label: 'Живой', value: 'live' }
 ];
 
-const emptyFilter = () => ({ status: '', type_order: '', festival_id: '', email: '', city: '' });
+// Способ оплаты (payment.method из расширенного контракта qr → колонка payment_method).
+const paymentMethodOptions = [
+    { label: 'Перевод', value: 'transfer' },
+    { label: 'Онлайн', value: 'online' },
+    { label: 'На месте (live)', value: 'live' }
+];
+
+const emptyFilter = () => ({ status: '', type_order: '', festival_id: '', email: '', city: '', payment_method: '', external_order_no: '' });
 const filter = ref(emptyFilter());
 
 // Состояние пагинации/сортировки DataTable (server-side).
@@ -49,6 +56,20 @@ const festivalOptions = computed(() => festivals.value.map((f) => ({ label: `${f
 
 const orderData = computed(() => item.value?.payload?.order_data || {});
 const guests = computed(() => item.value?.payload?.guests || []);
+// Богатые секции расширенного контракта qr (для детали заказа).
+const payment = computed(() => item.value?.payload?.payment || {});
+const buyer = computed(() => item.value?.payload?.buyer || {});
+const discounts = computed(() => payment.value?.discounts || []);
+const promoCodes = computed(() => payment.value?.promo_codes || []);
+const externalOrderNo = computed(() => item.value?.external_order_no ?? item.value?.payload?.external_order_no ?? null);
+
+function paymentMethodLabel(v) {
+    return paymentMethodOptions.find((o) => o.value === v)?.label || v || '—';
+}
+// Опции гостя с положительной кратностью (qty=0 — не выбрано).
+function guestOptions(g) {
+    return (g?.options || []).filter((o) => Number(o?.qty ?? 1) > 0);
+}
 
 function buildOrderBy() {
     return sortField.value ? { [sortField.value]: sortOrder.value > 0 ? 'asc' : 'desc' } : {};
@@ -216,6 +237,14 @@ onMounted(() => {
                         <label>Город</label>
                         <InputText v-model="filter.city" placeholder="Часть города" />
                     </div>
+                    <div class="qr-field">
+                        <label>Способ оплаты</label>
+                        <Select v-model="filter.payment_method" :options="paymentMethodOptions" option-label="label" option-value="value" placeholder="Все" show-clear />
+                    </div>
+                    <div class="qr-field">
+                        <label>№ заказа qr</label>
+                        <InputText v-model="filter.external_order_no" placeholder="Номер заказа" />
+                    </div>
                     <div class="qr-field qr-field-actions">
                         <Button label="Применить" icon="pi pi-search" @click="applyFilter" />
                         <Button label="Сбросить" icon="pi pi-times" severity="secondary" outlined @click="resetFilter" />
@@ -258,6 +287,9 @@ onMounted(() => {
                     <Column field="created_at" header="Создан" sortable :style="{ minWidth: '9rem' }">
                         <template #body="{ data }">{{ formatDate(data.created_at) }}</template>
                     </Column>
+                    <Column field="external_order_no" header="№ qr" :style="{ minWidth: '6rem' }">
+                        <template #body="{ data }">{{ data.external_order_no || '—' }}</template>
+                    </Column>
                     <Column field="email" header="Email" :style="{ minWidth: '13rem' }" />
                     <Column field="status" header="Статус" :style="{ minWidth: '8rem' }">
                         <template #body="{ data }">
@@ -271,6 +303,9 @@ onMounted(() => {
                         <template #body="{ data }">{{ festivalName(data.festival_id) }}</template>
                     </Column>
                     <Column field="city" header="Город" :style="{ minWidth: '8rem' }" />
+                    <Column field="payment_method" header="Оплата" :style="{ minWidth: '7rem' }">
+                        <template #body="{ data }">{{ data.payment_method ? paymentMethodLabel(data.payment_method) : '—' }}</template>
+                    </Column>
                     <Column field="total_price" header="Сумма" sortable :style="{ minWidth: '7rem' }">
                         <template #body="{ data }">{{ formatPrice(data.total_price) }}</template>
                     </Column>
@@ -291,14 +326,16 @@ onMounted(() => {
                         <span class="qr-label">Статус</span>
                         <Tag :value="item.status" :severity="statusSeverity(item.status)" />
                     </div>
+                    <div v-if="externalOrderNo"><span class="qr-label">№ заказа qr</span> {{ externalOrderNo }}</div>
                     <div><span class="qr-label">Тип</span> {{ typeOrderLabel(item.type_order) }}</div>
                     <div><span class="qr-label">Фестиваль</span> {{ orderData.festival?.title || festivalName(item.festival_id) }}</div>
                     <div><span class="qr-label">Email</span> {{ item.email }}</div>
                     <div><span class="qr-label">Телефон</span> {{ item.phone || '—' }}</div>
                     <div><span class="qr-label">Город</span> {{ item.city || '—' }}</div>
-                    <div><span class="qr-label">Оплата</span> {{ orderData.types_of_payment?.title || '—' }}</div>
+                    <div v-if="buyer.fio"><span class="qr-label">Покупатель</span> {{ buyer.fio }}</div>
                     <div><span class="qr-label">Сумма</span> {{ formatPrice(item.total_price) }}</div>
                     <div><span class="qr-label">Создан</span> {{ formatDate(item.created_at) }}</div>
+                    <div><span class="qr-label">Оплачен</span> {{ item.paid_at ? formatDate(item.paid_at) : '—' }}</div>
                     <div><span class="qr-label">Выдан</span> {{ item.issued_at ? formatDate(item.issued_at) : '—' }}</div>
                 </div>
 
@@ -311,20 +348,63 @@ onMounted(() => {
 
                 <div v-if="orderData.comment" class="qr-comment"><span class="qr-label">Комментарий</span> {{ orderData.comment }}</div>
 
+                <!-- Оплата (расширенный контракт qr): способ, сумма, чек, промокоды, скидки -->
+                <template v-if="payment.method || promoCodes.length || discounts.length">
+                    <h3 class="qr-section-title">Оплата</h3>
+                    <div class="qr-details-grid">
+                        <div><span class="qr-label">Способ</span> {{ paymentMethodLabel(payment.method) }}</div>
+                        <div v-if="payment.amount_total != null"><span class="qr-label">Сумма оплаты</span> {{ formatPrice(payment.amount_total) }}</div>
+                        <div v-if="payment.method_details?.title">
+                            <span class="qr-label">Реквизиты</span> {{ payment.method_details.title }}<span v-if="payment.transfer?.last4"> ••{{ payment.transfer.last4 }}</span>
+                        </div>
+                        <div v-if="payment.transfer?.receipt_url">
+                            <span class="qr-label">Чек/квитанция</span>
+                            <a :href="payment.transfer.receipt_url" target="_blank" rel="noopener">открыть <i class="pi pi-external-link" style="font-size: 0.7rem"></i></a>
+                        </div>
+                        <div v-if="payment.sales_point?.name"><span class="qr-label">Точка продаж</span> {{ payment.sales_point.name }}</div>
+                        <div v-if="promoCodes.length"><span class="qr-label">Промокоды</span> {{ promoCodes.join(', ') }}</div>
+                    </div>
+                    <div v-if="discounts.length" class="qr-discounts">
+                        <span class="qr-label">Скидки</span>
+                        <ul class="qr-discounts-list">
+                            <li v-for="(d, i) in discounts" :key="i">
+                                {{ d.code || '—' }} · {{ d.type || '' }}<span v-if="d.org_fee_price"> · {{ formatPrice(d.org_fee_price) }}</span
+                                ><span v-if="d.applied_to_org_fees"> ×{{ d.applied_to_org_fees }}</span>
+                            </li>
+                        </ul>
+                    </div>
+                </template>
+
                 <!-- Гости -->
                 <h3 class="qr-section-title">Гости ({{ guests.length }})</h3>
                 <DataTable :value="guests" striped-rows scrollable class="qr-guests">
                     <template #empty><div class="qr-empty">Нет гостей</div></template>
                     <Column field="name" header="Имя" :style="{ minWidth: '10rem' }" />
                     <Column field="email" header="Email" :style="{ minWidth: '12rem' }" />
-                    <Column header="Telegram" :style="{ minWidth: '8rem' }">
-                        <template #body="{ data }">{{ data.telegram || '—' }}</template>
-                    </Column>
-                    <Column header="Номер" :style="{ minWidth: '6rem' }">
-                        <template #body="{ data }">{{ data.number ?? '—' }}</template>
-                    </Column>
                     <Column header="Билет" :style="{ minWidth: '9rem' }">
                         <template #body="{ data }">{{ data.type_ticket?.title || '—' }}</template>
+                    </Column>
+                    <Column header="Опции" :style="{ minWidth: '10rem' }">
+                        <template #body="{ data }">
+                            <span v-if="guestOptions(data).length">{{
+                                guestOptions(data)
+                                    .map((o) => o.name + (o.qty > 1 ? ' ×' + o.qty : ''))
+                                    .join(', ')
+                            }}</span>
+                            <span v-else>—</span>
+                        </template>
+                    </Column>
+                    <Column header="Доп." :style="{ minWidth: '8rem' }">
+                        <template #body="{ data }">
+                            <Tag v-if="data.is_co_organizer" value="соорг" severity="info" class="qr-guest-tag" />
+                            <Tag v-if="data.child" value="ребёнок" severity="warn" class="qr-guest-tag" />
+                            <Tag v-if="data.car" value="авто" severity="secondary" class="qr-guest-tag" />
+                            <span v-if="!data.is_co_organizer && !data.child && !data.car && !data.telegram">—</span>
+                            <span v-if="data.telegram" class="qr-guest-tg">{{ data.telegram }}</span>
+                        </template>
+                    </Column>
+                    <Column header="Цена" :style="{ minWidth: '6rem' }">
+                        <template #body="{ data }">{{ data.price?.total != null ? formatPrice(data.price.total) : '—' }}</template>
                     </Column>
                 </DataTable>
 
@@ -347,13 +427,21 @@ onMounted(() => {
                 </div>
                 <DataTable :value="emails" striped-rows scrollable class="qr-guests">
                     <template #empty><div class="qr-empty">Писем нет</div></template>
-                    <Column header="Событие" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ emailEventLabel(data.event) }}</template></Column>
+                    <Column header="Событие" :style="{ minWidth: '9rem' }"
+                        ><template #body="{ data }">{{ emailEventLabel(data.event) }}</template></Column
+                    >
                     <Column header="Статус" :style="{ minWidth: '10rem' }">
                         <template #body="{ data }"><Tag :value="emailStatusMeta(data.status).label" :severity="emailStatusMeta(data.status).severity" /></template>
                     </Column>
-                    <Column header="Отправлено" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ formatDate(data.sent_at) }}</template></Column>
-                    <Column header="Прочитано" :style="{ minWidth: '9rem' }"><template #body="{ data }">{{ formatDate(data.opened_at) }}</template></Column>
-                    <Column header="Ошибка" :style="{ minWidth: '10rem' }"><template #body="{ data }">{{ data.error || '—' }}</template></Column>
+                    <Column header="Отправлено" :style="{ minWidth: '9rem' }"
+                        ><template #body="{ data }">{{ formatDate(data.sent_at) }}</template></Column
+                    >
+                    <Column header="Прочитано" :style="{ minWidth: '9rem' }"
+                        ><template #body="{ data }">{{ formatDate(data.opened_at) }}</template></Column
+                    >
+                    <Column header="Ошибка" :style="{ minWidth: '10rem' }"
+                        ><template #body="{ data }">{{ data.error || '—' }}</template></Column
+                    >
                 </DataTable>
 
                 <!-- Путь заказа (история + шаги пайплайна) -->
@@ -449,6 +537,24 @@ onMounted(() => {
 
 .qr-comment {
     margin-bottom: 1rem;
+}
+
+.qr-discounts {
+    margin: 0.25rem 0 0.75rem;
+}
+
+.qr-discounts-list {
+    margin: 0.25rem 0 0;
+    padding-left: 1.1rem;
+}
+
+.qr-guest-tag {
+    margin-right: 0.25rem;
+}
+
+.qr-guest-tg {
+    color: var(--p-text-muted-color, #6b7280);
+    font-size: 0.8rem;
 }
 
 .qr-section-title {
