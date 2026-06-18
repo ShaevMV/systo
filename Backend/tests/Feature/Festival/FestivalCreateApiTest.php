@@ -59,4 +59,26 @@ class FestivalCreateApiTest extends TestCase
         $this->postJson('/api/v1/festival/create', ['data' => ['active' => true]])
             ->assertStatus(422);
     }
+
+    public function test_admin_creates_festival_with_provided_id(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']), 'api');
+
+        $id = \Shared\Domain\ValueObject\Uuid::random()->value();
+
+        $this->postJson('/api/v1/festival/create', $this->payload(['id' => $id]))
+            ->assertOk()
+            ->assertJson(['success' => true, 'item' => ['id' => $id]]);
+
+        // переданный id использован, а не сгенерирован новый
+        $this->assertDatabaseHas('festivals', ['id' => $id, 'name' => 'Осенний Систо']);
+    }
+
+    public function test_create_with_invalid_id_returns_422(): void
+    {
+        $this->actingAs(User::factory()->create(['role' => 'admin']), 'api');
+
+        $this->postJson('/api/v1/festival/create', $this->payload(['id' => 'not-a-uuid']))
+            ->assertStatus(422);
+    }
 }

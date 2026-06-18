@@ -202,6 +202,7 @@
 ```json
 {
   "data": {
+    "id": "UUID? (опционально — можно задать с клиента; не передан → генерируется на сервере)",
     "name": "string (required, max:255)",
     "year": "int (required, 2000..2100)",
     "active": "bool (default false)"
