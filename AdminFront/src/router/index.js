@@ -103,6 +103,33 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/ticket-types',
+                    name: 'ticketTypes',
+                    component: () => import('@/views/admin/TicketTypeListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/promo-codes',
+                    name: 'promoCodes',
+                    component: () => import('@/views/admin/PromoCodeListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/questionnaires',
+                    name: 'questionnaires',
+                    component: () => import('@/views/admin/QuestionnaireListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },
