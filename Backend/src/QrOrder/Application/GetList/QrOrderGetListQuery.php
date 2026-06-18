@@ -14,15 +14,14 @@ use Shared\Domain\Criteria\Order;
 class QrOrderGetListQuery implements Query
 {
     /**
-     * @param array<string, mixed> $filter
+     * @param  array<string, mixed>  $filter
      */
     public function __construct(
         private array $filter,
         private Order $orderBy,
         private int $page,
         private int $perPage,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>

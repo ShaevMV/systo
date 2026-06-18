@@ -13,25 +13,27 @@ use Shared\Domain\Bus\Query\Response;
 class QrOrderStatsResponse implements Response
 {
     /**
-     * @param array{orders: int, revenue: int} $totals
-     * @param array<int, array{status: string, orders: int, revenue: int}> $byStatus
-     * @param array<int, array{type_order: ?string, orders: int, revenue: int}> $byType
-     * @param array<int, array{date: string, orders: int, revenue: int}> $timeseries
+     * @param  array{orders: int, revenue: int}  $totals
+     * @param  array<int, array{status: string, orders: int, revenue: int}>  $byStatus
+     * @param  array<int, array{type_order: ?string, orders: int, revenue: int}>  $byType
+     * @param  array<int, array{date: string, orders: int, revenue: int}>  $timeseries
+     * @param  array<int, array{payment_method: ?string, orders: int, revenue: int}>  $byPaymentMethod
      */
     public function __construct(
         private array $totals,
         private array $byStatus,
         private array $byType,
         private array $timeseries,
-    ) {
-    }
+        private array $byPaymentMethod = [],
+    ) {}
 
     /**
      * @return array{
      *     totals: array{orders: int, revenue: int},
      *     byStatus: array<int, array{status: string, orders: int, revenue: int}>,
      *     byType: array<int, array{type_order: ?string, orders: int, revenue: int}>,
-     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>
+     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>,
+     *     byPaymentMethod: array<int, array{payment_method: ?string, orders: int, revenue: int}>
      * }
      */
     public function toArray(): array
@@ -41,6 +43,7 @@ class QrOrderStatsResponse implements Response
             'byStatus' => $this->byStatus,
             'byType' => $this->byType,
             'timeseries' => $this->timeseries,
+            'byPaymentMethod' => $this->byPaymentMethod,
         ];
     }
 }

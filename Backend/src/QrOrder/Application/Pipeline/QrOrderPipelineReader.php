@@ -23,14 +23,13 @@ final class QrOrderPipelineReader
         private readonly HistoryRepositoryInterface $history,
         private readonly EmailMessageRepositoryInterface $emails,
         private readonly TicketsRepositoryInterface $tickets,
-    ) {
-    }
+    ) {}
 
     /** Ссылки на PDF билетов заказа (storage/tickets/{ticketId}.pdf). */
     public function ticketPdfUrls(Uuid $orderId): array
     {
         return array_map(
-            static fn (Uuid $ticketId): string => asset('storage/tickets/' . $ticketId->value() . '.pdf'),
+            static fn (Uuid $ticketId): string => asset('storage/tickets/'.$ticketId->value().'.pdf'),
             $this->tickets->getListIdByOrderId($orderId),
         );
     }
@@ -49,7 +48,7 @@ final class QrOrderPipelineReader
         $tickets = array_map(
             static fn (Uuid $ticketId): array => [
                 'ticket_id' => $ticketId->value(),
-                'pdf_url' => asset('storage/tickets/' . $ticketId->value() . '.pdf'),
+                'pdf_url' => asset('storage/tickets/'.$ticketId->value().'.pdf'),
             ],
             $this->tickets->getListIdByOrderId($orderId),
         );

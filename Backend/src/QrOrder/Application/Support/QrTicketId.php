@@ -22,7 +22,7 @@ final class QrTicketId
     public static function forGuest(Uuid $orderId, int $index): Uuid
     {
         return new Uuid(
-            RamseyUuid::uuid5(self::NAMESPACE, $orderId->value() . ':' . $index)->toString(),
+            RamseyUuid::uuid5(self::NAMESPACE, $orderId->value().':'.$index)->toString(),
         );
     }
 }

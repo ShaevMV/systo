@@ -30,7 +30,7 @@ class QrOrderDtoTest extends TestCase
             ],
             'guests' => [
                 ['name' => 'Иван Гость', 'email' => 'guest@example.com', 'promocode' => 'SUMMER',
-                 'type_ticket' => ['id' => '44444444-4444-4444-4444-444444444444', 'title' => 'Оргвзнос', 'options' => []]],
+                    'type_ticket' => ['id' => '44444444-4444-4444-4444-444444444444', 'title' => 'Оргвзнос', 'options' => []]],
             ],
         ];
     }
@@ -51,6 +51,44 @@ class QrOrderDtoTest extends TestCase
         self::assertSame('55555555-5555-5555-5555-555555555555', $dto->getFestivalId()?->value());
         // payload сохранён целиком (гости на месте).
         self::assertCount(1, $dto->getPayload()['guests']);
+    }
+
+    public function test_projects_extended_contract_fields(): void
+    {
+        // Расширенный контракт qr: external_order_no, payment.method, payment.promo_codes[0],
+        // order_data.paid_at — денормализуются в колонки (для списка/фильтра/отчётности),
+        // при этом весь JSON (включая payment/buyer/options) остаётся в payload as-is.
+        $contract = $this->contract();
+        $contract['external_order_no'] = 90909;
+        $contract['order_data']['paid_at'] = '2026-06-18T12:45:00+03:00';
+        $contract['payment'] = [
+            'method' => 'transfer',
+            'amount_total' => 4000,
+            'promo_codes' => ['OSEN.BUDET', 'SECOND'],
+            'transfer' => ['receipt_url' => 'https://qr/r.pdf'],
+            'discounts' => [['code' => 'OSEN.BUDET', 'type' => 'fixed']],
+        ];
+
+        $dto = QrOrderDto::fromQrContract($contract);
+
+        self::assertSame('90909', $dto->getExternalOrderNo());
+        self::assertSame('transfer', $dto->getPaymentMethod());
+        self::assertSame('OSEN.BUDET', $dto->getPromoCode()); // первый из promo_codes
+        self::assertSame('2026-06-18', $dto->getPaidAt()?->toDateString());
+        // Богатые секции лежат в payload целиком (для богатой детали в админке).
+        self::assertSame('https://qr/r.pdf', $dto->getPayload()['payment']['transfer']['receipt_url']);
+        self::assertCount(1, $dto->getPayload()['payment']['discounts']);
+    }
+
+    public function test_extended_fields_are_null_when_absent(): void
+    {
+        // Старый/минимальный контракт без payment/external_order_no → новые проекции = null.
+        $dto = QrOrderDto::fromQrContract($this->contract());
+
+        self::assertNull($dto->getExternalOrderNo());
+        self::assertNull($dto->getPaymentMethod());
+        self::assertNull($dto->getPromoCode());
+        self::assertNull($dto->getPaidAt());
     }
 
     public function test_festival_id_is_null_when_absent_in_contract(): void

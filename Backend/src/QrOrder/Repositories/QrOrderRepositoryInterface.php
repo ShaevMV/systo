@@ -30,7 +30,7 @@ interface QrOrderRepositoryInterface
      * Сводные агрегаты для дашборда (read-only): заказы + выручка, всего и в разрезах
      * (по статусу, по типу заказа, по дням). Деньги — целые рубли (как total_price).
      *
-     * @param array{festival_id?: ?string, date_from?: ?string, date_to?: ?string} $filter
+     * @param  array{festival_id?: ?string, date_from?: ?string, date_to?: ?string}  $filter
      * @return array{
      *     totals: array{orders: int, revenue: int},
      *     byStatus: array<int, array{status: string, orders: int, revenue: int}>,

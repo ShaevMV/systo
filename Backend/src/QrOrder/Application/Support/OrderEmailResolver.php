@@ -9,6 +9,7 @@ use App\Mail\OrderToPaidFriendly;
 use Illuminate\Mail\Mailable;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 
 /**
  * Резолвер письма с билетами по типу заказа (C3, уровень order-type).
@@ -23,7 +24,7 @@ use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 final class OrderEmailResolver
 {
     /**
-     * @param array<int, \Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse> $responses
+     * @param  array<int, TicketResponse>  $responses
      */
     public function resolve(?string $typeOrder, array $responses, ?Uuid $ticketTypeId, ?string $comment): Mailable
     {

@@ -18,8 +18,7 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
 {
     public function __construct(
         private QrOrderModel $model,
-    ) {
-    }
+    ) {}
 
     public function create(QrOrderDto $dto): bool
     {
@@ -34,6 +33,10 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
             'phone' => $dto->getPhone(),
             'total_price' => $dto->getTotalPrice(),
             'payload' => $dto->getPayload(),
+            'external_order_no' => $dto->getExternalOrderNo(),
+            'payment_method' => $dto->getPaymentMethod(),
+            'promo_code' => $dto->getPromoCode(),
+            'paid_at' => $dto->getPaidAt(),
         ]);
     }
 
@@ -62,12 +65,13 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
      * Сводные агрегаты для дашборда. Считаем на стороне БД (COUNT/SUM/GROUP BY) —
      * без загрузки строк в PHP. Фильтр — festival_id + диапазон дат created_at.
      *
-     * @param array{festival_id?: ?string, date_from?: ?string, date_to?: ?string} $filter
+     * @param  array{festival_id?: ?string, date_from?: ?string, date_to?: ?string}  $filter
      * @return array{
      *     totals: array{orders: int, revenue: int},
      *     byStatus: array<int, array{status: string, orders: int, revenue: int}>,
      *     byType: array<int, array{type_order: ?string, orders: int, revenue: int}>,
-     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>
+     *     timeseries: array<int, array{date: string, orders: int, revenue: int}>,
+     *     byPaymentMethod: array<int, array{payment_method: ?string, orders: int, revenue: int}>
      * }
      */
     public function aggregateStats(array $filter): array
@@ -77,13 +81,13 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
             $query = $this->model::query();
 
             if (! empty($filter['festival_id'])) {
-                $query->where(QrOrderModel::TABLE . '.festival_id', $filter['festival_id']);
+                $query->where(QrOrderModel::TABLE.'.festival_id', $filter['festival_id']);
             }
             if (! empty($filter['date_from'])) {
-                $query->whereDate(QrOrderModel::TABLE . '.created_at', '>=', $filter['date_from']);
+                $query->whereDate(QrOrderModel::TABLE.'.created_at', '>=', $filter['date_from']);
             }
             if (! empty($filter['date_to'])) {
-                $query->whereDate(QrOrderModel::TABLE . '.created_at', '<=', $filter['date_to']);
+                $query->whereDate(QrOrderModel::TABLE.'.created_at', '<=', $filter['date_to']);
             }
 
             return $query;
@@ -126,6 +130,18 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
                 'revenue' => (int) $row->revenue,
             ])->all();
 
+        // Отчётность по способу оплаты (проекция payment_method из расширенного контракта qr).
+        $byPaymentMethod = $scoped()
+            ->selectRaw('payment_method, COUNT(*) as orders, COALESCE(SUM(total_price), 0) as revenue')
+            ->groupBy('payment_method')
+            ->orderByDesc('orders')
+            ->get()
+            ->map(static fn ($row) => [
+                'payment_method' => $row->payment_method,
+                'orders' => (int) $row->orders,
+                'revenue' => (int) $row->revenue,
+            ])->all();
+
         return [
             'totals' => [
                 'orders' => (int) ($totals->orders ?? 0),
@@ -134,6 +150,7 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
             'byStatus' => $byStatus,
             'byType' => $byType,
             'timeseries' => $timeseries,
+            'byPaymentMethod' => $byPaymentMethod,
         ];
     }
 
