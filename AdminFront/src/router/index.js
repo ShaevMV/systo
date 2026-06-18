@@ -130,6 +130,33 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/orders',
+                    name: 'orders',
+                    component: () => import('@/views/admin/OrderListForAdminView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/orders-friendly',
+                    name: 'ordersFriendly',
+                    component: () => import('@/views/admin/OrderListForFriendlyView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/orders-lists',
+                    name: 'ordersLists',
+                    component: () => import('@/views/admin/OrderListsListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },

@@ -12,14 +12,34 @@ const model = ref([
                 to: '/admin/dashboard'
             },
             {
+                label: 'Анкеты',
+                icon: 'pi pi-fw pi-id-card',
+                to: '/admin/questionnaires'
+            }
+        ]
+    },
+    {
+        label: 'Заказы',
+        items: [
+            {
                 label: 'QR-заказы',
                 icon: 'pi pi-fw pi-qrcode',
                 to: '/admin/qr-orders'
             },
             {
-                label: 'Анкеты',
-                icon: 'pi pi-fw pi-id-card',
-                to: '/admin/questionnaires'
+                label: 'Оргвзносы',
+                icon: 'pi pi-fw pi-shopping-cart',
+                to: '/admin/orders'
+            },
+            {
+                label: 'Дружеские',
+                icon: 'pi pi-fw pi-users',
+                to: '/admin/orders-friendly'
+            },
+            {
+                label: 'Заказы-списки',
+                icon: 'pi pi-fw pi-list',
+                to: '/admin/orders-lists'
             }
         ]
     },
