@@ -392,8 +392,8 @@ class Questionnaire extends AggregateRoot {
 
 | DTO | Файл | Поля |
 |-----|------|------|
-| **QrOrderDto** | `QrOrder/Dto/` | `id` (Uuid, == id заказа qr/org), `email`, `status`, `festivalId` (?Uuid), `typeOrder` (?string: regular/friendly/list/live), `city`, `phone`, `totalPrice` (int, рубли), `payload` (array — весь контракт qr), `issuedAt`. Фабрики: `fromState($row)` (из строки БД), `fromQrContract($json)` (из контракта витрины) |
-| **QrOrderItemForListResponse** | `QrOrder/Responses/` | Облегчённая проекция для списка админки (snake_case, **без `payload`**): `id`, `email`, `status`, `festival_id`, `type_order`, `city`, `phone`, `total_price`, `issued_at`, `created_at` |
+| **QrOrderDto** | `QrOrder/Dto/` | `id` (Uuid, == id заказа qr/org), `email`, `status`, `festivalId` (?Uuid), `typeOrder` (?string: regular/friendly/list/live), `city`, `phone`, `totalPrice` (int, рубли), `payload` (array — весь контракт qr), `issuedAt`, `externalOrderNo` (?string), `paymentMethod` (?string), `promoCode` (?string), `paidAt` (?Carbon). Фабрики: `fromState($row)` (из строки БД), `fromQrContract($json)` (из контракта витрины — проецирует `external_order_no`, `payment.method`, `payment.promo_codes[0]`, `order_data.paid_at`; весь JSON в `payload`) |
+| **QrOrderItemForListResponse** | `QrOrder/Responses/` | Облегчённая проекция для списка админки (snake_case, **без `payload`**): `id`, `email`, `status`, `festival_id`, `type_order`, `city`, `phone`, `total_price`, `external_order_no`, `payment_method`, `promo_code`, `issued_at`, `paid_at`, `created_at` |
 | **QrOrderGetListResponse** | `QrOrder/Responses/` | `collection` (Collection<QrOrderItemForListResponse>) + `totalCount` (int) — страница + total для пагинации |
 
 ### EmailDelivery Module

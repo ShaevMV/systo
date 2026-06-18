@@ -576,7 +576,10 @@
     "city": "string? (LIKE)",
     "status": "string? (EQUAL)",
     "festival_id": "UUID? (EQUAL)",
-    "type_order": "string? (EQUAL: regular/friendly/list/live)"
+    "type_order": "string? (EQUAL: regular/friendly/list/live)",
+    "external_order_no": "string? (LIKE — № заказа qr)",
+    "payment_method": "string? (EQUAL: transfer/online/live)",
+    "promo_code": "string? (EQUAL)"
   },
   "orderBy": { "created_at": "asc|desc" },
   "page": 1,
@@ -596,13 +599,15 @@
       "id": "UUID", "email": "...", "status": "оплачен",
       "festival_id": "UUID", "type_order": "regular", "city": "...",
       "phone": "...", "total_price": 4200,
-      "issued_at": "ISO8601|null", "created_at": "ISO8601"
+      "external_order_no": "90909", "payment_method": "transfer", "promo_code": "OSEN.BUDET",
+      "issued_at": "ISO8601|null", "paid_at": "ISO8601|null", "created_at": "ISO8601"
     }
   ],
   "totalNumber": { "totalCount": 42 }
 }
 ```
 - Проекция списка — `QrOrderItemForListResponse` (snake_case, **без `payload`** — он тяжёлый, отдаётся только в `getItem`)
+- **Проекция расширенного контракта qr** (миграция `2026_06_18_140000`): `external_order_no` (№ заказа qr), `payment_method` (`payment.method`), `promo_code` (`payment.promo_codes[0]`), `paid_at` (`order_data.paid_at`) денормализованы в колонки `qr_orders` для списка/фильтров/отчётности. Весь JSON по-прежнему в `payload` (см. `getItem`). `getStats` получил разрез `byPaymentMethod`.
 
 ---
 
