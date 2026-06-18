@@ -4,6 +4,10 @@ namespace Tickets\Order\OrderTicket\Repositories;
 
 use App\Models\Festival\FestivalModel;
 use App\Models\Festival\TicketTypesModel;
+use Illuminate\Support\Collection;
+use Shared\Domain\Criteria\Filters;
+use Shared\Domain\Criteria\Order;
+use Shared\Domain\Filter\FilterBuilder;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 
@@ -59,5 +63,36 @@ class InMemoryMySqlFestivalRepository implements FestivalRepositoryInterface
         }
 
         return $result;
+    }
+
+    public function getList(Filters $filters, Order $orderBy): Collection
+    {
+        $build = $this->model::query();
+
+        $result = FilterBuilder::build($build, $filters);
+
+        if ($orderBy->orderBy()->value()) {
+            $result = $result->orderBy(
+                $orderBy->orderBy()->value(),
+                $orderBy->orderType()->value()
+            );
+        }
+
+        return $result->get()
+            ->map(fn (FestivalModel $model) => FestivalDto::fromState($model->toArray()));
+    }
+
+    public function editItem(Uuid $id, FestivalDto $data): bool
+    {
+        if (!$rawData = $this->model::whereId($id->value())->first()) {
+            throw new \DomainException("Фестиваль {$id->value()} не найден");
+        }
+
+        return $rawData->fill($data->toArrayForEdit())->save();
+    }
+
+    public function remove(Uuid $id): bool
+    {
+        return (bool) $this->model::whereId($id->value())->delete();
     }
 }

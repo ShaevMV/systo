@@ -25,8 +25,21 @@ Route::prefix('v1/festival')->group(static function (): void {
     // получения списка всех фестивалей
     Route::get('/getFestivalList', [FestivalController::class, 'getFestivalList']);
 
+    // CRUD каталога фестивалей (мастер на org)
+    // чтение — публичное (как у location), запись — только admin
+    Route::post('/getList', [FestivalController::class, 'getList']);
+    Route::get('/getItem/{id}', [FestivalController::class, 'getItem']);
+
     // создание фестиваля (каталог — мастер на org), только admin
     Route::post('/create', [FestivalController::class, 'create'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
+    Route::post('/edit/{id}', [FestivalController::class, 'edit'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
+    Route::delete('/delete/{id}', [FestivalController::class, 'delete'])
         ->middleware('auth:api')
         ->middleware('admin');
 });

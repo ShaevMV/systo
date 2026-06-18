@@ -214,6 +214,59 @@
 
 ---
 
+### POST `/api/v1/festival/getList`
+**Middleware:** публичный
+
+**Описание:** список фестивалей с фильтрами + сортировкой для админ-CRUD (по образцу `location/getList`). CQRS: `FestivalController::getList` → `FestivalApplication::getList` → `FestivalGetListQuery`/`Handler` → `FestivalRepositoryInterface::getList` (БД только в репозитории, `FilterBuilder` + `Order`). Не путать с `getFestivalList` (старый формат `{festivalDto:[…]}` для витрины, без фильтров). Soft-deleted фестивали в список не попадают.
+
+**Request (фильтр — whitelist):**
+```json
+{
+  "filter": {
+    "name": "string? (LIKE)",
+    "year": "int? (EQUAL)",
+    "active": "bool? (EQUAL)"
+  },
+  "orderBy": { "name": "asc|desc" }
+}
+```
+- Фильтр — **whitelist** (`name`/`year`/`active`)
+- `orderBy.*` допускает только `asc`/`desc`; кривое значение → `Order::none()` (запрос не падает)
+
+**Response 200:** `{ "success": true, "list": [ { "id": "UUID", "name": "...", "year": 2026, "active": true } ] }`
+
+---
+
+### GET `/api/v1/festival/getItem/{id}`
+**Middleware:** публичный
+
+**Response 200:** `{ "success": true, "item": { "id": "UUID", "name": "...", "year": 2026, "active": true } }`
+**Response 200 (не найден):** `{ "success": false, "message": "Фестиваль не найден" }`
+
+---
+
+### POST `/api/v1/festival/edit/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** редактировать фестиваль (admin). CQRS: `FestivalController::edit` → `FestivalApplication::edit` → `FestivalEditCommand`/`Handler` → `FestivalRepositoryInterface::editItem`.
+
+**Request:** как у `create` (`data.name` required, `data.year` 2000..2100, `data.active` bool).
+
+**Response 200:** `{ "success": true, "item": { ... }, "message": "Фестиваль отредактирован" }`
+**Response 200 (не найден):** `{ "success": false, "message": "Фестиваль не найден" }`
+**Response 422:** `{ "errors": { "data.name": [...], "data.year": [...] } }`
+
+---
+
+### DELETE `/api/v1/festival/delete/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** **soft delete** фестиваля (помечается `deleted_at`, данные не теряются — фестиваль связан с заказами/билетами/типами билетов/промокодами/локациями). CQRS: `FestivalController::delete` → `FestivalApplication::delete` → `FestivalDeleteCommand`/`Handler` → `FestivalRepositoryInterface::remove`.
+
+**Response 200:** `{ "success": true }` (или `false`, если фестиваля с таким `id` нет)
+
+---
+
 ## 3. Заказы
 
 Префикс: **`/api/v1/order`**
@@ -1088,9 +1141,9 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/*, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/* (кроме getTicketTypeList/create/edit/delete), festival/getList, festival/getItem, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, festival/create, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
+| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
