@@ -62,9 +62,12 @@
 
 ---
 
-### T3 — Привязка шаблонов писем/PDF по типу оплаты (расширение AF-3)
+### T3 — Привязка шаблонов писем/PDF по типу оплаты (расширение AF-3) ✅ Backend сделан (2026-06-18)
 
-**Нужно:** добавить ось **`types_of_payment_id`** в `template_bindings` (как ранее добавили ось `event`):
+> **Сделано (backend):** ось `types_of_payment_id` в `template_bindings` (миграция `2026_06_18_130000`), `TemplateBindingDto`/`matches()`/`specificity()` (вес **16** — сильнейший override), `TemplateBindingResolver::resolve()` + `TemplateBindingApplication::resolveSlug()` получили параметр, `InMemoryMySqlTicketsRepository::getTicket()` пробрасывает `order_tickets.types_of_payment_id` в резолв email/PDF. Легаси `types_of_payment.email` (`emailPayView`) остаётся **fallback**. Тесты: 4 unit резолвера + 1 persistence; полный прогон Backend **410 зелёных**.
+> **Остаётся:** UI-селектор `types_of_payment` в экране «Привязки шаблонов» (AF-8/фронт); проброс `paymentTypeId` в S2S-канал писем (`emailNotification/send`) — опционально.
+
+**Было нужно:** добавить ось **`types_of_payment_id`** в `template_bindings` (как ранее добавили ось `event`):
 - Миграция: `template_bindings.types_of_payment_id` (uuid, nullable = wildcard).
 - `TemplateBindingResolver`: учесть payment-type в специфичности. Текущая ось: `event` > `ticket_type` > `order_type` > `festival`. Определить вес `types_of_payment` (вероятно сразу после `event`/`ticket_type` — обсудить). → **Открытый вопрос 4.**
 - `create`/`edit` привязки принимают `types_of_payment_id`; UI-селектор в экране «Привязки шаблонов».
@@ -97,8 +100,10 @@
 1. **«Адрес магазина»** — это почтовый адрес, ссылка (URL) на магазин, или набор полей (название + адрес + телефон + ссылка)? Что выводить в письме?
 2. **Привязка магазина** — к **типу оплаты** (`types_of_payment`) или к **продавцу** (`user_external_id` → пользователь)? Один тип оплаты = один магазин, или у типа оплаты несколько продавцов/магазинов?
 3. ~~**Festival-агрегат** — новый модуль или на месте?~~ → **Решено (2026-06-18):** класс агрегата — в новом модуле `Backend/src/Festival/Domain/`. CRUD/репозиторий пока под `Order/OrderTicket/`; полный перенос — отдельный рефакторинг.
-4. **Вес оси `types_of_payment`** в резолвере привязок относительно `event`/`ticket_type`/`order_type`/`festival`.
-5. **Легаси `types_of_payment.email`/`pdf`** — мигрировать в `template_bindings` и удалить, или оставить как fallback до cutover?
+4. ~~**Вес оси `types_of_payment`**~~ → **Решено (2026-06-18):** вес **16** — сильнейший override (`types_of_payment > event > ticket > order > festival`). Под каждого продавца своё письмо доминирует.
+5. ~~**Легаси `types_of_payment.email`/`pdf`**~~ → **Решено (2026-06-18):** оставлен как **fallback** (резолвер вернул null → старый slug, в т.ч. `emailPayView`). Не удаляем сейчас.
+
+**Открыто по AF-10:** «адрес магазина» — какие именно поля/данные продавца выводить в письмо (вопросы 1) и где их хранить (вопрос 2: на `types_of_payment` или на продавце `user_external_id`). Сама привязка письма к продавцу (через тип оплаты) — уже готова (T3).
 
 ---
 
@@ -108,5 +113,5 @@
 |--------|-----|--------|--------|
 | **T1** | Festival → AggregateRoot + история + getHistory ✅ **done (2026-06-18)** | M | — |
 | **T2** | Перенос CRUD (festival/ticketType/option/typesOfPayment) в AdminFront | L | v2.7.0–v2.9.0 (AF-1) |
-| **T3** | Ось `types_of_payment` в `template_bindings` + резолвер + UI | M | v2.8.0 (AF-3) |
+| **T3** | Ось `types_of_payment` в `template_bindings` + резолвер ✅ **backend done (2026-06-18)**; UI — остаётся | M | v2.8.0 (AF-3) |
 | **T4** | Спец-письмо внешних продавцов с адресом магазина | M | v2.8.0 (AF-3/AF-6) |

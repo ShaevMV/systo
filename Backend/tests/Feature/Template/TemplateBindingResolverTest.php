@@ -169,4 +169,59 @@ class TemplateBindingResolverTest extends TestCase
         // Обе подходят под (event=order_paid, ticket=TT); событие (вес 8) важнее типа билета (вес 4).
         $this->assertSame('byEvent', $this->resolver->resolve($bindings, 'email', EmailEvent::ORDER_PAID, self::FEST, 'regular', self::TT));
     }
+
+    // --- Ось «тип оплаты» (= продавец/магазин, AF-9) -----------------------
+
+    public function test_payment_type_binding_selected_for_matching_payment(): void
+    {
+        $bindings = [
+            $this->binding(['types_of_payment_id' => 'pay-1', 'email_slug' => 'sellerMail']),
+        ];
+
+        // Письмо по заказу с этим типом оплаты (продавцом) → берётся привязка продавца.
+        $this->assertSame(
+            'sellerMail',
+            $this->resolver->resolve($bindings, 'email', EmailEvent::ORDER_PAID, self::FEST, 'regular', self::TT, 'pay-1'),
+        );
+    }
+
+    public function test_payment_type_binding_ignored_for_other_payment(): void
+    {
+        $bindings = [
+            $this->binding(['types_of_payment_id' => 'pay-1', 'email_slug' => 'sellerMail']),
+        ];
+
+        // Другой тип оплаты → привязка продавца не матчит (дефолта нет → null).
+        $this->assertNull(
+            $this->resolver->resolve($bindings, 'email', EmailEvent::ORDER_PAID, self::FEST, 'regular', self::TT, 'pay-2'),
+        );
+    }
+
+    public function test_payment_type_specificity_beats_event(): void
+    {
+        $bindings = [
+            $this->binding(['event' => EmailEvent::ORDER_PAID, 'email_slug' => 'byEvent']),     // спец. 8
+            $this->binding(['types_of_payment_id' => 'pay-1', 'email_slug' => 'bySeller']),      // спец. 16
+        ];
+
+        // Обе подходят; тип оплаты (продавец, вес 16) — сильнейший override, важнее события (8).
+        $this->assertSame(
+            'bySeller',
+            $this->resolver->resolve($bindings, 'email', EmailEvent::ORDER_PAID, self::FEST, 'regular', self::TT, 'pay-1'),
+        );
+    }
+
+    public function test_payment_type_and_event_most_specific_wins(): void
+    {
+        $bindings = [
+            $this->binding(['types_of_payment_id' => 'pay-1', 'email_slug' => 'sellerAny']),                                   // спец. 16
+            $this->binding(['types_of_payment_id' => 'pay-1', 'event' => EmailEvent::ORDER_PAID, 'email_slug' => 'sellerPaid']), // спец. 24
+        ];
+
+        // Привязка (продавец + событие) специфичнее, чем только продавец.
+        $this->assertSame(
+            'sellerPaid',
+            $this->resolver->resolve($bindings, 'email', EmailEvent::ORDER_PAID, self::FEST, 'regular', self::TT, 'pay-1'),
+        );
+    }
 }

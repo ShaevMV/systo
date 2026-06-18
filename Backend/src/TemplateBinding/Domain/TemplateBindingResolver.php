@@ -33,13 +33,14 @@ class TemplateBindingResolver
         ?string $festivalId,
         ?string $orderType,
         ?string $ticketTypeId,
+        ?string $typesOfPaymentId = null,
     ): ?string {
         $candidates = [];
         foreach ($bindings as $binding) {
             if (! $binding->isActive() || $binding->slugForKind($kind) === null || $binding->isDefault()) {
                 continue;
             }
-            if ($binding->matches($event, $festivalId, $orderType, $ticketTypeId)) {
+            if ($binding->matches($event, $festivalId, $orderType, $ticketTypeId, $typesOfPaymentId)) {
                 $candidates[] = $binding;
             }
         }

@@ -22,6 +22,7 @@ class TemplateBindingDto extends AbstractionEntity implements Response
         protected ?string $order_type,
         protected ?string $event,
         protected ?string $ticket_type_id,
+        protected ?string $types_of_payment_id,
         protected ?string $email_template_id,
         protected ?string $pdf_template_id,
         protected bool $is_default,
@@ -39,6 +40,7 @@ class TemplateBindingDto extends AbstractionEntity implements Response
             $data['order_type'] ?? null,
             $data['event'] ?? null,
             $data['ticket_type_id'] ?? null,
+            $data['types_of_payment_id'] ?? null,
             $data['email_template_id'] ?? null,
             $data['pdf_template_id'] ?? null,
             (bool) ($data['is_default'] ?? false),
@@ -74,6 +76,12 @@ class TemplateBindingDto extends AbstractionEntity implements Response
         return $this->ticket_type_id;
     }
 
+    /** Тип оплаты (= внешний продавец/магазин, AF-9) или null = «любой» (wildcard). */
+    public function getTypesOfPaymentId(): ?string
+    {
+        return $this->types_of_payment_id;
+    }
+
     public function getEmailTemplateId(): ?string
     {
         return $this->email_template_id;
@@ -102,23 +110,31 @@ class TemplateBindingDto extends AbstractionEntity implements Response
 
     /**
      * Специфичность: чем больше непустых полей ключа, тем выше приоритет.
-     * event — сильнейший дискриминатор (намерение письма): event > ticket > order > festival.
+     * types_of_payment (= конкретный продавец/магазин, AF-9) — сильнейший override:
+     * types_of_payment > event > ticket > order > festival.
      */
     public function specificity(): int
     {
-        return ($this->event !== null ? 8 : 0)
+        return ($this->types_of_payment_id !== null ? 16 : 0)
+            + ($this->event !== null ? 8 : 0)
             + ($this->ticket_type_id !== null ? 4 : 0)
             + ($this->order_type !== null ? 2 : 0)
             + ($this->festival_id !== null ? 1 : 0);
     }
 
     /** Подходит ли привязка под запрос (NULL-поле = wildcard «любой»). */
-    public function matches(?string $event, ?string $festivalId, ?string $orderType, ?string $ticketTypeId): bool
-    {
+    public function matches(
+        ?string $event,
+        ?string $festivalId,
+        ?string $orderType,
+        ?string $ticketTypeId,
+        ?string $typesOfPaymentId = null,
+    ): bool {
         return ($this->event === null || $this->event === $event)
             && ($this->festival_id === null || $this->festival_id === $festivalId)
             && ($this->order_type === null || $this->order_type === $orderType)
-            && ($this->ticket_type_id === null || $this->ticket_type_id === $ticketTypeId);
+            && ($this->ticket_type_id === null || $this->ticket_type_id === $ticketTypeId)
+            && ($this->types_of_payment_id === null || $this->types_of_payment_id === $typesOfPaymentId);
     }
 
     /** Для записи в БД: без join-полей slug и без timestamps (их ставит Eloquent). */

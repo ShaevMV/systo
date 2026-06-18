@@ -97,6 +97,7 @@ class TemplateBindingApplication
         ?string $festivalId,
         ?string $orderType,
         ?string $ticketTypeId,
+        ?string $typesOfPaymentId = null,
     ): ?string {
         return $this->resolver->resolve(
             $this->repository->getActiveForResolve(),
@@ -105,6 +106,7 @@ class TemplateBindingApplication
             $festivalId,
             $orderType,
             $ticketTypeId,
+            $typesOfPaymentId,
         );
     }
 }
