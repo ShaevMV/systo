@@ -13,7 +13,7 @@
 | URL | Что это | Где проверять |
 |-----|---------|---------------|
 | **https://staging.spaceofjoy.ru** | Фронт SPA (Vue 3, старый `FrontEnd/`, Vue CLI/webpack) | Покупка билетов, формы заказа, личный кабинет, админ-UI (после логина) |
-| **https://staging.spaceofjoy.ru/admin/** | Новая админка org (`AdminFront/`, Vite + PrimeVue Sakai) | Новая admin-only система. Экраны: дашборд, QR-заказы, шаблоны (редактор + привязки), доставка писем. Сборка `--base=/admin/`, dist раздаётся nginx-staging (location `/admin/` + 301 с голого `/admin`). Перехватывает `/admin/*` у старого фронта (мини-cutover) |
+| **https://staging.spaceofjoy.ru/admin/** | Новая админка org (`AdminFront/`, Vite + PrimeVue Sakai) | Новая admin-only система. Разделы: **Управление** (дашборд, анкеты), **Заказы** (qr-заказы, оргвзносы, дружеские, заказы-списки), **Справочники** (типы билетов, опции, типы анкет, типы оплат, локации, промокоды), **Письма** (шаблоны, привязки, доставка). Сборка `--base=/admin/`, dist раздаётся nginx-staging (location `/admin/` + 301 с голого `/admin`). Перехватывает `/admin/*` у старого фронта (мини-cutover) |
 | **https://api.staging.spaceofjoy.ru** | Backend API (Laravel) | Endpoint'ы `/api/v1/*` — через `curl`/Postman/DevTools браузера. Healthcheck: `GET /` → 200 |
 | **https://vhod.staging.spaceofjoy.ru** | Baza (аутентификация) | Регистрация, логин, восстановление пароля |
 | **https://pma.staging.spaceofjoy.ru** | phpMyAdmin → MySQL | Просмотр/правка БД `systo`, `baza`. **Basic auth + MySQL логин** (см. §«Креды») |
