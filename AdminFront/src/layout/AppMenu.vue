@@ -17,6 +17,51 @@ const model = ref([
                 to: '/admin/qr-orders'
             },
             {
+                label: 'Анкеты',
+                icon: 'pi pi-fw pi-id-card',
+                to: '/admin/questionnaires'
+            }
+        ]
+    },
+    {
+        label: 'Справочники',
+        items: [
+            {
+                label: 'Типы билетов',
+                icon: 'pi pi-fw pi-ticket',
+                to: '/admin/ticket-types'
+            },
+            {
+                label: 'Опции',
+                icon: 'pi pi-fw pi-tags',
+                to: '/admin/options'
+            },
+            {
+                label: 'Типы анкет',
+                icon: 'pi pi-fw pi-list-check',
+                to: '/admin/questionnaire-types'
+            },
+            {
+                label: 'Типы оплат',
+                icon: 'pi pi-fw pi-credit-card',
+                to: '/admin/types-of-payment'
+            },
+            {
+                label: 'Локации',
+                icon: 'pi pi-fw pi-map-marker',
+                to: '/admin/locations'
+            },
+            {
+                label: 'Промокоды',
+                icon: 'pi pi-fw pi-percentage',
+                to: '/admin/promo-codes'
+            }
+        ]
+    },
+    {
+        label: 'Письма',
+        items: [
+            {
                 label: 'Шаблоны',
                 icon: 'pi pi-fw pi-file-edit',
                 to: '/admin/templates'
@@ -30,31 +75,6 @@ const model = ref([
                 label: 'Доставка писем',
                 icon: 'pi pi-fw pi-send',
                 to: '/admin/email-delivery'
-            }
-        ]
-    },
-    {
-        label: 'Справочники',
-        items: [
-            {
-                label: 'Локации',
-                icon: 'pi pi-fw pi-map-marker',
-                to: '/admin/locations'
-            },
-            {
-                label: 'Опции',
-                icon: 'pi pi-fw pi-tags',
-                to: '/admin/options'
-            },
-            {
-                label: 'Типы оплат',
-                icon: 'pi pi-fw pi-credit-card',
-                to: '/admin/types-of-payment'
-            },
-            {
-                label: 'Типы анкет',
-                icon: 'pi pi-fw pi-list-check',
-                to: '/admin/questionnaire-types'
             }
         ]
     }
