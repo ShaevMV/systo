@@ -62,7 +62,7 @@
 - **Гибридная модель** (НЕ полный разворот, см. pivot 2026-06-13): qr = коммерция (заказ/промокод/биллинг/UX), org+Baza = исполнение (билет/PDF/QR/доставка/каталог/скан). **Каталог (фестивали/типы/опции/цены) остаётся мастером на org.**
 - Канал приёма qr→org: таблица `qr_orders`, эндпоинты `POST /api/v1/qrOrder/create` + `changeStatus` (S2S, Sanctum scope `qr:ingest`), `actor_type = qr`. Боевой код интеграции — релиз **v2.7.0**.
 - **Новый фронт админки `AdminFront/`** (greenfield, **Vite + PrimeVue Sakai**, тема Aura, MIT-шаблон) рядом со старым `FrontEnd/` (Vue CLI/webpack не трогаем до cutover). Поднимается отдельным Docker-сервисом `node-admin`. Cutover по Strangler (Nginx `/admin` → новый фронт). Vuex остаётся для доменов, Pinia — только под layout Sakai.
-- Фирменный стиль Solar Systo (палитра/шрифты/лого/favicon), светлая тема по умолчанию. Первый экран (qr-заказы, read-only) уже сделан в старом `FrontEnd/` и переносится в `AdminFront/` 1:1 как PoC. Превью на стенде: `https://staging.spaceofjoy.ru/new-admin/`.
+- Фирменный стиль Solar Systo (палитра/шрифты/лого/favicon), светлая тема по умолчанию. В `AdminFront/` уже перенесены экраны: дашборд, qr-заказы, шаблоны (редактор + привязки), доставка писем. Стенд (2026-06-18, мини-cutover): `https://staging.spaceofjoy.ru/admin/` (раньше было `/new-admin/`).
 - Спека переезда: `.claude/specs/admin-frontend-vite-sakai.md`. Память: `project_admin_ui_primevue`, `project_qr_pivot_2026_06_13`.
 
 ### Прочие решения
