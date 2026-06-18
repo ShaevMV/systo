@@ -34,8 +34,7 @@ final class PushTicketToBazaJob implements ShouldQueue
 
     public function __construct(
         private TicketResponse $ticket,
-    ) {
-    }
+    ) {}
 
     public function handle(TicketsRepositoryInterface $ticketsRepository): void
     {
@@ -51,7 +50,7 @@ final class PushTicketToBazaJob implements ShouldQueue
         if (! $ok) {
             $log->error('push_baza.fail', ['ticket_id' => $this->ticket->getId()->value(), 'list' => $isList]);
 
-            throw new RuntimeException('Не удалось записать билет в Baza: ' . $this->ticket->getId()->value());
+            throw new RuntimeException('Не удалось записать билет в Baza: '.$this->ticket->getId()->value());
         }
 
         $log->info('push_baza.ok', [

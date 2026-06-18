@@ -81,7 +81,7 @@ final class IssueOrderJob implements ShouldQueue
                 // Персист шага в историю заказа (Ф5: «видеть весь путь» в админке).
                 $history->save(new SaveHistoryDto(
                     $this->orderId,
-                    new QrOrderHistoryEvent('step_' . $step->name(), ['status' => 'ok']),
+                    new QrOrderHistoryEvent('step_'.$step->name(), ['status' => 'ok']),
                     null,
                     ActorType::QR,
                 ));
@@ -93,7 +93,7 @@ final class IssueOrderJob implements ShouldQueue
                 ]);
                 $history->save(new SaveHistoryDto(
                     $this->orderId,
-                    new QrOrderHistoryEvent('step_' . $step->name(), ['status' => 'fail', 'error' => $e->getMessage()]),
+                    new QrOrderHistoryEvent('step_'.$step->name(), ['status' => 'fail', 'error' => $e->getMessage()]),
                     null,
                     ActorType::QR,
                 ));

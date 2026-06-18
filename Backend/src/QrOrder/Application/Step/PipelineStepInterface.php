@@ -17,7 +17,7 @@ interface PipelineStepInterface
     public function name(): string;
 
     /**
-     * @param array<string, mixed> $carry данные предыдущих шагов
+     * @param  array<string, mixed>  $carry  данные предыдущих шагов
      * @return array<string, mixed> обновлённый carry
      */
     public function handle(QrOrderDto $order, array $carry): array;

@@ -13,8 +13,11 @@ namespace Tickets\QrOrder\Domain\ValueObject;
 final class TypeOrder
 {
     public const REGULAR = 'regular';
+
     public const FRIENDLY = 'friendly';
+
     public const LIST = 'list';
+
     public const LIVE = 'live';
 
     /** Нормализует значение из контракта для сопоставления со стратегией в реестре. */

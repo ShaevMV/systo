@@ -15,13 +15,12 @@ use Tickets\History\Domain\HistoryEventInterface;
 final class QrOrderHistoryEvent implements HistoryEventInterface
 {
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     public function __construct(
         private readonly string $eventName,
         private readonly array $payload = [],
-    ) {
-    }
+    ) {}
 
     public function getAggregateType(): string
     {

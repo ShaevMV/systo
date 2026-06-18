@@ -28,8 +28,7 @@ final class CreateLiveTicketsStep implements PipelineStepInterface
     public function __construct(
         private readonly TicketsRepositoryInterface $ticketsRepository,
         private readonly QrIssuanceRepositoryInterface $issuanceRepository,
-    ) {
-    }
+    ) {}
 
     public function name(): string
     {
@@ -129,7 +128,7 @@ final class CreateLiveTicketsStep implements PipelineStepInterface
     }
 
     /**
-     * @param array<string, mixed> $guest
+     * @param  array<string, mixed>  $guest
      */
     private function guestTicketTypeId(array $guest): ?Uuid
     {

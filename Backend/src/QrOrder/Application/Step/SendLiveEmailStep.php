@@ -21,8 +21,7 @@ final class SendLiveEmailStep implements PipelineStepInterface
 {
     public function __construct(
         private readonly MailDispatcher $dispatcher,
-    ) {
-    }
+    ) {}
 
     public function name(): string
     {

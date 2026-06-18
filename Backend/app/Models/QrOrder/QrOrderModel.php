@@ -26,8 +26,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property Carbon|null $issued_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ *
  * @method static Builder|QrOrderModel query()
  * @method static Builder|QrOrderModel whereId($value)
+ *
  * @mixin Eloquent
  */
 class QrOrderModel extends Model
@@ -49,11 +51,16 @@ class QrOrderModel extends Model
         'total_price',
         'payload',
         'issued_at',
+        'external_order_no',
+        'payment_method',
+        'promo_code',
+        'paid_at',
     ];
 
     protected $casts = [
         'payload' => 'array',      // единственный источник кодирования JSON (правило №11)
         'total_price' => 'integer',
         'issued_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 }

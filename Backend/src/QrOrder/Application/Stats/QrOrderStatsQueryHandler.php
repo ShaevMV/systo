@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Tickets\QrOrder\Application\Stats;
 
+use Shared\Domain\Bus\Query\QueryHandler;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 use Tickets\QrOrder\Responses\QrOrderStatsResponse;
-use Shared\Domain\Bus\Query\QueryHandler;
 
 /**
  * Считает сводные метрики qr-заказов для дашборда: заказы + выручка, всего и в разрезах
@@ -19,8 +19,7 @@ class QrOrderStatsQueryHandler implements QueryHandler
 {
     public function __construct(
         private QrOrderRepositoryInterface $repository,
-    ) {
-    }
+    ) {}
 
     public function __invoke(QrOrderStatsQuery $query): QrOrderStatsResponse
     {
@@ -37,6 +36,7 @@ class QrOrderStatsQueryHandler implements QueryHandler
             $raw['byStatus'],
             $raw['byType'],
             $raw['timeseries'],
+            $raw['byPaymentMethod'] ?? [],
         );
     }
 }

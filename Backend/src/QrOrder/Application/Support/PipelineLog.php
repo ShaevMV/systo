@@ -32,6 +32,6 @@ final class PipelineLog
             return '***';
         }
 
-        return mb_substr($email, 0, 1) . '***' . mb_substr($email, $at);
+        return mb_substr($email, 0, 1).'***'.mb_substr($email, $at);
     }
 }

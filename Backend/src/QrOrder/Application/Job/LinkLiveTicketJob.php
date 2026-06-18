@@ -35,8 +35,7 @@ final class LinkLiveTicketJob implements ShouldQueue
     public function __construct(
         private string $ticketId,
         private int $number,
-    ) {
-    }
+    ) {}
 
     public function handle(TicketsRepositoryInterface $ticketsRepository): void
     {

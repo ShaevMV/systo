@@ -19,7 +19,7 @@ final class IssuanceStrategyRegistry
     private array $map = [];
 
     /**
-     * @param iterable<IssuanceStrategyInterface> $strategies
+     * @param  iterable<IssuanceStrategyInterface>  $strategies
      */
     public function __construct(iterable $strategies)
     {

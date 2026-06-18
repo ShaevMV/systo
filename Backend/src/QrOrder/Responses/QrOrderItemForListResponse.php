@@ -26,14 +26,17 @@ class QrOrderItemForListResponse extends AbstractionEntity implements Response
         protected int $total_price,
         protected ?string $issued_at,
         protected ?string $created_at,
-    ) {
-    }
+        protected ?string $external_order_no = null,
+        protected ?string $payment_method = null,
+        protected ?string $promo_code = null,
+        protected ?string $paid_at = null,
+    ) {}
 
     /**
      * Сборка из строки БД (qr_orders.*) — даты уже ISO-строки (Eloquent-каст), не оборачиваем
      * в Carbon повторно (правило единого формата данных).
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromState(array $data): self
     {
@@ -48,6 +51,10 @@ class QrOrderItemForListResponse extends AbstractionEntity implements Response
             (int) ($data['total_price'] ?? 0),
             isset($data['issued_at']) ? (string) $data['issued_at'] : null,
             isset($data['created_at']) ? (string) $data['created_at'] : null,
+            isset($data['external_order_no']) ? (string) $data['external_order_no'] : null,
+            isset($data['payment_method']) ? (string) $data['payment_method'] : null,
+            isset($data['promo_code']) ? (string) $data['promo_code'] : null,
+            isset($data['paid_at']) ? (string) $data['paid_at'] : null,
         );
     }
 }

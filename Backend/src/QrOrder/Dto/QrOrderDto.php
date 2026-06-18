@@ -19,7 +19,7 @@ use Shared\Domain\ValueObject\Uuid;
 class QrOrderDto extends AbstractionEntity implements Response
 {
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     public function __construct(
         protected Uuid $id,
@@ -34,13 +34,16 @@ class QrOrderDto extends AbstractionEntity implements Response
         protected ?Carbon $issued_at = null,
         protected ?Carbon $created_at = null,
         protected ?Carbon $updated_at = null,
-    ) {
-    }
+        protected ?string $external_order_no = null,
+        protected ?string $payment_method = null,
+        protected ?string $promo_code = null,
+        protected ?Carbon $paid_at = null,
+    ) {}
 
     /**
      * Сборка из строки БД (qr_orders.*).
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     public static function fromState(array $data): self
     {
@@ -57,6 +60,10 @@ class QrOrderDto extends AbstractionEntity implements Response
             empty($data['issued_at']) ? null : new Carbon($data['issued_at']),
             empty($data['created_at']) ? null : new Carbon($data['created_at']),
             empty($data['updated_at']) ? null : new Carbon($data['updated_at']),
+            external_order_no: isset($data['external_order_no']) ? (string) $data['external_order_no'] : null,
+            payment_method: isset($data['payment_method']) ? (string) $data['payment_method'] : null,
+            promo_code: isset($data['promo_code']) ? (string) $data['promo_code'] : null,
+            paid_at: empty($data['paid_at']) ? null : new Carbon($data['paid_at']),
         );
     }
 
@@ -68,7 +75,8 @@ class QrOrderDto extends AbstractionEntity implements Response
      * (пустое — пропускается). Используется шагом SendTelegramStep для уведомления в бот;
      * хранится в payload, в проекцию qr_orders НЕ выносится (по нему не фильтруем).
      *
-     * @param array<string, mixed> $json
+     * @param  array<string, mixed>  $json
+     *
      * @throws InvalidArgumentException при отсутствии обязательных полей
      */
     public static function fromQrContract(array $json): self
@@ -91,6 +99,10 @@ class QrOrderDto extends AbstractionEntity implements Response
         $festival = is_array($orderData['festival'] ?? null) ? $orderData['festival'] : [];
         $festivalId = $festival['id'] ?? ($orderData['festival_id'] ?? ($json['festival_id'] ?? null));
 
+        // Доп. проекция расширенного контракта (хранится и в payload; здесь — денормализация в колонки).
+        $payment = is_array($json['payment'] ?? null) ? $json['payment'] : [];
+        $promoCodes = is_array($payment['promo_codes'] ?? null) ? $payment['promo_codes'] : [];
+
         return new self(
             new Uuid($orderId),
             $email,
@@ -101,6 +113,10 @@ class QrOrderDto extends AbstractionEntity implements Response
             isset($user['phone']) ? (string) $user['phone'] : null,
             (int) ($price['total'] ?? 0),
             $json,
+            external_order_no: isset($json['external_order_no']) ? (string) $json['external_order_no'] : null,
+            payment_method: isset($payment['method']) ? (string) $payment['method'] : null,
+            promo_code: ! empty($promoCodes) ? (string) $promoCodes[0] : null,
+            paid_at: empty($orderData['paid_at']) ? null : new Carbon((string) $orderData['paid_at']),
         );
     }
 
@@ -155,5 +171,25 @@ class QrOrderDto extends AbstractionEntity implements Response
     public function getIssuedAt(): ?Carbon
     {
         return $this->issued_at;
+    }
+
+    public function getExternalOrderNo(): ?string
+    {
+        return $this->external_order_no;
+    }
+
+    public function getPaymentMethod(): ?string
+    {
+        return $this->payment_method;
+    }
+
+    public function getPromoCode(): ?string
+    {
+        return $this->promo_code;
+    }
+
+    public function getPaidAt(): ?Carbon
+    {
+        return $this->paid_at;
     }
 }

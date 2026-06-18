@@ -15,8 +15,7 @@ class QrOrderGetListResponse implements Response
     public function __construct(
         private Collection $collection,
         private int $totalCount,
-    ) {
-    }
+    ) {}
 
     public function getCollection(): Collection
     {

@@ -13,12 +13,11 @@ use Shared\Domain\Bus\Query\Query;
 class QrOrderStatsQuery implements Query
 {
     /**
-     * @param array<string, mixed> $filter
+     * @param  array<string, mixed>  $filter
      */
     public function __construct(
         private array $filter,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array<string, mixed>
