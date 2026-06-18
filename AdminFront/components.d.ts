@@ -11,6 +11,8 @@ declare module 'vue' {
     ConfirmDeleteButton: typeof import('./src/components/ConfirmDeleteButton.vue')['default']
     FilterBar: typeof import('./src/components/FilterBar.vue')['default']
     FloatingConfigurator: typeof import('./src/components/FloatingConfigurator.vue')['default']
+    OrderHistoryDialog: typeof import('./src/components/OrderHistoryDialog.vue')['default']
+    OrderStatusDialog: typeof import('./src/components/OrderStatusDialog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SelectButton: typeof import('primevue/selectbutton')['default']
