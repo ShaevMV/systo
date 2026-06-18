@@ -10,9 +10,12 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Nette\Utils\JsonException;
+use Shared\Domain\Criteria\Order;
 use Shared\Domain\ValueObject\Uuid;
+use Throwable;
 use Tickets\Festival\Application\GetInfoForOrder\GetInfoForOrder;
 use Tickets\Order\OrderTicket\Application\GetFestivalList\FestivalApplication;
+use Tickets\Order\OrderTicket\Application\GetList\FestivalGetListQuery;
 use Tickets\Order\OrderTicket\Dto\Festival\FestivalDto;
 use Tickets\User\Account\Helpers\AccountRoleHelper;
 
@@ -115,6 +118,103 @@ class FestivalController extends Controller
             'success' => true,
             'item' => $dto->toArray(),
             'message' => 'Фестиваль создан',
+        ]);
+    }
+
+    /**
+     * Список фестивалей с фильтрами (name/year/active) + orderBy — для админ-CRUD.
+     *
+     * @throws JsonException
+     */
+    public function getList(Request $request): JsonResponse
+    {
+        try {
+            $orderBy = Order::fromState($request->toArray()['orderBy'] ?? []);
+        } catch (Throwable) {
+            // кривое значение orderBy не должно ронять публичный список
+            $orderBy = Order::none();
+        }
+
+        $collection = $this->festivalApplication->getList(
+            new FestivalGetListQuery(
+                $request->toArray()['filter'] ?? [],
+                $orderBy,
+            )
+        )->getCollection();
+
+        return response()->json([
+            'success' => true,
+            'list' => $collection->map(fn (FestivalDto $dto) => $dto->toArray())->values()->all(),
+        ]);
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function getItem(string $id): JsonResponse
+    {
+        $festival = $this->festivalApplication->getItem(new Uuid($id));
+
+        if (null === $festival) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Фестиваль не найден',
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'item' => $festival->toArray(),
+        ]);
+    }
+
+    /**
+     * Редактировать фестиваль (admin).
+     *
+     * @throws Throwable
+     */
+    public function edit(string $id, Request $request): JsonResponse
+    {
+        $request->validate([
+            'data.name' => 'required|string|max:255',
+            'data.year' => 'required|integer|min:2000|max:2100',
+            'data.active' => 'boolean',
+        ]);
+
+        $uuid = new Uuid($id);
+
+        if (null === $this->festivalApplication->getItem($uuid)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Фестиваль не найден',
+            ]);
+        }
+
+        $dto = new FestivalDto(
+            $uuid,
+            (string) $request->input('data.name'),
+            (int) $request->input('data.year'),
+            (bool) $request->input('data.active', false),
+        );
+
+        $this->festivalApplication->edit($uuid, $dto);
+
+        return response()->json([
+            'success' => true,
+            'item' => $this->festivalApplication->getItem($uuid)->toArray(),
+            'message' => 'Фестиваль отредактирован',
+        ]);
+    }
+
+    /**
+     * Удалить фестиваль (admin) — soft delete (запись помечается deleted_at).
+     *
+     * @throws Throwable
+     */
+    public function delete(string $id): JsonResponse
+    {
+        return response()->json([
+            'success' => $this->festivalApplication->delete(new Uuid($id)),
         ]);
     }
 

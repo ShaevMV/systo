@@ -3,10 +3,11 @@
 namespace Tickets\Order\OrderTicket\Dto\Festival;
 
 
+use Shared\Domain\Bus\Query\Response;
 use Shared\Domain\Entity\AbstractionEntity;
 use Shared\Domain\ValueObject\Uuid;
 
-class FestivalDto extends AbstractionEntity
+class FestivalDto extends AbstractionEntity implements Response
 {
     public function __construct(
         protected Uuid $id,
