@@ -38,7 +38,10 @@ export function useCrud(resource) {
         loading.value = true;
         error.value = null;
         try {
-            const r = await axios.post(`${resource}/getList`, payload);
+            // Часть контроллеров читает filter/orderBy без `?? []` и падает 500 без
+            // этих ключей (typesOfPayment, account…). Всегда гарантируем их наличие.
+            const body = { filter: {}, orderBy: {}, ...payload };
+            const r = await axios.post(`${resource}/getList`, body);
             list.value = asArray(r.data?.list);
             return list.value;
         } catch (e) {

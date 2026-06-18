@@ -40,6 +40,21 @@ const model = ref([
                 label: 'Локации',
                 icon: 'pi pi-fw pi-map-marker',
                 to: '/admin/locations'
+            },
+            {
+                label: 'Опции',
+                icon: 'pi pi-fw pi-tags',
+                to: '/admin/options'
+            },
+            {
+                label: 'Типы оплат',
+                icon: 'pi pi-fw pi-credit-card',
+                to: '/admin/types-of-payment'
+            },
+            {
+                label: 'Типы анкет',
+                icon: 'pi pi-fw pi-list-check',
+                to: '/admin/questionnaire-types'
             }
         ]
     }
