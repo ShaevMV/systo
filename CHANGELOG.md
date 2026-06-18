@@ -11,7 +11,42 @@
 
 ## [Unreleased]
 
-_(пусто — текущие изменения вошли в [2.7.0-alpha.2])_
+_(пусто — текущие изменения вошли в [2.7.0-alpha.3])_
+
+---
+
+## [2.7.0-alpha.3] — 2026-06-18
+
+**Staging-preview.** Срез поверх `v2.7.0-alpha.2`: **система отправки писем по шаблонам (Ф1–Ф5)** + **CRUD каталога фестивалей** (AF-7/AF-9) + перенос новой админки с `/new-admin/` на **`/admin/`**. Релизная ветка `release/v2.7.0-alpha.3` — пересборка `feat/qr-order-pipeline-view` (#77) на актуальный `master` (rebase отсеял дубли уже-влитых шаблонов/qr; дерево бэкенда идентично текущему staging). Прод не затронут. PHPUnit Backend **413 OK**.
+
+### Added (Добавлено)
+
+- **Система писем (Ф1–Ф5)** — модуль `Backend/src/EmailDelivery/`. Спека: `.claude/specs/email-delivery-system.md`.
+  - **Каталог событий** `EmailEvent` (15 событий → дефолтный slug + метка) + **привязка шаблона по событию** (ось `event` в `template_bindings`, резолвер учитывает `event` > `ticket` > `order` > `festival`; вес типа оплаты — сильнейший override). Эндпоинт `GET /api/v1/templateBinding/events`.
+  - **Трекинг доставки** — таблица `email_messages`, машина статусов `queued→sending→sent`/`failed` (+ `error` = «где застряло»), асинхронный `SendEmailJob` (ретрай `tries=3`), `MailDispatcher`. Экран **«Доставка писем»**: `POST /api/v1/emailDelivery/getList`, `getItem/{id}`, `resend/{id}` (всё admin, ПДн).
+  - **Пиксель прочтения** (Ф3) — `GET /api/v1/mail/open/{token}.gif` (публичный, `throttle:120,1`), статус `opened`. За флагом `MAIL_OPEN_TRACKING` (default `false`, 152-ФЗ).
+  - **S2S-канал писем от витрины qr** (Ф4) — `POST /api/v1/emailNotification/send` (middleware `qr.ingest`, `X-QR-Token`) для НЕ-заказных писем (регистрация, сброс пароля, «заказ в обработке»…). Идемпотентность по `external_id`. Контракт: `.claude/specs/qr-integration/EMAIL_SEND_API.md`.
+  - **Весь путь qr-заказа** (Ф5) — `GET /api/v1/qrOrder/getPipeline/{id}` и `getTicketPdf/{id}` (admin): приём → билеты (PDF) → письма → шаги пайплайна (`step_*` в `domain_history`).
+  - **Legacy org-письма** (отмена/изменение/оплата/анкеты — `ProcessUserNotification*`, `ProcessAccountNotification`, `ProcessPasswordResets`) переведены на `MailDispatcher` → видны в «Доставке писем» (`source=org_event`). Закрывает **TD-37**.
+- **Каталог фестивалей — CRUD (AF-7)** — `POST /api/v1/festival/create`, `getList`, `getItem/{id}`, `edit/{id}`, `delete/{id}` (soft). `Festival` → **AggregateRoot** + история (`getHistory/{id}`: `festival_created`/`edited`/`deleted`).
+- **Привязка шаблонов по типу оплаты (AF-9)** — ось `types_of_payment_id` в `template_bindings` («под каждого внешнего продавца — своё письмо/PDF»). Закрывает AF-10.
+- **Единый приём клиентского `id`** во всех `*/create` (qr и org — одинаковый id заказа).
+
+### Changed (Изменено)
+
+- **Новая админка переехала с `/new-admin/` на `/admin/`** (мини-cutover превью): nginx-staging `location /admin/` (+ 301 с голого `/admin`) перехватывает путь у старого фронта; Vite собирается с `--base=/admin/`. Старый фронт остаётся главным на `/` (полный cutover — позже).
+
+### Fixed (Исправлено)
+
+- **Релиз-гигиена B-0 закрыта** — `v2.6.0` затегана (PR #75), история релизов без дыр.
+
+### Removed (Удалено)
+
+- PR #74 (старый вариант приёма qr на Sanctum) закрыт как **поглощённый** — финальная реализация (таблица `qr_orders` + `X-QR-Token`) уже на `master`.
+
+### Breaking Changes
+
+Нет (pre-release, прод не затрагивается).
 
 ---
 
