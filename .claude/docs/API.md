@@ -1067,7 +1067,7 @@
 
 Префикс: **`/api/v1/templateBinding`** | **Middleware всех роутов:** `auth:api` + `admin`
 
-Маппинг `(event, festival_id, order_type, ticket_type_id)` → `email_template_id`/`pdf_template_id` + `is_default`. `NULL`-поля = wildcard. Резолвер выбирает самую специфичную привязку (`event` > `ticket_type` > `order_type` > `festival`); нет совпадения → `is_default`; нет дефолта → старый slug (обратная совместимость). Применяется при выдаче билетов (`InMemoryMySqlTicketsRepository::getTicket`) и при выборе slug в системе писем (см. §3.4). Спека: `.claude/specs/template-aggregate-and-bindings.md`.
+Маппинг `(event, festival_id, order_type, ticket_type_id, types_of_payment_id)` → `email_template_id`/`pdf_template_id` + `is_default`. `NULL`-поля = wildcard. Резолвер выбирает самую специфичную привязку (`types_of_payment` > `event` > `ticket_type` > `order_type` > `festival`); нет совпадения → `is_default`; нет дефолта → старый slug (обратная совместимость, в т.ч. легаси `types_of_payment.email`). Ось `types_of_payment` (AF-9) даёт «под каждого продавца своё письмо/PDF». Применяется при выдаче билетов (`InMemoryMySqlTicketsRepository::getTicket`) и при выборе slug в системе писем (см. §3.4). Спека: `.claude/specs/template-aggregate-and-bindings.md`.
 
 | Метод | Маршрут | Описание |
 |-------|---------|----------|
@@ -1086,6 +1086,7 @@
   "festival_id": "UUID? (nullable=wildcard)",
   "order_type": "string? (nullable=wildcard: regular/friendly/list/live)",
   "ticket_type_id": "UUID? (nullable=wildcard)",
+  "types_of_payment_id": "UUID? (nullable=wildcard; AF-9 — тип оплаты = внешний продавец/магазин)",
   "email_template_id": "UUID?",
   "pdf_template_id": "UUID?",
   "is_default": "bool (default false)",

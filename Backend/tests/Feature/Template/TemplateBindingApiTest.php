@@ -112,4 +112,26 @@ class TemplateBindingApiTest extends TestCase
 
         $this->postJson('/api/v1/templateBinding/getList')->assertStatus(403);
     }
+
+    /** AF-9: привязка по типу оплаты (= продавцу) сохраняется и читается обратно. */
+    public function test_create_with_types_of_payment_persists(): void
+    {
+        $this->actingAsAdmin();
+        $tplId = $this->makeEmailTemplate();
+        $payId = RamseyUuid::uuid4()->toString();
+
+        $id = $this->postJson('/api/v1/templateBinding/create', ['data' => [
+            'types_of_payment_id' => $payId,
+            'event' => 'order_paid',
+            'email_template_id' => $tplId,
+        ]])
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->json('item.id');
+
+        $this->getJson('/api/v1/templateBinding/getItem/' . $id)
+            ->assertStatus(200)
+            ->assertJsonPath('item.types_of_payment_id', $payId)
+            ->assertJsonPath('item.event', 'order_paid');
+    }
 }

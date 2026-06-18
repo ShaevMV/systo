@@ -167,6 +167,7 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
                 OrderTicketModel::TABLE . '.status',
                 OrderTicketModel::TABLE . '.created_at',
                 OrderTicketModel::TABLE . '.ticket_type_id',
+                OrderTicketModel::TABLE . '.types_of_payment_id',
                 OrderTicketModel::TABLE . '.friendly_id',
                 OrderTicketModel::TABLE . '.id as order_id',
                 OrderTicketModel::TABLE . '.curator_id',
@@ -193,16 +194,18 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
         $pdfSlug = $result['pdf'] ?: ($result['location_pdf_template'] ?: null);
         $emailSlug = $result['emailPayView'] ?? $result['emailView'];
 
-        // Привязки шаблонов (Часть B): настроенная привязка ПЕРЕОПРЕДЕЛЯЕТ slug по ключу
-        // (festival, order_type, ticket_type); нет привязки → остаётся старый slug (обратная совместимость).
+        // Привязки шаблонов (Часть B + AF-9): настроенная привязка ПЕРЕОПРЕДЕЛЯЕТ slug по ключу
+        // (festival, order_type, ticket_type, types_of_payment); нет привязки → остаётся старый
+        // slug (обратная совместимость, в т.ч. легаси types_of_payment.email = emailPayView).
         $bindings = app(TemplateBindingRepositoryInterface::class)->getActiveForResolve();
         $resolver = app(TemplateBindingResolver::class);
         $orderType = $this->deriveOrderType($result);
         $event = $this->deriveIssuanceEvent($orderType);
         $festivalId = $result['festival_id'] ?? null;
         $ticketTypeId = $result['ticket_type_id'] ?? null;
-        $pdfSlug = $resolver->resolve($bindings, 'pdf', $event, $festivalId, $orderType, $ticketTypeId) ?? $pdfSlug;
-        $emailSlug = $resolver->resolve($bindings, 'email', $event, $festivalId, $orderType, $ticketTypeId) ?? $emailSlug;
+        $typesOfPaymentId = $result['types_of_payment_id'] ?? null;
+        $pdfSlug = $resolver->resolve($bindings, 'pdf', $event, $festivalId, $orderType, $ticketTypeId, $typesOfPaymentId) ?? $pdfSlug;
+        $emailSlug = $resolver->resolve($bindings, 'email', $event, $festivalId, $orderType, $ticketTypeId, $typesOfPaymentId) ?? $emailSlug;
 
         return new TicketResponse(
             $result['name'],

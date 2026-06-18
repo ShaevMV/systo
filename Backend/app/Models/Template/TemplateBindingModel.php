@@ -43,6 +43,7 @@ class TemplateBindingModel extends Model
         'order_type',
         'event',
         'ticket_type_id',
+        'types_of_payment_id',
         'email_template_id',
         'pdf_template_id',
         'is_default',
