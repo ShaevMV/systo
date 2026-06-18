@@ -88,6 +88,8 @@ class TypesOfPaymentController extends Controller
         TypesOfPaymentApplication $application,
     ): JsonResponse
     {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $paymentDto = TypesOfPaymentDto::fromState($request->toArray()['data']);
 
         return response()->json([

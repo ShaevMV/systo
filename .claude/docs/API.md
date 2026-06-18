@@ -312,6 +312,7 @@
 **Request:**
 ```json
 {
+  "id": "UUID? (опционально — id заказа можно задать с клиента: внешняя система qr и org должны иметь ОДИНАКОВЫЙ id заказа; не передан → генерируется на сервере)",
   "email": "string (required, email)",
   "phone": "string (required)",
   "city": "string (required)",
@@ -326,6 +327,8 @@
   "price": "float"
 }
 ```
+
+> **`id` заказа (важно для интеграции с qr):** валидируется `sometimes|uuid`. Если передан — заказ создаётся именно с этим id (внешний id == наш id). Сохраняется в `order_tickets.id`. Так же `id` опционально принимают `order/createFriendly` и `order/createList`. Все catalog CRUD `*/create` тоже принимают опциональный `data.id` (uuid).
 
 **Особенность для парковочных билетов (`ticket_type.is_parking = true`):**
 - На бэке формат запроса **не отличается** — приходит обычный `guests[]` с полями `value` и `email`

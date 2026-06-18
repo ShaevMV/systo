@@ -64,6 +64,8 @@ class LocationController extends Controller
         Request $request,
         LocationApplication $application,
     ): JsonResponse {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $data = LocationDto::fromState($request->toArray()['data']);
 
         return response()->json([
