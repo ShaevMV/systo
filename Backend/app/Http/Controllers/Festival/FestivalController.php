@@ -101,13 +101,20 @@ class FestivalController extends Controller
     public function create(Request $request): JsonResponse
     {
         $request->validate([
+            'data.id' => 'sometimes|uuid',
             'data.name' => 'required|string|max:255',
             'data.year' => 'required|integer|min:2000|max:2100',
             'data.active' => 'boolean',
         ]);
 
+        // id можно передать с клиента (как в location/ticketType/templateBinding);
+        // не передан → генерируем на сервере.
+        $id = $request->filled('data.id')
+            ? new Uuid((string) $request->input('data.id'))
+            : Uuid::random();
+
         $dto = new FestivalDto(
-            Uuid::random(),
+            $id,
             (string) $request->input('data.name'),
             (int) $request->input('data.year'),
             (bool) $request->input('data.active', false),
