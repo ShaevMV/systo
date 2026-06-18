@@ -32,10 +32,13 @@
 
 ## Задачи
 
-### T1 — Festival → AggregateRoot + история (backend)
+### T1 — Festival → AggregateRoot + история (backend) ✅ Сделано (2026-06-18)
 
-**Сейчас:** festival CRUD — пассивная сущность под `Order/OrderTicket`.
-**Нужно:** сделать `Festival` полноценным **AggregateRoot** с трейтом `HasHistory` (как `OrderTicket` / `Template`):
+> **Сделано:** агрегат `Festival` в новом модуле `Backend/src/Festival/Domain/Festival.php` + `HasHistory`; события `festival_created` (payload name/year/active) / `festival_edited` (payload changed-поля) / `festival_deleted` в `History/Domain/Event/`; запись в `domain_history` (`aggregate_type='festival'`, `actor_type=user`, `actor_id=Auth::id()`) на create/edit/delete; `GET /api/v1/festival/getHistory/{id}` (admin). Тест `FestivalHistoryApiTest` (5), полный прогон Backend **405 зелёных**.
+> **Остаётся (отдельный рефакторинг, не входит в T1):** перенос CRUD/репозитория/DTO из `Order/OrderTicket/` в модуль `Festival/` — рискованно (репозиторий шарят заказы/письма/цены), делать отдельным верифицированным PR.
+
+**Было:** festival CRUD — пассивная сущность под `Order/OrderTicket`.
+**Сделали:** `Festival` — полноценный **AggregateRoot** с трейтом `HasHistory` (как `OrderTicket` / `Template`):
 - Фабричные методы `create` / `edit` / `delete` (и, возможно, `activate/deactivate`) пишут события в `domain_history` (`aggregate_type = 'festival'`, `actor_type = user`, `actor_id = Auth::id()`).
 - События `FestivalCreatedEvent` / `FestivalEditedEvent` / `FestivalDeletedEvent` (по образцу `Template*Event` в `History/Domain/Event/`).
 - Эндпоинт `GET /api/v1/festival/getHistory/{id}` (admin) — журнал изменений (как `template/history`, `order/getHistory`).
@@ -93,7 +96,7 @@
 
 1. **«Адрес магазина»** — это почтовый адрес, ссылка (URL) на магазин, или набор полей (название + адрес + телефон + ссылка)? Что выводить в письме?
 2. **Привязка магазина** — к **типу оплаты** (`types_of_payment`) или к **продавцу** (`user_external_id` → пользователь)? Один тип оплаты = один магазин, или у типа оплаты несколько продавцов/магазинов?
-3. **Festival-агрегат** — выносить в новый модуль `Backend/src/Festival/` (чистая DDD-структура) или оставить под `Order/OrderTicket/` и добавить AggregateRoot там?
+3. ~~**Festival-агрегат** — новый модуль или на месте?~~ → **Решено (2026-06-18):** класс агрегата — в новом модуле `Backend/src/Festival/Domain/`. CRUD/репозиторий пока под `Order/OrderTicket/`; полный перенос — отдельный рефакторинг.
 4. **Вес оси `types_of_payment`** в резолвере привязок относительно `event`/`ticket_type`/`order_type`/`festival`.
 5. **Легаси `types_of_payment.email`/`pdf`** — мигрировать в `template_bindings` и удалить, или оставить как fallback до cutover?
 
@@ -103,7 +106,7 @@
 
 | Задача | Что | Оценка | Версия |
 |--------|-----|--------|--------|
-| **T1** | Festival → AggregateRoot + история + getHistory | M | v2.7.0 / v2.8.0 |
+| **T1** | Festival → AggregateRoot + история + getHistory ✅ **done (2026-06-18)** | M | — |
 | **T2** | Перенос CRUD (festival/ticketType/option/typesOfPayment) в AdminFront | L | v2.7.0–v2.9.0 (AF-1) |
 | **T3** | Ось `types_of_payment` в `template_bindings` + резолвер + UI | M | v2.8.0 (AF-3) |
 | **T4** | Спец-письмо внешних продавцов с адресом магазина | M | v2.8.0 (AF-3/AF-6) |
