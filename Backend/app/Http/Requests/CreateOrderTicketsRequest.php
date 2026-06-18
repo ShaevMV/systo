@@ -37,6 +37,9 @@ class CreateOrderTicketsRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // id заказа можно задать с клиента (внешняя система qr и org должны иметь
+            // ОДИНАКОВЫЙ id заказа); не передан → генерируется на сервере (OrderTicketDto::fromState).
+            'id' => 'sometimes|uuid',
             'email' => 'required|email',
             'phone' => 'required',
             'city' => 'required',

@@ -77,6 +77,52 @@ class CreateOrderTest extends TestCase
 
 
     /**
+     * Критично: id заказа можно задать с клиента — внешняя система (qr) и org
+     * должны иметь ОДИНАКОВЫЙ id заказа. fromState использует переданный id,
+     * и он сохраняется в БД (а не генерируется новый).
+     *
+     * @throws Throwable
+     */
+    public function test_provided_order_id_is_used_and_persisted(): void
+    {
+        $id = '11111111-2222-4333-8444-555555555555';
+
+        $request = [
+            'id' => $id,
+            'festival_id' => FestivalHelper::UUID_FESTIVAL,
+            'email' => 'admin@admin.ru',
+            'phone' => '+9555555555',
+            'city' => 'SPB',
+            'guests' => [
+                [
+                    'id' => (string) Uuid::random(),
+                    'value' => '321',
+                    'email' => null,
+                    'number' => null,
+                    'festival_id' => FestivalHelper::UUID_FESTIVAL,
+                    'ticket_type_id' => TypeTicketsSeeder::ID_FOR_FIRST_WAVE,
+                    'options' => [],
+                    'promo_code' => null,
+                    'price_snapshot' => ['base_price' => 1000, 'options_sum' => 0, 'discount' => 0],
+                    'is_live_ticket' => false,
+                ],
+            ],
+            'id_buy' => '321',
+            'date' => '2023-02-10T17:02',
+            'types_of_payment_id' => '3fcded69-4aef-4c4a-a041-52c91e5afd63',
+        ];
+
+        $dto = OrderTicketDto::fromState($request, new Uuid(UserSeeder::ID_FOR_USER_UUID));
+
+        // 1) fromState использует переданный id, а не генерирует новый.
+        self::assertSame($id, $dto->getId()->value());
+
+        // 2) id сохраняется в БД — внешний id заказа == наш id.
+        self::assertTrue($this->createOrder->createAndSave($dto));
+        $this->assertDatabaseHas('order_tickets', ['id' => $id]);
+    }
+
+    /**
      * @throws JsonException
      */
     public function dataProvider(): array

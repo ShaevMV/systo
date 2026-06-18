@@ -44,6 +44,8 @@ class TemplateBindingController extends Controller
 
     public function create(Request $request, TemplateBindingApplication $application): JsonResponse
     {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $data = $request->toArray()['data'] ?? [];
 
         if ($error = $this->validateBinding($data, $application)) {

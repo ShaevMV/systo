@@ -124,6 +124,8 @@ class TicketTypeController extends Controller
         TicketTypeApplication $application,
     ): JsonResponse
     {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $data = TicketTypeDto::fromState($request->toArray()['data']);
 
         return response()->json([

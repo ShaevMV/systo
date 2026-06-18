@@ -91,6 +91,8 @@ class QuestionnaireTypeController extends Controller
         QuestionnaireTypeApplication $application,
     ): JsonResponse
     {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $data = QuestionnaireTypeDto::fromState($request->toArray()['data']);
 
         return response()->json([

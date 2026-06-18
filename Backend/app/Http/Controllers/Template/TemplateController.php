@@ -140,6 +140,8 @@ class TemplateController extends Controller
         Request $request,
         TemplateApplication $application,
     ): JsonResponse {
+        $request->validate(['data.id' => 'sometimes|uuid']);
+
         $data = TemplateDto::fromState($request->toArray()['data']);
 
         return response()->json([

@@ -23,6 +23,9 @@ class CreateListOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            // id заказа-списка можно задать с клиента (id во внешней системе и org совпадают);
+            // не передан → генерируется на сервере (OrderTicketDto::fromStateForList).
+            'id' => 'sometimes|uuid',
             'email' => 'required|email',
             'festival_id' => 'required|exists:App\Models\Festival\FestivalModel,id',
             'location_id' => 'required|exists:App\Models\Location\LocationModel,id',
