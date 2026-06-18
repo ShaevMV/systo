@@ -32,6 +32,16 @@ const model = ref([
                 to: '/admin/email-delivery'
             }
         ]
+    },
+    {
+        label: 'Справочники',
+        items: [
+            {
+                label: 'Локации',
+                icon: 'pi pi-fw pi-map-marker',
+                to: '/admin/locations'
+            }
+        ]
     }
 ]);
 </script>
