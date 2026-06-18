@@ -76,6 +76,33 @@ const router = createRouter({
                         requiresAuth: true,
                         role: ['admin']
                     }
+                },
+                {
+                    path: '/admin/types-of-payment',
+                    name: 'typesOfPayment',
+                    component: () => import('@/views/admin/TypesOfPaymentListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/options',
+                    name: 'options',
+                    component: () => import('@/views/admin/OptionListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
+                    path: '/admin/questionnaire-types',
+                    name: 'questionnaireTypes',
+                    component: () => import('@/views/admin/QuestionnaireTypeListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
                 }
             ]
         },
