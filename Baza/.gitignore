@@ -17,3 +17,6 @@ yarn-error.log
 /.idea
 /.vscode
 .phpunit.cache
+
+# Список логин+пароль персонала на фестиваль — НЕ коммитить (в репо только .example)
+/database/seeders/data/staff_users.php
