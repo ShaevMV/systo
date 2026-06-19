@@ -13,9 +13,8 @@ use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Tickets\EmailDelivery\Application\Job\SendEmailJob;
 use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
+use Tickets\BazaDelivery\Application\Job\DeliverTicketToBazaJob;
 use Tickets\QrOrder\Application\Issuance\IssueOrderJob;
-use Tickets\QrOrder\Application\Job\LinkLiveTicketJob;
-use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
 use Tickets\QrOrder\Repositories\QrOrderRepositoryInterface;
 use Tickets\Questionnaire\Domain\DomainEvent\ProcessTelegramSend;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
@@ -85,7 +84,7 @@ class QrOrderPipelineTest extends TestCase
         ]);
 
         // Запись билета в Baza — отдельной изолированной задачей (на каждый билет).
-        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+        Queue::assertPushed(DeliverTicketToBazaJob::class, 1);
 
         // Уведомление гостя в Telegram — отдельной задачей (у гостя задан telegram).
         Queue::assertPushed(ProcessTelegramSend::class, 1);
@@ -125,7 +124,7 @@ class QrOrderPipelineTest extends TestCase
 
         // Нет telegram у гостя → задача в бот не ставится (мягкая валидация), остальное работает.
         Queue::assertNotPushed(ProcessTelegramSend::class);
-        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+        Queue::assertPushed(DeliverTicketToBazaJob::class, 1);
     }
 
     public function test_failed_job_resets_issued_at_for_retry(): void
@@ -173,7 +172,7 @@ class QrOrderPipelineTest extends TestCase
 
         // Билет всё равно создаётся и пишется в Baza.
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
-        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+        Queue::assertPushed(DeliverTicketToBazaJob::class, 1);
     }
 
     public function test_list_order_sends_list_email_and_creates_ticket(): void
@@ -209,7 +208,7 @@ class QrOrderPipelineTest extends TestCase
         $this->assertDatabaseHas('email_messages', ['aggregate_id' => $oid, 'event' => 'list_approved', 'status' => 'queued']);
         $this->assertDatabaseMissing('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid']);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
-        Queue::assertPushed(PushTicketToBazaJob::class, 1);
+        Queue::assertPushed(DeliverTicketToBazaJob::class, 1);
     }
 
     public function test_live_order_no_pdf_links_and_sends_live_email(): void
@@ -237,12 +236,11 @@ class QrOrderPipelineTest extends TestCase
         app()->call([new IssueOrderJob(new Uuid($oid)), 'handle']);
 
         // Живой: событие order_paid_live в очереди доставки (письмо без PDF), связка с live_tickets поставлена;
-        // PDF (ProcessCreatingQRCode) и el_tickets (PushTicketToBazaJob) НЕ задействованы.
+        // PDF (ProcessCreatingQRCode) и отдельная el_tickets-доставка НЕ задействованы (только live-связка).
         Queue::assertPushed(SendEmailJob::class, 1);
         $this->assertDatabaseHas('email_messages', ['aggregate_id' => $oid, 'event' => 'order_paid_live', 'status' => 'queued']);
-        Queue::assertPushed(LinkLiveTicketJob::class, 1);
+        Queue::assertPushed(DeliverTicketToBazaJob::class, 1);
         Queue::assertNotPushed(ProcessCreatingQRCode::class);
-        Queue::assertNotPushed(PushTicketToBazaJob::class);
         self::assertSame(1, TicketModel::where('order_ticket_id', $oid)->count());
     }
 

@@ -50,22 +50,27 @@ final class InMemoryMySqlAutoRepository implements AutoRepositoryInterface
     {
         try {
             DB::connection('mysqlBaza')->getPdo();
+            // Идемпотентно по (order_id, auto): повторная доставка (авто-ретрай/resend) не плодит дубли.
             DB::connection('mysqlBaza')
                 ->table('auto')
-                ->insert([
-                    'order_id'    => $auto->orderTicketId->value(),
-                    'curator'     => (string) ($auto->curator ?? ''),
-                    'project'     => (string) ($auto->project ?? ''),
-                    'auto'        => $auto->number,
-                    'festival_id' => $festivalId?->value(),
-                    'created_at'  => now(),
-                    'updated_at'  => now(),
-                ]);
-        } catch (\Exception $e) {
-            Log::error('setInBazaAuto: ' . $e->getMessage(), ['auto_id' => $auto->id->value()]);
-            return false;
-        } finally {
+                ->updateOrInsert(
+                    ['order_id' => $auto->orderTicketId->value(), 'auto' => $auto->number],
+                    [
+                        'curator'     => (string) ($auto->curator ?? ''),
+                        'project'     => (string) ($auto->project ?? ''),
+                        'festival_id' => $festivalId?->value(),
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
+                    ],
+                );
+
             return true;
+        } catch (\Throwable $e) {
+            // Возвращаем реальный результат (раньше finally{return true} глушил сбой) —
+            // чтобы DeliverTicketToBazaJob увидел ошибку и ретраил.
+            Log::error('setInBazaAuto: ' . $e->getMessage(), ['auto_id' => $auto->id->value()]);
+
+            return false;
         }
     }
 
@@ -77,11 +82,12 @@ final class InMemoryMySqlAutoRepository implements AutoRepositoryInterface
                 ->table('auto')
                 ->where('order_id', '=', $orderId->value())
                 ->delete();
-        } catch (\Exception $e) {
-            Log::error('removeAllFromBazaByOrderId: ' . $e->getMessage(), ['order_id' => $orderId->value()]);
-            return false;
-        } finally {
+
             return true;
+        } catch (\Throwable $e) {
+            Log::error('removeAllFromBazaByOrderId: ' . $e->getMessage(), ['order_id' => $orderId->value()]);
+
+            return false;
         }
     }
 }
