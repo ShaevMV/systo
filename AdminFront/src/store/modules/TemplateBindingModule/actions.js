@@ -21,9 +21,11 @@ export const loadRefs = (context) => {
         axios.post('/api/v1/ticketType/getList', { filter: {}, orderBy: {} }).then((r) => r.data.list ?? r.data ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'email' } }).then((r) => r.data.list ?? []),
         axios.post('/api/v1/template/getList', { filter: { kind: 'pdf' } }).then((r) => r.data.list ?? []),
-        axios.get(API + '/events').then((r) => r.data.list ?? [])
-    ]).then(([festivals, ticketTypes, emailTemplates, pdfTemplates, events]) => {
-        context.commit('setRefs', { festivals, ticketTypes, emailTemplates, pdfTemplates, events });
+        axios.get(API + '/events').then((r) => r.data.list ?? []),
+        // Типы оплаты (ось AF-9: «под каждый тип оплаты — свой шаблон письма/PDF»).
+        axios.post('/api/v1/typesOfPayment/getList', { filter: {}, orderBy: {} }).then((r) => r.data.list ?? [])
+    ]).then(([festivals, ticketTypes, emailTemplates, pdfTemplates, events, typesOfPayment]) => {
+        context.commit('setRefs', { festivals, ticketTypes, emailTemplates, pdfTemplates, events, typesOfPayment });
     });
 };
 

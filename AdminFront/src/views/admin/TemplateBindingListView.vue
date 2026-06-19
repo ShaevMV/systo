@@ -24,6 +24,7 @@ const ticketTypes = computed(() => arr('appTemplateBinding/getTicketTypes'));
 const emailTemplates = computed(() => arr('appTemplateBinding/getEmailTemplates'));
 const pdfTemplates = computed(() => arr('appTemplateBinding/getPdfTemplates'));
 const events = computed(() => arr('appTemplateBinding/getEvents'));
+const typesOfPayment = computed(() => arr('appTemplateBinding/getTypesOfPayment'));
 const isLoading = computed(() => store.getters['appTemplateBinding/getIsLoading']);
 
 const ORDER_TYPES = [
@@ -37,12 +38,13 @@ const ORDER_TYPES = [
 const dialogVisible = ref(false);
 const saving = ref(false);
 const errorMsg = ref('');
-const blank = () => ({ id: null, festival_id: '', order_type: '', event: '', ticket_type_id: '', email_template_id: '', pdf_template_id: '', is_default: false, active: true });
+const blank = () => ({ id: null, festival_id: '', order_type: '', event: '', ticket_type_id: '', types_of_payment_id: '', email_template_id: '', pdf_template_id: '', is_default: false, active: true });
 const form = ref(blank());
 
 // Отображение id → читаемое имя (из загруженных справочников).
 const festivalName = (id) => (id ? festivals.value.find((f) => f.id === id)?.name || '—' : 'Любой');
 const ticketTypeName = (id) => (id ? ticketTypes.value.find((t) => t.id === id)?.name || '—' : 'Любой');
+const typeOfPaymentName = (id) => (id ? typesOfPayment.value.find((t) => t.id === id)?.name || '—' : 'Любой');
 const templateTitle = (id) => {
     const t = [...emailTemplates.value, ...pdfTemplates.value].find((x) => x.id === id);
     return t ? t.title || t.slug : '—';
@@ -54,6 +56,7 @@ const eventLabel = (v) => (v ? events.value.find((e) => e.value === v)?.label ||
 const eventOptions = computed(() => [{ label: 'Любое', value: '' }, ...events.value]);
 const festivalOptions = computed(() => [{ name: 'Любой', id: '' }, ...festivals.value]);
 const ticketTypeOptions = computed(() => [{ name: 'Любой', id: '' }, ...ticketTypes.value]);
+const typeOfPaymentOptions = computed(() => [{ name: 'Любой', id: '' }, ...typesOfPayment.value]);
 const emailOptions = computed(() => [{ title: '— нет —', id: '' }, ...emailTemplates.value.map((t) => ({ id: t.id, title: t.title || t.slug }))]);
 const pdfOptions = computed(() => [{ title: '— нет —', id: '' }, ...pdfTemplates.value.map((t) => ({ id: t.id, title: t.title || t.slug }))]);
 
@@ -70,6 +73,7 @@ function openEdit(row) {
         order_type: row.order_type || '',
         event: row.event || '',
         ticket_type_id: row.ticket_type_id || '',
+        types_of_payment_id: row.types_of_payment_id || '',
         email_template_id: row.email_template_id || '',
         pdf_template_id: row.pdf_template_id || '',
         is_default: !!row.is_default,
@@ -87,6 +91,7 @@ async function save() {
         order_type: form.value.order_type || null,
         event: form.value.event || null,
         ticket_type_id: form.value.ticket_type_id || null,
+        types_of_payment_id: form.value.types_of_payment_id || null,
         email_template_id: form.value.email_template_id || null,
         pdf_template_id: form.value.pdf_template_id || null,
         is_default: form.value.is_default,
@@ -125,7 +130,10 @@ onMounted(() => {
         <div class="tb-header">
             <div>
                 <h1>Привязки шаблонов</h1>
-                <p class="tb-subtitle">Какой шаблон письма и PDF-билета использовать для события (оплата/отмена/изменение/регистрация…), типа заказа и типа билета. Без подходящей привязки — поведение по умолчанию (как раньше).</p>
+                <p class="tb-subtitle">
+                    Какой шаблон письма и PDF-билета использовать для события (оплата/отмена/изменение/регистрация…), типа заказа, типа билета и типа оплаты. Тип оплаты — сильнейший приоритет (под внешнего продавца). Без подходящей привязки —
+                    поведение по умолчанию (как раньше).
+                </p>
             </div>
             <Button label="Создать" icon="pi pi-plus" @click="openCreate" />
         </div>
@@ -133,14 +141,33 @@ onMounted(() => {
         <Card>
             <template #content>
                 <DataTable :value="list" :loading="isLoading" data-key="id" responsive-layout="scroll">
-                    <Column header="Фестиваль"><template #body="{ data }">{{ festivalName(data.festival_id) }}</template></Column>
-                    <Column header="Событие"><template #body="{ data }">{{ eventLabel(data.event) }}</template></Column>
-                    <Column header="Тип заказа"><template #body="{ data }">{{ orderTypeLabel(data.order_type) }}</template></Column>
-                    <Column header="Тип билета"><template #body="{ data }">{{ ticketTypeName(data.ticket_type_id) }}</template></Column>
-                    <Column header="Письмо"><template #body="{ data }">{{ data.email_template_id ? templateTitle(data.email_template_id) : '—' }}</template></Column>
-                    <Column header="PDF"><template #body="{ data }">{{ data.pdf_template_id ? templateTitle(data.pdf_template_id) : '—' }}</template></Column>
-                    <Column header="Дефолт"><template #body="{ data }"><Tag v-if="data.is_default" value="по умолчанию" severity="info" /></template></Column>
-                    <Column header="Активна"><template #body="{ data }"><Tag :value="data.active ? 'да' : 'нет'" :severity="data.active ? 'success' : 'secondary'" /></template></Column>
+                    <Column header="Фестиваль"
+                        ><template #body="{ data }">{{ festivalName(data.festival_id) }}</template></Column
+                    >
+                    <Column header="Событие"
+                        ><template #body="{ data }">{{ eventLabel(data.event) }}</template></Column
+                    >
+                    <Column header="Тип заказа"
+                        ><template #body="{ data }">{{ orderTypeLabel(data.order_type) }}</template></Column
+                    >
+                    <Column header="Тип билета"
+                        ><template #body="{ data }">{{ ticketTypeName(data.ticket_type_id) }}</template></Column
+                    >
+                    <Column header="Тип оплаты"
+                        ><template #body="{ data }">{{ typeOfPaymentName(data.types_of_payment_id) }}</template></Column
+                    >
+                    <Column header="Письмо"
+                        ><template #body="{ data }">{{ data.email_template_id ? templateTitle(data.email_template_id) : '—' }}</template></Column
+                    >
+                    <Column header="PDF"
+                        ><template #body="{ data }">{{ data.pdf_template_id ? templateTitle(data.pdf_template_id) : '—' }}</template></Column
+                    >
+                    <Column header="Дефолт"
+                        ><template #body="{ data }"><Tag v-if="data.is_default" value="по умолчанию" severity="info" /></template
+                    ></Column>
+                    <Column header="Активна"
+                        ><template #body="{ data }"><Tag :value="data.active ? 'да' : 'нет'" :severity="data.active ? 'success' : 'secondary'" /></template
+                    ></Column>
                     <Column header="">
                         <template #body="{ data }">
                             <Button icon="pi pi-pencil" text rounded aria-label="Изменить" @click="openEdit(data)" />
@@ -169,6 +196,11 @@ onMounted(() => {
                 <div class="tb-field">
                     <label>Тип билета</label>
                     <Select v-model="form.ticket_type_id" :options="ticketTypeOptions" option-label="name" option-value="id" placeholder="Любой" filter />
+                </div>
+                <div class="tb-field">
+                    <label>Тип оплаты</label>
+                    <Select v-model="form.types_of_payment_id" :options="typeOfPaymentOptions" option-label="name" option-value="id" placeholder="Любой" filter />
+                    <small class="tb-hint">Сильнейший приоритет (AF-9): под конкретный тип оплаты / внешнего продавца — свой шаблон письма и PDF</small>
                 </div>
                 <div class="tb-field">
                     <label>Шаблон письма</label>
@@ -239,5 +271,9 @@ onMounted(() => {
 }
 .tb-error {
     color: var(--p-red-500, #ef4444);
+}
+.tb-hint {
+    color: var(--p-text-muted-color, #9ca3af);
+    font-size: 0.75rem;
 }
 </style>

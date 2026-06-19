@@ -10,4 +10,6 @@ export const getPdfTemplates = (state) => state.pdfTemplates;
 
 export const getEvents = (state) => state.events;
 
+export const getTypesOfPayment = (state) => state.typesOfPayment;
+
 export const getIsLoading = (state) => state.isLoading;

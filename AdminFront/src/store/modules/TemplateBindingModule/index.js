@@ -13,6 +13,7 @@ export default {
         emailTemplates: [],
         pdfTemplates: [],
         events: [],
+        typesOfPayment: [],
         isLoading: false
     },
     getters,
