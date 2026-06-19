@@ -59,14 +59,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/enter', [\App\Http\Controllers\Api\ScanController::class, 'enter'])->name('tickets.scan.enter');
 });
 
-// changes
-Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware('admin');
-Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->name('changes.edit')->middleware('admin');
-Route::post('/change/close', [ChangesController::class, 'close'])->name('changes.close')->middleware('admin');
-Route::post('/change/save', [ChangesController::class, 'save'])->name('changes.save')->middleware('admin');
-Route::post('/change/remove', [ChangesController::class, 'remove'])->name('changes.remove')->middleware('admin');
+// changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
+// administrator проходит везде (суперроль), is_admin-юзеры не теряют доступ.
+Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware(['auth', 'permission:report.view']);
+Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->name('changes.edit')->middleware(['auth', 'permission:shift.compose']);
+Route::post('/change/close', [ChangesController::class, 'close'])->name('changes.close')->middleware(['auth', 'permission:shift.close']);
+Route::post('/change/save', [ChangesController::class, 'save'])->name('changes.save')->middleware(['auth', 'permission:shift.compose']);
+Route::post('/change/remove', [ChangesController::class, 'remove'])->name('changes.remove')->middleware(['auth', 'permission:shift.remove']);
 
-// sync (только для админов)
-Route::get('/sync', [SyncController::class, 'index'])->name('sync.index')->middleware('admin');
-Route::post('/sync/export', [SyncController::class, 'export'])->name('sync.export')->middleware('admin');
-Route::post('/sync/import', [SyncController::class, 'import'])->name('sync.import')->middleware('admin');
+// sync — только право sync.manage (в дефолте — лишь administrator)
+Route::get('/sync', [SyncController::class, 'index'])->name('sync.index')->middleware(['auth', 'permission:sync.manage']);
+Route::post('/sync/export', [SyncController::class, 'export'])->name('sync.export')->middleware(['auth', 'permission:sync.manage']);
+Route::post('/sync/import', [SyncController::class, 'import'])->name('sync.import')->middleware(['auth', 'permission:sync.manage']);
