@@ -73,10 +73,17 @@ class QrOrderPipelineTest extends TestCase
         ]);
         self::assertSame(1, TicketModel::where('order_ticket_id', self::ORDER_ID)->count());
 
-        // PDF/QR поставлен в очередь; письмо со всеми PDF поставлено в очередь доставки (Ф2):
-        // трекаемая запись email_messages(queued) + асинхронный SendEmailJob (статус виден в админке).
+        // PDF/QR поставлен в очередь; письма поставлены в очередь доставки (Ф2): трекаемые
+        // записи email_messages(queued) + асинхронные SendEmailJob (статус виден в админке).
+        // Для regular в статусе «создан» писем два: (1) «заказ создан» (order_created) при приёме,
+        // (2) «оплачен» со всеми PDF (order_paid) при выдаче оркестратором.
         Queue::assertPushed(ProcessCreatingQRCode::class);
-        Queue::assertPushed(SendEmailJob::class, 1);
+        Queue::assertPushed(SendEmailJob::class, 2);
+        $this->assertDatabaseHas('email_messages', [
+            'aggregate_id' => self::ORDER_ID,
+            'event' => 'order_created',
+            'status' => 'queued',
+        ]);
         $this->assertDatabaseHas('email_messages', [
             'aggregate_id' => self::ORDER_ID,
             'event' => 'order_paid',

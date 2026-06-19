@@ -34,6 +34,7 @@ final class EmailEvent
     public const PASSWORD_RESET = 'password_reset';
     public const INVITE = 'invite';
     public const QUESTIONNAIRE = 'questionnaire';
+    public const QUESTIONNAIRE_APPROVED = 'questionnaire_approved';
 
     /** event → дефолтный slug шаблона (= текущий зашитый в Mailable). */
     private const DEFAULT_SLUG = [
@@ -52,6 +53,7 @@ final class EmailEvent
         self::PASSWORD_RESET => 'passwordResets',
         self::INVITE => 'invate',
         self::QUESTIONNAIRE => 'questionnaire',
+        self::QUESTIONNAIRE_APPROVED => 'questionnaireApproved',
     ];
 
     /** event → человекочитаемая метка (для селектора события в админке). */
@@ -71,6 +73,7 @@ final class EmailEvent
         self::PASSWORD_RESET => 'Сброс пароля',
         self::INVITE => 'Приглашение',
         self::QUESTIONNAIRE => 'Анкета гостя',
+        self::QUESTIONNAIRE_APPROVED => 'Анкета одобрена',
     ];
 
     /** @return string[] все коды событий */

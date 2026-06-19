@@ -66,9 +66,12 @@ class QrOrderPipelineViewTest extends TestCase
         $this->assertCount(1, $pipeline['tickets']);
         $this->assertStringContainsString('.pdf', $pipeline['tickets'][0]['pdf_url']);
 
-        // Письмо заказа отслеживается (событие order_paid, статус queued под Queue::fake).
+        // Письма заказа отслеживаются: «заказ создан» (order_created) при приёме в статусе «создан»
+        // + «оплачен» (order_paid) при выдаче. Оба статуса queued под Queue::fake.
         $this->assertNotEmpty($pipeline['emails']);
-        $this->assertSame('order_paid', $pipeline['emails'][0]['event']);
+        $emailEvents = array_column($pipeline['emails'], 'event');
+        $this->assertContains('order_created', $emailEvents);
+        $this->assertContains('order_paid', $emailEvents);
 
         // История содержит шаги пайплайна (step_*) и финальное issued.
         $names = array_column($pipeline['history'], 'event_name');

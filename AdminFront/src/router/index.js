@@ -24,6 +24,15 @@ const router = createRouter({
                     }
                 },
                 {
+                    // Личный кабинет — доступен любому авторизованному пользователю (без role-гейта).
+                    path: '/admin/profile',
+                    name: 'profile',
+                    component: () => import('@/views/admin/ProfileView.vue'),
+                    meta: {
+                        requiresAuth: true
+                    }
+                },
+                {
                     path: '/admin/qr-orders',
                     name: 'qrOrders',
                     component: () => import('@/views/admin/QrOrderListView.vue'),

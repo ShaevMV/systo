@@ -1,8 +1,23 @@
 <script setup>
+import { computed } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+const store = useStore();
+const router = useRouter();
+
+const email = computed(() => store.getters['appUser/getEmail']);
+
+function goProfile() {
+    router.push('/admin/profile');
+}
+
+function logout() {
+    store.dispatch('appUser/logOut');
+}
 </script>
 
 <template>
@@ -43,17 +58,13 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" :title="email || 'Личный кабинет'" @click="goProfile">
                         <i class="pi pi-user"></i>
-                        <span>Profile</span>
+                        <span>Личный кабинет</span>
+                    </button>
+                    <button type="button" class="layout-topbar-action" title="Выйти из системы" @click="logout">
+                        <i class="pi pi-sign-out"></i>
+                        <span>Выход</span>
                     </button>
                 </div>
             </div>
