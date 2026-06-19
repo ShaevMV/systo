@@ -44,7 +44,8 @@ class StagingDemoSeeder extends Seeder
         // демо-смена из этого состава — только если открытой смены ещё нет
         // (SaveChange всегда создаёт новую, поэтому защищаемся от дублей).
         if (! ChangesModel::query()->whereNull('end')->exists()) {
-            app(SaveChange::class)->save([1, 3, 4, 9, 33], Carbon::now());
+            // chiefId = 3 (Юля Рахлина, shift_chief) — инвариант «есть начальник» (Ф2 PR-7)
+            app(SaveChange::class)->save([1, 3, 4, 9, 33], Carbon::now(), null, 3);
         }
     }
 }

@@ -5,6 +5,9 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body" id="scan-result">
+                    @if(session('shift_error'))
+                        <div class="alert alert-danger">{{ session('shift_error') }}</div>
+                    @endif
                     <form class="form" method="post"
                           action="/change/save">
                         @csrf
@@ -16,6 +19,17 @@
                             <select name="compound[]" multiple aria-label="multiple select example" style="width: 254px;" required>
                                 @foreach($users as $user)
                                     <option value="{{$user->id}}" @if(isset($findChange['user_id']) && in_array($user->id, $findChange['user_id'])) selected @endif>
+                                        {{$user->name}}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="" style="margin-top: 10px;">
+                            <label> Начальник смены (обязательно) </label>
+                            <select name="chief" style="width: 254px;" required>
+                                <option value="">— выбери начальника —</option>
+                                @foreach($users as $user)
+                                    <option value="{{$user->id}}" @if(isset($findChange['chief_id']) && (int)$findChange['chief_id'] === (int)$user->id) selected @endif>
                                         {{$user->name}}
                                     </option>
                                 @endforeach

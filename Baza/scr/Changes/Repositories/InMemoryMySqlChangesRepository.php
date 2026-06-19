@@ -81,9 +81,9 @@ group by `changes`.`id`", [
         return $result?->id;
     }
 
-    public function updateOrCreate(array $userList, Carbon $start, string $festivalId, ?int $id = null): bool
+    public function updateOrCreate(array $userList, Carbon $start, string $festivalId, ?int $id = null, ?int $chiefId = null): bool
     {
-        return DB::transaction(function () use ($userList, $start, $festivalId, $id) {
+        return DB::transaction(function () use ($userList, $start, $festivalId, $id, $chiefId) {
             // Дедуп состава: один человек в смене ровно один раз. Защита от кривого
             // POST compound[] с дублем — иначе UNIQUE(change_id,user_id) в change_user
             // уронил бы сохранение. JSON и change_user пишем одинаковым составом.
@@ -104,7 +104,7 @@ group by `changes`.`id`", [
 
             // Двойная запись (Ф2): состав смены с ролями в change_user — параллельно
             // changes.user_id JSON выше. Читающие экраны пока используют JSON → вход цел.
-            $this->syncChangeUsers((int) $model->id, $userList);
+            $this->syncChangeUsers((int) $model->id, $userList, $chiefId);
 
             return true;
         });
@@ -112,13 +112,12 @@ group by `changes`.`id`", [
 
     /**
      * Пересобирает состав change_user для смены (delete старые → insert текущие).
-     * Роль участника — мягкий маппинг ShiftRole::fromUser: явная глобальная
-     * users.role перекрывает производную по is_admin. Явное назначение ролей
-     * именно в этой смене и выбор главного делается из UI в PR-6.
+     * Роль участника: выбранный главный (chiefId) → shift_chief; остальные —
+     * мягкий маппинг ShiftRole::fromUser (явная users.role перекрывает is_admin).
      *
      * @param int[] $userList
      */
-    private function syncChangeUsers(int $changeId, array $userList): void
+    private function syncChangeUsers(int $changeId, array $userList, ?int $chiefId = null): void
     {
         ChangeUserModel::where('change_id', $changeId)->delete();
 
@@ -134,12 +133,25 @@ group by `changes`.`id`", [
             $userId = (int) $userId;
             $user = $users->get($userId);
 
+            $role = $userId === $chiefId
+                ? ShiftRole::SHIFT_CHIEF
+                : ShiftRole::fromUser((bool) ($user?->is_admin ?? false), $user?->role);
+
             ChangeUserModel::create([
                 'change_id' => $changeId,
                 'user_id'   => $userId,
-                'role'      => ShiftRole::fromUser((bool) ($user?->is_admin ?? false), $user?->role),
+                'role'      => $role,
             ]);
         }
+    }
+
+    public function getChiefId(int $changeId): ?int
+    {
+        $value = ChangeUserModel::where('change_id', $changeId)
+            ->where('role', ShiftRole::SHIFT_CHIEF)
+            ->value('user_id');
+
+        return $value !== null ? (int) $value : null;
     }
 
     /**
