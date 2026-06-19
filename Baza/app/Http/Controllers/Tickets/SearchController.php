@@ -48,13 +48,16 @@ class SearchController extends Controller
     {
         try {
             $changeId = $this->getCurrentChanges->getId((int)\Auth::id());
-            $this->addTicketsInReport->increment($changeId, $request->get('type'));
 
+            // Сначала впуск (skip бросит исключение, если билет уже был пропущен/не найден),
+            // и только при успехе — +1 в отчёт смены. Иначе повторный впуск накручивал счётчик.
             $this->enterTicket->skip(
                 $request->get('type'),
                 (int)$request->get('id'),
                 $changeId,
             );
+
+            $this->addTicketsInReport->increment($changeId, $request->get('type'));
 
             return Redirect::route('tickets.search', [
                 'q' => $request->get('q'),

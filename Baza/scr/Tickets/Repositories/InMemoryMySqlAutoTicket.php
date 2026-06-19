@@ -25,6 +25,14 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
     {
         $rawData = $this->model::whereId($id)->first();
 
+        // Серверная защита от повторного впуска (см. InMemoryMySqlElTicket::skip).
+        if ($rawData === null) {
+            throw new \DomainException('Билет не найден в Базе входа');
+        }
+        if ($rawData->date_change !== null) {
+            throw new \DomainException('Билет уже был пропущен ' . $rawData->date_change);
+        }
+
         DB::beginTransaction();
         try {
             $rawData->change_id = $userId;
