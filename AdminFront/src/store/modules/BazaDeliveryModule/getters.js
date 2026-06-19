@@ -4,12 +4,6 @@ export const getItem = (state) => state.item;
 
 export const getHistory = (state) => state.history;
 
-export const getTickets = (state) => state.tickets;
-
-export const getEmails = (state) => state.emails;
-
-export const getBaza = (state) => state.baza;
-
 export const getFilter = (state) => state.filter;
 
 export const getOrderBy = (state) => state.orderBy;
@@ -19,3 +13,7 @@ export const getPagination = (state) => state.pagination;
 export const getIsLoading = (state) => state.isLoading;
 
 export const getDataError = (state) => state.dataError;
+
+export const getStats = (state) => state.stats;
+
+export const getStuck = (state) => state.stats.stuck ?? 0;

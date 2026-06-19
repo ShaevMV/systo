@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 import Card from 'primevue/card';
 import Select from 'primevue/select';
@@ -11,8 +12,16 @@ import Column from 'primevue/column';
 import Tag from 'primevue/tag';
 
 const store = useStore();
+const router = useRouter();
 
 const typeOrderLabels = { regular: 'Обычный', friendly: 'Friendly', list: 'Список', live: 'Живой' };
+
+// Застрявшие доставки билетов в baza (AF-4) — число failed по выбранному фестивалю.
+const stuckTickets = computed(() => store.getters['appBazaDelivery/getStuck'] || 0);
+
+function goToBazaDelivery() {
+    router.push('/admin/baza-delivery');
+}
 
 const periodOptions = [
     { label: 'Всё время', value: 'all' },
@@ -90,6 +99,7 @@ function buildFilter() {
 
 function reload() {
     store.dispatch('appDashboard/loadStats', { filter: buildFilter() });
+    store.dispatch('appBazaDelivery/loadStats', { festival_id: filter.value.festival_id });
 }
 
 function resetFilter() {
@@ -175,6 +185,12 @@ onMounted(() => {
                 <template #content>
                     <span class="dash-kpi-label"><i class="pi pi-chart-line"></i> Средний чек</span>
                     <span class="dash-kpi-value">{{ formatPrice(avgCheck) }}</span>
+                </template>
+            </Card>
+            <Card class="dash-kpi dash-kpi-clickable" :class="{ 'dash-kpi-alert': stuckTickets > 0 }" @click="goToBazaDelivery">
+                <template #content>
+                    <span class="dash-kpi-label"><i class="pi pi-server"></i> Застряли в baza</span>
+                    <span class="dash-kpi-value">{{ formatNumber(stuckTickets) }}</span>
                 </template>
             </Card>
         </div>
@@ -313,6 +329,19 @@ onMounted(() => {
     font-size: 1.7rem;
     font-weight: 700;
     line-height: 1.1;
+}
+
+.dash-kpi-clickable {
+    cursor: pointer;
+    transition: box-shadow 0.15s ease;
+}
+
+.dash-kpi-clickable:hover {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dash-kpi-alert .dash-kpi-value {
+    color: var(--p-red-500, #ef4444);
 }
 
 /* Графики */

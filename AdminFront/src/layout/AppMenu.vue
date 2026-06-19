@@ -79,6 +79,16 @@ const model = ref([
         ]
     },
     {
+        label: 'Билеты',
+        items: [
+            {
+                label: 'Доставка в baza',
+                icon: 'pi pi-fw pi-server',
+                to: '/admin/baza-delivery'
+            }
+        ]
+    },
+    {
         label: 'Письма',
         items: [
             {

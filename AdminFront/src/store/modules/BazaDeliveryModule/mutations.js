@@ -10,18 +10,6 @@ export const setHistory = (state, payload) => {
     state.history = payload;
 };
 
-export const setTickets = (state, payload) => {
-    state.tickets = payload;
-};
-
-export const setEmails = (state, payload) => {
-    state.emails = payload;
-};
-
-export const setBaza = (state, payload) => {
-    state.baza = payload;
-};
-
 export const setFilter = (state, payload) => {
     state.filter = payload;
 };
@@ -36,6 +24,10 @@ export const setPagination = (state, payload) => {
 
 export const setTotal = (state, payload) => {
     state.pagination = { ...state.pagination, total: payload };
+};
+
+export const setStats = (state, payload) => {
+    state.stats = payload;
 };
 
 export const setIsLoading = (state, payload) => {
