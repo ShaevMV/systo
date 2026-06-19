@@ -11,6 +11,10 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
+    // UUID текущего фестиваля зашит прямо в коде — фильтр, чтобы на входе показывались
+    // билеты только актуального события. Дублируется в Spisok/Friendly/Auto-репозиториях,
+    // в SaveChange и в отчёте смен. В Live и Parking фильтра по festival_id НЕТ вообще.
+    // Кандидат на вынос в конфиг/env — меняется каждый фестиваль. См. .claude/docs/BAZA.md §9.
     private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
 
     public function __construct(
@@ -45,12 +49,30 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
     }
 
     /**
+     * Пометить билет впущенным на КПП.
+     *
+     * ВНИМАНИЕ: параметр $userId на деле — это changeId (id открытой смены), а НЕ id
+     * пользователя. Он пишется в колонку change_id, которая одновременно служит флагом
+     * «гость впущен» (NULL = ещё не входил). Имя параметра вводит в заблуждение —
+     * кандидат на переименование в $changeId.
+     * Билет здесь ищется по kilter (число из QR), тогда как search() — по uuid: разные ключи.
+     *
      * @throws Throwable
      */
     public function skip(int $id, int $userId): bool
     {
         $rawData = $this->addFestivalUuid()->whereKilter($id)
             ->first();
+
+        // Серверная защита от повторного впуска: билет должен существовать и ещё не быть
+        // пропущенным (date_change пуст). Раньше проверка жила только на фронте — повторный
+        // запрос перезаписывал отметку и накручивал счётчик смены.
+        if ($rawData === null) {
+            throw new \DomainException('Билет не найден в Базе входа');
+        }
+        if ($rawData->date_change !== null) {
+            throw new \DomainException('Билет уже был пропущен ' . $rawData->date_change);
+        }
 
         DB::beginTransaction();
         try {

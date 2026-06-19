@@ -62,6 +62,14 @@ Route::get('/scan', [ScanController::class, 'scanPage'])->name('tickets.scan');
 Route::get('/search', [SearchController::class, 'searchPage'])->name('tickets.search');
 Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name('tickets.scan.enterForTable');
 
+// Сканирование QR и впуск гостя (AJAX из scan.blade.php). Перенесено из routes/api.php
+// под middleware('auth'): web-группа стартует сессию + проверяет CSRF (_token уже шлёт фронт),
+// поэтому id сотрудника берётся из сессии (Auth::id()), а не из тела запроса.
+Route::middleware('auth')->group(function () {
+    Route::post('/api/scan', [\App\Http\Controllers\Api\ScanController::class, 'search'])->name('tickets.scan.search');
+    Route::post('/api/enter', [\App\Http\Controllers\Api\ScanController::class, 'enter'])->name('tickets.scan.enter');
+});
+
 // changes
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware('admin');
 Route::get('/change/edit/{id?}', [ChangesController::class, 'viewAddChange'])->name('changes.edit')->middleware('admin');

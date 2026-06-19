@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\ScanController;
-use App\Http\Controllers\Api\TicketsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,5 +18,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('scan', [ScanController::class, 'search'])->name('tickets.scan.search');
-Route::post('enter', [ScanController::class, 'enter'])->name('tickets.scan.enter');
+// Маршруты сканирования и впуска (POST /api/scan, /api/enter) перенесены в routes/web.php
+// под middleware('auth'): группа `api` не стартует сессию, поэтому раньше эндпоинты были
+// фактически без авторизации, а id сотрудника брался из тела запроса. Теперь они под
+// web-группой (сессия + CSRF) и auth — см. routes/web.php.

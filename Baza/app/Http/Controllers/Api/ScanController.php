@@ -42,16 +42,29 @@ class ScanController extends Controller
         }
     }
 
+    /**
+     * Впуск гостя на КПП. Порядок шагов важен:
+     *   1) по сотруднику (Auth::id() — из сессии, НЕ из тела запроса) находим id его
+     *      ТЕКУЩЕЙ открытой смены (getCurrentChanges);
+     *   2) помечаем билет впущенным (skip): change_id = id смены, date_change = now.
+     *      skip() бросает исключение, если билет НЕ найден или УЖЕ был пропущен —
+     *      серверная защита от повторного впуска (не только фронт);
+     *   3) только при успешном skip — +1 к счётчику прошедших билетов в отчёте смены.
+     *
+     * Маршрут защищён middleware('auth') в routes/web.php (web-группа: сессия + CSRF).
+     */
     public function enter(Request $request): JsonResponse
     {
         try {
-            $changeId = $this->getCurrentChanges->getId((int)$request->get('user_id'));
-            $this->addTicketsInReport->increment($changeId, $request->get('type'));
+            $changeId = $this->getCurrentChanges->getId((int) \Auth::id());
+
             $this->enterTicket->skip(
                 $request->get('type'),
                 (int)$request->get('id'),
                 $changeId,
             );
+
+            $this->addTicketsInReport->increment($changeId, $request->get('type'));
 
             return response()->json('OK');
         } catch (Throwable $e) {

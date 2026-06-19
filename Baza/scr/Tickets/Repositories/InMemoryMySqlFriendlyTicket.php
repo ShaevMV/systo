@@ -44,6 +44,14 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
             ->whereFestivalId(self::UUID_FESTIVAL)
             ->first();
 
+        // Серверная защита от повторного впуска (см. InMemoryMySqlElTicket::skip).
+        if ($rawData === null) {
+            throw new \DomainException('Билет не найден в Базе входа');
+        }
+        if ($rawData->date_change !== null) {
+            throw new \DomainException('Билет уже был пропущен ' . $rawData->date_change);
+        }
+
         DB::beginTransaction();
         try {
             $rawData->change_id = $userId;
