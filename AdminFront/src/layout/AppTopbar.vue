@@ -1,8 +1,42 @@
 <script setup>
+import { computed, ref } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import { useLayout } from '@/layout/composables/layout';
 import AppConfigurator from './AppConfigurator.vue';
+import Menu from 'primevue/menu';
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
+const store = useStore();
+const router = useRouter();
+
+const email = computed(() => store.getters['appUser/getEmail']);
+
+// 📅 Календарь → сводка/дашборд (обзор продаж и заказов «на сегодня»).
+function goCalendar() {
+    router.push('/admin/dashboard');
+}
+
+// 📥 Входящие → «Доставка писем» (лента всех писем со статусами доставки).
+function goInbox() {
+    router.push('/admin/email-delivery');
+}
+
+// 👤 Профиль → выпадающее меню: личный кабинет + выход.
+const userMenu = ref(null);
+const userMenuItems = computed(() => [
+    {
+        label: email.value || 'Аккаунт',
+        items: [
+            { label: 'Личный кабинет', icon: 'pi pi-id-card', command: () => router.push('/admin/profile') },
+            { label: 'Выход', icon: 'pi pi-sign-out', command: () => store.dispatch('appUser/logOut') }
+        ]
+    }
+]);
+
+function toggleUserMenu(event) {
+    userMenu.value.toggle(event);
+}
 </script>
 
 <template>
@@ -43,18 +77,19 @@ const { toggleMenu, toggleDarkMode, isDarkTheme } = useLayout();
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" title="Сводка / дашборд" @click="goCalendar">
                         <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
+                        <span>Сводка</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" title="Доставка писем" @click="goInbox">
                         <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
+                        <span>Письма</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
+                    <button type="button" class="layout-topbar-action" :title="email || 'Аккаунт'" aria-haspopup="true" @click="toggleUserMenu">
                         <i class="pi pi-user"></i>
-                        <span>Profile</span>
+                        <span>Профиль</span>
                     </button>
+                    <Menu ref="userMenu" :model="userMenuItems" :popup="true" />
                 </div>
             </div>
         </div>

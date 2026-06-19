@@ -548,18 +548,36 @@
 ### POST `/api/v1/qrOrder/create`
 **Middleware:** `qr.ingest` (S2S, заголовок `X-QR-Token`)
 
-**Описание:** приём заказа от витрины (API №1). Идемпотентно: повторный приём заказа с тем же `id` не создаёт дубль. Сервисный ключ qr предъявляется в заголовке `X-QR-Token` и сверяется со списком валидных ключей (`config services.qr_ingest.tokens`).
+**Описание:** приём заказа от витрины (API №1). Идемпотентно: повторный приём заказа с тем же `id` не создаёт дубль (не шлёт письмо «создан» повторно и не выпускает билеты снова). Сервисный ключ qr предъявляется в заголовке `X-QR-Token` и сверяется со списком валидных ключей (`config services.qr_ingest.tokens`).
 
-**Request:** расширенный JSON-контракт qr (`order_id`, `user`, `price`, `order_data`, `guests[]`, см. `.claude/specs/admin-qr-orders-prompt.md §2`).
+**Два режима приёма (по `status` в контракте):**
+- **«создан»** (`создан` / `new` / `created`) — двухшаговый цикл: org шлёт письмо «заказ создан» (шаблон `orderToCreate`, `source = qr_pipeline`), билеты **НЕ выпускает**. Письмо «создан» шлётся **только для `type_order = regular`** (списки писем при создании не шлют, живые билеты стартуют оплаченными). Выпуск произойдёт позже при `changeStatus` → «оплачен».
+- **«оплачен»** (`оплачен` / `paid`) — одношаговый приём: org **сразу** запускает выдачу билетов (PDF/письма/Telegram) — один раз (защита по `issued_at`).
+
+**Request:** расширенный JSON-контракт qr (`order_id`, `user`, `price`, `order_data`, `guests[]`, `status`, см. `.claude/specs/admin-qr-orders-prompt.md §2`).
 
 **Response 200:** `{ "success": true, "order_id": "UUID", "message": "Заказ принят" }`
 **Response 422:** `{ "success": false, "message": "..." }` (невалидный контракт)
 
 ---
 
-### ~~POST `/api/v1/qrOrder/changeStatus/{id}`~~ (удалён)
+### POST `/api/v1/qrOrder/changeStatus/{id}`
+**Middleware:** `qr.ingest` (S2S, заголовок `X-QR-Token`)
 
-**Удалён из `routes/qrOrder.php`.** Заказ от витрины приходит **уже в статусе «оплачен»**, и `qrOrder/create` сразу запускает выдачу билетов (PDF/письма) — **один раз** (защита по `issued_at`, повторный приём того же `id` не выдаёт билеты снова). Отдельной смены статуса (API №2) больше нет.
+**Описание:** смена статуса принятого заказа (API №2). Нужна для двухшагового цикла «создан» → «оплачен». При переходе в «оплачен» (`оплачен` / `paid`) и `issued_at == null` запускается **выдача билетов** (PDF/письма) — **один раз** (защита по `issued_at`: повторный «оплачен» от ретраев qr не выдаёт билеты снова). Любая смена пишет событие `status_changed` в `domain_history` (`actor_type = qr`).
+
+**Request:**
+```json
+{
+  "status": "оплачен"
+}
+```
+- `status` — **обязателен** (строка от qr).
+
+**Response 200:** `{ "success": true, "item": { ...заказ... }, "message": "Статус обновлён" }`
+**Response 422:** `{ "success": false, "message": "Не передан status" }`
+**Response 404:** `{ "success": false, "message": "Заказ не найден" }`
+**Response 401:** без/с невалидным `X-QR-Token` (middleware `qr.ingest`)
 
 ---
 
@@ -681,7 +699,7 @@
 - **Статусы письма** (`EmailStatus`): `queued` → `sending` → `sent` (передано на SMTP) → `[delivered → opened]` / `failed` (+ текст ошибки = «где застряло»). `bounced` — отскок. Из `failed`/`bounced` — повтор в `queued`.
 - `delivered`/`bounced` требуют транзакционного провайдера с вебхуками (**AF-6**, ещё не подключён); `opened` ставится пикселем прочтения (Ф3).
 - **`source`** письма ∈ `qr_pipeline` (выдача билетов qr) / `qr_intake` (S2S-приём от витрины) / `org_event` (события org).
-- **Событие письма** (`EmailEvent`, 15 кодов) → дефолтный slug шаблона: `order_created`→`orderToCreate`, `order_paid`→`orderToPaid`, `order_paid_friendly`→`TypeTicketMailOrderToPaidFriendly1`, `order_paid_live`→`orderToPaidLiveTicket`, `order_cancel`→`orderToCancel`, `order_changed`→`orderToChangeTicket`, `order_difficulties`→`orderToDifficultiesArose`, `order_live_issued`→`orderToLiveTicketIssued`, `list_approved`→`orderListApproved`, `list_cancel`→`orderListCancel`, `list_difficulties`→`orderListDifficultiesArose`, `user_registered`→`newUser`, `password_reset`→`passwordResets`, `invite`→`invate`, `questionnaire`→`questionnaire`.
+- **Событие письма** (`EmailEvent`, 16 кодов) → дефолтный slug шаблона: `order_created`→`orderToCreate`, `order_paid`→`orderToPaid`, `order_paid_friendly`→`TypeTicketMailOrderToPaidFriendly1`, `order_paid_live`→`orderToPaidLiveTicket`, `order_cancel`→`orderToCancel`, `order_changed`→`orderToChangeTicket`, `order_difficulties`→`orderToDifficultiesArose`, `order_live_issued`→`orderToLiveTicketIssued`, `list_approved`→`orderListApproved`, `list_cancel`→`orderListCancel`, `list_difficulties`→`orderListDifficultiesArose`, `user_registered`→`newUser`, `password_reset`→`passwordResets`, `invite`→`invate`, `questionnaire`→`questionnaire`, `questionnaire_approved`→`questionnaireApproved`.
 - Slug выбирается привязкой шаблона по событию (`templateBinding`, см. §8.3) с fallback на дефолтный slug события.
 - В `domain_history` для писем — `aggregate_type='email'`, события `email_queued`/`email_sending`/`email_sent`/`email_failed`/`email_opened`. Письма от qr пишутся `actor_type=qr`, системные — `system`.
 
@@ -1169,7 +1187,7 @@
 | Метод | Маршрут | Описание |
 |-------|---------|----------|
 | POST | `/getList` | Список всех привязок |
-| GET | `/events` | Каталог событий писем для селектора: `{ success, list: [{ value, label }] }` (15 событий из `EmailEvent`) |
+| GET | `/events` | Каталог событий писем для селектора: `{ success, list: [{ value, label }] }` (16 событий из `EmailEvent`) |
 | GET | `/getItem/{id}` | Одна привязка (404 если нет) |
 | POST | `/create` | Создать (UUID в `data.id` опционально) |
 | POST | `/edit/{id}` | Редактировать |
@@ -1256,7 +1274,7 @@
 |------------|-------|----------|
 | **CORS** | global | Проверяет Origin против белого списка |
 | **Authenticate** | `auth:api` | JWT через `php-open-source-saver/jwt-auth` |
-| **QrIngestAuth** | `qr.ingest` | S2S-канал qr→org: заголовок `X-QR-Token` сверяется со списком валидных ключей (`config services.qr_ingest.tokens`, env `QR_INGEST_TOKENS`). Закрывает `qrOrder/create` и `emailNotification/send`. Без/невалидный токен → 401 |
+| **QrIngestAuth** | `qr.ingest` | S2S-канал qr→org: заголовок `X-QR-Token` сверяется со списком валидных ключей (`config services.qr_ingest.tokens`, env `QR_INGEST_TOKENS`). Закрывает `qrOrder/create`, `qrOrder/changeStatus` и `emailNotification/send`. Без/невалидный токен → 401 |
 | **IsAdmin** | `admin` | Проверка `is_admin = true` или `role = 'admin'` |
 | **CheckRole** | `role:role1,role2` | Проверка роли пользователя |
 | **Bot** | `bot` | Заголовок `auth-token` == `PCf4yeeM8prVGee3zbArQGQP2eGpPHsV` |
@@ -1276,7 +1294,7 @@
 | **role: admin,manager** | order/getListsList |
 | **role: seller,admin,pusher,manager** | order/toChangeStatus (для list-статусов внутри проверка admin/manager) |
 | **bot** | promoCode/savePromoCodeForBot |
-| **qr.ingest** (S2S, `X-QR-Token`) | qrOrder/create, emailNotification/send (от витрины qr) |
+| **qr.ingest** (S2S, `X-QR-Token`) | qrOrder/create, qrOrder/changeStatus, emailNotification/send (от витрины qr) |
 | **admin** (qr) | qrOrder/getList, qrOrder/getStats, qrOrder/getItem, qrOrder/getHistory, qrOrder/getTicketPdf, qrOrder/getPipeline |
 
 ---
