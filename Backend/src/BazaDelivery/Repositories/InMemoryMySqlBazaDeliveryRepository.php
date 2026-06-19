@@ -118,4 +118,21 @@ final class InMemoryMySqlBazaDeliveryRepository implements BazaDeliveryRepositor
             ->when($festivalId !== null, fn ($q) => $q->where('festival_id', $festivalId->value()))
             ->count();
     }
+
+    public function statusCounts(?Uuid $festivalId): array
+    {
+        $counts = $this->model::query()
+            ->when($festivalId !== null, fn ($q) => $q->where('festival_id', $festivalId->value()))
+            ->selectRaw('status, COUNT(*) as cnt')
+            ->groupBy('status')
+            ->pluck('cnt', 'status');
+
+        return [
+            BazaDeliveryStatus::QUEUED => (int) $counts->get(BazaDeliveryStatus::QUEUED, 0),
+            BazaDeliveryStatus::SENDING => (int) $counts->get(BazaDeliveryStatus::SENDING, 0),
+            BazaDeliveryStatus::DELIVERED => (int) $counts->get(BazaDeliveryStatus::DELIVERED, 0),
+            BazaDeliveryStatus::FAILED => (int) $counts->get(BazaDeliveryStatus::FAILED, 0),
+            'stuck' => (int) $counts->get(BazaDeliveryStatus::FAILED, 0),
+        ];
+    }
 }
