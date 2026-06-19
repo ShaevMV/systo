@@ -107,6 +107,17 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        // Канал доставки билетов в Baza (AF-4): постановка в очередь, запись, сбой, ретрай — без ПДн.
+        'baza_delivery' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/baza_delivery.log'),
+            'level' => 'debug',
+            'days' => 30,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            // Сбой записи лога не должен ронять доставку билета в Baza (job).
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
