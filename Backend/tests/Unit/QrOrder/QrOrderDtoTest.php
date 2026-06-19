@@ -120,4 +120,52 @@ class QrOrderDtoTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         QrOrderDto::fromQrContract($contract);
     }
+
+    public function test_reads_buyer_section_with_fallback_to_user(): void
+    {
+        // Новый контракт: секция buyer{} — приоритет над legacy user{}.
+        $contract = $this->contract();
+        $contract['buyer'] = ['fio' => 'Пётр Покупатель', 'city' => 'Казань', 'phone' => '+79991112233'];
+
+        $dto = QrOrderDto::fromQrContract($contract);
+        self::assertSame('Казань', $dto->getCity());
+        self::assertSame('+79991112233', $dto->getPhone());
+        self::assertSame('Пётр Покупатель', $dto->getBuyerFio());
+
+        // Без buyer{} — fallback на user{} (старый формат): user.name → buyer_fio.
+        $legacy = QrOrderDto::fromQrContract($this->contract());
+        self::assertSame('Москва', $legacy->getCity());
+        self::assertSame('+70000000000', $legacy->getPhone());
+        self::assertSame('Иван', $legacy->getBuyerFio());
+    }
+
+    public function test_total_price_from_payment_amount_total_with_fallback(): void
+    {
+        // amount_total (новый контракт) приоритетнее price.total (старый).
+        $contract = $this->contract(); // price.total = 4000
+        $contract['payment'] = ['amount_total' => 12300];
+        self::assertSame(12300, QrOrderDto::fromQrContract($contract)->getTotalPrice());
+
+        // Без amount_total — fallback на price.total.
+        self::assertSame(4000, QrOrderDto::fromQrContract($this->contract())->getTotalPrice());
+    }
+
+    public function test_projects_festival_title(): void
+    {
+        self::assertSame('Систо 2026', QrOrderDto::fromQrContract($this->contract())->getFestivalTitle());
+
+        $noFestival = $this->contract();
+        unset($noFestival['order_data']['festival']);
+        self::assertNull(QrOrderDto::fromQrContract($noFestival)->getFestivalTitle());
+    }
+
+    public function test_rejects_too_many_guests(): void
+    {
+        // Защита приёма: патологически большой заказ не должен раздуть payload.
+        $contract = $this->contract();
+        $contract['guests'] = array_fill(0, QrOrderDto::MAX_GUESTS + 1, ['name' => 'X']);
+
+        $this->expectException(InvalidArgumentException::class);
+        QrOrderDto::fromQrContract($contract);
+    }
 }

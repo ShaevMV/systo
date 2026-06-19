@@ -55,6 +55,8 @@ class QrOrderModel extends Model
         'payment_method',
         'promo_code',
         'paid_at',
+        'buyer_fio',
+        'festival_title',
     ];
 
     protected $casts = [

@@ -83,7 +83,7 @@ final class CreateTicketsStep implements PipelineStepInterface
             if ($isNew) {
                 $this->ticketsRepository->createTickets(new TicketDto(
                     $order->getId(),
-                    (string) ($guest['name'] ?? ''),
+                    (string) ($guest['name'] ?? $guest['fio'] ?? $guest['value'] ?? ''),
                     $festivalId,
                     $ticketId,
                     email: $email,
@@ -98,7 +98,7 @@ final class CreateTicketsStep implements PipelineStepInterface
 
             // 3. Собираем TicketResponse вручную (без getTicket → без зависимости от order_tickets).
             $response = new TicketResponse(
-                name: (string) ($guest['name'] ?? ''),
+                name: (string) ($guest['name'] ?? $guest['fio'] ?? $guest['value'] ?? ''),
                 kilter: $kilter,
                 uuid: $ticketId,
                 status: 'paid',

@@ -69,7 +69,7 @@ final class CreateLiveTicketsStep implements PipelineStepInterface
             if ($existingKilter === null) {
                 $this->ticketsRepository->createTickets(new TicketDto(
                     $order->getId(),
-                    (string) ($guest['name'] ?? ''),
+                    (string) ($guest['name'] ?? $guest['fio'] ?? $guest['value'] ?? ''),
                     $festivalId,
                     $ticketId,
                     email: $email,
@@ -80,7 +80,7 @@ final class CreateLiveTicketsStep implements PipelineStepInterface
 
             // Живой билет — без PDF: festivalView=null (письмо не прикрепит PDF), QR не генерим.
             $responses[] = new TicketResponse(
-                name: (string) ($guest['name'] ?? ''),
+                name: (string) ($guest['name'] ?? $guest['fio'] ?? $guest['value'] ?? ''),
                 kilter: $kilter,
                 uuid: $ticketId,
                 status: 'paid',

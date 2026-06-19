@@ -19,6 +19,14 @@ use Shared\Domain\ValueObject\Uuid;
 class QrOrderDto extends AbstractionEntity implements Response
 {
     /**
+     * Защита приёма (новый полный контракт кратно тяжелее — per-guest child/car/options):
+     * payload пишется as-is в json-колонку, поэтому ограничиваем число гостей, чтобы
+     * патологически большой заказ не раздул qr_orders.payload / max_allowed_packet.
+     * Сырой объём тела уже капается PHP post_max_size + nginx client_max_body_size.
+     */
+    public const MAX_GUESTS = 1000;
+
+    /**
      * @param  array<string, mixed>  $payload
      */
     public function __construct(
@@ -38,6 +46,9 @@ class QrOrderDto extends AbstractionEntity implements Response
         protected ?string $payment_method = null,
         protected ?string $promo_code = null,
         protected ?Carbon $paid_at = null,
+        // Проекции нового контракта — ТОЛЬКО named в конце (иначе сместятся позиционные).
+        protected ?string $buyer_fio = null,
+        protected ?string $festival_title = null,
     ) {}
 
     /**
@@ -64,6 +75,8 @@ class QrOrderDto extends AbstractionEntity implements Response
             payment_method: isset($data['payment_method']) ? (string) $data['payment_method'] : null,
             promo_code: isset($data['promo_code']) ? (string) $data['promo_code'] : null,
             paid_at: empty($data['paid_at']) ? null : new Carbon($data['paid_at']),
+            buyer_fio: isset($data['buyer_fio']) ? (string) $data['buyer_fio'] : null,
+            festival_title: isset($data['festival_title']) ? (string) $data['festival_title'] : null,
         );
     }
 
@@ -87,12 +100,20 @@ class QrOrderDto extends AbstractionEntity implements Response
         }
 
         $orderData = is_array($json['order_data'] ?? null) ? $json['order_data'] : [];
+        // Покупатель: новый контракт — секция buyer{}, старый — user{} (qr оставил оба для совместимости).
+        $buyer = is_array($json['buyer'] ?? null) ? $json['buyer'] : [];
         $user = is_array($json['user'] ?? null) ? $json['user'] : [];
         $price = is_array($json['price'] ?? null) ? $json['price'] : [];
 
         $email = $orderData['email'] ?? null;
         if (! is_string($email) || $email === '') {
             throw new InvalidArgumentException('qr-контракт: отсутствует "order_data.email" (куда отправлять билеты)');
+        }
+
+        // Защита от патологически большого заказа (payload пишется as-is в json-колонку).
+        $guests = is_array($json['guests'] ?? null) ? $json['guests'] : [];
+        if (count($guests) > self::MAX_GUESTS) {
+            throw new InvalidArgumentException('qr-контракт: слишком много гостей (> '.self::MAX_GUESTS.')');
         }
 
         // Фестиваль приходит объектом order_data.festival = {id, title} (как types_of_payment/location).
@@ -103,20 +124,29 @@ class QrOrderDto extends AbstractionEntity implements Response
         $payment = is_array($json['payment'] ?? null) ? $json['payment'] : [];
         $promoCodes = is_array($payment['promo_codes'] ?? null) ? $payment['promo_codes'] : [];
 
+        // city/phone/ФИО покупателя: buyer{} → user{} (fallback на старый формат).
+        $city = $buyer['city'] ?? $user['city'] ?? null;
+        $phone = $buyer['phone'] ?? $user['phone'] ?? null;
+        $buyerFio = $buyer['fio'] ?? $user['name'] ?? null;
+        // Итог: новый payment.amount_total → старый price.total (qr — мастер цены, не пересчитываем).
+        $totalPrice = (int) ($payment['amount_total'] ?? $price['total'] ?? 0);
+
         return new self(
             new Uuid($orderId),
             $email,
             (string) ($orderData['status'] ?? 'создан'),
             empty($festivalId) ? null : new Uuid((string) $festivalId),
             isset($orderData['type_order']) ? (string) $orderData['type_order'] : null,
-            isset($user['city']) ? (string) $user['city'] : null,
-            isset($user['phone']) ? (string) $user['phone'] : null,
-            (int) ($price['total'] ?? 0),
+            $city !== null ? (string) $city : null,
+            $phone !== null ? (string) $phone : null,
+            $totalPrice,
             $json,
             external_order_no: isset($json['external_order_no']) ? (string) $json['external_order_no'] : null,
             payment_method: isset($payment['method']) ? (string) $payment['method'] : null,
             promo_code: ! empty($promoCodes) ? (string) $promoCodes[0] : null,
             paid_at: empty($orderData['paid_at']) ? null : new Carbon((string) $orderData['paid_at']),
+            buyer_fio: $buyerFio !== null ? (string) $buyerFio : null,
+            festival_title: isset($festival['title']) ? (string) $festival['title'] : null,
         );
     }
 
@@ -191,5 +221,15 @@ class QrOrderDto extends AbstractionEntity implements Response
     public function getPaidAt(): ?Carbon
     {
         return $this->paid_at;
+    }
+
+    public function getBuyerFio(): ?string
+    {
+        return $this->buyer_fio;
+    }
+
+    public function getFestivalTitle(): ?string
+    {
+        return $this->festival_title;
     }
 }

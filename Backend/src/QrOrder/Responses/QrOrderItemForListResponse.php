@@ -30,6 +30,9 @@ class QrOrderItemForListResponse extends AbstractionEntity implements Response
         protected ?string $payment_method = null,
         protected ?string $promo_code = null,
         protected ?string $paid_at = null,
+        // Новые проекции — ТОЛЬКО named в конце (иначе сместятся позиционные аргументы).
+        protected ?string $buyer_fio = null,
+        protected ?string $festival_title = null,
     ) {}
 
     /**
@@ -55,6 +58,8 @@ class QrOrderItemForListResponse extends AbstractionEntity implements Response
             isset($data['payment_method']) ? (string) $data['payment_method'] : null,
             isset($data['promo_code']) ? (string) $data['promo_code'] : null,
             isset($data['paid_at']) ? (string) $data['paid_at'] : null,
+            buyer_fio: isset($data['buyer_fio']) ? (string) $data['buyer_fio'] : null,
+            festival_title: isset($data['festival_title']) ? (string) $data['festival_title'] : null,
         );
     }
 }

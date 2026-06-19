@@ -626,6 +626,7 @@
 ```
 - Проекция списка — `QrOrderItemForListResponse` (snake_case, **без `payload`** — он тяжёлый, отдаётся только в `getItem`)
 - **Проекция расширенного контракта qr** (миграция `2026_06_18_140000`): `external_order_no` (№ заказа qr), `payment_method` (`payment.method`), `promo_code` (`payment.promo_codes[0]`), `paid_at` (`order_data.paid_at`) денормализованы в колонки `qr_orders` для списка/фильтров/отчётности. Весь JSON по-прежнему в `payload` (см. `getItem`). `getStats` получил разрез `byPaymentMethod`.
+- **Полный контракт qr** (2026-06-20, миграция `2026_06_20_120000`): приём принимает расширенный JSON (`QR_FULL_EXAMPLE.md`) — секция `buyer{}` (fallback на legacy `user{}`), `payment.amount_total` (fallback `price.total`), `order_data.festival.{id,title}`. Новые проекционные колонки `buyer_fio` (`buyer.fio`/`user.name`), `festival_title` (`festival.title`). Приём **не ругается на новые поля**, хранит весь JSON `as-is`; выпуск читает per-guest `guests[].type_ticket.id` + `guests[].name`. **ПДн** (`guests[].child{}`, `payment.method_details.card_number`) в колонки НЕ проецируются (только `payload`, минимизация 152-ФЗ/PCI). Гард `MAX_GUESTS=1000` → 422.
 
 ---
 
