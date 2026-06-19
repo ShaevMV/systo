@@ -20,6 +20,10 @@ class ReportTotalDto extends AbstractionEntity
         protected int $parkingFree = 0,
     )
     {
+        // ВНИМАНИЕ: в общий итог входят только 4 основных типа (живые + френдли + список + электронные).
+        // Парковки (parking, parkingFree) и авто в "Всего" НЕ учитываются, хотя суммируются
+        // отдельными колонками. При апдейте смен/финансов уточнить, баг это или намеренно
+        // (см. .claude/docs/BAZA.md §6 «Особенность итога» и список открытых вопросов).
         $this->total = $this->live + $this->drug + $this->spisok + $this->el;
     }
 

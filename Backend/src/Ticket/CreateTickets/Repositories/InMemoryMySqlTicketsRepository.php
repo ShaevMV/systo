@@ -266,6 +266,13 @@ class InMemoryMySqlTicketsRepository implements TicketsRepositoryInterface
 
     /**
      * @throws \Nette\Utils\JsonException
+     *
+     * ВНИМАНИЕ: пишем напрямую в ЧУЖУЮ базу Baza (соединение 'mysqlBaza', таблица el_tickets) —
+     * это НЕ наша БД и НЕ API. Backend выступает писателем в БД системы входа (shared database).
+     * Контракт НЕЯВНЫЙ: схему таблицы держат миграции Baza, а проекцию строки — toArrayForBaza().
+     * При расхождении имён колонок insert/update молча упадёт в catch и вернёт false →
+     * доставка (модуль BazaDelivery) уйдёт в ретрай. Менять синхронно с миграциями Baza.
+     * См. .claude/docs/SYSTEM_OVERVIEW.md §4 (зона пересечения доменов).
      */
     public function setInBaza(TicketResponse $ticketsDto): bool
     {

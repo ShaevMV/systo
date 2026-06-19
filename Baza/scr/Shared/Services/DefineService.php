@@ -17,6 +17,10 @@ class DefineService
     public const DRUG_TICKET = 'drug';
     public const PARKING_TICKET = 'parking';
     public const PARKING_FREE_TICKET = 'parking_free';
+    // ВНИМАНИЕ: значение содержит дубль 'cross-country' ('parking_cross-countrycross-country').
+    // Такая подстрока в нормальной ссылке практически не встречается, поэтому
+    // распознавание парковки-вездехода по QR в getTypeByReference() фактически НЕ работает
+    // (мёртвая ветка). Вероятно опечатка — проверить при апдейте. См. .claude/docs/BAZA.md.
     public const PARKING_CROSS_COUNTRY_TICKET = 'parking_cross-countrycross-country';
 
     public const HUMAN_LIST = [
@@ -60,6 +64,17 @@ class DefineService
     private const ELECTRON_TICKET_URL = '/newTickets/';
     private const LIVE_TICKET_URL = 'https://org.spaceofjoy.ru/ticket/live/';
 
+    /**
+     * Ядро распознавания QR-кода: по подстроке в ссылке определяет ТИП билета
+     * и достаёт его идентификатор (Uuid для электронного, номер для парковки/живого).
+     *
+     * ПОРЯДОК проверок важен: parking_free и cross-country проверяются ДО общей parking,
+     * иначе они бы перехватывались общим 'parking'. Электронный билет приходит ссылкой
+     * вида '/newTickets/<uuid>', живой — 'https://org.spaceofjoy.ru/ticket/live/<шифр>'.
+     *
+     * Через QR этим методом распознаются только el / live / parking(+free).
+     * Friendly (drug) и Spisok по QR здесь НЕ распознаются — только ручным поиском.
+     */
     public function getTypeByReference(string $origLink): SearchDto
     {
         $link = str_replace(self::URL, '', $origLink);

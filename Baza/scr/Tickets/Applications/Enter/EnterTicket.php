@@ -46,6 +46,13 @@ class EnterTicket
     }
 
     /**
+     * Отметить билет впущенным: по типу билета выбирается нужный CommandHandler,
+     * который проставляет билету change_id (смена КПП) и date_change (время впуска).
+     *
+     * Именно здесь рождается «дельта», ради которой работает обратная синхронизация:
+     * эти отметки потом увозятся с офлайн-ноутбука обратно на сервер через
+     * baza:export/import (upsert по updated_at). См. .claude/docs/BAZA.md §7.
+     *
      * @throws Throwable
      */
     public function skip(string $type, int $id, int $changeId): void
