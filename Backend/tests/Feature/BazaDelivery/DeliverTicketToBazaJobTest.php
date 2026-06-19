@@ -90,6 +90,24 @@ class DeliverTicketToBazaJobTest extends TestCase
         $this->assertContains('baza_delivered', $events);
     }
 
+    public function test_el_target_uses_stored_subject_blob_not_get_ticket(): void
+    {
+        // qr-кейс: getTicket не пересоберёт билет (заказ в qr_orders) → берём сохранённый TicketResponse.
+        $id = Uuid::random();
+        app(BazaDeliveryRepositoryInterface::class)->create(
+            BazaDeliveryDto::queued($id, Uuid::random(), BazaDeliveryDispatcher::TARGET_EL, new BazaDeliveryContext(source: 'qr_pipeline')),
+            base64_encode(serialize($this->ticketResponse())),
+        );
+
+        $tickets = $this->createMock(TicketsRepositoryInterface::class);
+        $tickets->expects($this->never())->method('getTicket');
+        $tickets->expects($this->once())->method('setInBaza')->willReturn(true);
+
+        $this->runJob($id, $tickets);
+
+        $this->assertSame(BazaDeliveryStatus::DELIVERED, app(BazaDeliveryRepositoryInterface::class)->findById($id)->getStatus());
+    }
+
     public function test_marks_failed_and_throws_on_baza_failure(): void
     {
         $id = $this->queuedDelivery();
