@@ -9,6 +9,9 @@ use Shared\Domain\ValueObject\Status;
 use Shared\Domain\ValueObject\Uuid;
 use Tickets\Auto\Dto\AutoDto;
 use Tickets\Auto\Repositories\AutoRepositoryInterface;
+use Tickets\BazaDelivery\Application\BazaDeliveryContext;
+use Tickets\BazaDelivery\Application\BazaDeliveryDispatcher;
+use Tickets\History\Domain\ActorType;
 use Tickets\Order\OrderTicket\Dto\OrderTicket\OrderTicketDto;
 use Tickets\Order\OrderTicket\Repositories\OrderTicketRepositoryInterface;
 use Tickets\User\Account\Repositories\UserRepositoriesInterface;
@@ -27,7 +30,18 @@ final class AutoApplication
         private AutoRepositoryInterface        $autoRepository,
         private OrderTicketRepositoryInterface $orderRepository,
         private UserRepositoriesInterface      $userRepository,
+        private BazaDeliveryDispatcher         $bazaDispatcher,
     ) {
+    }
+
+    /** Поставить доставку авто в Baza в очередь с трекингом (target=auto). */
+    private function dispatchAutoToBaza(AutoDto $auto, OrderTicketDto $order): void
+    {
+        $this->bazaDispatcher->dispatchAuto(
+            $auto,
+            $order->getFestivalId()?->value(),
+            new BazaDeliveryContext(source: 'org_event', actorType: ActorType::SYSTEM),
+        );
     }
 
     /**
@@ -49,7 +63,7 @@ final class AutoApplication
         $this->autoRepository->create($auto);
 
         if ($order->getStatus()->equals(new Status(Status::APPROVE_LIST))) {
-            $this->autoRepository->setInBazaAuto($auto, $order->getFestivalId());
+            $this->dispatchAutoToBaza($auto, $order);
         }
 
         return $auto;
@@ -117,7 +131,7 @@ final class AutoApplication
         $this->autoRepository->removeAllFromBazaByOrderId($orderId);
 
         foreach ($this->autoRepository->getByOrderId($orderId) as $auto) {
-            $this->autoRepository->setInBazaAuto($auto, $order->getFestivalId());
+            $this->dispatchAutoToBaza($auto, $order);
         }
     }
 

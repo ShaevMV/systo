@@ -120,6 +120,11 @@ class BazaDeliveryDto extends AbstractionEntity implements Response
         return $this->number;
     }
 
+    public function getFestivalId(): ?string
+    {
+        return $this->festival_id;
+    }
+
     public function getSource(): string
     {
         return $this->source;

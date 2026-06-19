@@ -10,6 +10,8 @@ use RuntimeException;
 use Shared\Domain\ValueObject\Uuid;
 use Tests\TestCase;
 use Throwable;
+use Tickets\Auto\Dto\AutoDto;
+use Tickets\Auto\Repositories\AutoRepositoryInterface;
 use Tickets\BazaDelivery\Application\BazaDeliveryContext;
 use Tickets\BazaDelivery\Application\BazaDeliveryDispatcher;
 use Tickets\BazaDelivery\Application\Job\DeliverTicketToBazaJob;
@@ -59,12 +61,13 @@ class DeliverTicketToBazaJobTest extends TestCase
         return $id;
     }
 
-    private function runJob(Uuid $id, TicketsRepositoryInterface $tickets): void
+    private function runJob(Uuid $id, TicketsRepositoryInterface $tickets, ?AutoRepositoryInterface $autos = null): void
     {
         (new DeliverTicketToBazaJob($id->value()))->handle(
             app(BazaDeliveryRepositoryInterface::class),
             $tickets,
             app(HistoryRepositoryInterface::class),
+            $autos ?? app(AutoRepositoryInterface::class),
         );
     }
 
@@ -159,6 +162,23 @@ class DeliverTicketToBazaJobTest extends TestCase
         $row = app(BazaDeliveryRepositoryInterface::class)->findById($id);
         $this->assertSame(10, $row->getAttempts(), 'attempts должно остановиться на 10');
         $this->assertSame(BazaDeliveryStatus::FAILED, $row->getStatus(), 'после капа — терминальный failed');
+    }
+
+    public function test_auto_target_uses_set_in_baza_auto(): void
+    {
+        $id = $this->queuedDelivery(BazaDeliveryDispatcher::TARGET_AUTO);
+        $ticketId = app(BazaDeliveryRepositoryInterface::class)->findById($id)->getTicketId();
+
+        $autos = $this->createMock(AutoRepositoryInterface::class);
+        $autos->method('getById')->willReturn(AutoDto::create($ticketId, 'А123АА777'));
+        $autos->expects($this->once())->method('setInBazaAuto')->willReturn(true);
+
+        $tickets = $this->createMock(TicketsRepositoryInterface::class);
+        $tickets->expects($this->never())->method('getTicket');
+
+        $this->runJob($id, $tickets, $autos);
+
+        $this->assertSame(BazaDeliveryStatus::DELIVERED, app(BazaDeliveryRepositoryInterface::class)->findById($id)->getStatus());
     }
 
     public function test_idempotent_when_already_delivered(): void

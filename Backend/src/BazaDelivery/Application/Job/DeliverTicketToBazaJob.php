@@ -12,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use RuntimeException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
+use Tickets\Auto\Repositories\AutoRepositoryInterface;
 use Tickets\BazaDelivery\Application\Support\BazaDeliveryLog;
 use Tickets\BazaDelivery\Domain\BazaDeliveryLifecycleEvent;
 use Tickets\BazaDelivery\Domain\ValueObject\BazaDeliveryStatus;
@@ -54,6 +55,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         BazaDeliveryRepositoryInterface $repository,
         TicketsRepositoryInterface $tickets,
         HistoryRepositoryInterface $history,
+        AutoRepositoryInterface $autos,
     ): void {
         $id = new Uuid($this->deliveryId);
         $delivery = $repository->findById($id);
@@ -88,7 +90,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         ]);
 
         try {
-            if (! $this->deliver($delivery, $tickets)) {
+            if (! $this->deliver($delivery, $tickets, $autos)) {
                 throw new RuntimeException('Запись билета в Baza вернула false');
             }
 
@@ -130,15 +132,32 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         }
     }
 
-    /** Маршрутизация записи в Baza по цели доставки. Билет пересобирается из БД (getTicket). */
-    private function deliver(BazaDeliveryDto $delivery, TicketsRepositoryInterface $tickets): bool
-    {
+    /** Маршрутизация записи в Baza по цели доставки. Субъект пересобирается из БД. */
+    private function deliver(
+        BazaDeliveryDto $delivery,
+        TicketsRepositoryInterface $tickets,
+        AutoRepositoryInterface $autos,
+    ): bool {
         return match ($delivery->getTarget()) {
             'el_tickets' => $tickets->setInBaza($tickets->getTicket($delivery->getTicketId(), true)),
             'spisok_tickets' => $tickets->setInBazaList($tickets->getTicket($delivery->getTicketId(), true)),
             'live_tickets' => $tickets->setInBazaLive((int) $delivery->getNumber(), $delivery->getTicketId()),
+            'auto' => $this->deliverAuto($delivery, $autos),
             default => throw new RuntimeException('Неизвестная цель доставки в Baza: ' . $delivery->getTarget()),
         };
+    }
+
+    /** Запись авто заказа-списка в Baza: пересобираем AutoDto по id и пишем через setInBazaAuto. */
+    private function deliverAuto(BazaDeliveryDto $delivery, AutoRepositoryInterface $autos): bool
+    {
+        $auto = $autos->getById($delivery->getTicketId());
+        if ($auto === null) {
+            throw new RuntimeException('Авто не найдено: ' . $delivery->getTicketId()->value());
+        }
+
+        $festivalId = $delivery->getFestivalId() !== null ? new Uuid($delivery->getFestivalId()) : null;
+
+        return $autos->setInBazaAuto($auto, $festivalId);
     }
 
     /** Окончательный сбой задачи (tries исчерпаны) — фиксируем failed. */

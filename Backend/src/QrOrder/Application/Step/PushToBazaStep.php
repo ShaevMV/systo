@@ -4,20 +4,28 @@ declare(strict_types=1);
 
 namespace Tickets\QrOrder\Application\Step;
 
-use Tickets\QrOrder\Application\Job\PushTicketToBazaJob;
+use Tickets\BazaDelivery\Application\BazaDeliveryContext;
+use Tickets\BazaDelivery\Application\BazaDeliveryDispatcher;
+use Tickets\History\Domain\ActorType;
 use Tickets\QrOrder\Application\Support\PipelineLog;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 
 /**
- * Шаг 3: запись билетов заказа в Baza (el_tickets). На каждый билет ставит ИЗОЛИРОВАННУЮ
- * задачу PushTicketToBazaJob (свои ретраи, идемпотентно) — сбой Baza не валит выдачу/письмо.
+ * Шаг 3: запись билетов заказа в Baza (el_tickets/spisok_tickets). На каждый билет ставит
+ * трекаемую доставку через BazaDeliveryDispatcher (запись baza_deliveries + DeliverTicketToBazaJob,
+ * свои ретраи, кап 10) — сбой Baza не валит выдачу/письмо, путь доставки виден в админке.
  *
  * Билеты без type_ticket_id в Baza не пишутся (нечего записать) — как в классическом флоу
- * (PushTicketsCommandHandler пропускает такие). Шаг сам никогда не бросает: только ставит задачи.
+ * (PushTicketsCommandHandler пропускает такие). Шаг сам никогда не бросает: только ставит доставки.
  */
 final class PushToBazaStep implements PipelineStepInterface
 {
+    public function __construct(
+        private readonly BazaDeliveryDispatcher $dispatcher,
+    ) {
+    }
+
     public function name(): string
     {
         return 'push_to_baza';
@@ -42,7 +50,10 @@ final class PushToBazaStep implements PipelineStepInterface
                 continue;
             }
 
-            PushTicketToBazaJob::dispatch($response);
+            $this->dispatcher->dispatch(
+                $response,
+                new BazaDeliveryContext(source: 'qr_pipeline', actorType: ActorType::QR),
+            );
             $queued++;
         }
 

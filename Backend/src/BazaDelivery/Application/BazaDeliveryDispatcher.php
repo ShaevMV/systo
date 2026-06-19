@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\BazaDelivery\Application;
 
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\Auto\Dto\AutoDto;
 use Tickets\BazaDelivery\Application\Job\DeliverTicketToBazaJob;
 use Tickets\BazaDelivery\Domain\BazaDeliveryLifecycleEvent;
 use Tickets\BazaDelivery\Domain\ValueObject\BazaDeliveryStatus;
@@ -52,6 +53,48 @@ final class BazaDeliveryDispatcher
                 name: $ticket->getName(),
                 email: $ticket->getEmail(),
                 number: $ticket->getKilter(),
+                source: $ctx->source,
+                actorType: $ctx->actorType,
+            ),
+        );
+    }
+
+    /**
+     * Поставить связку живого билета (target=live_tickets) в очередь. Запись в Baza —
+     * setInBazaLive(number, ticketId). Описательные поля (ФИО/email) — из контекста, если есть.
+     */
+    public function dispatchLive(Uuid $ticketId, int $number, BazaDeliveryContext $ctx): Uuid
+    {
+        return $this->enqueue(
+            $ticketId,
+            self::TARGET_LIVE,
+            new BazaDeliveryContext(
+                orderId: $ctx->orderId,
+                festivalId: $ctx->festivalId,
+                name: $ctx->name,
+                email: $ctx->email,
+                number: $number,
+                source: $ctx->source,
+                actorType: $ctx->actorType,
+            ),
+        );
+    }
+
+    /**
+     * Поставить доставку авто заказа-списка (target=auto) в очередь. Запись в Baza —
+     * setInBazaAuto(AutoDto, festivalId). ticket_id = id строки авто; гос-номер → в name (отображение).
+     */
+    public function dispatchAuto(AutoDto $auto, ?string $festivalId, BazaDeliveryContext $ctx): Uuid
+    {
+        return $this->enqueue(
+            $auto->id,
+            self::TARGET_AUTO,
+            new BazaDeliveryContext(
+                orderId: $auto->orderTicketId->value(),
+                festivalId: $festivalId,
+                name: $auto->number,
+                email: null,
+                number: null,
                 source: $ctx->source,
                 actorType: $ctx->actorType,
             ),

@@ -13,7 +13,7 @@ use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 
 /**
  * Заказ-список: билеты + PDF → письмо OrderListApproved (по локации) → запись в spisok_tickets
- * (PushTicketToBazaJob маршрутизирует по isList) → telegram.
+ * (BazaDeliveryDispatcher маршрутизирует по isList) → telegram.
  *
  * CreateTicketsStep заполняет curator/location/project из контракта → TicketResponse::isList()=true.
  * Цены у списка нет (price игнорируется).

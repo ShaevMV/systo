@@ -16,7 +16,7 @@ use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
  * (setInBazaLive) → telegram. В el_tickets живой билет не пишется.
  *
  * qr присылает номер живого билета (guests[].number); строка live_tickets с этим номером уже
- * существует — задача LinkLiveTicketJob проставляет ей el_ticket_id.
+ * существует — доставка live_tickets (BazaDeliveryDispatcher) проставляет ей el_ticket_id.
  */
 final class LiveIssuanceStrategy implements IssuanceStrategyInterface
 {
