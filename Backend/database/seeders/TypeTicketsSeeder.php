@@ -22,40 +22,46 @@ use Tickets\Order\OrderTicket\Helpers\FestivalHelper;
 class TypeTicketsSeeder extends Seeder
 {
     public const ID_FOR_FIRST_WAVE = '222abc0c-fc8e-4a1d-a4b0-d345cafacf95';
+
     public const DEFAULT_PRICE = 3800;
+
     public const ID_FOR_REGIONS = '37c6b8d8-e01e-4bc4-b7b8-fcaa422ab25b';
 
     public const ID_FOR_NEXT_FESTIVAL = '37c6b8d8-e01e-4bc4-b7b8-fcaa422ab25f';
+
     public const ID_LIVE_FOR_NEXT_FESTIVAL = '222abc0c-fc8e-4a1d-a4b0-d345cafacf01';
 
     public const ID_CHILD_TICKET = 'c3d4e5f6-a7b8-9012-cdef-345678901235';
+
     public const CHILD_TICKET_PRICE = 400;
 
     public function run(): void
     {
-        $ticketTypes = new TicketTypesModel();
+        $ticketTypes = new TicketTypesModel;
         $ticketTypes->id = self::ID_FOR_FIRST_WAVE;
         $ticketTypes->name = 'Оргвзнос';
         $ticketTypes->price = self::DEFAULT_PRICE;
         $ticketTypes->sort = 1;
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL, [
-            'pdf' => 'TypeTicketPdf1.black.php',
-            'email' => 'TypeTicketMailOrderToPaid1.black.php',
+            // slug blade-шаблона БЕЗ расширения (Laravel сам добавит .blade.php). Совпадает с
+            // реальными данными прода/стенда и активными DB-шаблонами AF-3 (TypeTicketPdf1 и т.п.).
+            'pdf' => 'TypeTicketPdf1',
+            'email' => 'TypeTicketMailOrderToPaid1',
         ]);
         $ticketTypes->save();
 
-        $ticketTypes = new TicketTypesModel();
+        $ticketTypes = new TicketTypesModel;
         $ticketTypes->id = self::ID_FOR_REGIONS;
         $ticketTypes->name = 'Оргвзнос для регионов';
         $ticketTypes->price = '3600';
         $ticketTypes->sort = 2;
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_FESTIVAL, [
-            'pdf' => 'TypeTicketPdf2.black.php',
-            'email' => 'TypeTicketMailOrderToPaid2.black.php',
+            'pdf' => 'TypeTicketPdf2',
+            'email' => 'TypeTicketMailOrderToPaid2',
         ]);
         $ticketTypes->save();
 
-        $ticketTypes = new TicketTypesModel();
+        $ticketTypes = new TicketTypesModel;
         $ticketTypes->id = self::ID_FOR_NEXT_FESTIVAL;
         $ticketTypes->name = 'Оргвзнос на осень';
         $ticketTypes->price = '4000';
@@ -63,7 +69,7 @@ class TypeTicketsSeeder extends Seeder
         $ticketTypes->festivals()->attach(FestivalHelper::UUID_SECOND_FESTIVAL);
         $ticketTypes->save();
 
-        $ticketTypes = new TicketTypesModel();
+        $ticketTypes = new TicketTypesModel;
         $ticketTypes->id = self::ID_LIVE_FOR_NEXT_FESTIVAL;
         $ticketTypes->name = 'Оргвзнос Живой билет';
         $ticketTypes->price = self::DEFAULT_PRICE;
