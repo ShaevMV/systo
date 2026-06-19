@@ -49,6 +49,7 @@ class ChangesController extends Controller
             $findChange = $this->repository->get($id);
             $findChange['user_id'] = Json::decode($findChange['user_id']);
             $findChange['start'] = Carbon::parse($findChange['start'])->format('Y-m-d H:i');
+            $findChange['chief_id'] = $this->repository->getChiefId($id);
         }
 
         return view('change.add', [
@@ -63,12 +64,26 @@ class ChangesController extends Controller
     public function save(Request $request): RedirectResponse
     {
         $id = $request->get('id') === null ? null : (int)$request->get('id');
+        $chiefId = $request->get('chief') !== null && $request->get('chief') !== ''
+            ? (int) $request->get('chief')
+            : null;
 
-        $this->saveChange->save(
-            $request->get('compound'),
-            Carbon::parse($request->get('start')),
-            $id,
-        );
+        // Инвариант Ф2 на уровне формы: у смены обязан быть начальник.
+        if ($chiefId === null) {
+            return Redirect::back()->withInput()->with('shift_error', 'Выберите начальника смены.');
+        }
+
+        try {
+            $this->saveChange->save(
+                (array) $request->get('compound', []),
+                Carbon::parse($request->get('start')),
+                $id,
+                $chiefId,
+            );
+        } catch (\DomainException $e) {
+            // Инвариант «у смены есть начальник» и пр. — мягко возвращаем на форму.
+            return Redirect::back()->withInput()->with('shift_error', $e->getMessage());
+        }
 
         return Redirect::route('changes.report');
     }
