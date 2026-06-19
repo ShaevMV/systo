@@ -93,6 +93,11 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/emailDelivery.php'));
 
+            // контроль доставки билетов в Baza (admin-only): список/деталь/повтор/статистика
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(base_path('routes/bazaDelivery.php'));
+
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/option.php'));

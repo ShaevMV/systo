@@ -47,4 +47,11 @@ interface BazaDeliveryRepositoryInterface
 
     /** Число застрявших доставок (status=failed) — для дашборд-виджета. */
     public function countStuck(?Uuid $festivalId): int;
+
+    /**
+     * Счётчики доставок по статусам (+ alias stuck=failed) для дашборда/статистики.
+     *
+     * @return array<string, int>
+     */
+    public function statusCounts(?Uuid $festivalId): array;
 }

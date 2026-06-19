@@ -74,6 +74,9 @@ class QrOrderPipelineViewTest extends TestCase
         $names = array_column($pipeline['history'], 'event_name');
         $this->assertContains('issued', $names);
         $this->assertNotEmpty(array_filter($names, static fn (string $n): bool => str_starts_with($n, 'step_')));
+
+        // Секция доставки в baza присутствует (наполняется после перевода qr на BazaDeliveryDispatcher).
+        $this->assertArrayHasKey('baza', $pipeline);
     }
 
     public function test_ticket_pdf_urls(): void

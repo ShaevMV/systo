@@ -62,6 +62,16 @@ final class BazaDeliveryApplication
     }
 
     /**
+     * Счётчики доставок по статусам (queued/sending/delivered/failed + stuck) — для дашборда.
+     *
+     * @return array<string, int>
+     */
+    public function getStats(?Uuid $festivalId): array
+    {
+        return $this->repository->statusCounts($festivalId);
+    }
+
+    /**
      * Повторная доставка из админки: возвращает запись в очередь и ставит DeliverTicketToBazaJob.
      * Счётчик попыток НЕ сбрасывается (§6.4) — если кап 10 уже достигнут, job сразу фиксирует
      * терминальный failed без новой записи в Baza. false → запись не найдена.

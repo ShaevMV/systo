@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tickets\QrOrder\Application\Pipeline;
 
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\BazaDelivery\Repositories\BazaDeliveryRepositoryInterface;
 use Tickets\EmailDelivery\Repositories\EmailMessageRepositoryInterface;
 use Tickets\History\Dto\DomainHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
@@ -13,8 +14,8 @@ use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 /**
  * Сборка «всего пути» qr-заказа для админки (Ф5): приём → создание билетов (PDF) →
- * письма (статусы доставки) → история шагов. Только чтение; БД — в репозиториях.
- * Оркеструет 4 репозитория, ничего не пишет.
+ * письма (статусы доставки) → доставка в baza → история шагов. Только чтение; БД — в репозиториях.
+ * Оркеструет репозитории, ничего не пишет.
  */
 final class QrOrderPipelineReader
 {
@@ -23,6 +24,7 @@ final class QrOrderPipelineReader
         private readonly HistoryRepositoryInterface $history,
         private readonly EmailMessageRepositoryInterface $emails,
         private readonly TicketsRepositoryInterface $tickets,
+        private readonly BazaDeliveryRepositoryInterface $baza,
     ) {}
 
     /** Ссылки на PDF билетов заказа (storage/tickets/{ticketId}.pdf). */
@@ -68,11 +70,17 @@ final class QrOrderPipelineReader
             ->values()
             ->all();
 
+        $baza = $this->baza->getByOrderId($orderId)
+            ->map(static fn ($dto) => $dto->toArray())
+            ->values()
+            ->all();
+
         return [
             'order' => $order->toArray(),
             'tickets' => $tickets,
             'history' => $history,
             'emails' => $emails,
+            'baza' => $baza,
         ];
     }
 }
