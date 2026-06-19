@@ -69,6 +69,15 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/admin/baza-delivery',
+                    name: 'bazaDelivery',
+                    component: () => import('@/views/admin/BazaDeliveryListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
                     path: '/admin/locations',
                     name: 'locations',
                     component: () => import('@/views/admin/LocationListView.vue'),

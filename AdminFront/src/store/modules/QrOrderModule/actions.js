@@ -95,6 +95,7 @@ export const loadPipeline = (context, payload) => {
                 context.commit('setHistory', response.data.history ?? []);
                 context.commit('setTickets', response.data.tickets ?? []);
                 context.commit('setEmails', response.data.emails ?? []);
+                context.commit('setBaza', response.data.baza ?? []);
                 resolve(response.data);
             })
             .catch((error) => {

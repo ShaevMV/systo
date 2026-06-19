@@ -162,6 +162,22 @@ const EMAIL_EVENT_LABELS = {
 const emailStatusMeta = (s) => EMAIL_STATUS[s] || { label: s || '—', severity: 'secondary' };
 const emailEventLabel = (e) => EMAIL_EVENT_LABELS[e] || e || '—';
 
+// Доставка билетов заказа в baza (AF-4).
+const baza = computed(() => store.getters['appQrOrder/getBaza'] || []);
+const BAZA_STATUS = {
+    queued: { label: 'В очереди', severity: 'secondary' },
+    sending: { label: 'Отправляется', severity: 'info' },
+    delivered: { label: 'Доставлен', severity: 'success' },
+    failed: { label: 'Ошибка', severity: 'danger' }
+};
+const BAZA_TARGET_LABELS = { el_tickets: 'Обычный', spisok_tickets: 'Список', live_tickets: 'Живой', auto: 'Авто' };
+const bazaStatusMeta = (s) => BAZA_STATUS[s] || { label: s || '—', severity: 'secondary' };
+const bazaTargetLabel = (t) => BAZA_TARGET_LABELS[t] || t || '—';
+
+function goToBazaDelivery() {
+    router.push('/admin/baza-delivery');
+}
+
 // Резолв имени фестиваля по id из загруженного списка.
 function festivalName(id) {
     if (!id) return '—';
@@ -456,6 +472,30 @@ onMounted(() => {
                     >
                     <Column header="Прочитано" :style="{ minWidth: '9rem' }"
                         ><template #body="{ data }">{{ formatDate(data.opened_at) }}</template></Column
+                    >
+                    <Column header="Ошибка" :style="{ minWidth: '10rem' }"
+                        ><template #body="{ data }">{{ data.error || '—' }}</template></Column
+                    >
+                </DataTable>
+
+                <!-- Доставка билетов в baza (AF-4) -->
+                <div class="qr-section-row">
+                    <h3 class="qr-section-title">Доставка в baza ({{ baza.length }})</h3>
+                    <Button label="Открыть в «Доставке в baza»" icon="pi pi-server" size="small" text @click="goToBazaDelivery" />
+                </div>
+                <DataTable :value="baza" striped-rows scrollable class="qr-guests">
+                    <template #empty><div class="qr-empty">Доставок нет</div></template>
+                    <Column header="Цель" :style="{ minWidth: '8rem' }"
+                        ><template #body="{ data }">{{ bazaTargetLabel(data.target) }}</template></Column
+                    >
+                    <Column header="Статус" :style="{ minWidth: '10rem' }">
+                        <template #body="{ data }"><Tag :value="bazaStatusMeta(data.status).label" :severity="bazaStatusMeta(data.status).severity" /></template>
+                    </Column>
+                    <Column header="Попыток" :style="{ minWidth: '6rem' }"
+                        ><template #body="{ data }">{{ data.attempts }}</template></Column
+                    >
+                    <Column header="Доставлено" :style="{ minWidth: '9rem' }"
+                        ><template #body="{ data }">{{ formatDate(data.delivered_at) }}</template></Column
                     >
                     <Column header="Ошибка" :style="{ minWidth: '10rem' }"
                         ><template #body="{ data }">{{ data.error || '—' }}</template></Column

@@ -12,6 +12,7 @@ export default {
         history: [],
         tickets: [],
         emails: [],
+        baza: [],
         filter: {},
         orderBy: { created_at: 'desc' },
         pagination: { page: 1, perPage: 20, total: 0 },
