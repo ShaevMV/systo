@@ -70,6 +70,8 @@ function paymentMethodLabel(v) {
 function guestOptions(g) {
     return (g?.options || []).filter((o) => Number(o?.qty ?? 1) > 0);
 }
+// Гости-дети (role=kid / есть блок child) — для отдельной сводки «медпункт».
+const kidGuests = computed(() => guests.value.filter((g) => g?.child));
 
 function buildOrderBy() {
     return sortField.value ? { [sortField.value]: sortOrder.value > 0 ? 'asc' : 'desc' } : {};
@@ -403,10 +405,26 @@ onMounted(() => {
                             <span v-if="data.telegram" class="qr-guest-tg">{{ data.telegram }}</span>
                         </template>
                     </Column>
+                    <Column header="№ билета" :style="{ minWidth: '5rem' }">
+                        <template #body="{ data }">{{ data.number ?? '—' }}</template>
+                    </Column>
                     <Column header="Цена" :style="{ minWidth: '6rem' }">
                         <template #body="{ data }">{{ data.price?.total != null ? formatPrice(data.price.total) : '—' }}</template>
                     </Column>
                 </DataTable>
+
+                <!-- Дети (для медпункта): имя/возраст/аллергии/контакты родителя и доверенного лица -->
+                <template v-if="kidGuests.length">
+                    <h3 class="qr-section-title">Дети (для медпункта)</h3>
+                    <div v-for="(g, i) in kidGuests" :key="i" class="qr-child-card">
+                        <div class="qr-child-name">
+                            {{ g.child.name || g.name }}<span v-if="g.child.age"> · {{ g.child.age }} лет</span>
+                        </div>
+                        <div v-if="g.child.allergies" class="qr-child-row"><span class="qr-label">Аллергии</span> {{ g.child.allergies }}</div>
+                        <div class="qr-child-row"><span class="qr-label">Родитель</span> {{ g.child.parent_fio || g.parent?.fio || '—' }} · {{ g.child.parent_phone || '—' }}</div>
+                        <div v-if="g.child.trustee_fio || g.child.trustee_phone" class="qr-child-row"><span class="qr-label">Доверенное лицо</span> {{ g.child.trustee_fio || '—' }} · {{ g.child.trustee_phone || '—' }}</div>
+                    </div>
+                </template>
 
                 <!-- Билеты + скачивание PDF -->
                 <div class="qr-section-row">
@@ -555,6 +573,27 @@ onMounted(() => {
 .qr-guest-tg {
     color: var(--p-text-muted-color, #6b7280);
     font-size: 0.8rem;
+}
+
+.qr-child-card {
+    border: 1px solid var(--p-content-border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.qr-child-name {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.qr-child-row {
+    font-size: 0.85rem;
+}
+
+.qr-child-row .qr-label {
+    display: inline;
+    margin-right: 0.35rem;
 }
 
 .qr-section-title {
