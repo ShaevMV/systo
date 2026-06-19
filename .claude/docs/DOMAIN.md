@@ -223,7 +223,7 @@ class TemplateVersionDto extends AbstractionEntity implements Response {
 
 **Домен:**
 
-- **`EmailEvent`** (`Domain/EmailEvent.php`) — канонический справочник **15 событий** писем → `defaultSlug()` (= текущий зашитый в Mailable slug) + `label`. Источник правды «какое письмо за каким событием». Маппинг event → defaultSlug:
+- **`EmailEvent`** (`Domain/EmailEvent.php`) — канонический справочник **16 событий** писем → `defaultSlug()` (= текущий зашитый в Mailable slug) + `label`. Источник правды «какое письмо за каким событием». Маппинг event → defaultSlug:
 
   | event | defaultSlug | label |
   |-------|-------------|-------|
@@ -242,6 +242,7 @@ class TemplateVersionDto extends AbstractionEntity implements Response {
   | `password_reset` | `passwordResets` | Сброс пароля |
   | `invite` | `invate` | Приглашение |
   | `questionnaire` | `questionnaire` | Анкета гостя |
+  | `questionnaire_approved` | `questionnaireApproved` | Анкета одобрена |
 
   Методы: `all()`, `isValid()`, `defaultSlug()`, `catalog()` (для селектора `[{value, label}]`).
 
@@ -318,6 +319,7 @@ class TemplateVersionDto extends AbstractionEntity implements Response {
 
 ```php
 class Questionnaire extends AggregateRoot {
+    use HasHistory; // запись истории одобрения анкеты в domain_history
     // Состояние хранится в QuestionnaireTicketDto
 }
 ```
@@ -326,8 +328,10 @@ class Questionnaire extends AggregateRoot {
 
 | Метод | Domain Events | Описание |
 |-------|---------------|----------|
-| `toApprove(dto)` | `ProcessInviteLinkQuestionnaire` | Одобрение анкеты → invite link |
+| `toApprove(dto)` | `ProcessQuestionnaireApprovedNotification` + история `QuestionnaireApprovedEvent` | Одобрение анкеты → письмо гостю «анкета одобрена» (если есть email) + событие истории |
 | `toSendTelegram(dto)` | `ProcessTelegramSend` | Уведомление в Telegram |
+
+**Одобрение анкеты (`toApprove`):** теперь `Questionnaire` использует trait `HasHistory`. При одобрении пишется доменное событие `ProcessQuestionnaireApprovedNotification` (письмо гостю «анкета одобрена», шлётся через `MailDispatcher`, событие `EmailEvent::QUESTIONNAIRE_APPROVED`, `source = org_event`) — **заменило** прежнее `ProcessInviteLinkQuestionnaire` в approve-флоу (то же письмо со ссылкой-приглашением, но под отдельным событием → видно в каталоге писем, привязке шаблонов и трекинге). Дополнительно `recordHistory(QuestionnaireApprovedEvent)` → факт одобрения пишется в `domain_history`.
 
 ---
 
@@ -425,6 +429,7 @@ class Questionnaire extends AggregateRoot {
 - `aggregate_type = 'baza_delivery'` (AF-4, модуль BazaDelivery) — таймлайн доставки билета в Baza, **история КАЖДОЙ попытки**: `baza_queued` / `baza_sending` / `baza_delivered` / `baza_failed`. `actor_type`: доставки от qr → `qr`, системные → `system`, повтор из админки → `user`.
 - Новые `event_name` для `aggregate_type = 'qr_order'` (шаги пайплайна выдачи, `'step_' . $step->name()`, payload `{status: ok|fail, error?}`): `step_create_tickets`, `step_send_order_email`, `step_push_to_baza`, `step_send_telegram`, `step_create_live_tickets`, `step_link_live`, `step_send_list_email`, `step_send_live_email`.
 - `aggregate_type = 'festival'` (AF-7, модуль `Festival`) — журнал каталога фестивалей: `festival_created` (payload `{name, year, active}`), `festival_edited` (payload `{changed: [...]}` — изменившиеся поля), `festival_deleted`. `actor_type = user` (`actor_id = Auth::id()`). Отдаётся `GET /api/v1/festival/getHistory/{id}` (admin).
+- `aggregate_type = 'questionnaire'` (модуль `Questionnaire`) — факт одобрения анкеты: `questionnaire_approved` (payload без ПДн — `{order_id?, ticket_id?, questionnaire_type_id?}`, через `QuestionnaireApprovedEvent`). Пишется при `toApprove()` с `actor_type = user`, `actor_id = Auth::id()` администратора, выполнившего одобрение.
 
 ### QrOrder Module
 
