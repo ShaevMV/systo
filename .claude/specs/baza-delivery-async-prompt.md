@@ -74,7 +74,8 @@
 ### 3.3 Application
 - **`Application/BazaDeliveryDispatcher.php`** — единая точка (как `MailDispatcher`): `dispatch(TicketResponse $ticket, string $target, BazaDeliveryContext $ctx): Uuid`. Создаёт/обновляет запись `baza_deliveries` (`queued`, upsert по `(ticket_id,target)`) + пишет историю `baza_queued` + `DeliverTicketToBazaJob::dispatch($id)`.
 - **`Application/BazaDeliveryContext.php`** — контекст: `orderId?`, `festivalId?`, `name?`, `email?`, `kilter?`, `source` (default `org_event`), `actorType` (default `system`/`qr`).
-- **`Application/Job/DeliverTicketToBazaJob.php`** (`ShouldQueue`, `tries=3`, `backoff=[30,120,600]`) — по `id`: `markSending` (attempts++) → читает нужный `TicketResponse` (или хранит сериализованный, как `email_messages.mailable` — реши проще: храни `ticket_id`+`target`, в job заново `getTicket($ticketId)` через репозиторий) → вызывает `setInBaza`/`setInBazaList` → `markDelivered`/`markFailed(error)` + история. Идемпотентность: `delivered` повторно не шлёт. `failed()` (tries исчерпаны) → финальный `failed`.
+- **`Application/Job/DeliverTicketToBazaJob.php`** (`ShouldQueue`, `backoff=[30,120,600,...]`) — по `id`: `markSending` (attempts++) → читает нужный `TicketResponse` (НЕ сериализуй Mailable-стиль: храни `ticket_id`+`target`, в job заново `getTicket($ticketId)` через репозиторий) → вызывает `setInBaza`/`setInBazaList`/`setInBazaLive`/`setInBazaAuto` → `markDelivered`/`markFailed(error)` + **пишет историю на КАЖДУЮ попытку** (`baza_sending` → `baza_delivered`/`baza_failed` с текстом ошибки) в `domain_history`. Идемпотентность: из `delivered` повторно не доставляет.
+  - **Кап = 10 попыток (решение владельца §6.4):** общее число попыток (`attempts`) на запись `baza_deliveries` не превышает **10**. Auto-ретрай продолжается, пока `attempts < 10` и статус `failed`; на 10-й неуспешной — **терминальный `failed`, авто-ретрай прекращается** (job больше не пере-диспатчится). Реализуй кап на уровне приложения (проверка `attempts` перед/после попытки), а не только через Laravel `tries` (т.к. ретрай складывается из авто-бэкоффа + ручного resend). Ручной `resend` по умолчанию **НЕ сбрасывает** счётчик (после 10 — только разовая попытка по явному действию админа; задокументируй выбранное поведение). **ОБЯЗАТЕЛЕН тест:** 10 подряд неуспешных → 11-я не выполняется, статус терминальный `failed`, `attempts==10`.
   - **Важно:** этот job ЗАМЕНЯЕТ/ОБОРАЧИВАЕТ `PushTicketToBazaJob` (qr) — qr-пайплайн начинает диспатчить через `BazaDeliveryDispatcher`, чтобы у qr-билетов тоже был трекинг (а не только шаг `step_push_to_baza`). Старый `PushTicketToBazaJob` — депрекейтнуть/удалить после переезда qr на новый путь.
 - **`Application/BazaDeliveryApplication.php`** — `getList(Query)` (через QueryBus), `getItem(Uuid)` (+ история через `HistoryRepositoryInterface::getByAggregateId`), `getByAggregate(type,id)` (для экрана «весь путь» qr — добавить в `getPipeline`), `resend(Uuid, ?actorId)` (`failed→queued` + history + dispatch), `getStats()`/`countStuck()` (число `failed` — для дашборда «застрявшие билеты»).
 - **`Application/GetList/BazaDeliveryGetListQuery(+Handler).php`** — whitelist фильтров: `status` (EQUAL), `ticket_id` (EQUAL), `order_id` (EQUAL), `festival_id` (EQUAL), `target` (EQUAL), `name`/`email` (LIKE). Пагинация `page`/`perPage` (1..100). Сортировка `Order::none()` на кривом orderBy.
@@ -89,8 +90,9 @@
 ### 3.5 Точки интеграции (заменить синхронный setInBaza на трекаемый async)
 1. **legacy/order:** `PushTicketsCommandHandler` — вместо синхронного `setInBaza`/`setInBazaList` → `BazaDeliveryDispatcher::dispatch($ticket, target, ctx)`. БОЛЬШЕ НЕ кидать `DomainException` на сбой Baza (сбой не должен рвать выдачу билета/письма — Baza доедет ретраем).
 2. **qr:** `PushToBazaStep` → вместо `PushTicketToBazaJob` диспатчить через `BazaDeliveryDispatcher` (`source='qr_pipeline'`, `actorType='qr'`). Шаг `step_push_to_baza` в `domain_history(qr_order)` оставить (это «поставлено в очередь»), а реальный статус доставки — в `baza_deliveries`. Удалить/депрекейтнуть `PushTicketToBazaJob`.
-3. **live-билет:** `setInBazaLive` (связка номера) — реши, трекать ли отдельно (target=`live_tickets`). Минимум — обработать аккуратно, не сломать `LinkLiveTicketJob`.
-4. `setInBaza*` в репозитории — НЕ удалять (это реальная запись; job их вызывает).
+3. **live-билет:** `setInBazaLive` (связка номера) — **трекать** как `target=live_tickets` (§6.1). Номер приходит в составе запроса (`guests[].number`), связка в выдаче — провести через тот же диспатч/трекинг, не сломав `LinkLiveTicketJob`.
+4. **Auto-модуль:** `Backend/src/Auto/Application/AutoApplication.php` (`setInBazaAuto`, строки ~52/120) + `Backend/src/Auto/Repositories/InMemoryMySqlAutoRepository.php::setInBazaAuto` — перевести на `BazaDeliveryDispatcher` (target=`auto`), async + трекинг (§6.2). Прочитай эти файлы.
+5. `setInBaza*`/`setInBazaAuto` в репозиториях — НЕ удалять (это реальная запись в Baza; job их вызывает).
 
 ### 3.6 Admin API — `Backend/routes/bazaDelivery.php` (все `auth:api`+`admin`, ПДн)
 - `POST /api/v1/bazaDelivery/getList` — фильтры (whitelist) + пагинация + total.
@@ -106,7 +108,7 @@
 - **`AdminFront/src/store/modules/BazaDeliveryModule/`** (index/actions/getters/mutations) — по образцу `EmailDeliveryModule`.
 - **Роут** `/admin/baza-delivery` (`meta:{requiresAuth:true, role:['admin']}`) + **новый раздел меню «Билеты» → «Доставка в baza»** в `AdminFront/src/layout/AppMenu.vue` (раздела «Билеты» сейчас нет — создать).
 - **Экран qr-заказа** (`QrOrderListView.vue`, деталь): добавить блок «Доставка в baza» (статусы по билетам) — данные из расширенного `getPipeline` (`pipeline.baza`).
-- **Дашборд** (`DashboardView.vue`): виджет «застрявшие билеты» (число `failed` из `bazaDelivery/getStats`) — опционально.
+- **Дашборд** (`DashboardView.vue`): виджет **«застрявшие билеты»** (число `failed` из `bazaDelivery/getStats`) — **в составе этой задачи** (§6.3).
 
 ### 3.8 Тесты (Docker, обязательно зелёные)
 - Unit: `BazaDeliveryStatus` (переходы), `BazaDeliveryDto`.
@@ -118,7 +120,7 @@
 1. **Домен + таблица + модель + DTO + репозиторий** (без интеграции) + unit-тесты статуса.
 2. **Dispatcher + Job + Application + history** + feature-тесты (delivered/failed/retry/resend).
 3. **Admin API** (getList/getItem/resend + getPipeline.baza) + контроллер + роуты + feature-тесты HTTP.
-4. **Интеграция:** перевести legacy `PushTicketsCommandHandler` и qr `PushToBazaStep` на dispatcher; убрать кидание исключения в legacy; депрекейт `PushTicketToBazaJob`. Регресс — полный сьют.
+4. **Интеграция:** перевести на dispatcher все 4 пути записи в Baza — legacy `PushTicketsCommandHandler`, qr `PushToBazaStep` (депрекейт `PushTicketToBazaJob`), live `setInBazaLive`/`LinkLiveTicketJob`, Auto `AutoApplication::setInBazaAuto`; убрать кидание исключения в legacy (сбой Baza не рвёт выдачу). Реализовать кап 10 попыток + тест. Регресс — полный сьют.
 5. **Frontend:** `BazaDeliveryListView` + Vuex-модуль + роут + меню «Билеты» + блок в детали qr-заказа (+ дашборд-виджет). Build `vite --base=/admin/` + ESLint зелёные.
 6. **Доки:** `.claude/docs/API.md` (§ bazaDelivery), `DOMAIN.md` (модуль BazaDelivery + таблица + история `aggregate_type=baza_delivery`), `BUSINESS_RULES.md` (если меняется поведение выдачи), `BOARD.md`/`TECH_DEBT.md` (AF-4/TD-35 закрыты в части доставки в baza), спека `.claude/specs/` при необходимости.
 
@@ -127,15 +129,21 @@
 - [ ] Каждая запись билета в Baza видна в админке `/admin/baza-delivery` со статусом (`в очереди/отправляется/доставлен/ошибка`) + текстом ошибки + числом попыток.
 - [ ] Ручной «Повторить» из админки переотправляет застрявший билет (`failed→queued`).
 - [ ] В детали qr-заказа виден статус доставки его билетов в baza.
-- [ ] Таймлайн в `domain_history` (`aggregate_type=baza_delivery`).
+- [ ] Таймлайн в `domain_history` (`aggregate_type=baza_delivery`) — **история КАЖДОЙ попытки** видна.
+- [ ] **Кап 10 попыток** работает: после 10 неуспешных — терминальный `failed`, авто-ретрай прекращён (есть тест).
+- [ ] **live-билеты и Auto** (`setInBazaLive`/`setInBazaAuto`) тоже идут через трекинг (target `live_tickets`/`auto`).
+- [ ] **Дашборд-виджет «застрявшие билеты»** показывает число `failed`.
 - [ ] Полный PHPUnit зелёный; build/ESLint AdminFront зелёные.
 - [ ] Идемпотентность: повторный прогон не плодит дубли строк трекинга и не пишет билет в Baza повторно с побочными эффектами.
 
-## 6. Открытые вопросы (уточни у владельца ДО старта, если всплывут)
-1. **Live-билеты** (`setInBazaLive` — связка номера): трекать как `target=live_tickets` или оставить вне трекинга (там своя логика `LinkLiveTicketJob`)?
-2. **Auto-модуль** (`setInBazaAuto` в `Backend/src/Auto/`) — включать в трекинг доставки в baza или вне рамок AF-4?
-3. **Дашборд-виджет** «застрявшие билеты» — в этой задаче или отдельно (AF-2)?
-4. **Идемпотентность трекинга:** upsert по `(ticket_id, target)` (одна строка на билет, перезапись статуса) — ОК? Или хранить историю всех попыток отдельными строками?
+## 6. Решения владельца (2026-06-19) — зафиксированы, НЕ переспрашивать
+
+1. **Live-билеты** (`setInBazaLive`) — **трекаем** как `target=live_tickets`. Номер живого билета приходит **в составе запроса** (qr-контракт `guests[].number`), связка идёт в выдаче — трекать вместе со всеми (не выносить наружу). Не сломать `LinkLiveTicketJob`.
+2. **Auto-модуль** (`setInBazaAuto` в `Backend/src/Auto/Application/AutoApplication.php` + `InMemoryMySqlAutoRepository.php`) — **тоже в трекер** (target напр. `auto`). Перевести `setInBazaAuto` на тот же `BazaDeliveryDispatcher` (async + трекинг).
+3. **Дашборд-виджет «застрявшие билеты»** — **делаем в этой задаче** (`bazaDelivery/getStats` → `failed`-счётчик → виджет в `DashboardView.vue`).
+4. **История попыток, но не более 10:** хранить **историю ВСЕХ попыток** (каждая попытка видна — таймлайн в `domain_history` `aggregate_type=baza_delivery`: `baza_sending`/`baza_delivered`/`baza_failed` с ошибкой на каждую попытку), при этом **жёсткий кап = 10 попыток**: после 10 неуспешных — терминальный `failed`, авто-ретрай прекращается (ручной resend из админки тоже не превышает 10; либо resend сбрасывает счётчик — реши и задокументируй, по умолчанию НЕ сбрасывает). **Обязателен тест на кап 10 попыток** (11-я не происходит, статус терминальный `failed`).
+
+> Состояние доставки билета — одна строка `baza_deliveries` на `(ticket_id, target)` (текущий статус + `attempts`), а **история всех попыток** — в `domain_history` (как у писем: snapshot в таблице + таймлайн в истории). Это и есть «история попыток» без дублей строк трекинга.
 
 ## 7. Файлы-референсы (быстрый старт)
 - Зеркало: весь `Backend/src/EmailDelivery/` + `App\Models\EmailDelivery\EmailMessageModel` + `Backend/routes/emailDelivery.php` + `App\Http\Controllers\EmailDelivery\EmailDeliveryController` + `AdminFront/src/views/admin/EmailDeliveryListView.vue` + `AdminFront/src/store/modules/EmailDeliveryModule/`.
