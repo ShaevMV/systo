@@ -50,6 +50,8 @@ use Tickets\TemplateBinding\Repositories\InMemoryMySqlTemplateBindingRepository;
 use Tickets\TemplateBinding\Repositories\TemplateBindingRepositoryInterface;
 use Tickets\EmailDelivery\Repositories\EmailMessageRepositoryInterface;
 use Tickets\EmailDelivery\Repositories\InMemoryMySqlEmailMessageRepository;
+use Tickets\BazaDelivery\Repositories\BazaDeliveryRepositoryInterface;
+use Tickets\BazaDelivery\Repositories\InMemoryMySqlBazaDeliveryRepository;
 use Tickets\TicketTypePrice\Repositories\InMemoryMySqlTicketTypePriceRepository;
 use Tickets\TicketTypePrice\Repositories\TicketTypePriceRepositoryInterface;
 use Tickets\User\Account\Repositories\InMemoryMySqlUserRepositories;
@@ -98,6 +100,8 @@ class TicketsProvider extends ServiceProvider
         $this->app->singleton(TemplateBindingResolver::class);
         // Трекинг доставки писем (Ф2): репозиторий статусов писем.
         $this->app->bind(EmailMessageRepositoryInterface::class, InMemoryMySqlEmailMessageRepository::class);
+        // Трекинг доставки билетов в Baza (AF-4): репозиторий статусов доставки.
+        $this->app->bind(BazaDeliveryRepositoryInterface::class, InMemoryMySqlBazaDeliveryRepository::class);
         $this->app->bind(TicketTypePriceRepositoryInterface::class, InMemoryMySqlTicketTypePriceRepository::class);
         $this->app->bind(OptionRepositoryInterface::class, InMemoryMySqlOptionRepository::class);
         $this->app->bind(OptionPriceRepositoryInterface::class, InMemoryMySqlOptionPriceRepository::class);
