@@ -26,6 +26,12 @@
                         <p>{{ __('Синхронизация') }}</p>
                     </a>
                 </li>
+                <li @if ($pageSlug == 'permission') class="active " @endif>
+                    <a href="{{ route('permission.index') }}">
+                        <i class="tim-icons icon-lock-circle"></i>
+                        <p>{{ __('Права доступа') }}</p>
+                    </a>
+                </li>
             @endif
         </ul>
     </div>

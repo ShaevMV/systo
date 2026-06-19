@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Changes\ChangesController;
+use App\Http\Controllers\Permission\PermissionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Sync\SyncController;
 use App\Http\Controllers\Tickets\ScanController;
@@ -71,3 +72,8 @@ Route::post('/change/remove', [ChangesController::class, 'remove'])->name('chang
 Route::get('/sync', [SyncController::class, 'index'])->name('sync.index')->middleware(['auth', 'permission:sync.manage']);
 Route::post('/sync/export', [SyncController::class, 'export'])->name('sync.export')->middleware(['auth', 'permission:sync.manage']);
 Route::post('/sync/import', [SyncController::class, 'import'])->name('sync.import')->middleware(['auth', 'permission:sync.manage']);
+
+// Права доступа — редактор матрицы роль×действие (Ф2). Только право rbac.manage
+// (по дефолту лишь administrator). administrator не редактируется (суперроль).
+Route::get('/permissions', [PermissionController::class, 'index'])->name('permission.index')->middleware(['auth', 'permission:rbac.manage']);
+Route::post('/permissions', [PermissionController::class, 'save'])->name('permission.save')->middleware(['auth', 'permission:rbac.manage']);
