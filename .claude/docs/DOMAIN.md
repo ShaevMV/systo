@@ -275,6 +275,43 @@ class TemplateVersionDto extends AbstractionEntity implements Response {
 
 ---
 
+### BazaDelivery (AF-4)
+
+**Путь:** `Backend/src/BazaDelivery/` (модуль без AggregateRoot — пассивная сущность, как `QrOrder`/`EmailDelivery`; БД только в репозитории). Спека: `.claude/specs/baza-delivery-async-prompt.md`.
+
+Контроль пути записи билета в **Baza** («система входа», сканирование на входе): `queued → sending → delivered / failed (+текст ошибки)`. **Запись в Baza теперь асинхронная и трекаемая** — сбой Baza больше НЕ роняет выдачу билета/смену статуса (доедет ретраем). Зеркало системы писем под билет.
+
+**Домен:**
+
+- **`BazaDeliveryStatus`** (`Domain/ValueObject/BazaDeliveryStatus.php`) — VO статуса + машина переходов:
+  ```
+  queued ──► sending ──► delivered
+     │          │
+     └► failed ◄┘          (failed ──► queued при ретрае/ручном повторе)
+  ```
+  Переходы: `queued→{sending, failed}`; `sending→{delivered, failed}`; `delivered→{}` (финал); `failed→{queued}`. Методы: `value()`, `equals()`, `canTransitionTo()`, `isUnresolved()` (queued/sending/failed), `all()`.
+
+- **`BazaDeliveryLifecycleEvent`** (`Domain/BazaDeliveryLifecycleEvent.php`) — `HistoryEventInterface`: `aggregate_type = 'baza_delivery'`, `event_name = 'baza_' . <status>` (`baza_queued`/`baza_sending`/`baza_delivered`/`baza_failed`). Пишется на **каждую попытку** доставки. Payload без ПДн (статус/ошибка/target/attempt).
+
+**Application:**
+
+- **`BazaDeliveryDispatcher`** (`Application/BazaDeliveryDispatcher.php`) — единая точка постановки доставки в очередь (зеркало `MailDispatcher`): `dispatch(TicketResponse, BazaDeliveryContext)` (target el/spisok выводится из билета), `dispatchLive(ticketId, number, ctx)` (target `live_tickets`), `dispatchAuto(AutoDto, festivalId, ctx)` (target `auto`), `enqueue(ticketId, target, ctx)` (низкоуровневая, идемпотентно по `(ticket_id, target)`). Создаёт/возвращает в очередь запись `baza_deliveries(queued)` + пишет историю `baza_queued` + `DeliverTicketToBazaJob::dispatch`. Уже доставленное (delivered) повторно не доставляет; застрявшее (не delivered) — requeue.
+- **`BazaDeliveryContext`** (`Application/BazaDeliveryContext.php`) — контекст: `orderId?`, `festivalId?`, `name?`, `email?`, `number?`, `source` (default `org_event`), `actorType` (default `system`). Заполняется из `TicketResponse`/`AutoDto`.
+- **`DeliverTicketToBazaJob`** (`Application/Job/DeliverTicketToBazaJob.php`, `ShouldQueue`) — async-запись (зеркало `SendEmailJob`): `queued → sending → delivered / failed`, `backoff = [30, 120, 600]`. Маршрут по `target` (`setInBaza`/`setInBazaList`/`setInBazaLive`/`setInBazaAuto`); субъект пересобирается из БД (`getTicket`/`AutoRepository::getById`). История на каждую попытку. **Кап = 10 попыток** (`MAX_ATTEMPTS`, авто-ретрай + ручной resend суммарно; счётчик не сбрасывается): после 10 неуспешных — терминальный `failed`, новых попыток нет. Идемпотентность: из `delivered` повторно не доставляет.
+- **`BazaDeliveryApplication`** (`Application/BazaDeliveryApplication.php`) — admin-чтение/управление: `getList` (через QueryBus), `getItem`, `getByOrderId` (для «весь путь» qr), `resend(Uuid, ?actorId)` (`failed→queued` + history + dispatch), `countStuck(?festivalId)` / `getStats(?festivalId)` (счётчики по статусам, `stuck = failed` — для дашборда).
+- **`BazaDeliveryGetListQuery(+Handler)`** (`Application/GetList/`) — whitelist фильтров: `status`/`target`/`ticket_id`/`order_id`/`festival_id`/`source` (EQUAL), `name`/`email` (LIKE). Пагинация `page`/`perPage`.
+- **`BazaDeliveryLog`** (`Application/Support/`) — канал логов `baza_delivery` (`config/logging.php`).
+
+**Источники доставки (`source`):** `qr_pipeline` (выдача qr-заказа в пайплайне — `PushToBazaStep`/`LinkLiveStep`), `org_event` (классический org-флоу — `PushTicketsCommandHandler`/`PushTicketsLiveCommandHandler`/`AutoApplication`).
+
+**Цели (`target`):** `el_tickets` (обычный), `spisok_tickets` (заказ-список), `live_tickets` (живой билет, по номеру), `auto` (авто заказа-списка; `ticket_id` = id строки авто, гос-номер → в `name`).
+
+**Repository:** `BazaDeliveryRepositoryInterface` → `InMemoryMySqlBazaDeliveryRepository` (таблица `baza_deliveries`). См. §Repository. Bind в `Tickets/TicketsProvider`.
+
+**Точки интеграции (4 пути записи в Baza переведены на трекинг):** legacy `PushTicketsCommandHandler` (больше не кидает `DomainException` на сбой Baza), legacy live `PushTicketsLiveCommandHandler`, qr `PushToBazaStep` + `LinkLiveStep` (старые `PushTicketToBazaJob`/`LinkLiveTicketJob` удалены), `AutoApplication` (`setInBazaAuto` стал идемпотентным `updateOrInsert` + исправлен баг `finally{return true}`).
+
+---
+
 ### Questionnaire
 
 **Путь:** `Backend/src/Questionnaire/Domain/Questionnaire.php`
@@ -385,6 +422,7 @@ class Questionnaire extends AggregateRoot {
 
 **Новые `aggregate_type` / `event_name` в `domain_history`:**
 - `aggregate_type = 'email'` (модуль EmailDelivery) — таймлайн письма: `email_queued` / `email_sending` / `email_sent` / `email_failed` / `email_opened`. `actor_type`: события писем от qr → `qr`, системные → `system`, повтор из админки → `user`.
+- `aggregate_type = 'baza_delivery'` (AF-4, модуль BazaDelivery) — таймлайн доставки билета в Baza, **история КАЖДОЙ попытки**: `baza_queued` / `baza_sending` / `baza_delivered` / `baza_failed`. `actor_type`: доставки от qr → `qr`, системные → `system`, повтор из админки → `user`.
 - Новые `event_name` для `aggregate_type = 'qr_order'` (шаги пайплайна выдачи, `'step_' . $step->name()`, payload `{status: ok|fail, error?}`): `step_create_tickets`, `step_send_order_email`, `step_push_to_baza`, `step_send_telegram`, `step_create_live_tickets`, `step_link_live`, `step_send_list_email`, `step_send_live_email`.
 - `aggregate_type = 'festival'` (AF-7, модуль `Festival`) — журнал каталога фестивалей: `festival_created` (payload `{name, year, active}`), `festival_edited` (payload `{changed: [...]}` — изменившиеся поля), `festival_deleted`. `actor_type = user` (`actor_id = Auth::id()`). Отдаётся `GET /api/v1/festival/getHistory/{id}` (admin).
 
@@ -649,6 +687,34 @@ Bus::chain($list)->delay(now()->addMinutes($delay))->dispatch();
 | `existsByExternalId(string): bool` | Идемпотентность S2S-приёма (Ф4): письмо с таким `external_id` уже принято |
 
 **Whitelist фильтров `getList`** (в `EmailMessageGetListQueryHandler`): `recipient` (LIKE), `status` (EQUAL), `event` (EQUAL), `source` (EQUAL), `festival_id` (EQUAL), `aggregate_id` (EQUAL). Сортировка через `Order` (`Order::none()` на кривом `orderBy`). Пагинация `forPage(page, perPage)` (`page` ≥ 1, `perPage` 1..100, иначе 20).
+
+### BazaDeliveryRepositoryInterface (AF-4)
+
+**Путь:** `Backend/src/BazaDelivery/Repositories/BazaDeliveryRepositoryInterface.php`
+**Реализация:** `InMemoryMySqlBazaDeliveryRepository` (таблица `baza_deliveries`)
+
+Трекинг доставки билетов в Baza: текущий статус доставки здесь, таймлайн всех попыток — в `domain_history` (`aggregate_type='baza_delivery'`). Модуль без AggregateRoot (как `EmailDelivery`). БД только здесь. Чтение списка — через QueryBus (`BazaDeliveryGetListQuery` + `Handler`, паттерн `Location`).
+
+| Метод | Описание |
+|-------|----------|
+| `create(BazaDeliveryDto): bool` | Создать запись доставки (`queued`). Одна строка на `(ticket_id, target)` — UNIQUE |
+| `findById(Uuid): ?BazaDeliveryDto` | Доставка по ID |
+| `findByTicketTarget(Uuid, target): ?BazaDeliveryDto` | Текущая доставка по `(билет, цель)` — для идемпотентного диспатча |
+| `markSending(Uuid): bool` | `status → sending`, `attempts++` |
+| `markDelivered(Uuid): bool` | `status → delivered`, `delivered_at = now` |
+| `markFailed(Uuid, error): bool` | `status → failed`, `error = причина` |
+| `requeue(Uuid): bool` | `status → queued` (авто-ретрай / повтор из админки) |
+| `getList(Filters, Order, int page, int perPage): Collection` | Страница списка (проекции `BazaDeliveryItemForListResponse`) |
+| `countList(Filters): int` | Общее число доставок под фильтрами (для `totalNumber`) |
+| `getByOrderId(Uuid): Collection` | Доставки билетов заказа (для «весь путь» qr) |
+| `countStuck(?Uuid festivalId): int` | Число застрявших (`failed`) — для дашборда |
+| `statusCounts(?Uuid festivalId): array` | Счётчики по статусам (+ `stuck` = failed) — для дашборда |
+
+**Whitelist фильтров `getList`** (в `BazaDeliveryGetListQueryHandler`): `status` (EQUAL), `target` (EQUAL), `ticket_id` (EQUAL), `order_id` (EQUAL), `festival_id` (EQUAL), `source` (EQUAL), `name` (LIKE), `email` (LIKE). Сортировка через `Order`. Пагинация `forPage(page, perPage)`.
+
+**Таблица `baza_deliveries`** (миграция `2026_06_19_120000`): `id` (uuid PK), `ticket_id` (uuid; для auto — id строки авто), `order_id` (nullable), `target` (el_tickets/spisok_tickets/live_tickets/auto), `status`, `attempts` (tinyint), `error`, `name`/`email` (ПДн), `number` (номер живого билета), `festival_id`, `source` (qr_pipeline/org_event), `delivered_at`, timestamps. UNIQUE `(ticket_id, target)`; индексы `(status, created_at)`, `(festival_id, status)`, `order_id`/`target`/`status`/`source`. **Eloquent-модель** `App\Models\BazaDelivery\BazaDeliveryModel` (касты `attempts`/`number` → int, `delivered_at` → datetime).
+
+**DTO:** `BazaDeliveryDto` (фабрики `queued(id, ticketId, target, BazaDeliveryContext)`, `fromState($row)`). **Responses:** `BazaDeliveryItemForListResponse` (snake_case для списка, с `error`) + `BazaDeliveryGetListResponse` (collection + totalCount).
 
 ---
 

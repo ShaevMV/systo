@@ -41,7 +41,7 @@
 | **AF-1** | **Продолжение переезда админки на Vite+Sakai** — каркас AdminLayout, UI-фундамент (`DataTablePage`/`useCrud`), перенос существующих CRUD-экранов | L (дробится по экранам) | Фазы 0–3 | v2.7.0 → v2.9.0 | — |
 | **AF-2** | **Дашборды со сводными графиками** в админке — продажи + количество билетов (НЕ замена Grafana, сводные графики внутри админки) | M | Фаза 4 (дашборд) | v2.8.0 | данные продаж (qr-заказы + заказы org) |
 | **AF-3** | **Универсальный генератор шаблонов** — единый редактор шаблонов для письма и PDF-билета. **Фазы 1–4 done** (на стенде, e2e доказан): модуль `Backend/src/Template/` (Mustache + сущность `Template` + `template_versions`), рендер писем (11 Mailable через трейт `RendersDbTemplate`) и PDF из БД с fallback на blade, импорт blade (`templates:import-blade`), admin-CRUD API `/api/v1/template/*` (превью/версии/откат/палитра), экран редактора в AdminFront. **Фаза 5 почти готова:** **32 шаблона** (базовый `pdf` + 7 PDF-билетов + 20 order/list писем + 4 auth/анкетных) конвертированы в Mustache и **активны на стенде** (глубокий рендер-тест 154 assertions + e2e); остаётся только MJML/кэш `compiled_html`. **Привязки по событию done (2026-06-17, PR #77):** ось `event` в `template_bindings` (15 событий, каталог `EmailEvent`), резолвер учитывает событие (`event` > `ticket` > `order` > `festival`), эндпоинт `templateBinding/events`. Спеки: `.claude/specs/template-system.md`, `.claude/specs/email-delivery-system.md` (Часть 1) | L | новый модуль | v2.8.0–v2.9.0 | ✅ модель шаблонов согласована |
-| **AF-4** | **Подтверждение доставки билета в baza** — экран/статус «билет доставлен в baza» + ручной retry застрявших | M | Фаза 4 | v2.8.0 | ⚠️ **бэкенд-эндпоинт** статуса sync + retry (открытый вопрос спеки) |
+| **AF-4** | **Подтверждение доставки билета в baza** — ✅ **сделано (2026-06-19):** модуль `Backend/src/BazaDelivery/` (async-доставка `BazaDeliveryDispatcher`/`DeliverTicketToBazaJob`, машина `queued→sending→delivered/failed`, кап 10), сбой Baza не роняет выдачу; admin-API `bazaDelivery/*` + экран «Доставка в baza» + дашборд-виджет «застряли в baza» + блок в детали qr-заказа (`getPipeline.baza`); все 4 пути записи (el/spisok/live/auto) на трекинге. Спека: `.claude/specs/baza-delivery-async-prompt.md` | M | Фаза 4 | ✅ done | ✅ закрыт |
 | **AF-5** | **S3-хранилище билетов/PDF** — хранить билеты/PDF в S3-совместимом хранилище отдельно от приложения | M | вне фаз фронта (инфра+backend) | v2.8.0–v2.9.0 | ⚙️ **devops** (выбор S3, ресурсы) + backend (драйвер storage) |
 | **AF-6** | **Подтверждение доставки билета на email** — **частично закрыт (2026-06-17, PR #77):** есть таблица статусов писем (`email_messages`), внутренние статусы пути (`queued→sending→sent`/`failed` + `error` = «где застряло»), ретрай из админки (`emailDelivery/resend`), экран «Доставка писем» и пиксель прочтения (`opened`, за флагом `MAIL_OPEN_TRACKING`, 152-ФЗ). **Остаётся:** транзакционный провайдер с вебхуками для `delivered`/`bounced` (драйвер + вебхук-эндпоинт). Парная к AF-4 («билет реально дошёл» = baza + email). | M | вне базовых фаз (backend + админ-экран) | v2.8.0 | ⚙️ аккаунт транзакц. провайдера (под РФ/152-ФЗ: UniOne/Unisender, SendPulse, Mailopost) + backend (драйвер + вебхук-эндпоинт) |
 | **AF-7** | **Festival → AggregateRoot + история** — ✅ **сделано (2026-06-18):** агрегат `Festival` в новом модуле `Backend/src/Festival/Domain/` + `HasHistory`, события `festival_created/edited/deleted` в `domain_history` (`actor_type=user`), `GET /api/v1/festival/getHistory/{id}` (admin). 405 тестов зелёных. **Остаётся** (отдельный рефакторинг): перенос CRUD/репозитория/DTO из `Order/OrderTicket/` в модуль `Festival/`. | M | новый backend-модуль | ✅ done | CRUD фестиваля (✅ done) |
@@ -55,7 +55,7 @@
 
 ### Открытые вопросы / блокеры новых фич
 
-- **AF-4** — нужен бэкенд-эндпоинт статуса доставки билет→baza + ручной retry (есть ли уже / проектировать). Блокер фазы 4.
+- ~~**AF-4** — нужен бэкенд-эндпоинт статуса доставки билет→baza + ручной retry.~~ ✅ **Закрыт (2026-06-19):** модуль `BazaDelivery` (async + трекинг + кап 10) + admin-API/экран/виджет. Спека `.claude/specs/baza-delivery-async-prompt.md`.
 - **AF-5** — выбор S3-совместимого хранилища и ресурсы оцениваются параллельно с devops.
 - **AF-6** — частично закрыт (PR #77): внутренние статусы письма (`queued→sending→sent`/`failed`), ретрай из админки и пиксель прочтения уже есть. Остаётся транзакционный провайдер с вебхуками (RU — под 152-ФЗ) для `delivered`/`bounced` + аккаунт (биллинг владельца). Пара к AF-4.
 - **AF-2** — источник данных для графиков: qr-заказы + заказы org (агрегаты по периодам). Не дублировать Grafana (та — для логов/инфры).
@@ -95,6 +95,24 @@
 ---
 
 ## ✅ Сделано
+
+### 2026-06-19 — Асинхронная трекаемая доставка билетов в Baza (AF-4)
+
+**Запись билета в Baza стала асинхронной и отслеживаемой. Сбой Baza больше не роняет выдачу билета / смену статуса. Полный PHPUnit зелёный (451), ESLint + Vite build AdminFront зелёные.**
+
+- 🌿 Ветка: `feat/baza-delivery-async`
+- 📜 Спека: `.claude/specs/baza-delivery-async-prompt.md`
+
+**Что вошло (6 фаз, зеркало модуля EmailDelivery):**
+- **Backend `Backend/src/BazaDelivery/`** — модуль трекинга (пассивная сущность): VO `BazaDeliveryStatus` (`queued→sending→delivered/failed`), `BazaDeliveryLifecycleEvent` (`aggregate_type=baza_delivery`, история каждой попытки), `BazaDeliveryDispatcher` (постановка в очередь, идемпотентно по `(ticket_id, target)`), `DeliverTicketToBazaJob` (async-запись, маршрут по target, **кап 10 попыток**), `BazaDeliveryApplication` (getList/getItem/resend/getStats/countStuck), репозиторий + таблица `baza_deliveries` (миграция `2026_06_19_120000`).
+- **Интеграция (4 пути записи в Baza на трекинг):** legacy `PushTicketsCommandHandler` (**больше не кидает `DomainException` на сбой Baza** — главная цель) + `PushTicketsLiveCommandHandler`; qr `PushToBazaStep` + `LinkLiveStep` (старые `PushTicketToBazaJob`/`LinkLiveTicketJob` удалены); `AutoApplication` (`setInBazaAuto` стал идемпотентным + исправлен баг `finally{return true}`).
+- **Admin-API** (`auth:api`+`admin`): `POST /api/v1/bazaDelivery/getList` (whitelist + пагинация), `getItem/{id}` (+ таймлайн `baza_*`), `resend/{id}`, `getStats`. Секция `baza` добавлена в `qrOrder/getPipeline`.
+- **AdminFront:** Vuex `appBazaDelivery` + экран `BazaDeliveryListView` (список/деталь/повтор + Toast), роут `/admin/baza-delivery`, раздел меню «Билеты» → «Доставка в baza», дашборд-виджет «застряли в baza», блок «Доставка в baza» в детали qr-заказа.
+- **Проверка:** PHPUnit **451 зелёный** (unit статуса/DTO + feature dispatcher/job/cap-10/resend/getList + HTTP-API + legacy-интеграция); ESLint + `vite build` (606 модулей) зелёные.
+
+**Решения владельца (2026-06-19):** кап 10 попыток (resend не сбрасывает счётчик), live и auto тоже в трекер, дашборд-виджет в этой задаче, история всех попыток в `domain_history`.
+
+**Закрывает:** AF-4 (доставка в baza) + часть TD-35 (S3-хранилище AF-5 — остаётся).
 
 ### 2026-06-17 — Система отправки писем по шаблонам (AF-3 событийные привязки + AF-6 частично)
 

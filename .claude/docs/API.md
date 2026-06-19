@@ -655,7 +655,7 @@
 ### GET `/api/v1/qrOrder/getPipeline/{id}`
 **Middleware:** `auth:api` + `admin`
 
-**Описание:** весь путь заказа (Ф5 системы писем) в одном ответе для экрана «видеть весь путь»: приём → билеты (PDF) → письма (статусы доставки) → история шагов. Читается через `QrOrderPipelineReader` (БД только в репозиториях).
+**Описание:** весь путь заказа (Ф5 системы писем) в одном ответе для экрана «видеть весь путь»: приём → билеты (PDF) → письма (статусы доставки) → доставка билетов в baza (статусы) → история шагов. Читается через `QrOrderPipelineReader` (БД только в репозиториях).
 
 **Response 200:**
 ```json
@@ -664,7 +664,8 @@
   "order": { "...полный заказ (как getItem)..." },
   "tickets": [{ "ticket_id": "UUID", "pdf_url": "https://.../storage/tickets/{ticketId}.pdf" }],
   "history": [{ "event_name": "...", "payload": {...}, "actor_type": "qr", "occurred_at": "ISO8601" }],
-  "emails": [{ "id": "UUID", "event": "...", "recipient": "...", "status": "...", "...": "..." }]
+  "emails": [{ "id": "UUID", "event": "...", "recipient": "...", "status": "...", "...": "..." }],
+  "baza": [{ "id": "UUID", "ticket_id": "UUID", "target": "el_tickets", "status": "delivered", "attempts": 1, "error": null, "...": "..." }]
 }
 ```
 **Response 404:** `{ "success": false, "message": "Заказ не найден" }`
@@ -779,6 +780,93 @@
 **Response 200 (повтор по `external_id`):** `{ "success": true, "message": "Уже принято ранее (идемпотентно)" }`
 **Response 422:** `{ "success": false, "message": "Неизвестное событие письма" }` / `{ "success": false, "message": "Не передан email получателя" }`
 **Response 401:** без/с невалидным `X-QR-Token` (middleware `qr.ingest`)
+
+---
+
+## 3.5. Доставка билетов в Baza (AF-4)
+
+Префикс: **`/api/v1/bazaDelivery`**
+
+Контроль пути записи билета в **Baza** («система входа», сканирование на входе фестиваля) «доставлен / где застряло» (модуль `Backend/src/BazaDelivery/` — пассивная сущность, как `QrOrder`/`EmailDelivery`, БД только в репозитории). Зеркало системы писем под билет.
+
+- **Запись в Baza теперь асинхронная и трекаемая**: `BazaDeliveryDispatcher` ставит доставку в очередь (таблица `baza_deliveries`, статус `queued`) + `DeliverTicketToBazaJob` пишет билет в Baza с авто-ретраем. **Сбой Baza больше НЕ роняет выдачу билета/смену статуса** — доставка доедет ретраем.
+- **Статусы доставки** (`BazaDeliveryStatus`): `queued` → `sending` → `delivered` / `failed` (+ текст ошибки = «где застряло»). Из `failed` — повтор в `queued` (авто-ретрай / ручной resend).
+- **Кап = 10 попыток** (авто-ретрай + ручной resend суммарно; счётчик не сбрасывается). После 10 неуспешных — терминальный `failed`, новых попыток записи в Baza нет.
+- **`target`** доставки ∈ `el_tickets` (обычный) / `spisok_tickets` (заказ-список) / `live_tickets` (живой билет) / `auto` (авто заказа-списка).
+- **`source`** ∈ `qr_pipeline` (выдача qr-заказа) / `org_event` (классический org-флоу).
+- В `domain_history` для доставок — `aggregate_type='baza_delivery'`, события `baza_queued`/`baza_sending`/`baza_delivered`/`baza_failed` (история КАЖДОЙ попытки). `actor_type`: доставки от qr → `qr`, системные → `system`, повтор из админки → `user`.
+
+### POST `/api/v1/bazaDelivery/getList`
+**Middleware:** `auth:api` + `admin` (read-only, содержит ПДн)
+
+**Описание:** список доставок для админки. Фильтр — **whitelist** (только перечисленные поля попадают в `WHERE`).
+
+**Request (фильтр + пагинация):**
+```json
+{
+  "filter": {
+    "status": "string? (EQUAL: queued/sending/delivered/failed)",
+    "target": "string? (EQUAL: el_tickets/spisok_tickets/live_tickets/auto)",
+    "ticket_id": "UUID? (EQUAL)",
+    "order_id": "UUID? (EQUAL)",
+    "festival_id": "UUID? (EQUAL)",
+    "source": "string? (EQUAL: qr_pipeline/org_event)",
+    "name": "string? (LIKE)",
+    "email": "string? (LIKE)"
+  },
+  "orderBy": { "created_at": "asc|desc" },
+  "page": 1,
+  "perPage": 20
+}
+```
+- `page` зажат снизу к 1; `perPage` — диапазон 1..100, иначе fallback на 20
+- `orderBy.*` допускает только `asc`/`desc`; кривое значение → `Order::none()`
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "list": [
+    {
+      "id": "UUID", "ticket_id": "UUID", "order_id": "UUID|null",
+      "target": "el_tickets", "status": "failed", "attempts": 3,
+      "error": "Не найден билет в Базе входа", "name": "...", "email": "...",
+      "number": 1024, "festival_id": "UUID", "source": "org_event",
+      "delivered_at": "ISO8601|null", "created_at": "ISO8601"
+    }
+  ],
+  "totalNumber": { "totalCount": 42 }
+}
+```
+- Проекция списка — `BazaDeliveryItemForListResponse` (snake_case; `error` включён намеренно — сразу видно «где застряло»)
+
+---
+
+### GET `/api/v1/bazaDelivery/getItem/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Response 200:** `{ "success": true, "item": {...}, "history": [ { "event_name": "baza_failed", "payload": {...}, "actor_type": "qr|system|user", "occurred_at": "ISO8601" } ] }`
+**Response 404:** `{ "success": false, "message": "Доставка не найдена" }`
+
+---
+
+### POST `/api/v1/bazaDelivery/resend/{id}`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** ручной повтор застрявшей доставки (re-dispatch `DeliverTicketToBazaJob` по `id`). Переводит доставку обратно в `queued`. Счётчик попыток **не сбрасывается** — если кап 10 уже достигнут, job сразу фиксирует терминальный `failed` без новой записи в Baza.
+
+**Response 200:** `{ "success": true, "message": "Доставка поставлена на повторную попытку" }`
+**Response 404:** `{ "success": false, "message": "Доставка не найдена" }`
+
+---
+
+### POST `/api/v1/bazaDelivery/getStats`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** счётчики доставок по статусам (для дашборд-виджета «застрявшие билеты»). `festival_id` — опционально.
+
+**Request:** `{ "festival_id": "UUID?" }`
+**Response 200:** `{ "success": true, "stats": { "queued": 0, "sending": 0, "delivered": 120, "failed": 3, "stuck": 3 } }` (`stuck` = алиас `failed`)
 
 ---
 
@@ -1180,7 +1268,7 @@
 |-----------|----------|
 | **Публичные** | login, register, forgot-password, resetPassword, festival/* (кроме getTicketTypeList/create/edit/delete), festival/getList, festival/getItem, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, festival/getHistory, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend) |
+| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, festival/getHistory, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend), bazaDelivery/* (getList, getItem, resend, getStats) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
