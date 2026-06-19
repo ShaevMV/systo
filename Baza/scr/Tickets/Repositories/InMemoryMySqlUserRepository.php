@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\User;
+use Baza\Shared\Domain\ValueObject\ShiftRole;
 
 class InMemoryMySqlUserRepository implements UserRepositoryInterface
 {
@@ -21,7 +22,7 @@ class InMemoryMySqlUserRepository implements UserRepositoryInterface
      * перевыпускать пароли. Теперь updateOrCreate по email: повторный прогон
      * обновляет имя/пароль существующего сотрудника, не создавая дублей.
      *
-     * @param array<int, array{email:string, name:string, password:string, is_admin?:bool}> $dataUsers
+     * @param array<int, array{email:string, name:string, password:string, is_admin?:bool, role?:string}> $dataUsers
      */
     public function createList(array $dataUsers): bool
     {
@@ -34,9 +35,16 @@ class InMemoryMySqlUserRepository implements UserRepositoryInterface
                     'password' => bcrypt($user['password']),
                 ]
             );
-            // is_admin сознательно вне $fillable (защита от mass-assignment) —
+            // is_admin и role сознательно вне $fillable (защита от mass-assignment) —
             // выставляем напрямую, не ослабляя модель.
             $model->is_admin = (bool) ($user['is_admin'] ?? false);
+
+            // Явная глобальная роль смены (опционально). Невалидную игнорируем —
+            // тогда роль выведется по is_admin (ShiftRole::fromUser).
+            if (isset($user['role']) && ShiftRole::isValid((string) $user['role'])) {
+                $model->role = (string) $user['role'];
+            }
+
             $model->save();
         }
 

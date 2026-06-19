@@ -42,7 +42,7 @@ class CreateUserCommand extends Command
             return Command::FAILURE;
         }
 
-        /** @var array<int, array{0:string, 1:string, 2:string, 3?:bool}> $rows */
+        /** @var array<int, array{0:string, 1:string, 2:string, 3?:bool, 4?:string}> $rows */
         $rows = require $path;
 
         $users = array_map(
@@ -51,6 +51,7 @@ class CreateUserCommand extends Command
                 'name'     => $row[1],
                 'password' => $row[2],
                 'is_admin' => (bool) ($row[3] ?? false),
+                'role'     => $row[4] ?? null, // опц. роль смены (ShiftRole); невалидную репозиторий игнорирует
             ],
             $rows
         );
