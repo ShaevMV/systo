@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Baza\Changes\Repositories;
 
 use App\Models\ChangesModel;
+use App\Models\ChangeUserModel;
+use App\Models\User;
 use Baza\Changes\Applications\Report\ReportForChangesDto;
+use Baza\Shared\Domain\ValueObject\ShiftRole;
 use Carbon\Carbon;
 use DB;
 use Nette\Utils\Json;
@@ -80,16 +83,62 @@ group by `changes`.`id`", [
 
     public function updateOrCreate(array $userList, Carbon $start, string $festivalId, ?int $id = null): bool
     {
-        if (!is_null($id)) {
-            $model = $this->model::find($id);
-        } else {
-            $model = $this->model;
-        }
-        $model->user_id = Json::encode($userList);
-        $model->festival_id = $festivalId;
-        $model->start = $start;
+        return DB::transaction(function () use ($userList, $start, $festivalId, $id) {
+            // Дедуп состава: один человек в смене ровно один раз. Защита от кривого
+            // POST compound[] с дублем — иначе UNIQUE(change_id,user_id) в change_user
+            // уронил бы сохранение. JSON и change_user пишем одинаковым составом.
+            $userList = array_values(array_unique(array_map('intval', $userList)));
 
-        return $model->save();
+            if (!is_null($id)) {
+                $model = $this->model::find($id);
+            } else {
+                $model = $this->model;
+            }
+            $model->user_id = Json::encode($userList);
+            $model->festival_id = $festivalId;
+            $model->start = $start;
+
+            if (!$model->save()) {
+                return false;
+            }
+
+            // Двойная запись (Ф2): состав смены с ролями в change_user — параллельно
+            // changes.user_id JSON выше. Читающие экраны пока используют JSON → вход цел.
+            $this->syncChangeUsers((int) $model->id, $userList);
+
+            return true;
+        });
+    }
+
+    /**
+     * Пересобирает состав change_user для смены (delete старые → insert текущие).
+     * Роль участника — производная (ShiftRole::fromUser по is_admin); явное
+     * назначение ролей и главного смены делается из UI в PR-6.
+     *
+     * @param int[] $userList
+     */
+    private function syncChangeUsers(int $changeId, array $userList): void
+    {
+        ChangeUserModel::where('change_id', $changeId)->delete();
+
+        if ($userList === []) {
+            return;
+        }
+
+        $users = User::whereIn('id', array_map('intval', $userList))
+            ->get(['id', 'is_admin'])
+            ->keyBy('id');
+
+        foreach ($userList as $userId) {
+            $userId = (int) $userId;
+            $user = $users->get($userId);
+
+            ChangeUserModel::create([
+                'change_id' => $changeId,
+                'user_id'   => $userId,
+                'role'      => ShiftRole::fromUser((bool) ($user?->is_admin ?? false)),
+            ]);
+        }
     }
 
     /**
@@ -102,6 +151,13 @@ group by `changes`.`id`", [
 
     public function remove(int $id): bool
     {
-        return $this->model::find($id)->delete($id);
+        return DB::transaction(function () use ($id) {
+            // Нет FK/каскада → состав смены чистим явно, иначе осиротевшие строки (Ф2).
+            ChangeUserModel::where('change_id', $id)->delete();
+
+            $model = $this->model::find($id);
+
+            return $model !== null && (bool) $model->delete();
+        });
     }
 }
