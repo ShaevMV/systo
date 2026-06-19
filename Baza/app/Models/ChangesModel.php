@@ -46,6 +46,12 @@ class ChangesModel extends Model
 
     public const TABLE = 'changes';
 
+    // ВНИМАНИЕ: колонка count_auto_tickets СОЗНАТЕЛЬНО отсутствует в $fillable,
+    // хотя она есть в БД (миграция 2026_05_29) и читается в отчёте (getAllReport).
+    // Через updateOrCreate()/fill() это поле молча НЕ сохранится — оно наполняется
+    // только operation increment() при впуске авто. При добавлении НОВЫХ полей смены
+    // (финансы, матответственность из грядущего апдейта) их нужно явно внести сюда,
+    // иначе они тихо не запишутся. См. .claude/docs/BAZA.md §6.
     protected $fillable = [
         'user_id',
         'count_live_tickets',

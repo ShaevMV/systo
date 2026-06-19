@@ -80,6 +80,11 @@ class TicketResponse extends AbstractionEntity implements Response
      * Структура для записи билета во внешнюю БД (таблица `el_tickets`).
      * White-list — указываем только реальные колонки таблицы, чтобы любые
      * новые поля DTO (например, для заказов-списков) не утекали в insert/update.
+     *
+     * ЭТО НЕЯВНЫЙ КОНТРАКТ интеграции Backend → Baza: имена ключей здесь должны
+     * 1-в-1 совпадать с колонками таблицы el_tickets в БД Baza (миграции Baza).
+     * Менять синхронно с Baza, иначе запись молча упадёт (см. setInBaza()).
+     * toArrayForSpisok() — то же для таблицы spisok_tickets.
      */
     public function toArrayForBaza(): array
     {
