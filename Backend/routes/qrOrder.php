@@ -6,10 +6,18 @@ use App\Http\Controllers\QrOrder\QrOrderController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/qrOrder')->group(static function (): void {
-    // Приём заказа от витрины qr: заказ приходит уже в статусе «оплачен» → org сразу выпускает
-    // билеты (см. QrOrderApplication::create). Канал закрыт сервисным ключом qr (заголовок
-    // X-QR-Token, middleware qr.ingest) + опционально allowlist IP qr на nginx. Эндпоинт хранит ПДн.
+    // Приём заказа от витрины qr. Два режима (см. QrOrderApplication::create):
+    //  - «создан» → org шлёт письмо «заказ создан», билеты НЕ выпускает (двухшаговый цикл);
+    //  - «оплачен» → org сразу выпускает билеты (одношаговый приём).
+    // Канал закрыт сервисным ключом qr (заголовок X-QR-Token, middleware qr.ingest) +
+    // опционально allowlist IP qr на nginx. Эндпоинт хранит ПДн.
     Route::post('/create', [QrOrderController::class, 'create'])
+        ->middleware('qr.ingest');
+
+    // Смена статуса принятого заказа (S2S, тот же X-QR-Token). Переход в «оплачен» запускает
+    // выдачу билетов (PDF/письма) — один раз, защита по issued_at (повторный «оплачен» от
+    // ретраев qr не выдаёт билеты снова). Нужен для двухшагового цикла «создан» → «оплачен».
+    Route::post('/changeStatus/{id}', [QrOrderController::class, 'changeStatus'])
         ->middleware('qr.ingest');
 
     // Список принятых заказов для админки org (read-only): фильтры + пагинация. Содержит ПДн.
