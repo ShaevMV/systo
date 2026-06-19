@@ -538,6 +538,7 @@ queued ──→ sending ──→ sent ──→ delivered ──→ opened
 | 2026-05-04 | Добавлены статусы списков: `NEW_LIST`, `APPROVE_LIST`, `CANCEL_LIST`, `DIFFICULTIES_AROSE_LIST` + матрица переходов. Роль `curator`. Сущность `Location`. | `Shared/Domain/ValueObject/Status.php`, `AccountRoleHelper.php`, миграции |
 | 2026-06-14 | Добавлен канал приёма qr-заказов (таблица `qr_orders`, `actor_type = qr`, выдача билетов при `оплачен`). | `Backend/src/QrOrder/`, `History/Domain/ActorType.php` |
 | 2026-06-17 | Система отправки писем по шаблонам: каталог событий `EmailEvent`, привязка шаблона по событию (ось `event` в `template_bindings`), машина статусов `EmailStatus` + контроль доставки (`email_messages`, история `aggregate_type=email`), qr-канал писем (S2S), пиксель прочтения за флагом (152-ФЗ), шаги пайплайна qr (`step_*` в истории). | `Backend/src/EmailDelivery/`, `template_bindings.event`, миграции `2026_06_17_*` |
+| 2026-06-19 | **Асинхронная трекаемая доставка билетов в Baza (AF-4).** Запись билета в Baza стала **асинхронной**: `BazaDeliveryDispatcher` → `DeliverTicketToBazaJob` (машина `queued→sending→delivered/failed`, кап 10 попыток). **Сбой Baza больше НЕ роняет выдачу билета / смену статуса** (раньше `PushTicketsCommandHandler` кидал `DomainException`) — доставка доедет ретраем, путь виден в админке «Доставка в baza». Все 4 пути записи (el/spisok/live/auto, classic + qr) переведены на трекинг. История `aggregate_type=baza_delivery` (каждая попытка). | `Backend/src/BazaDelivery/`, `baza_deliveries`, миграция `2026_06_19_120000` |
 
 ---
 
