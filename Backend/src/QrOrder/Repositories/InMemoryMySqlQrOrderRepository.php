@@ -37,6 +37,8 @@ final class InMemoryMySqlQrOrderRepository implements QrOrderRepositoryInterface
             'payment_method' => $dto->getPaymentMethod(),
             'promo_code' => $dto->getPromoCode(),
             'paid_at' => $dto->getPaidAt(),
+            'buyer_fio' => $dto->getBuyerFio(),
+            'festival_title' => $dto->getFestivalTitle(),
         ]);
     }
 

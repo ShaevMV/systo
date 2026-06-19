@@ -101,4 +101,86 @@ class QrOrderCreateApiTest extends TestCase
             'actor_type' => 'qr',
         ]);
     }
+
+    /** Новый полный контракт qr: buyer{}, payment.amount_total, per-guest type_ticket, ПДн. */
+    private function fullContract(): array
+    {
+        return [
+            'order_id' => '99999999-9999-4999-8999-999999999999',
+            'source' => 'qr.spaceofjoy.ru',
+            'external_order_no' => 123,
+            'order_data' => [
+                'status' => 'оплачен',
+                'type_order' => 'regular',
+                'email' => 'ivan@example.com',
+                'festival' => ['id' => '55555555-5555-5555-5555-555555555555', 'title' => 'СИСТО ОСЕНЬ'],
+                'paid_at' => '2026-06-18T12:45:00+03:00',
+            ],
+            'payment' => [
+                'method' => 'transfer',
+                'amount_total' => 12300,
+                'promo_codes' => ['OSEN.BUDET'],
+                // ПДн/PCI — должны остаться ТОЛЬКО в payload, не в колонках.
+                'method_details' => ['card_number' => '410011904396730'],
+            ],
+            'buyer' => [
+                'user_id' => '9d6e7c10-1111-4222-8333-444455556666',
+                'fio' => 'Иван Петров', 'city' => 'Казань', 'phone' => '+79991234567', 'telegram' => '@ivan',
+            ],
+            'guests' => [
+                ['role' => 'org_fee', 'name' => 'Иван Петров',
+                 'type_ticket' => ['id' => '44444444-4444-4444-4444-444444444444', 'title' => 'Оргвзнос']],
+                ['role' => 'kid', 'name' => 'Маша Петрова (7 лет)',
+                 'type_ticket' => ['id' => 'c3d4e5f6-aaaa-4bbb-8ccc-dddd11112222', 'title' => 'Детский'],
+                 'child' => ['name' => 'Маша Петрова', 'age' => 7, 'allergies' => 'пыльца']],
+                ['role' => 'eco_car', 'name' => 'А123БВ77 / авто / Иван',
+                 'type_ticket' => ['id' => '20066a25-eeee-4fff-8000-111122223333', 'title' => 'Парковка'],
+                 'car' => ['number' => 'А123БВ77', 'driver_fio' => 'Иван Петров']],
+            ],
+        ];
+    }
+
+    public function test_creates_from_new_full_contract(): void
+    {
+        $this->postJson('/api/v1/qrOrder/create', $this->fullContract(), $this->qrIngestHeaders())
+            ->assertOk()->assertJson(['success' => true]);
+
+        // Проекция: buyer_fio/festival_title (новые) + total_price из payment.amount_total.
+        $this->assertDatabaseHas('qr_orders', [
+            'id' => '99999999-9999-4999-8999-999999999999',
+            'email' => 'ivan@example.com',
+            'status' => 'оплачен',
+            'festival_id' => '55555555-5555-5555-5555-555555555555',
+            'festival_title' => 'СИСТО ОСЕНЬ',
+            'buyer_fio' => 'Иван Петров',
+            'city' => 'Казань',
+            'total_price' => 12300,
+            'payment_method' => 'transfer',
+            'promo_code' => 'OSEN.BUDET',
+            'external_order_no' => '123',
+        ]);
+
+        // payload хранит ВЕСЬ контракт as-is (3 гостя, ПДн ребёнка/карты — только тут).
+        $row = QrOrderModel::whereId('99999999-9999-4999-8999-999999999999')->firstOrFail();
+        self::assertCount(3, $row->payload['guests']);
+        self::assertSame(7, $row->payload['guests'][1]['child']['age']);
+        self::assertSame('410011904396730', $row->payload['payment']['method_details']['card_number']);
+        // ПДн ребёнка/карты НЕ спроецированы в колонки (минимизация по 152-ФЗ/PCI).
+        self::assertArrayNotHasKey('child', $row->getAttributes());
+        self::assertArrayNotHasKey('card_number', $row->getAttributes());
+    }
+
+    public function test_backward_compat_buyer_fio_from_legacy_user(): void
+    {
+        // Старый контракт без buyer{}: buyer_fio из user.name, city из user.city, total из price.total.
+        $this->postJson('/api/v1/qrOrder/create', $this->contract(), $this->qrIngestHeaders())->assertOk();
+
+        $this->assertDatabaseHas('qr_orders', [
+            'id' => '11111111-1111-1111-1111-111111111111',
+            'buyer_fio' => 'Иван',
+            'city' => 'Москва',
+            'total_price' => 4000,
+            'festival_title' => 'Систо 2026',
+        ]);
+    }
 }
