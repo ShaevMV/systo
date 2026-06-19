@@ -112,8 +112,9 @@ group by `changes`.`id`", [
 
     /**
      * Пересобирает состав change_user для смены (delete старые → insert текущие).
-     * Роль участника — производная (ShiftRole::fromUser по is_admin); явное
-     * назначение ролей и главного смены делается из UI в PR-6.
+     * Роль участника — мягкий маппинг ShiftRole::fromUser: явная глобальная
+     * users.role перекрывает производную по is_admin. Явное назначение ролей
+     * именно в этой смене и выбор главного делается из UI в PR-6.
      *
      * @param int[] $userList
      */
@@ -126,7 +127,7 @@ group by `changes`.`id`", [
         }
 
         $users = User::whereIn('id', array_map('intval', $userList))
-            ->get(['id', 'is_admin'])
+            ->get(['id', 'is_admin', 'role'])
             ->keyBy('id');
 
         foreach ($userList as $userId) {
@@ -136,7 +137,7 @@ group by `changes`.`id`", [
             ChangeUserModel::create([
                 'change_id' => $changeId,
                 'user_id'   => $userId,
-                'role'      => ShiftRole::fromUser((bool) ($user?->is_admin ?? false)),
+                'role'      => ShiftRole::fromUser((bool) ($user?->is_admin ?? false), $user?->role),
             ]);
         }
     }

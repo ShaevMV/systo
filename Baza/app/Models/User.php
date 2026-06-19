@@ -24,6 +24,7 @@ use Laravel\Sanctum\PersonalAccessToken;
  * @property string $name
  * @property string $email
  * @property boolean $is_admin
+ * @property string|null $role
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
@@ -61,12 +62,16 @@ use Laravel\Sanctum\PersonalAccessToken;
  * Роль определяется единственным булевым флагом is_admin (плоская модель прав):
  *   true  — администратор (отчёты по сменам + синхронизация данных, см. middleware 'admin');
  *   false — обычный сотрудник (сканер + поиск + впуск).
- * Заметь: is_admin сознательно НЕ в $fillable — его нельзя выставить через mass-assignment,
- * только напрямую/сидером. Вход — сессионный (web guard), JWT в Baza нет
- * (Sanctum подключён к модели, но боевого входа по API-токену в роутах нет).
+ * Заметь: is_admin (и добавленное в Ф2 поле role) сознательно НЕ в $fillable —
+ * их нельзя выставить через mass-assignment, только напрямую/сидером. Вход —
+ * сессионный (web guard), JWT в Baza нет (Sanctum подключён к модели, но боевого
+ * входа по API-токену в роутах нет).
  *
- * Грядущий апдейт заменит этот флаг на полноценные роли (Администратор / Начальник смены /
- * Билетёр / Ответственный за приём смены / Охранник) — см. .claude/docs/BAZA.md §8 и §11.
+ * Ф2 (в процессе): добавлено nullable-поле `role` — глобальная роль смены
+ * (коды ShiftRole: administrator / shift_chief / ticketer / kpp_commandant / guard).
+ * is_admin пока НЕ удаляем — мягкий маппинг ShiftRole::fromUser(is_admin, role):
+ * явная role перекрывает, иначе is_admin → administrator/ticketer. Полный перевод
+ * прав на роли+матрицу — см. .claude/specs/baza-f2-roles-rbac.md, BAZA.md §8 и §11.
  */
 class User extends Authenticatable
 {
