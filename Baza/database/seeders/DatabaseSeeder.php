@@ -13,6 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([UsersTableSeeder::class]);
+        $this->call([
+            UsersTableSeeder::class,
+            // Дефолтная матрица прав роль×действие (Ф2) — идемпотентна, без ПДн,
+            // защищает от «заперли всех» при появлении не-админских ролей.
+            BazaRolePermissionsSeeder::class,
+        ]);
     }
 }
