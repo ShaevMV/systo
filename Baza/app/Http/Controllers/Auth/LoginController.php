@@ -14,19 +14,12 @@ class LoginController extends Controller
     public function __construct(
     )
     {
-        $this->middleware('guest')->except(['logout','registerPage']);
+        $this->middleware('guest')->except(['logout']);
     }
 
     public function loginPage(): View
     {
         return view('auth.login', [
-            'pageSlug' => null
-        ]);
-    }
-
-    public function registerPage(): View
-    {
-        return view('auth.register',[
             'pageSlug' => null
         ]);
     }
