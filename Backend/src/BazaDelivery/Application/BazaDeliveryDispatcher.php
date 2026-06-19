@@ -56,6 +56,8 @@ final class BazaDeliveryDispatcher
                 source: $ctx->source,
                 actorType: $ctx->actorType,
             ),
+            // Несём готовый TicketResponse: getTicket не пересоберёт qr-билет (заказ в qr_orders, не order_tickets).
+            base64_encode(serialize($ticket)),
         );
     }
 
@@ -108,7 +110,7 @@ final class BazaDeliveryDispatcher
      *
      * Используется dispatch() (el/spisok) и точечными вызовами live/auto (target задан явно).
      */
-    public function enqueue(Uuid $ticketId, string $target, BazaDeliveryContext $ctx): Uuid
+    public function enqueue(Uuid $ticketId, string $target, BazaDeliveryContext $ctx, ?string $subjectBlob = null): Uuid
     {
         $existing = $this->repository->findByTicketTarget($ticketId, $target);
 
@@ -121,7 +123,7 @@ final class BazaDeliveryDispatcher
             $this->repository->requeue($id);
         } else {
             $id = Uuid::random();
-            $this->repository->create(BazaDeliveryDto::queued($id, $ticketId, $target, $ctx));
+            $this->repository->create(BazaDeliveryDto::queued($id, $ticketId, $target, $ctx), $subjectBlob);
         }
 
         $this->history->save(new SaveHistoryDto(

@@ -17,10 +17,16 @@ use Tickets\BazaDelivery\Dto\BazaDeliveryDto;
  */
 interface BazaDeliveryRepositoryInterface
 {
-    /** Создать запись доставки (status=queued). Одна строка на (ticket_id, target) — UNIQUE. */
-    public function create(BazaDeliveryDto $dto): bool;
+    /**
+     * Создать запись доставки (status=queued). Одна строка на (ticket_id, target) — UNIQUE.
+     * $subjectBlob = base64(serialize(TicketResponse)) для el/spisok (для записи в Baza/повтора).
+     */
+    public function create(BazaDeliveryDto $dto, ?string $subjectBlob = null): bool;
 
     public function findById(Uuid $id): ?BazaDeliveryDto;
+
+    /** Сериализованный субъект доставки (TicketResponse) для el/spisok, или null. */
+    public function getSubjectBlob(Uuid $id): ?string;
 
     /** Текущая доставка по (билет, цель) — для идемпотентного диспатча (создать/повторить). */
     public function findByTicketTarget(Uuid $ticketId, string $target): ?BazaDeliveryDto;

@@ -53,6 +53,7 @@ class BazaDeliveryModel extends Model
         'number',
         'festival_id',
         'source',
+        'subject_blob',
         'delivered_at',
     ];
 

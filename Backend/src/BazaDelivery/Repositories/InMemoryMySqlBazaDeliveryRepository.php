@@ -22,10 +22,13 @@ final class InMemoryMySqlBazaDeliveryRepository implements BazaDeliveryRepositor
     ) {
     }
 
-    public function create(BazaDeliveryDto $dto): bool
+    public function create(BazaDeliveryDto $dto, ?string $subjectBlob = null): bool
     {
         // create() (а не insert) — единая точка форматирования через Eloquent-касты.
-        return (bool) $this->model::create($dto->toArrayForCreate());
+        return (bool) $this->model::create(array_merge(
+            $dto->toArrayForCreate(),
+            ['subject_blob' => $subjectBlob],
+        ));
     }
 
     public function findById(Uuid $id): ?BazaDeliveryDto
@@ -33,6 +36,11 @@ final class InMemoryMySqlBazaDeliveryRepository implements BazaDeliveryRepositor
         $row = $this->model::whereId($id->value())->first();
 
         return $row === null ? null : BazaDeliveryDto::fromState($row->toArray());
+    }
+
+    public function getSubjectBlob(Uuid $id): ?string
+    {
+        return $this->model::query()->select('subject_blob')->whereId($id->value())->first()?->subject_blob;
     }
 
     public function findByTicketTarget(Uuid $ticketId, string $target): ?BazaDeliveryDto

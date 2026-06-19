@@ -21,6 +21,7 @@ use Tickets\BazaDelivery\Repositories\BazaDeliveryRepositoryInterface;
 use Tickets\History\Domain\ActorType;
 use Tickets\History\Dto\SaveHistoryDto;
 use Tickets\History\Repositories\HistoryRepositoryInterface;
+use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Repositories\TicketsRepositoryInterface;
 
 /**
@@ -90,7 +91,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         ]);
 
         try {
-            if (! $this->deliver($delivery, $tickets, $autos)) {
+            if (! $this->deliver($delivery, $repository, $tickets, $autos)) {
                 throw new RuntimeException('Запись билета в Baza вернула false');
             }
 
@@ -132,19 +133,40 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         }
     }
 
-    /** Маршрутизация записи в Baza по цели доставки. Субъект пересобирается из БД. */
+    /** Маршрутизация записи в Baza по цели доставки. */
     private function deliver(
         BazaDeliveryDto $delivery,
+        BazaDeliveryRepositoryInterface $repository,
         TicketsRepositoryInterface $tickets,
         AutoRepositoryInterface $autos,
     ): bool {
         return match ($delivery->getTarget()) {
-            'el_tickets' => $tickets->setInBaza($tickets->getTicket($delivery->getTicketId(), true)),
-            'spisok_tickets' => $tickets->setInBazaList($tickets->getTicket($delivery->getTicketId(), true)),
+            'el_tickets' => $tickets->setInBaza($this->resolveTicket($delivery, $repository, $tickets)),
+            'spisok_tickets' => $tickets->setInBazaList($this->resolveTicket($delivery, $repository, $tickets)),
             'live_tickets' => $tickets->setInBazaLive((int) $delivery->getNumber(), $delivery->getTicketId()),
             'auto' => $this->deliverAuto($delivery, $autos),
             default => throw new RuntimeException('Неизвестная цель доставки в Baza: ' . $delivery->getTarget()),
         };
+    }
+
+    /**
+     * Субъект доставки (TicketResponse) для el/spisok: из сохранённого blob (несёт верные данные,
+     * в т.ч. для qr-билета), иначе fallback на getTicket (классический order_tickets-билет).
+     */
+    private function resolveTicket(
+        BazaDeliveryDto $delivery,
+        BazaDeliveryRepositoryInterface $repository,
+        TicketsRepositoryInterface $tickets,
+    ): TicketResponse {
+        $blob = $repository->getSubjectBlob($delivery->getId());
+        if ($blob !== null) {
+            /** @var TicketResponse $ticket */
+            $ticket = unserialize(base64_decode($blob));
+
+            return $ticket;
+        }
+
+        return $tickets->getTicket($delivery->getTicketId(), true);
     }
 
     /** Запись авто заказа-списка в Baza: пересобираем AutoDto по id и пишем через setInBazaAuto. */

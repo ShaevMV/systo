@@ -66,6 +66,9 @@ class BazaDeliveryDispatcherTest extends TestCase
         $this->assertNotEmpty($history);
         $this->assertSame('baza_queued', $history[0]->eventName);
 
+        // Готовый TicketResponse сохранён (job возьмёт его, не пересобирая через getTicket).
+        $this->assertNotNull(app(BazaDeliveryRepositoryInterface::class)->getSubjectBlob($id));
+
         Queue::assertPushed(DeliverTicketToBazaJob::class);
     }
 
