@@ -1,404 +1,86 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Базовый набор персонала-фикстуры (dev/staging + тесты).
+ *
+ * Это НЕ боевой список (боевой персонал заводится перед фестивалём из
+ * staff_users.php через tickets:crateUser, см. StaffUsersSeeder). Здесь —
+ * фиксированные id (тесты опираются на id=1 = admin, id=3 = обычный) с дев-паролем
+ * 'secret'.
+ *
+ * ИДЕМПОТЕНТЕН (TD-41): updateOrInsert по id → повторный прогон (force-seed на
+ * стенде) обновляет, а не падает с duplicate key. role здесь НЕ задаём — роли
+ * смены раздаёт демо-сидер стенда (StagingDemoSeeder), чтобы не ломать тесты,
+ * которые ждут id=3 без роли (= ticketer).
+ */
 class UsersTableSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     *
-     * @return void
+     * @var array<int, array{0:int, 1:string, 2:string, 3:bool}>
      */
+    private const USERS = [
+        [1, 'Admin Admin', 'admin@admin.ru', true],
+        [2, 'Митрофан', 'Mitrofan@spaceofjoy.ru', true],
+        [3, 'Юля Рахлина', 'YulyaRahlina@spaceofjoy.ru', false],
+        [4, 'Костя Ихти', 'KostyaIhti@spaceofjoy.ru', false],
+        [5, 'Женя Филиппова', 'ZhenyaFilippova@spaceofjoy.ru', false],
+        [6, 'Денис Арчи', 'DenisArchi@spaceofjoy.ru', false],
+        [7, 'Костя', 'Kostya@spaceofjoy.ru', false],
+        [8, 'Лера', 'Lera@spaceofjoy.ru', false],
+        [9, 'Инфоцентр 1', 'Infocentr1@spaceofjoy.ru', false],
+        [10, 'Арчи', 'Archi@spaceofjoy.ru', false],
+        [11, 'Головин', 'Golovin@spaceofjoy.ru', false],
+        [12, 'Ядя', 'Yadya@spaceofjoy.ru', false],
+        [13, 'Свят', 'Svyat@spaceofjoy.ru', false],
+        [14, 'Саша Свят', 'SashaSvyat@spaceofjoy.ru', false],
+        [15, 'Антон Тульский', 'AntonTulskij@spaceofjoy.ru', false],
+        [16, 'Катя Бут', 'KatyaBut@spaceofjoy.ru', false],
+        [17, 'Фауст', 'Faust@spaceofjoy.ru', false],
+        [18, 'Фауст Алена', 'FaustAlena@spaceofjoy.ru', false],
+        [19, 'Тома КПП', 'TomaKPP@spaceofjoy.ru', false],
+        [20, 'Егор', 'Egor@spaceofjoy.ru', false],
+        [21, 'Алиса Егор', 'AlisaEgor@spaceofjoy.ru', false],
+        [22, 'Света Мутабор', 'SvetaMutabor@spaceofjoy.ru', false],
+        [23, 'Катя Жарова', 'KatyaZharova@spaceofjoy.ru', false],
+        [24, 'Лукич', 'Lukich@spaceofjoy.ru', false],
+        [25, 'Гвалди', 'Gvaldi@spaceofjoy.ru', false],
+        [26, 'Саша Фауст', 'SashaFaust@spaceofjoy.ru', false],
+        [27, 'Настя АЛИСА', 'NastyaALISA@spaceofjoy.ru', false],
+        [28, 'Оля Ваня', 'OlyaVanya@spaceofjoy.ru', false],
+        [29, 'Ваня Оля', 'VanyaOlya@spaceofjoy.ru', false],
+        [30, 'Инфоцентр 2', 'Infocentr2@spaceofjoy.ru', false],
+        [31, 'Инфоцентр 3', 'Infocentr3@spaceofjoy.ru', false],
+        [32, 'Инфоцентр 4', 'Infocentr4@spaceofjoy.ru', false],
+        [33, 'Охрана 1', 'Ohrana1@spaceofjoy.ru', false],
+        [34, 'Охрана 2', 'Ohrana2@spaceofjoy.ru', false],
+        [35, 'Охрана 3', 'Ohrana3@spaceofjoy.ru', false],
+        [36, 'Охрана 4', 'Ohrana4@spaceofjoy.ru', false],
+    ];
+
     public function run(): void
     {
-        DB::table('users')->insert([
-            'id' => 1,
-            'name' => 'Admin Admin',
-            'email' => 'admin@admin.ru',
-            'is_admin' => true,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $now = now();
 
-        DB::table('users')->insert([
-            'id' => 2,
-            'name' => 'Митрофан',
-            'email' => 'Mitrofan@spaceofjoy.ru',
-            'is_admin' => true,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 3,
-            'name' => 'Юля Рахлина',
-            'email' => 'YulyaRahlina@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 4,
-            'name' => 'Костя Ихти',
-            'email' => 'KostyaIhti@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 5,
-            'name' => 'Женя Филиппова',
-            'email' => 'ZhenyaFilippova@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 6,
-            'name' => 'Денис Арчи',
-            'email' => 'DenisArchi@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 7,
-            'name' => 'Костя',
-            'email' => 'Kostya@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 8,
-            'name' => 'Лера',
-            'email' => 'Lera@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 9,
-            'name' => 'Инфоцентр 1',
-            'email' => 'Infocentr1@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 10,
-            'name' => 'Арчи',
-            'email' => 'Archi@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-
-        DB::table('users')->insert([
-            'id' => 11,
-            'name' => 'Головин',
-            'email' => 'Golovin@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 12,
-            'name' => 'Ядя',
-            'email' => 'Yadya@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 13,
-            'name' => 'Свят',
-            'email' => 'Svyat@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 14,
-            'name' => 'Саша Свят',
-            'email' => 'SashaSvyat@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 15,
-            'name' => 'Антон Тульский',
-            'email' => 'AntonTulskij@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 16,
-            'name' => 'Катя Бут',
-            'email' => 'KatyaBut@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 17,
-            'name' => 'Фауст',
-            'email' => 'Faust@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 18,
-            'name' => 'Фауст Алена',
-            'email' => 'FaustAlena@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 19,
-            'name' => 'Тома КПП',
-            'email' => 'TomaKPP@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 20,
-            'name' => 'Егор',
-            'email' => 'Egor@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-
-
-        DB::table('users')->insert([
-            'id' => 21,
-            'name' => 'Алиса Егор',
-            'email' => 'AlisaEgor@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 22,
-            'name' => 'Света Мутабор',
-            'email' => 'SvetaMutabor@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 23,
-            'name' => 'Катя Жарова',
-            'email' => 'KatyaZharova@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 24,
-            'name' => 'Лукич',
-            'email' => 'Lukich@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 25,
-            'name' => 'Гвалди',
-            'email' => 'Gvaldi@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 26,
-            'name' => 'Саша Фауст',
-            'email' => 'SashaFaust@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 27,
-            'name' => 'Настя АЛИСА',
-            'email' => 'NastyaALISA@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 28,
-            'name' => 'Оля Ваня',
-            'email' => 'OlyaVanya@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 29,
-            'name' => 'Ваня Оля',
-            'email' => 'VanyaOlya@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-
-        DB::table('users')->insert([
-            'id' => 30,
-            'name' => 'Инфоцентр 2',
-            'email' => 'Infocentr2@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        DB::table('users')->insert([
-            'id' => 31,
-            'name' => 'Инфоцентр 3',
-            'email' => 'Infocentr3@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 32,
-            'name' => 'Инфоцентр 4',
-            'email' => 'Infocentr4@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 33,
-            'name' => 'Охрана 1',
-            'email' => 'Ohrana1@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 34,
-            'name' => 'Охрана 2',
-            'email' => 'Ohrana2@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 35,
-            'name' => 'Охрана 3',
-            'email' => 'Ohrana3@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        DB::table('users')->insert([
-            'id' => 36,
-            'name' => 'Охрана 4',
-            'email' => 'Ohrana4@spaceofjoy.ru',
-            'is_admin' => false,
-            'email_verified_at' => now(),
-            'password' => Hash::make('secret'),
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        foreach (self::USERS as [$id, $name, $email, $isAdmin]) {
+            // updateOrInsert по id → идемпотентно (повторный прогон не падает на дубле)
+            DB::table('users')->updateOrInsert(
+                ['id' => $id],
+                [
+                    'name'              => $name,
+                    'email'             => $email,
+                    'is_admin'          => $isAdmin,
+                    'email_verified_at' => $now,
+                    'password'          => Hash::make('secret'),
+                    'updated_at'        => $now,
+                    'created_at'        => $now,
+                ]
+            );
+        }
     }
 }
