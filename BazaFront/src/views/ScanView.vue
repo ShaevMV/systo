@@ -10,6 +10,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { resolveScan, doEnter } from '@/services/scan';
 import { syncSnapshot } from '@/services/snapshotSync';
+import { syncBlacklist } from '@/services/blacklistSync';
 import { snapshotCount } from '@/db/snapshot';
 
 const video = ref(null);
@@ -159,9 +160,9 @@ onMounted(() => {
     window.addEventListener('offline', setOnline);
     refreshSnapCount();
 
-    // Синк снимка best-effort (облако-мастер): тянем дельту, не блокируя экран.
+    // Синк best-effort (облако-мастер): сперва blacklist (приоритет B6), затем снимок.
     if (online.value) {
-        syncSnapshot().then(refreshSnapCount);
+        syncBlacklist().then(() => syncSnapshot()).then(refreshSnapCount);
     }
 
     startCamera();

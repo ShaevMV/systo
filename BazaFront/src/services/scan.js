@@ -11,8 +11,10 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import { http } from '@/api/http';
 import { parseQrReference, humanType } from '@/lib/qr';
-import { getByUuid, getByKilter } from '@/db/snapshot';
+import { getByUuid, getByKilter, nameOf } from '@/db/snapshot';
+import { isBlacklisted } from '@/db/blacklist';
 import { enqueue, hasEnterIntent } from '@/db/queue';
+import { getKey } from '@/services/pin';
 
 function ticketKey(type, kilter) {
     return `${type}:${kilter}`;
@@ -35,15 +37,28 @@ function errorMessage(e, fallback) {
  * @param {{online: boolean}} ctx
  */
 export async function resolveScan(rawText, { online }) {
+    const ref = parseQrReference(rawText);
+
+    // B6 (приоритет): отозванный билет — красный, независимо от онлайн/офлайн.
+    if (ref && (await isBlacklisted(ref.kind === 'uuid' ? ref.id : null, ref.kind === 'number' ? ref.id : null))) {
+        return revoked();
+    }
+
     if (online) {
         return resolveOnline(rawText);
     }
-    return resolveOffline(parseQrReference(rawText));
+    return resolveOffline(ref);
 }
 
 async function resolveOnline(rawText) {
     try {
         const { data } = await http.post('/api/scan', { search: rawText });
+
+        // Локальный blacklist может опережать снимок — мгновенный красный по авторитетным uuid/kilter.
+        if (await isBlacklisted(data.uuid || null, data.kilter ?? null)) {
+            return { ...revoked(), online: true, ticket: cardFromOnline(data) };
+        }
+
         const entered = !!data.date_change;
         return {
             online: true,
@@ -79,6 +94,9 @@ async function resolveOffline(ref) {
         return verdict('red', 'Не найден', 'Нет в офлайн-снимке. Проверьте онлайн (снимок мог устареть).');
     }
 
+    // Имя в снимке может быть зашифровано (PR-6) — расшифровываем для карточки.
+    const card = cardFromOffline({ ...row, name: await nameOf(row, getKey()) });
+
     const key = ticketKey(row.type, row.kilter);
     if (await hasEnterIntent(key)) {
         return {
@@ -86,7 +104,7 @@ async function resolveOffline(ref) {
             color: 'red',
             title: 'Уже прошёл',
             reason: 'Впущен с этого устройства.',
-            ticket: cardFromOffline(row),
+            ticket: card,
             enterRef: null
         };
     }
@@ -96,7 +114,7 @@ async function resolveOffline(ref) {
         color: 'yellow', // офлайн = жёлтый: впуск возможен, но данные из снимка (реш. #16)
         title: 'Пропустить',
         reason: 'Данные из офлайн-снимка.',
-        ticket: cardFromOffline(row),
+        ticket: card,
         enterRef: { type: row.type, id: row.kilter, key }
     };
 }
@@ -158,4 +176,9 @@ function cardFromOffline(row) {
 
 function verdict(color, title, reason) {
     return { online: false, color, title, reason, ticket: null, enterRef: null };
+}
+
+/** Отозванный билет (B6) — красный, впуск запрещён. */
+function revoked() {
+    return { online: false, color: 'red', title: 'Отозван', reason: 'Билет отозван (возврат/отмена).', ticket: null, enterRef: null };
 }

@@ -10,6 +10,7 @@ use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
 use Baza\EntryOutbox\Applications\EntryOutboxApplication;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Scan\SearchEngine;
+use Baza\Tickets\Repositories\BlacklistRepositoryInterface;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class ScanController extends Controller
         private GetCurrentChanges $getCurrentChanges,
         private AddTicketsInReport $addTicketsInReport,
         private EntryOutboxApplication $entryOutbox,
+        private BlacklistRepositoryInterface $blacklist,
     ) {}
 
     public function search(Request $request): JsonResponse
@@ -56,6 +58,11 @@ class ScanController extends Controller
     public function enter(Request $request): JsonResponse
     {
         try {
+            // B6: отозванный билет не пускаем даже онлайн (defense-in-depth к клиентскому blacklist).
+            if ($this->blacklist->isRevoked(null, (int) $request->get('id'))) {
+                throw new DomainException('Билет отозван');
+            }
+
             $changeId = $this->getCurrentChanges->getId((int) \Auth::id());
 
             $this->enterTicket->skip(

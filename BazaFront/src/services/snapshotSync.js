@@ -8,6 +8,7 @@
 import { http } from '@/api/http';
 import { putSnapshotBatch } from '@/db/snapshot';
 import { getMeta, setMeta } from '@/db/index';
+import { getKey } from '@/services/pin';
 
 const KEY_SINCE = 'snapshot_since'; // server_time последнего успешного синка (граница дельты)
 const PAGE_LIMIT = 500;
@@ -52,7 +53,7 @@ export async function syncSnapshot({ festivalId = null } = {}) {
                 watermark = data.server_time || null;
             }
 
-            added += await putSnapshotBatch(data.items || []);
+            added += await putSnapshotBatch(data.items || [], getKey());
             afterId = Number.isFinite(data.next_after_id) ? data.next_after_id : afterId;
 
             if (!data.has_more) {

@@ -8,6 +8,7 @@
 import { http } from '@/api/http';
 import { humanType } from '@/lib/qr';
 import { searchSnapshot } from '@/db/snapshot';
+import { getKey } from '@/services/pin';
 
 /**
  * @typedef {{type: string, kilter: (number|null), name: string, typeTicket: string,
@@ -57,7 +58,7 @@ async function searchOnline(q) {
 }
 
 async function searchOffline(q) {
-    const rows = await searchSnapshot(q);
+    const rows = await searchSnapshot(q, getKey());
     return rows.map((r) => normalize(r, r.type, false));
 }
 

@@ -7,16 +7,17 @@
 //   - `snapshot` — минимизированный офлайн-снимок билетов (B5): уникальный ключ uuid,
 //                  индекс по kilter (номер) для сверки по номеру/парковке.
 //
-//  Версия БД поднята до 2 в PR-4 (добавлен store `snapshot`). Апгрейд идемпотентный.
+//  Версия БД: 2 — store `snapshot` (PR-4); 3 — store `blacklist` (PR-6). Апгрейд идемпотентный.
 // ─────────────────────────────────────────────────────────────────────────────
 import { openDB } from 'idb';
 
 const DB_NAME = 'baza-pwa';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const STORE_QUEUE = 'queue';
 export const STORE_META = 'meta';
 export const STORE_SNAPSHOT = 'snapshot';
+export const STORE_BLACKLIST = 'blacklist';
 
 let dbPromise = null;
 
@@ -45,6 +46,11 @@ export function db() {
                     const snap = database.createObjectStore(STORE_SNAPSHOT, { keyPath: 'uuid' });
                     // Сверка по номеру (kilter) — для парковки и поиска по номеру.
                     snap.createIndex('kilter', 'kilter');
+                }
+                if (!database.objectStoreNames.contains(STORE_BLACKLIST)) {
+                    // Чёрный список отозванных (B6): ключ = uuid (или 'k:'+kilter), индекс по kilter.
+                    const bl = database.createObjectStore(STORE_BLACKLIST, { keyPath: 'key' });
+                    bl.createIndex('kilter', 'kilter');
                 }
             }
         });

@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function () {
     // JSON-поиск без QR для PWA (Ф5, PR-5). GET → CSRF не требуется. Тот же SearchService,
     // что Blade /search; содержит ПДн → только сотруднику КПП.
     Route::get('/api/search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('tickets.search.api');
+
+    // Синк чёрного списка отозванных билетов (Ф5, PR-6, B6). GET → CSRF не требуется.
+    Route::get('/api/blacklist', [\App\Http\Controllers\Api\BlacklistController::class, 'index'])->name('tickets.blacklist');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
