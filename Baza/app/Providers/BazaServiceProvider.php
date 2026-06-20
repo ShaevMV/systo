@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use Baza\Changes\Repositories\ChangesRepositoryInterface;
 use Baza\Changes\Repositories\InMemoryMySqlChangesRepository;
+use Baza\EntryOutbox\Repositories\EntryOutboxRepositoryInterface;
+use Baza\EntryOutbox\Repositories\InMemoryMySqlEntryOutboxRepository;
 use Baza\Ingest\Repositories\IngestRepositoryInterface;
 use Baza\Ingest\Repositories\InMemoryMySqlIngestRepository;
 use Baza\Permission\Repositories\InMemoryMySqlRolePermissionRepository;
@@ -43,5 +45,6 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(SyncRepositoryInterface::class, InMemoryMySqlSyncRepository::class);
         $this->app->bind(RolePermissionRepositoryInterface::class, InMemoryMySqlRolePermissionRepository::class);
         $this->app->bind(IngestRepositoryInterface::class, InMemoryMySqlIngestRepository::class);
+        $this->app->bind(EntryOutboxRepositoryInterface::class, InMemoryMySqlEntryOutboxRepository::class);
     }
 }
