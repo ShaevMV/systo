@@ -125,6 +125,30 @@ jobs:
         working-directory: FrontEnd
         run: npm run build
 
+  # BazaFront — offline-first PWA входа КПП (Ф5). Собираем в CI ЗАРАНЕЕ (урок TD-32:
+  # AdminFront не собирался в CI → регрессии ловились только на деплое). Для входного
+  # приложения это недопустимо. Сборка под --base=/baza/ (как раздаёт nginx-staging).
+  build-baza-front:
+    name: Build BazaFront (PWA)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: BazaFront/package-lock.json
+
+      - name: Install dependencies
+        working-directory: BazaFront
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        working-directory: BazaFront
+        run: npm run build -- --base=/baza/
+
   # ─────────────── Аудит безопасности ───────────────
 
   audit:

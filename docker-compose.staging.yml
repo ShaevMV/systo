@@ -39,6 +39,7 @@ services:
       - ./Backend:/var/www/org
       - ./FrontEnd:/var/www/app
       - ./AdminFront:/var/www/admin
+      - ./BazaFront:/var/www/baza
       - ./Shared:/var/www/Shared
       - ./Baza:/var/www/vhod
     networks:
@@ -131,6 +132,26 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_API_URL=https://api.staging.spaceofjoy.ru/
+    restart: unless-stopped
+
+  # ═══ BAZA FRONTEND (offline-first PWA входа КПП, Ф5, на /baza/) ═════════════
+  # Build: `docker compose run --rm node-baza-staging sh -c "npm ci --include=dev
+  # && npm run build -- --base=/baza/"` — в workflow перед `up -d`. dist раздаётся
+  # nginx-staging по location /baza/ (см. default.staging.conf). API = сама Baza
+  # (vhod.*), auth по session-куке (не JWT). VITE_API_URL Vite читает при сборке.
+  node-baza-staging:
+    build:
+      context: ./Docker/node
+    container_name: node-baza-staging
+    working_dir: /var/www/baza
+    volumes:
+      - ./BazaFront:/var/www/baza
+    command: tail -f /dev/null
+    networks:
+      - staging
+    environment:
+      - NODE_ENV=production
+      - VITE_API_URL=https://vhod.staging.spaceofjoy.ru/
     restart: unless-stopped
 
   # ═══ MYSQL 8 (internal, persistent volume) ═════════════════════════════════
