@@ -431,6 +431,7 @@ class Questionnaire extends AggregateRoot {
 - Новые `event_name` для `aggregate_type = 'qr_order'` (шаги пайплайна выдачи, `'step_' . $step->name()`, payload `{status: ok|fail, error?}`): `step_create_tickets`, `step_send_order_email`, `step_push_to_baza`, `step_send_telegram`, `step_create_live_tickets`, `step_link_live`, `step_send_list_email`, `step_send_live_email`.
 - `aggregate_type = 'festival'` (AF-7, модуль `Festival`) — журнал каталога фестивалей: `festival_created` (payload `{name, year, active}`), `festival_edited` (payload `{changed: [...]}` — изменившиеся поля), `festival_deleted`. `actor_type = user` (`actor_id = Auth::id()`). Отдаётся `GET /api/v1/festival/getHistory/{id}` (admin).
 - `aggregate_type = 'questionnaire'` (модуль `Questionnaire`) — факт одобрения анкеты: `questionnaire_approved` (payload без ПДн — `{order_id?, ticket_id?, questionnaire_type_id?}`, через `QuestionnaireApprovedEvent`). Пишется при `toApprove()` с `actor_type = user`, `actor_id = Auth::id()` администратора, выполнившего одобрение.
+- `aggregate_type = 'ticket'` (Ф4, модуль `BazaWebhook`) — факт прохода билета через КПП: `ticket_entered` (payload без ПДн — `{event_id, target, kilter, change_id, entered_at, wristband_qr?}`, через `BazaTicketEnteredEvent`). `aggregate_id = uuid билета`. Пишется при приёме вебхука `POST /api/v1/baza/ticketEntered` от Baza с `actor_type = baza`, `actor_id = null`. Идемпотентно по `event_id` (id строки `baza_entry_outbox` в Baza).
 
 ### QrOrder Module
 

@@ -75,5 +75,7 @@ class Kernel extends HttpKernel
         'abilities' => \Laravel\Sanctum\Http\Middleware\CheckAbilities::class,
         // Аутентификация канала приёма заказов от витрины qr (заголовок X-QR-Token).
         'qr.ingest' => \App\Http\Middleware\QrIngestAuth::class,
+        // Аутентификация канала приёма вебхука «билет прошёл» от Baza (Ф4, заголовок X-Baza-Token).
+        'baza.webhook' => \App\Http\Middleware\BazaWebhookAuth::class,
     ];
 }

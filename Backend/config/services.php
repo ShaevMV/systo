@@ -57,4 +57,14 @@ return [
         'token' => env('BAZA_INGEST_TOKEN'),
     ],
 
+    // ВХОДЯЩИЙ S2S-канал приёма вебхука «билет прошёл» от Baza (Ф4, заголовок X-Baza-Token).
+    // Список валидных ключей (через запятую). Зеркало qr_ingest. Отдельный от исходящего
+    // baza_ingest (org→Baza). Пустой список → канал закрыт (безопасный дефолт).
+    'baza_webhook' => [
+        'tokens' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('BAZA_WEBHOOK_TOKENS', '')),
+        ))),
+    ],
+
 ];
