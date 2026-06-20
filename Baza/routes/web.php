@@ -62,6 +62,10 @@ Route::middleware('auth')->group(function () {
     // Офлайн-снимок билетов для PWA-сканера (Ф5, PR-3). GET → CSRF не требуется.
     // Сессионная auth: снимок содержит ФИО гостей, отдаём только сотруднику КПП.
     Route::get('/api/snapshot', [\App\Http\Controllers\Api\SnapshotController::class, 'index'])->name('tickets.snapshot');
+
+    // JSON-поиск без QR для PWA (Ф5, PR-5). GET → CSRF не требуется. Тот же SearchService,
+    // что Blade /search; содержит ПДн → только сотруднику КПП.
+    Route::get('/api/search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('tickets.search.api');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.

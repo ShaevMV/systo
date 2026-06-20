@@ -46,6 +46,34 @@ export async function getByKilter(kilter) {
     return database.getFromIndex(STORE_SNAPSHOT, 'kilter', n);
 }
 
+/**
+ * Офлайн-поиск по снимку (Ф5, PR-5). B5: в снимке только имя + номер, поэтому ищем
+ * по ним (телефон/телега/госномер офлайн недоступны — только онлайн /api/search).
+ * @param {string} q
+ * @param {number} [limit=50]
+ */
+export async function searchSnapshot(q, limit = 50) {
+    const term = String(q || '').trim().toLowerCase();
+    if (term === '') {
+        return [];
+    }
+    const num = Number(term);
+    const database = await db();
+    const all = await database.getAll(STORE_SNAPSHOT);
+    const out = [];
+    for (const r of all) {
+        const byName = r.name && r.name.toLowerCase().includes(term);
+        const byKilter = Number.isFinite(num) && r.kilter === num;
+        if (byName || byKilter) {
+            out.push(r);
+            if (out.length >= limit) {
+                break;
+            }
+        }
+    }
+    return out;
+}
+
 /** Сколько билетов в офлайн-снимке (для индикатора готовности офлайна). */
 export async function snapshotCount() {
     const database = await db();
