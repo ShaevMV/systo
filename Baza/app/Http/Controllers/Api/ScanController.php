@@ -7,24 +7,24 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Baza\Changes\Applications\AddTicketsInReport\AddTicketsInReport;
 use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
+use Baza\EntryOutbox\Applications\EntryOutboxApplication;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Scan\SearchEngine;
 use DomainException;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Throwable;
 
 class ScanController extends Controller
 {
     public function __construct(
-        private SearchEngine       $searchEngine,
-        private EnterTicket        $enterTicket,
-        private GetCurrentChanges  $getCurrentChanges,
+        private SearchEngine $searchEngine,
+        private EnterTicket $enterTicket,
+        private GetCurrentChanges $getCurrentChanges,
         private AddTicketsInReport $addTicketsInReport,
-    )
-    {
-    }
+        private EntryOutboxApplication $entryOutbox,
+    ) {}
 
     public function search(Request $request): JsonResponse
     {
@@ -60,11 +60,14 @@ class ScanController extends Controller
 
             $this->enterTicket->skip(
                 $request->get('type'),
-                (int)$request->get('id'),
+                (int) $request->get('id'),
                 $changeId,
             );
 
             $this->addTicketsInReport->increment($changeId, $request->get('type'));
+
+            // Ф4: фиксируем факт входа в outbox для вебхука Baza→org (best-effort, впуск не падает).
+            $this->entryOutbox->record($request->get('type'), (int) $request->get('id'), $changeId);
 
             return response()->json('OK');
         } catch (Throwable $e) {

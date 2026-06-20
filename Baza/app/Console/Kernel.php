@@ -15,7 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        // Дренаж буфера вебхука «билет прошёл» Baza→org (Ф4). Канал выключен (нет
+        // ORG_WEBHOOK_URL/TOKEN) → команда ничего не шлёт. Требует запущенного `schedule:run`
+        // (cron/supervisord) на ноутбуке КПП — см. infra-следствие в плане Ф4.
+        $schedule->command('baza:drain-entry-outbox')->everyMinute()->withoutOverlapping();
     }
 
     /**
