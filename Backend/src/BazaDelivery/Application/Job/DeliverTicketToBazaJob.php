@@ -145,15 +145,18 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         AutoRepositoryInterface $autos,
         BazaIngestClient $client,
     ): bool {
+        // Богатые поля гостя для поискового индекса Baza (ticket_search) — если org их приложил.
+        $search = $this->resolveSearch($delivery, $repository);
+
         switch ($delivery->getTarget()) {
             case 'el_tickets':
                 $ticket = $this->resolveTicket($delivery, $repository, $tickets);
 
-                return $this->ingestOrDirect($client, 'el_tickets', $ticket->toArrayForBaza(), fn () => $tickets->setInBaza($ticket));
+                return $this->ingestOrDirect($client, 'el_tickets', $ticket->toArrayForBaza(), $search, fn () => $tickets->setInBaza($ticket));
             case 'spisok_tickets':
                 $ticket = $this->resolveTicket($delivery, $repository, $tickets);
 
-                return $this->ingestOrDirect($client, 'spisok_tickets', $ticket->toArrayForSpisok(), fn () => $tickets->setInBazaList($ticket));
+                return $this->ingestOrDirect($client, 'spisok_tickets', $ticket->toArrayForSpisok(), $search, fn () => $tickets->setInBazaList($ticket));
             case 'live_tickets':
                 $number = (int) $delivery->getNumber();
                 $ticketId = $delivery->getTicketId();
@@ -162,10 +165,11 @@ final class DeliverTicketToBazaJob implements ShouldQueue
                     $client,
                     'live_tickets',
                     ['kilter' => $number, 'el_ticket_id' => $ticketId?->value()],
+                    $search,
                     fn () => $tickets->setInBazaLive($number, $ticketId),
                 );
             case 'auto':
-                return $this->deliverAuto($delivery, $autos, $client);
+                return $this->deliverAuto($delivery, $autos, $client, $search);
             default:
                 throw new RuntimeException('Неизвестная цель доставки в Baza: '.$delivery->getTarget());
         }
@@ -178,15 +182,33 @@ final class DeliverTicketToBazaJob implements ShouldQueue
      * напр. нет live-номера) / null (канал выключен или ошибка транспорта) → прямая запись.
      *
      * @param  array<string, mixed>  $payload
+     * @param  array<string, mixed>  $search  богатые поля для ticket_search (пусто → fallback на ticket в Baza)
      * @param  callable(): bool  $direct
      */
-    private function ingestOrDirect(BazaIngestClient $client, string $target, array $payload, callable $direct): bool
+    private function ingestOrDirect(BazaIngestClient $client, string $target, array $payload, array $search, callable $direct): bool
     {
-        if ($client->send($target, $payload) === true) {
+        if ($client->send($target, $payload, $search) === true) {
             return true;
         }
 
         return (bool) $direct();
+    }
+
+    /**
+     * Богатые поля гостя из search_blob (base64-json), приложенные org-доставкой. Пусто → [].
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveSearch(BazaDeliveryDto $delivery, BazaDeliveryRepositoryInterface $repository): array
+    {
+        $blob = $repository->getSearchBlob($delivery->getId());
+        if ($blob === null || $blob === '') {
+            return [];
+        }
+
+        $decoded = json_decode((string) base64_decode($blob), true);
+
+        return is_array($decoded) ? $decoded : [];
     }
 
     /**
@@ -209,8 +231,12 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         return $tickets->getTicket($delivery->getTicketId(), true);
     }
 
-    /** Запись авто заказа-списка в Baza: пересобираем AutoDto по id, ingest-API → fallback setInBazaAuto. */
-    private function deliverAuto(BazaDeliveryDto $delivery, AutoRepositoryInterface $autos, BazaIngestClient $client): bool
+    /**
+     * Запись авто заказа-списка в Baza: пересобираем AutoDto по id, ingest-API → fallback setInBazaAuto.
+     *
+     * @param  array<string, mixed>  $search
+     */
+    private function deliverAuto(BazaDeliveryDto $delivery, AutoRepositoryInterface $autos, BazaIngestClient $client, array $search): bool
     {
         $auto = $autos->getById($delivery->getTicketId());
         if ($auto === null) {
@@ -230,6 +256,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
             $client,
             'auto',
             $payload,
+            $search,
             fn () => $autos->setInBazaAuto($auto, $festivalId !== null ? new Uuid($festivalId) : null),
         );
     }

@@ -20,13 +20,17 @@ interface BazaDeliveryRepositoryInterface
     /**
      * Создать запись доставки (status=queued). Одна строка на (ticket_id, target) — UNIQUE.
      * $subjectBlob = base64(serialize(TicketResponse)) для el/spisok (для записи в Baza/повтора).
+     * $searchBlob = base64(json) богатых полей гостя для поискового индекса Baza (ticket_search).
      */
-    public function create(BazaDeliveryDto $dto, ?string $subjectBlob = null): bool;
+    public function create(BazaDeliveryDto $dto, ?string $subjectBlob = null, ?string $searchBlob = null): bool;
 
     public function findById(Uuid $id): ?BazaDeliveryDto;
 
     /** Сериализованный субъект доставки (TicketResponse) для el/spisok, или null. */
     public function getSubjectBlob(Uuid $id): ?string;
+
+    /** base64(json) богатых полей гостя для ingest-блока `search` (ticket_search), или null. */
+    public function getSearchBlob(Uuid $id): ?string;
 
     /** Текущая доставка по (билет, цель) — для идемпотентного диспатча (создать/повторить). */
     public function findByTicketTarget(Uuid $ticketId, string $target): ?BazaDeliveryDto;

@@ -28,8 +28,10 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property Carbon|null $delivered_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
+ *
  * @method static Builder|BazaDeliveryModel query()
  * @method static Builder|BazaDeliveryModel whereId($value)
+ *
  * @mixin Eloquent
  */
 class BazaDeliveryModel extends Model
@@ -54,6 +56,7 @@ class BazaDeliveryModel extends Model
         'festival_id',
         'source',
         'subject_blob',
+        'search_blob',
         'delivered_at',
     ];
 
