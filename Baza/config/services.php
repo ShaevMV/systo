@@ -31,4 +31,18 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Baza Ingest (S2S-приём билетов от org, Ф3)
+    |--------------------------------------------------------------------------
+    | Список валидных ключей (через запятую) для заголовка X-Baza-Token.
+    | Зеркало org services.qr_ingest. Пустой список → канал закрыт (безопасный дефолт).
+    */
+    'baza_ingest' => [
+        'tokens' => array_values(array_filter(array_map(
+            'trim',
+            explode(',', (string) env('BAZA_INGEST_TOKENS', '')),
+        ))),
+    ],
+
 ];
