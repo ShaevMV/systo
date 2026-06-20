@@ -408,40 +408,69 @@ jobs:
         run: |
           MODE="$SEED_MODE"
 
-          # auto → детектим состояние и выбираем skip / force-через-seed
-          if [[ "$MODE" == "auto" ]]; then
-            COUNT=$(docker compose -f docker-compose.staging.yml --env-file .env.staging \
-              exec -T mysql-staging \
-              sh -c 'mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -N -e "SELECT COUNT(*) FROM systo.festivals;" 2>/dev/null' \
-              | tr -d '\r\n ' || echo "")
+          # Хелперы запуска сидов — Backend (php-staging) и Baza (phpbaza-staging) РАЗДЕЛЬНО.
+          # Baza db:seed создаёт пользователей (admin@admin.ru / secret) + матрицу прав + демо —
+          # без него вход на vhod.staging невозможен (таблица baza.users пуста).
+          seed_backend() {
+            echo "::notice::Backend db:seed"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging \
+              exec -T php-staging php artisan db:seed --force --no-interaction
+          }
+          seed_baza() {
+            echo "::notice::Baza db:seed (пользователи + матрица прав + демо для входа/поиска)"
+            docker compose -f docker-compose.staging.yml --env-file .env.staging \
+              exec -T phpbaza-staging php artisan db:seed --force --no-interaction
+          }
 
-            if [[ "$COUNT" == "0" ]]; then
-              echo "::notice::auto: БД свежая (festivals=0) — запускаю db:seed"
-              MODE="force"
-            elif [[ -z "$COUNT" ]]; then
-              echo "::warning::auto: не удалось определить состояние БД (mysql exec упал) — сиды пропускаю"
-              MODE="skip"
-            else
-              echo "✓ auto: БД содержит данные (festivals=$COUNT) — сиды пропускаю. Для пересборки → workflow_dispatch seed=fresh"
-              MODE="skip"
-            fi
-          fi
+          # COUNT строк таблицы (или "" если mysql exec упал).
+          db_count() {
+            docker compose -f docker-compose.staging.yml --env-file .env.staging \
+              exec -T mysql-staging \
+              sh -c "mysql -uroot -p\"\$MYSQL_ROOT_PASSWORD\" -N -e \"$1\" 2>/dev/null" \
+              | tr -d '\r\n ' || echo ""
+          }
 
           case "$MODE" in
             skip)
               echo "✓ Сиды пропущены (mode=skip)"
               ;;
             force)
-              echo "::notice::Запускаю db:seed"
-              docker compose -f docker-compose.staging.yml --env-file .env.staging \
-                exec -T php-staging \
-                php artisan db:seed --force --no-interaction
+              echo "::notice::force: db:seed для Backend и Baza"
+              seed_backend
+              seed_baza
               ;;
             fresh)
-              echo "::warning::Запускаю migrate:fresh --seed — DROP всех таблиц systo и пересборка с нуля"
+              echo "::warning::fresh: migrate:fresh --seed — DROP всех таблиц systo И baza, пересборка с нуля"
               docker compose -f docker-compose.staging.yml --env-file .env.staging \
-                exec -T php-staging \
-                php artisan migrate:fresh --seed --force --no-interaction
+                exec -T php-staging     php artisan migrate:fresh --seed --force --no-interaction
+              docker compose -f docker-compose.staging.yml --env-file .env.staging \
+                exec -T phpbaza-staging php artisan migrate:fresh --seed --force --no-interaction
+              ;;
+            auto)
+              # auto = «если база пустая — прогнать сиды». Backend и Baza проверяем НЕЗАВИСИМО:
+              # у них разные БД (systo / baza), одна может быть засеяна, а другая пустой.
+
+              # Backend: сид при пустой systo.festivals.
+              BCOUNT=$(db_count "SELECT COUNT(*) FROM systo.festivals;")
+              if [[ "$BCOUNT" == "0" ]]; then
+                echo "::notice::auto: Backend свежий (festivals=0) — сидирую"
+                seed_backend
+              elif [[ -z "$BCOUNT" ]]; then
+                echo "::warning::auto: состояние Backend не определить (mysql exec упал) — Backend-сиды пропускаю"
+              else
+                echo "✓ auto: Backend содержит данные (festivals=$BCOUNT) — пропускаю"
+              fi
+
+              # Baza: сид при пустой baza.users (нужно для входа на vhod).
+              ZCOUNT=$(db_count "SELECT COUNT(*) FROM baza.users;")
+              if [[ "$ZCOUNT" == "0" ]]; then
+                echo "::notice::auto: Baza свежая (users=0) — сидирую (логин admin@admin.ru / secret)"
+                seed_baza
+              elif [[ -z "$ZCOUNT" ]]; then
+                echo "::warning::auto: состояние Baza не определить (mysql exec упал) — Baza-сиды пропускаю"
+              else
+                echo "✓ auto: Baza содержит данные (users=$ZCOUNT) — пропускаю"
+              fi
               ;;
             *)
               echo "::error::Неизвестный режим сидеров: $MODE"

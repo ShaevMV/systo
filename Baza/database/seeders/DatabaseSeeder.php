@@ -1,15 +1,13 @@
 <?php
+
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
     public function run(): void
     {
@@ -22,6 +20,9 @@ class DatabaseSeeder extends Seeder
             // Демо стенда (TD-41): раздаёт разные роли смены + открывает демо-смену,
             // чтобы Ф2 (роли/RBAC) было видно вживую. Идемпотентно.
             StagingDemoSeeder::class,
+            // Демо стенда: поисковый индекс ticket_search (поиск без QR) — чтобы поиск по
+            // ФИО/телефону/госномеру/имени ребёнка было видно вживую. Идемпотентно.
+            TicketSearchTestDataSeeder::class,
         ]);
     }
 }
