@@ -34,11 +34,15 @@ interface TicketSearchRepositoryInterface
      * Порция офлайн-снимка билетов фестиваля (Ф5, PR-3) — для IndexedDB телефона.
      *
      * Минимизация ПДн (B5): возвращаются только поля впуска (uuid/kilter/тип/цвет/имя).
-     * Пагинация по `id` (`afterId` — курсор, exclusive). Дельта по `since` (updated_at >=,
-     * null = полный снимок). На клиенте дедуп по uuid (порции могут перекрываться).
+     *
+     * Две оси курсора (клиент НЕ смешивает их в одном проходе):
+     *  - **Полный снимок** (первый раз): `since = null`, пагинация по `id` (`afterId` растёт
+     *    от 0 порциями, пока `has_more`).
+     *  - **Дельта** (инкремент): `since = server_time предыдущего синка`, `afterId = 0` —
+     *    забираем всё изменённое с момента since (updated_at >=). Дедуп по uuid на клиенте.
      *
      * @param  string|null  $festivalId  null → текущий фестиваль по умолчанию
-     * @param  string|null  $since        ISO/datetime: только изменённые с этого момента
+     * @param  string|null  $since        datetime в TZ приложения: только изменённые с этого момента
      * @param  int  $afterId  курсор по id (брать строки с id > afterId)
      * @param  int  $limit  размер порции (зажимается к безопасному максимуму)
      */

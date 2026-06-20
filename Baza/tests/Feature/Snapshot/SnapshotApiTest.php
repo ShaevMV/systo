@@ -138,4 +138,48 @@ class SnapshotApiTest extends TestCase
             ->assertOk()
             ->assertJson(['success' => true]);
     }
+
+    public function test_bad_numeric_params_do_not_500(): void
+    {
+        $this->makeRow('e0000002-0000-4000-8000-000000000002', 1);
+
+        // Нечисловой/отрицательный after_id и limit не должны валить 500.
+        $this->actingAs(User::find(1))->getJson(self::URL.'?after_id=abc&limit=-5')
+            ->assertOk()
+            ->assertJson(['success' => true]);
+    }
+
+    public function test_limit_is_capped(): void
+    {
+        $this->makeRow('e0000003-0000-4000-8000-000000000003', 1);
+
+        // Запрос огромного limit не падает и не отдаёт сверх потолка (всего 1 строка → count=1).
+        $res = $this->actingAs(User::find(1))->getJson(self::URL.'?limit=99999')->assertOk();
+        self::assertSame(1, $res->json('count'));
+        self::assertFalse($res->json('has_more'));
+    }
+
+    public function test_empty_result(): void
+    {
+        // Нет билетов нужного фестиваля → пустой снимок, курсор = переданный after_id, has_more=false.
+        $res = $this->actingAs(User::find(1))->getJson(self::URL.'?after_id=10')->assertOk();
+        self::assertSame(0, $res->json('count'));
+        self::assertSame(10, $res->json('next_after_id'));
+        self::assertFalse($res->json('has_more'));
+    }
+
+    public function test_payload_and_pii_columns_not_leaked(): void
+    {
+        $this->makeRow('e0000004-0000-4000-8000-000000000004', 5, 'electron', [
+            'car_number' => 'А123АА777',
+            'child_name' => 'Ребёнок Тест',
+            'parent_phone' => '+79990000000',
+        ]);
+
+        $item = $this->actingAs(User::find(1))->getJson(self::URL)->assertOk()->json('items.0');
+
+        foreach (['payload', 'phone', 'email', 'telegram', 'car_number', 'child_name', 'parent_phone', 'city'] as $forbidden) {
+            self::assertArrayNotHasKey($forbidden, $item, "Поле {$forbidden} не должно утекать в снимок (B5)");
+        }
+    }
 }

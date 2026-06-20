@@ -10,6 +10,7 @@ use Baza\Tickets\Applications\Snapshot\SnapshotApplication;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -52,14 +53,23 @@ class SnapshotController extends Controller
                 'server_time' => $serverTime,
             ] + $page->toArray());
         } catch (Throwable $e) {
+            // Сырой текст исключения наружу не отдаём (детали — в лог), обобщённое сообщение клиенту.
+            Log::error('snapshot failed', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => 'Не удалось получить снимок',
             ], 500);
         }
     }
 
-    /** Кривой/пустой since → null (полный снимок), а не 500. */
+    /**
+     * Кривой/пустой since → null (полный снимок), а не 500.
+     *
+     * Нормализуем к таймзоне приложения (Europe/Moscow): updated_at в БД хранится в ней,
+     * поэтому `...Z`/иной офсет от клиента приводим к московскому wall-clock — иначе окно
+     * дельты сместилось бы на офсет и могло пропустить изменения.
+     */
     private function normalizeSince(mixed $since): ?string
     {
         if (! is_string($since) || trim($since) === '') {
@@ -67,7 +77,7 @@ class SnapshotController extends Controller
         }
 
         try {
-            return Carbon::parse($since)->toDateTimeString();
+            return Carbon::parse($since)->setTimezone(config('app.timezone'))->toDateTimeString();
         } catch (Throwable) {
             return null;
         }
