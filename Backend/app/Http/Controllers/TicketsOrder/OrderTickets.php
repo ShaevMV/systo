@@ -519,7 +519,7 @@ class OrderTickets extends Controller
         $orderUuid = new Uuid($id);
         $number    = (string) $request->input('number', '');
 
-        if (! $this->canManageAutoOf($orderUuid)) {
+        if (! $this->canManageOrderOf($orderUuid)) {
             return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
         }
 
@@ -538,7 +538,7 @@ class OrderTickets extends Controller
     {
         $orderUuid = new Uuid($id);
 
-        if (! $this->canManageAutoOf($orderUuid)) {
+        if (! $this->canManageOrderOf($orderUuid)) {
             return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
         }
 
@@ -552,8 +552,17 @@ class OrderTickets extends Controller
 
     public function removeTicket(string $orderId, string $ticketId): JsonResponse
     {
+        $orderUuid = new Uuid($orderId);
+
+        // Защита от IDOR: удалять билет может только admin или куратор-создатель
+        // заказа (curator_id == auth_id). Иначе любой залогиненный куратор мог бы
+        // удалить билет из ЧУЖОГО заказа по UUID (TD-28).
+        if (! $this->canManageOrderOf($orderUuid)) {
+            return response()->json(['success' => false, 'message' => 'Нет доступа'], 403);
+        }
+
         $this->changeTicket->remove(
-            new Uuid($orderId),
+            $orderUuid,
             new Uuid($ticketId),
             Auth::id(),
         );
@@ -564,20 +573,23 @@ class OrderTickets extends Controller
     }
 
     /**
-     * Право на управление авто заказа: admin или куратор-создатель.
+     * Право на управление заказом: admin или куратор-создатель (curator_id == auth_id).
      */
-    private function canManageAutoOf(Uuid $orderUuid): bool
+    private function canManageOrderOf(Uuid $orderUuid): bool
     {
         /** @var User $user */
         $user   = Auth::user();
         $authId = Auth::id();
+        // Auth::id() в проекте возвращает Uuid-VO → приводим к строке: иначе сравнение
+        // с curator_id (string) всегда false и владелец-куратор получал бы 403.
+        $authIdStr = $authId instanceof Uuid ? $authId->value() : (string) $authId;
 
         if ($user->role === AccountRoleHelper::admin) {
             return true;
         }
 
         $orderItem = $this->getOrder->getItemById($orderUuid);
-        return $orderItem !== null && $orderItem->getCuratorId() === $authId;
+        return $orderItem !== null && $orderItem->getCuratorId() === $authIdStr;
     }
 
     /**
@@ -770,7 +782,10 @@ class OrderTickets extends Controller
         $authUser = Auth::user();
         if ($authUser->role === AccountRoleHelper::curator || $authUser->role === AccountRoleHelper::pusher_curator) {
             $orderItem = $this->getOrder->getItemById($orderUuid);
-            if ($orderItem === null || $orderItem->getCuratorId() !== Auth::id()) {
+            // Auth::id() — Uuid-VO; нормализуем к строке (иначе !== с curator_id всегда true → куратор заблокирован в своём заказе).
+            $authId    = Auth::id();
+            $authIdStr = $authId instanceof Uuid ? $authId->value() : (string) $authId;
+            if ($orderItem === null || $orderItem->getCuratorId() !== $authIdStr) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Нет доступа к этому заказу',
