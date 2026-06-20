@@ -9,11 +9,15 @@ use Baza\Tickets\Applications\Scan\TicketResponseInterface;
 
 class SearchResponse implements TicketResponseInterface
 {
+    /** Ключ группы богатого поиска (ticket_search) в результате. */
+    public const TICKET_SEARCH = 'ticket_search';
+
     /**
-     * @param SpisokTicketResponse[] $spisok
-     * @param ElTicketResponse[] $electron
-     * @param FriendlyTicketResponse[] $drug
-     * @param LiveTicketResponse[] $live
+     * @param  SpisokTicketResponse[]  $spisok
+     * @param  ElTicketResponse[]  $electron
+     * @param  FriendlyTicketResponse[]  $drug
+     * @param  LiveTicketResponse[]  $live
+     * @param  TicketSearchResponse[]  $ticketSearch  богатый поиск по всем полям (гость без QR)
      */
     public function __construct(
         private array $spisok,
@@ -21,9 +25,8 @@ class SearchResponse implements TicketResponseInterface
         private array $drug,
         private array $live,
         private array $auto,
-    )
-    {
-    }
+        private array $ticketSearch = [],
+    ) {}
 
     public function toArray(): array
     {
@@ -48,6 +51,10 @@ class SearchResponse implements TicketResponseInterface
             $result[DefineService::AUTO_TICKET][] = $item->toArray();
         }
 
+        foreach ($this->ticketSearch as $item) {
+            $result[self::TICKET_SEARCH][] = $item->toArray();
+        }
+
         return $result;
     }
 
@@ -58,7 +65,8 @@ class SearchResponse implements TicketResponseInterface
             $data[DefineService::ELECTRON_TICKET],
             $data[DefineService::DRUG_TICKET],
             $data[DefineService::LIVE_TICKET],
-            $data[DefineService::AUTO_TICKET]
+            $data[DefineService::AUTO_TICKET],
+            $data[self::TICKET_SEARCH] ?? [],
         );
     }
 }

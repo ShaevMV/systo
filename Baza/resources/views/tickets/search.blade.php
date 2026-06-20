@@ -32,6 +32,59 @@
                 </form>
             </div>
 
+            {{-- Богатый поиск по всем полям (ticket_search) — для гостей БЕЗ QR. --}}
+            @if (!empty($result[\Baza\Tickets\Responses\SearchResponse::TICKET_SEARCH]))
+                <div class="card">
+                    <div class="card-header card-header-success">
+                        <h5 class="title">{{ __('Найдено по данным (поиск без QR)') }}</h5>
+                    </div>
+                    <div class="card-body table-responsive">
+                        <table class="table">
+                            <thead class="text-success">
+                            <th></th>
+                            <th>ФИО</th>
+                            <th>Телефон</th>
+                            <th>Telegram</th>
+                            <th>Email</th>
+                            <th>Город</th>
+                            <th>Авто</th>
+                            <th>Ребёнок</th>
+                            <th>Тип</th>
+                            <th>№ заказа</th>
+                            <th>Номер</th>
+                            </thead>
+                            <tbody>
+                            @foreach($result[\Baza\Tickets\Responses\SearchResponse::TICKET_SEARCH] as $row)
+                                <tr>
+                                    <td>
+                                        @if(!empty($row['kilter']))
+                                            <form method="post" action="/enterForTable">
+                                                @csrf
+                                                <input type="hidden" name="id" value="{{$row['kilter']}}">
+                                                <input type="hidden" name="type" value="{{$row['type']}}">
+                                                <input type="hidden" name="q" value="{{$q}}">
+                                                <button type="submit" class="btn btn-fill btn-success">Пропустить</button>
+                                            </form>
+                                        @endif
+                                    </td>
+                                    <td>{{$row['fio']}}</td>
+                                    <td>{{$row['phone']}}</td>
+                                    <td>{{$row['telegram']}}</td>
+                                    <td>{{$row['email']}}</td>
+                                    <td>{{$row['city']}}</td>
+                                    <td>{{$row['car_number']}}</td>
+                                    <td>{{$row['child_name']}}</td>
+                                    <td>{{$row['type_ticket']}}</td>
+                                    <td>{{$row['external_order_no']}}</td>
+                                    <td>{{$row['kilter']}}</td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+
             <div class="card">
                 <div class="card-header">
                     <h5 class="title">{{ __('Результат поиска') }}</h5>

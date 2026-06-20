@@ -23,10 +23,12 @@ use Baza\Tickets\Repositories\InMemoryMySqlFriendlyTicket;
 use Baza\Tickets\Repositories\InMemoryMySqlLiveTicket;
 use Baza\Tickets\Repositories\InMemoryMySqlParkingTicketRepository;
 use Baza\Tickets\Repositories\InMemoryMySqlSpisokTicket;
+use Baza\Tickets\Repositories\InMemoryMySqlTicketSearch;
 use Baza\Tickets\Repositories\InMemoryMySqlUserRepository;
 use Baza\Tickets\Repositories\LiveTicketRepositoryInterface;
 use Baza\Tickets\Repositories\ParkingTicketRepositoryInterface;
 use Baza\Tickets\Repositories\SpisokTicketsRepositoryInterface;
+use Baza\Tickets\Repositories\TicketSearchRepositoryInterface;
 use Baza\Tickets\Repositories\UserRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
@@ -46,5 +48,6 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(RolePermissionRepositoryInterface::class, InMemoryMySqlRolePermissionRepository::class);
         $this->app->bind(IngestRepositoryInterface::class, InMemoryMySqlIngestRepository::class);
         $this->app->bind(EntryOutboxRepositoryInterface::class, InMemoryMySqlEntryOutboxRepository::class);
+        $this->app->bind(TicketSearchRepositoryInterface::class, InMemoryMySqlTicketSearch::class);
     }
 }

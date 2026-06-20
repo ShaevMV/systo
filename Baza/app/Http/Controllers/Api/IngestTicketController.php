@@ -36,9 +36,14 @@ class IngestTicketController extends Controller
         if (! is_array($ticket)) {
             $ticket = [];
         }
+        // Опциональный богатый блок для поискового индекса (Ф-rich). Нет → fallback на ticket.
+        $search = $request->input('search', []);
+        if (! is_array($search)) {
+            $search = [];
+        }
 
         try {
-            $applied = $this->application->ingest($target, $ticket);
+            $applied = $this->application->ingest($target, $ticket, $search);
 
             return response()->json([
                 'success' => $applied,
