@@ -315,6 +315,14 @@ jobs:
         run: |
           docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-admin-staging sh -c "rm -rf dist && npm ci --include=dev && npm run build -- --base=/admin/"
 
+      # BazaFront — offline-first PWA входа КПП (Ф5), собирается с base=/baza/,
+      # VITE_API_URL = https://vhod.staging.spaceofjoy.ru/ (Baza сама себе API).
+      # Под root — свежий bind-каталог, как у AdminFront.
+      - name: Build baza frontend (Vite PWA, /baza/)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging run --rm --no-deps -u root node-baza-staging sh -c "rm -rf dist && npm ci --include=dev && npm run build -- --base=/baza/"
+
       - name: Up containers
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
