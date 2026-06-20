@@ -13,6 +13,7 @@ use RuntimeException;
 use Shared\Domain\ValueObject\Uuid;
 use Throwable;
 use Tickets\Auto\Repositories\AutoRepositoryInterface;
+use Tickets\BazaDelivery\Application\Client\BazaIngestClient;
 use Tickets\BazaDelivery\Application\Support\BazaDeliveryLog;
 use Tickets\BazaDelivery\Domain\BazaDeliveryLifecycleEvent;
 use Tickets\BazaDelivery\Domain\ValueObject\BazaDeliveryStatus;
@@ -48,9 +49,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
     /** @var int[] backoff между авто-ретраями (сек): 30с / 2м / 10м (далее — последнее значение). */
     public array $backoff = [30, 120, 600];
 
-    public function __construct(private readonly string $deliveryId)
-    {
-    }
+    public function __construct(private readonly string $deliveryId) {}
 
     public function handle(
         BazaDeliveryRepositoryInterface $repository,
@@ -74,7 +73,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
 
         // Кап: после MAX_ATTEMPTS попыток — терминальный failed, новых попыток нет.
         if ($delivery->getAttempts() >= self::MAX_ATTEMPTS) {
-            $repository->markFailed($id, 'Достигнут предел попыток доставки в Baza (' . self::MAX_ATTEMPTS . ')');
+            $repository->markFailed($id, 'Достигнут предел попыток доставки в Baza ('.self::MAX_ATTEMPTS.')');
             BazaDeliveryLog::logger()->error('baza.cap_reached', [
                 'id' => $this->deliveryId,
                 'attempts' => $delivery->getAttempts(),
@@ -91,7 +90,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         ]);
 
         try {
-            if (! $this->deliver($delivery, $repository, $tickets, $autos)) {
+            if (! $this->deliver($delivery, $repository, $tickets, $autos, app(BazaIngestClient::class))) {
                 throw new RuntimeException('Запись билета в Baza вернула false');
             }
 
@@ -133,20 +132,61 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         }
     }
 
-    /** Маршрутизация записи в Baza по цели доставки. */
+    /**
+     * Маршрутизация записи в Baza по цели доставки.
+     *
+     * Каждая цель сперва пробует ingest-API Baza (если канал настроен), при сбое/неприменении —
+     * текущая прямая запись в БД Baza (fallback). Канал выключен → сразу прямая запись (как раньше).
+     */
     private function deliver(
         BazaDeliveryDto $delivery,
         BazaDeliveryRepositoryInterface $repository,
         TicketsRepositoryInterface $tickets,
         AutoRepositoryInterface $autos,
+        BazaIngestClient $client,
     ): bool {
-        return match ($delivery->getTarget()) {
-            'el_tickets' => $tickets->setInBaza($this->resolveTicket($delivery, $repository, $tickets)),
-            'spisok_tickets' => $tickets->setInBazaList($this->resolveTicket($delivery, $repository, $tickets)),
-            'live_tickets' => $tickets->setInBazaLive((int) $delivery->getNumber(), $delivery->getTicketId()),
-            'auto' => $this->deliverAuto($delivery, $autos),
-            default => throw new RuntimeException('Неизвестная цель доставки в Baza: ' . $delivery->getTarget()),
-        };
+        switch ($delivery->getTarget()) {
+            case 'el_tickets':
+                $ticket = $this->resolveTicket($delivery, $repository, $tickets);
+
+                return $this->ingestOrDirect($client, 'el_tickets', $ticket->toArrayForBaza(), fn () => $tickets->setInBaza($ticket));
+            case 'spisok_tickets':
+                $ticket = $this->resolveTicket($delivery, $repository, $tickets);
+
+                return $this->ingestOrDirect($client, 'spisok_tickets', $ticket->toArrayForSpisok(), fn () => $tickets->setInBazaList($ticket));
+            case 'live_tickets':
+                $number = (int) $delivery->getNumber();
+                $ticketId = $delivery->getTicketId();
+
+                return $this->ingestOrDirect(
+                    $client,
+                    'live_tickets',
+                    ['kilter' => $number, 'el_ticket_id' => $ticketId?->value()],
+                    fn () => $tickets->setInBazaLive($number, $ticketId),
+                );
+            case 'auto':
+                return $this->deliverAuto($delivery, $autos, $client);
+            default:
+                throw new RuntimeException('Неизвестная цель доставки в Baza: '.$delivery->getTarget());
+        }
+    }
+
+    /**
+     * Ingest-API сначала, при сбое/неприменении — прямая запись (fallback).
+     *
+     * client->send: true → Baza применила (прямую запись пропускаем); false (явно не применила,
+     * напр. нет live-номера) / null (канал выключен или ошибка транспорта) → прямая запись.
+     *
+     * @param  array<string, mixed>  $payload
+     * @param  callable(): bool  $direct
+     */
+    private function ingestOrDirect(BazaIngestClient $client, string $target, array $payload, callable $direct): bool
+    {
+        if ($client->send($target, $payload) === true) {
+            return true;
+        }
+
+        return (bool) $direct();
     }
 
     /**
@@ -169,17 +209,29 @@ final class DeliverTicketToBazaJob implements ShouldQueue
         return $tickets->getTicket($delivery->getTicketId(), true);
     }
 
-    /** Запись авто заказа-списка в Baza: пересобираем AutoDto по id и пишем через setInBazaAuto. */
-    private function deliverAuto(BazaDeliveryDto $delivery, AutoRepositoryInterface $autos): bool
+    /** Запись авто заказа-списка в Baza: пересобираем AutoDto по id, ingest-API → fallback setInBazaAuto. */
+    private function deliverAuto(BazaDeliveryDto $delivery, AutoRepositoryInterface $autos, BazaIngestClient $client): bool
     {
         $auto = $autos->getById($delivery->getTicketId());
         if ($auto === null) {
-            throw new RuntimeException('Авто не найдено: ' . $delivery->getTicketId()->value());
+            throw new RuntimeException('Авто не найдено: '.$delivery->getTicketId()->value());
         }
 
-        $festivalId = $delivery->getFestivalId() !== null ? new Uuid($delivery->getFestivalId()) : null;
+        $festivalId = $delivery->getFestivalId();
+        $payload = [
+            'order_id' => $auto->orderTicketId->value(),
+            'auto' => $auto->number,
+            'curator' => (string) ($auto->curator ?? ''),
+            'project' => (string) ($auto->project ?? ''),
+            'festival_id' => $festivalId,
+        ];
 
-        return $autos->setInBazaAuto($auto, $festivalId);
+        return $this->ingestOrDirect(
+            $client,
+            'auto',
+            $payload,
+            fn () => $autos->setInBazaAuto($auto, $festivalId !== null ? new Uuid($festivalId) : null),
+        );
     }
 
     /** Окончательный сбой задачи (tries исчерпаны) — фиксируем failed. */
@@ -189,7 +241,7 @@ final class DeliverTicketToBazaJob implements ShouldQueue
     }
 
     /**
-     * @param array<string, mixed> $payload
+     * @param  array<string, mixed>  $payload
      */
     private function recordHistory(
         HistoryRepositoryInterface $history,

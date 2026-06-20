@@ -48,4 +48,13 @@ return [
         ))),
     ],
 
+    // Исходящий S2S-канал записи билета в Baza через ingest-API (Ф3).
+    // Заданы И url, И token → доставка идёт через API (POST {url}/api/baza/ingest/ticket,
+    // заголовок X-Baza-Token), при сбое — fallback на прямую запись в БД Baza.
+    // Пусто (по умолчанию) → канал выключен, поведение org не меняется (только прямая запись).
+    'baza_ingest' => [
+        'url' => env('BAZA_INGEST_URL'),
+        'token' => env('BAZA_INGEST_TOKEN'),
+    ],
+
 ];
