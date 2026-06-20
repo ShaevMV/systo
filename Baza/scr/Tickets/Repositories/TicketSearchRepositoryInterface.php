@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Baza\Tickets\Repositories;
 
+use Baza\Tickets\Responses\SnapshotPageResponse;
 use Baza\Tickets\Responses\TicketSearchResponse;
 
 /**
- * Поисковый индекс билетов ticket_search (ручной поиск на КПП без QR). БД только здесь.
+ * Поисковый индекс билетов ticket_search (ручной поиск на КПП без QR + офлайн-снимок). БД только здесь.
  *
  * Наполняется из ingest (org→Baza), ищется на экране `/search`. Найдя — впуск по type+kilter.
+ * Тот же индекс отдаёт минимизированный офлайн-снимок для PWA-сканера (Ф5, PR-3).
  */
 interface TicketSearchRepositoryInterface
 {
@@ -27,4 +29,18 @@ interface TicketSearchRepositoryInterface
      * @return TicketSearchResponse[]
      */
     public function find(string $q): array;
+
+    /**
+     * Порция офлайн-снимка билетов фестиваля (Ф5, PR-3) — для IndexedDB телефона.
+     *
+     * Минимизация ПДн (B5): возвращаются только поля впуска (uuid/kilter/тип/цвет/имя).
+     * Пагинация по `id` (`afterId` — курсор, exclusive). Дельта по `since` (updated_at >=,
+     * null = полный снимок). На клиенте дедуп по uuid (порции могут перекрываться).
+     *
+     * @param  string|null  $festivalId  null → текущий фестиваль по умолчанию
+     * @param  string|null  $since        ISO/datetime: только изменённые с этого момента
+     * @param  int  $afterId  курсор по id (брать строки с id > afterId)
+     * @param  int  $limit  размер порции (зажимается к безопасному максимуму)
+     */
+    public function snapshot(?string $festivalId, ?string $since, int $afterId, int $limit): SnapshotPageResponse;
 }

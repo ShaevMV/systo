@@ -58,6 +58,10 @@ Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name(
 Route::middleware('auth')->group(function () {
     Route::post('/api/scan', [\App\Http\Controllers\Api\ScanController::class, 'search'])->name('tickets.scan.search');
     Route::post('/api/enter', [\App\Http\Controllers\Api\ScanController::class, 'enter'])->name('tickets.scan.enter');
+
+    // Офлайн-снимок билетов для PWA-сканера (Ф5, PR-3). GET → CSRF не требуется.
+    // Сессионная auth: снимок содержит ФИО гостей, отдаём только сотруднику КПП.
+    Route::get('/api/snapshot', [\App\Http\Controllers\Api\SnapshotController::class, 'index'])->name('tickets.snapshot');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
