@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\BazaIngestAuth;
 use App\Http\Middleware\CheckPermission;
 use App\Http\Middleware\IsAdmin;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -67,5 +68,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'admin' => IsAdmin::class,
         'permission' => CheckPermission::class,
+        'baza.ingest' => BazaIngestAuth::class,
     ];
 }
