@@ -113,6 +113,27 @@
 - **Идемпотентность по `external_id`** — повтор того же `external_id` не создаёт дубль письма.
 - Письмо отправляется через `GenericTemplatedMail` (рендер slug по событию + `vars`) и **отслеживается** диспетчером (см. §13). В истории — `actor_type = qr`, `source = qr_intake`.
 
+### Каналы org↔Baza (контроль входа на КПП)
+
+#### Канал доставки билетов org→Baza (Ф3, ingest)
+
+- org записывает выпущенные билеты в **Baza** (систему входа на КПП) через S2S ingest-API `POST /api/baza/ingest/ticket` (middleware `baza.ingest`, заголовок `X-Baza-Token`, идемпотентно по UUID билета; цели `el_tickets` / `spisok_tickets` / `live_tickets` / `auto`).
+- `DeliverTicketToBazaJob` сперва пробует ingest-API, при сбое/неактивном канале — **fallback прямой записью** в БД Baza.
+- Канал по умолчанию **ВЫКЛЮЧЕН** (нет `BAZA_INGEST_URL` / `BAZA_INGEST_TOKENS`) — тогда доставка идёт прямой записью, поведение не меняется.
+
+#### Вебхук «билет прошёл» Baza→org (Ф4)
+
+- Baza уведомляет org о проходе билета через КПП — `POST /api/v1/baza/ticketEntered` (S2S, middleware `baza.webhook`, заголовок `X-Baza-Token`).
+- Пишет событие `ticket_entered` в `domain_history` (`aggregate_type = ticket`, `actor_type = baza`, `actor_id = null`), идемпотентно по `event_id` (id строки `baza_entry_outbox` в Baza).
+- Тело: `{ event_id, ticket_uuid, target, kilter, change_id, entered_at, wristband_qr? }`.
+- Канал по умолчанию **ВЫКЛЮЧЕН** (нет конфига `baza_webhook` / токена → `401`) → впуск и поведение не меняются.
+- В историю всех событий, пришедших от Baza (S2S-канал, не человек), пишется `actor_type = baza`, `actor_id = null`.
+
+#### Поиск гостя без QR (`ticket_search`)
+
+- Когда на КПП нет работающего QR, гостя ищут по rich-данным. Baza ведёт локальный поисковый индекс `ticket_search` (наполняется из ingest-канала богатым блоком `search`; org обогащает доставку через `search_blob`): поиск по **ФИО / телефону / telegram / госномеру авто / имени ребёнка / № заказа**.
+- Локальная таблица → поиск работает **офлайн** (попадает в синк на ноутбук КПП). Требует включённого ingest-канала (Ф3). Подробности — в BAZA.md.
+
 ---
 
 ## 2. Промокоды
@@ -201,6 +222,8 @@
 | **Групповой билет** | 24000₽ | `group_limit` — лимит группы |
 | **Детский билет** | 400₽ | Фиксированная цена, без волн, детская анкета |
 | **Парковка** | Любая | `is_parking = true` — форма ввода авто вместо ФИО гостей |
+
+> **Цвет браслета** определяется **типом** билета/заказа (electron / live / friendly → зелёный, spisok → синий, auto / служебные машины → белый; парковка использует обычный тип, цвет зелёный). Маппинг в `Baza/scr/Tickets/ValueObject/Color.php`, подробности — в BAZA.md. Это подсказка сотруднику КПП, какой браслет выдать.
 
 ### Групповые билеты
 
@@ -544,6 +567,8 @@ queued ──→ sending ──→ sent ──→ delivered ──→ opened
 | 2026-06-14 | Добавлен канал приёма qr-заказов (таблица `qr_orders`, `actor_type = qr`, выдача билетов при `оплачен`). | `Backend/src/QrOrder/`, `History/Domain/ActorType.php` |
 | 2026-06-17 | Система отправки писем по шаблонам: каталог событий `EmailEvent`, привязка шаблона по событию (ось `event` в `template_bindings`), машина статусов `EmailStatus` + контроль доставки (`email_messages`, история `aggregate_type=email`), qr-канал писем (S2S), пиксель прочтения за флагом (152-ФЗ), шаги пайплайна qr (`step_*` в истории). | `Backend/src/EmailDelivery/`, `template_bindings.event`, миграции `2026_06_17_*` |
 | 2026-06-19 | **Асинхронная трекаемая доставка билетов в Baza (AF-4).** Запись билета в Baza стала **асинхронной**: `BazaDeliveryDispatcher` → `DeliverTicketToBazaJob` (машина `queued→sending→delivered/failed`, кап 10 попыток). **Сбой Baza больше НЕ роняет выдачу билета / смену статуса** (раньше `PushTicketsCommandHandler` кидал `DomainException`) — доставка доедет ретраем, путь виден в админке «Доставка в baza». Все 4 пути записи (el/spisok/live/auto, classic + qr) переведены на трекинг. История `aggregate_type=baza_delivery` (каждая попытка). | `Backend/src/BazaDelivery/`, `baza_deliveries`, миграция `2026_06_19_120000` |
+| 2026-06-20 | **Каналы org↔Baza (Ф3 + Ф4).** Ф3 ingest-API org→Baza (`POST /api/baza/ingest/ticket`, `baza.ingest`, fallback прямая запись) + Ф4 вебхук Baza→org (`POST /api/v1/baza/ticketEntered`, событие `ticket_entered`, `actor_type = baza`, идемпотентно по `event_id`). Оба канала default OFF. | `Baza/routes/api.php`, `Backend/routes/bazaWebhook.php`, `Backend/src/BazaWebhook/`, `History/Domain/ActorType.php` (`BAZA`) |
+| 2026-06-20 | **Поиск гостя без QR.** Поисковый индекс `ticket_search` в Baza (rich-данные из ingest-блока `search`, org обогащает через `search_blob`): поиск по ФИО / телефону / telegram / госномеру / имени ребёнка / № заказа, работает офлайн. | миграция `2026_06_20_150000_create_ticket_search_table` (Baza) |
 
 ---
 
