@@ -57,14 +57,13 @@
 - ~~Версионированный DTO билета (published language)~~ — отложено: контракт пока неявный `{target, ticket{}}` (поля = `toArrayForBaza/toArrayForSpisok`); явный версионированный DTO — когда q/Baza зафиксируют published-контракт.
 - **Критерий выполнен:** билет доезжает в Baza через API; при выключенном/упавшем API — через прямую БД (fallback); идемпотентность по UUID. Тесты: Baza `IngestTicketApiTest` (9) + org `BazaIngestRoutingTest` (4). На стенде роут отвечает 401 без токена; активация канала = задать `BAZA_INGEST_TOKENS` (Baza) + `BAZA_INGEST_URL`/`BAZA_INGEST_TOKEN` (org) в .env обоих.
 
-## Фаза 4 — Вебхук «билет прошёл» Baza→org (Шаг 4). Аддитивно
-**PR `feat(baza): outbox вебхука входа` + `feat(org): приём ticketEntered`**
-- [M] (Baza) таблица `baza_entry_outbox` (append-only буфер: ticket_uuid, change_id, entered_at, target, wristband_qr?, status, attempts).
-- [L] Буферизованная очередь вызова вебхука **при впуске** (НЕ синхронно — очередь на КПП не ждёт org; дренаж при сети).
-- [M] (org) `POST /api/v1/baza/ticketEntered` (S2S по образцу `qr.ingest`) → запись в `domain_history` (`actor_type=baza`).
-- [M] Транспорт через RabbitMQ с буферизацией.
-- **Критерий:** впуск работает и без вебхука; при сети факт прохода появляется в истории org; идемпотентно.
-- **🚪 ГЕЙТ:** транспорт — HTTP-вебхук как основной или RabbitMQ единым механизмом (не плодить два)?
+## Фаза 4 — Вебхук «билет прошёл» Baza→org (Шаг 4). Аддитивно ✅ ЗАВЕРШЕНА
+**PR #111 `feat(baza): outbox вебхука входа` + #112 `feat(org): приём ticketEntered`** (2026-06-20)
+- [x] (Baza) таблица `baza_entry_outbox` (id uuid, target, ticket_uuid, kilter, change_id, entered_at, wristband_qr [Ф6 forward], status, attempts, error; UNIQUE(target,ticket_uuid)). Модуль `scr/EntryOutbox/`: запись при впуске (`ScanController::enter`, best-effort — впуск не падает; резолв org-uuid: el/spisok/live по kilter, auto по id строки), дренаж `EntryOutboxApplication::drain` через `OrgWebhookClient` (POST `{url}/api/v1/baza/ticketEntered`, X-Baza-Token, кап 15).
+- [x] Буферизованная очередь: команда `baza:drain-entry-outbox` + `Kernel::schedule everyMinute()->withoutOverlapping()`. ⚠️ **infra-следствие:** нужен запущенный `schedule:run` (cron/supervisord) на ноутбуке КПП — иначе дренаж не запустится автоматически (см. TD).
+- [x] (org) `POST /api/v1/baza/ticketEntered` — middleware `baza.webhook` (X-Baza-Token, **отдельный** `services.baza_webhook.tokens` ≠ исходящий `baza_ingest`), модуль `src/BazaWebhook/` → `domain_history` (`aggregate_type='ticket'`, `event_name='ticket_entered'`, `actor_type=baza`). Идемпотентно по `event_id` (id строки outbox).
+- Транспорт — **HTTP-вебхук** (решение владельца 2026-06-20): outbox+дренаж переживает офлайн; НЕ RabbitMQ (брокер недоступен с офлайн-ноутбука КПП).
+- **Критерий выполнен:** впуск работает и без вебхука (канал default OFF — нет `ORG_WEBHOOK_URL`/`BAZA_WEBHOOK_TOKENS`); при сети факт прохода появляется в истории org; идемпотентно. Тесты: Baza `EntryOutboxTest` (7) + org `BazaWebhookApiTest` (5). Активация: `ORG_WEBHOOK_URL`/`ORG_WEBHOOK_TOKEN` (Baza) + `BAZA_WEBHOOK_TOKENS` (org) + `schedule:run` на КПП.
 
 ## Фаза 5 — Offline-first PWA BazaFront (Шаг 5). Главный приоритет входа
 **Серия PR (greenfield, Strangler рядом со старым Blade)**
