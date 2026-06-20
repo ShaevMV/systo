@@ -1,53 +1,17 @@
 // ─────────────────────────────────────────────────────────────────────────────
-//  IndexedDB офлайн-хранилище входного приложения КПП (Ф5).
+//  Append-only очередь НАМЕРЕНИЙ впуска/скана, накопленных офлайн (Ф5).
 //
-//  Два store:
-//   - `queue` — append-only очередь НАМЕРЕНИЙ впуска/скана, накопленных офлайн.
-//     Никогда не редактируем чужие записи — только добавляем свои и помечаем
-//     отправленными. Это основа мульти-устройственной синхронизации (PR-8):
-//     узел КПП мёржит журналы намерений, не теряя ни одного впуска.
-//   - `meta` — служебные ключи (device_id, отметки синка снимка и т.п.).
+//  Никогда не редактируем чужие записи — только добавляем свои и помечаем
+//  отправленными. Это основа мульти-устройственной синхронизации (PR-8):
+//  узел/облако мёржит журналы намерений, не теряя ни одного впуска.
 //
-//  Снимок билетов для офлайн-сверки (store `snapshot`) добавит PR-3 — там же
-//  поднимем версию БД. Здесь намеренно держим минимальную схему v1.
+//  Открыватель БД и meta-хелперы — в ./index.js (общие со снимком, PR-4).
 // ─────────────────────────────────────────────────────────────────────────────
-import { openDB } from 'idb';
+import { db, notifyChange, STORE_QUEUE } from '@/db/index';
 
-const DB_NAME = 'baza-pwa';
-const DB_VERSION = 1;
-
-const STORE_QUEUE = 'queue';
-const STORE_META = 'meta';
-
-let dbPromise = null;
-
-// Сигнал «очередь изменилась» — шапка обновляет бейдж неотправленных намерений.
-function notifyChange() {
-    if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('baza-queue-changed'));
-    }
-}
-
-function db() {
-    if (!dbPromise) {
-        dbPromise = openDB(DB_NAME, DB_VERSION, {
-            upgrade(database) {
-                if (!database.objectStoreNames.contains(STORE_QUEUE)) {
-                    const queue = database.createObjectStore(STORE_QUEUE, {
-                        keyPath: 'id',
-                        autoIncrement: true
-                    });
-                    // По статусу выбираем неотправленные при восстановлении сети.
-                    queue.createIndex('status', 'status');
-                }
-                if (!database.objectStoreNames.contains(STORE_META)) {
-                    database.createObjectStore(STORE_META, { keyPath: 'key' });
-                }
-            }
-        });
-    }
-    return dbPromise;
-}
+// Реэкспорт meta-хелперов для обратной совместимости (PR-2 импортировал из queue).
+export { getMeta, setMeta, deviceId } from '@/db/index';
+import { deviceId } from '@/db/index';
 
 // ── Очередь намерений ────────────────────────────────────────────────────────
 
@@ -100,6 +64,21 @@ export async function markFailed(id) {
     });
 }
 
+/**
+ * Есть ли уже намерение впуска по этому билету (с ЭТОГО устройства).
+ * Офлайн-защита от двойного впуска одним телефоном (полная меж-устройственная — PR-8).
+ * @param {string} ticketKey  стабильный ключ билета (`type:id`)
+ * @returns {Promise<boolean>}
+ */
+export async function hasEnterIntent(ticketKey) {
+    if (!ticketKey) {
+        return false;
+    }
+    const database = await db();
+    const all = await database.getAll(STORE_QUEUE);
+    return all.some((rec) => rec.type === 'enter' && rec.payload?.ticket_key === ticketKey);
+}
+
 async function patch(id, mutate) {
     const database = await db();
     const tx = database.transaction(STORE_QUEUE, 'readwrite');
@@ -111,33 +90,4 @@ async function patch(id, mutate) {
     await tx.done;
     notifyChange();
     return !!rec;
-}
-
-// ── Meta ─────────────────────────────────────────────────────────────────────
-
-export async function getMeta(key, fallback = null) {
-    const database = await db();
-    const row = await database.get(STORE_META, key);
-    return row ? row.value : fallback;
-}
-
-export async function setMeta(key, value) {
-    const database = await db();
-    return database.put(STORE_META, { key, value });
-}
-
-/**
- * Идентификатор устройства (self-service регистрация по решению PM): создаётся
- * один раз и хранится локально. Узел КПП различает устройства по нему при мёрже.
- */
-export async function deviceId() {
-    let id = await getMeta('device_id');
-    if (!id) {
-        id =
-            typeof crypto !== 'undefined' && crypto.randomUUID
-                ? crypto.randomUUID()
-                : 'dev-' + Date.now() + '-' + Math.floor(Math.random() * 1e6);
-        await setMeta('device_id', id);
-    }
-    return id;
 }
