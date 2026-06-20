@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Baza\Tickets\Applications\Blacklist\BlacklistApplication;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 /**
@@ -45,7 +46,10 @@ class RevokeTicketController extends Controller
 
             return response()->json(['success' => true]);
         } catch (Throwable $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            // Сырой текст исключения наружу не отдаём (детали — в лог).
+            Log::error('revoke failed', ['error' => $e->getMessage()]);
+
+            return response()->json(['success' => false, 'message' => 'Не удалось отозвать билет'], 500);
         }
     }
 
