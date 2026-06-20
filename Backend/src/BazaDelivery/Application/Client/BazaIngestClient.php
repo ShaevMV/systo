@@ -30,24 +30,27 @@ final class BazaIngestClient
 
     /**
      * @param  array<string, mixed>  $ticket
+     * @param  array<string, mixed>  $search  опц. богатые поля гостя для поискового индекса Baza (ticket_search)
      * @return bool|null true — Baza применила запись; false — Baza явно НЕ применила (200 success:false,
      *                   напр. live-номера ещё нет); null — канал выключен / HTTP-ошибка / транспорт упал.
      *                   В случае false/null вызывающий откатывается на прямую запись.
      */
-    public function send(string $target, array $ticket): ?bool
+    public function send(string $target, array $ticket, array $search = []): ?bool
     {
         if (! $this->isEnabled()) {
             return null;
+        }
+
+        $body = ['target' => $target, 'ticket' => $ticket];
+        if ($search !== []) {
+            $body['search'] = $search;
         }
 
         try {
             $response = Http::withHeaders(['X-Baza-Token' => $this->token()])
                 ->acceptJson()
                 ->timeout(self::TIMEOUT)
-                ->post($this->baseUrl().self::PATH, [
-                    'target' => $target,
-                    'ticket' => $ticket,
-                ]);
+                ->post($this->baseUrl().self::PATH, $body);
 
             if (! $response->successful()) {
                 BazaDeliveryLog::logger()->warning('baza.ingest.http_error', [

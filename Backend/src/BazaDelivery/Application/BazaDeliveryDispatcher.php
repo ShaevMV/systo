@@ -25,22 +25,26 @@ use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 final class BazaDeliveryDispatcher
 {
     public const TARGET_EL = 'el_tickets';
+
     public const TARGET_SPISOK = 'spisok_tickets';
+
     public const TARGET_LIVE = 'live_tickets';
+
     public const TARGET_AUTO = 'auto';
 
     public function __construct(
         private readonly BazaDeliveryRepositoryInterface $repository,
         private readonly HistoryRepositoryInterface $history,
-    ) {
-    }
+    ) {}
 
     /**
      * Поставить доставку билета (обычного/списочного) в очередь. target выводится из билета:
      * списочный (isList) → spisok_tickets, иначе → el_tickets. Описательные поля — из самого билета.
      * Возвращает id записи baza_deliveries.
+     *
+     * @param  array<string, mixed>|null  $search  богатые поля гостя для поискового индекса Baza (ticket_search)
      */
-    public function dispatch(TicketResponse $ticket, BazaDeliveryContext $ctx): Uuid
+    public function dispatch(TicketResponse $ticket, BazaDeliveryContext $ctx, ?array $search = null): Uuid
     {
         $target = $ticket->isList() ? self::TARGET_SPISOK : self::TARGET_EL;
 
@@ -58,6 +62,7 @@ final class BazaDeliveryDispatcher
             ),
             // Несём готовый TicketResponse: getTicket не пересоберёт qr-билет (заказ в qr_orders, не order_tickets).
             base64_encode(serialize($ticket)),
+            $search !== null && $search !== [] ? base64_encode((string) json_encode($search)) : null,
         );
     }
 
@@ -110,7 +115,7 @@ final class BazaDeliveryDispatcher
      *
      * Используется dispatch() (el/spisok) и точечными вызовами live/auto (target задан явно).
      */
-    public function enqueue(Uuid $ticketId, string $target, BazaDeliveryContext $ctx, ?string $subjectBlob = null): Uuid
+    public function enqueue(Uuid $ticketId, string $target, BazaDeliveryContext $ctx, ?string $subjectBlob = null, ?string $searchBlob = null): Uuid
     {
         $existing = $this->repository->findByTicketTarget($ticketId, $target);
 
@@ -123,7 +128,7 @@ final class BazaDeliveryDispatcher
             $this->repository->requeue($id);
         } else {
             $id = Uuid::random();
-            $this->repository->create(BazaDeliveryDto::queued($id, $ticketId, $target, $ctx), $subjectBlob);
+            $this->repository->create(BazaDeliveryDto::queued($id, $ticketId, $target, $ctx), $subjectBlob, $searchBlob);
         }
 
         $this->history->save(new SaveHistoryDto(
