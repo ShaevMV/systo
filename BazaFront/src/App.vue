@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router';
 import { useRegisterSW } from 'virtual:pwa-register/vue';
 import { pendingCount } from '@/db/queue';
 import { hasPin, isUnlocked, unlock } from '@/services/pin';
+import { drainQueue } from '@/services/drain';
 
 // Версия сборки — видна в шапке (решение архитектора: SW-версионирование, чтобы билетёр
 // не застрял на устаревшей оболочке). Подставляется при сборке через Vite define (PR-2).
@@ -12,6 +13,12 @@ const BUILD = import.meta.env.VITE_BUILD_VERSION || 'dev';
 const route = useRoute();
 const online = ref(navigator.onLine);
 const setOnline = () => (online.value = navigator.onLine);
+
+// При появлении связи — дренаж офлайн-намерений впуска в облако (PR-8).
+const onNetworkOnline = () => {
+    online.value = true;
+    drainQueue().then(refreshQueued);
+};
 
 // Service worker (Workbox, registerType='prompt'): когда подъехала новая версия —
 // показываем кнопку «обновить», НЕ перезагружаем молча посреди потока гостей.
@@ -31,14 +38,18 @@ async function refreshQueued() {
 }
 
 onMounted(() => {
-    window.addEventListener('online', setOnline);
+    window.addEventListener('online', onNetworkOnline);
     window.addEventListener('offline', setOnline);
     window.addEventListener('baza-queue-changed', refreshQueued);
     refreshQueued();
     checkLock();
+    // Досыл накопленных офлайн-намерений при старте, если уже онлайн.
+    if (online.value) {
+        drainQueue().then(refreshQueued);
+    }
 });
 onUnmounted(() => {
-    window.removeEventListener('online', setOnline);
+    window.removeEventListener('online', onNetworkOnline);
     window.removeEventListener('offline', setOnline);
     window.removeEventListener('baza-queue-changed', refreshQueued);
 });

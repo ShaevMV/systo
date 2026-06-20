@@ -69,6 +69,9 @@ Route::middleware('auth')->group(function () {
 
     // Синк чёрного списка отозванных билетов (Ф5, PR-6, B6). GET → CSRF не требуется.
     Route::get('/api/blacklist', [\App\Http\Controllers\Api\BlacklistController::class, 'index'])->name('tickets.blacklist');
+
+    // Дренаж офлайн-намерений впуска в append-only журнал (Ф5, PR-8, гейт мульти-устройства).
+    Route::post('/api/entry-events', [\App\Http\Controllers\Api\EntryEventsController::class, 'store'])->name('tickets.entry-events');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.

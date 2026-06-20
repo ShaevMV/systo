@@ -66,7 +66,9 @@ async function resolveOnline(rawText) {
             title: entered ? 'Уже прошёл' : 'Пропустить',
             reason: entered ? `Впущен: ${data.date_change}` : null,
             ticket: cardFromOnline(data),
-            enterRef: entered ? null : { type: data.type, id: data.kilter, key: ticketKey(data.type, data.kilter) }
+            enterRef: entered
+                ? null
+                : { type: data.type, id: data.kilter, uuid: data.uuid || null, key: ticketKey(data.type, data.kilter) }
         };
     } catch (e) {
         return {
@@ -115,7 +117,7 @@ async function resolveOffline(ref) {
         title: 'Пропустить',
         reason: 'Данные из офлайн-снимка.',
         ticket: card,
-        enterRef: { type: row.type, id: row.kilter, key }
+        enterRef: { type: row.type, id: row.kilter, uuid: row.uuid || null, key }
     };
 }
 
@@ -135,9 +137,18 @@ export async function doEnter(enterRef, { online }) {
             return { ok: false, message: errorMessage(e, 'Не удалось впустить') };
         }
     }
+    // client_op_id фиксируем при постановке — стабильная идемпотентность дренажа (PR-8).
+    const clientOpId =
+        typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : 'op-' + Date.now() + '-' + enterRef.key;
     await enqueue({
         type: 'enter',
-        payload: { type: enterRef.type, id: enterRef.id, ticket_key: enterRef.key }
+        payload: {
+            type: enterRef.type,
+            id: enterRef.id,
+            ticket_uuid: enterRef.uuid || null,
+            ticket_key: enterRef.key,
+            client_op_id: clientOpId
+        }
     });
     return { ok: true, queued: true };
 }
