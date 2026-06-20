@@ -2,7 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
 use Throwable;
 use Sentry\Laravel\Integration;
 
@@ -47,5 +49,21 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             Integration::captureUnhandledException($e);
         });
+    }
+
+    /**
+     * Неаутентифицированный запрос → всегда чистый 401 JSON (TD-33).
+     *
+     * Backend — API-only (login-страницы нет). Дефолтный обработчик для
+     * не-JSON запросов пытался редиректить на route('login'), которого нет →
+     * RouteNotFoundException → 500. Теперь любой защищённый роут без/с протухшим
+     * токеном отдаёт 401, а не 500 (важно для корректной обработки на фронте).
+     */
+    protected function unauthenticated($request, AuthenticationException $exception): JsonResponse
+    {
+        return response()->json(
+            ['message' => $exception->getMessage() ?: 'Unauthenticated.'],
+            401,
+        );
     }
 }
