@@ -49,13 +49,13 @@
 - [M] Тесты ролей/инварианта + актуализация доков.
 - **🚪 ГЕЙТ владельца:** RBAC-матрица «роль × экран/действие» (кто правит отчёт, кто формирует состав, кто видит финансы, кто `/sync`). Нужна перед мержем.
 
-## Фаза 3 — Контракт интеграции org→Baza (Шаг 3). Fallback держит доставку
-**PR `feat(baza): ingest-API приёма билета` + `feat(org): маршрутизация доставки`**
-- [S] (org) `ActorType::BAZA` + конфиг S2S-ключа `baza-ingest`.
-- [M] Версионированный DTO билета (published language; явный контракт вместо неявного `toArrayForBaza`).
-- [L] (Baza) `POST /api/baza/ingest/ticket` (`X-Baza-Token`, идемпотентно по UUID, target el/spisok/live/auto).
-- [L] (org) `DeliverTicketToBazaJob`: сперва ingest-API, при сбое — **текущая прямая запись `mysqlBaza`** (fallback). Прямая запись работает весь переход → доставка не прерывается.
-- **Критерий:** билет доезжает в Baza через API; при выключенном API — через прямую БД; идемпотентность по UUID.
+## Фаза 3 — Контракт интеграции org→Baza (Шаг 3). Fallback держит доставку ✅ ЗАВЕРШЕНА
+**PR #108 `feat(baza): ingest-API приёма билета` + #109 `feat(org): маршрутизация доставки`** (2026-06-20)
+- [x] (org) `ActorType::BAZA` + конфиг S2S-канала `services.baza_ingest` (env `BAZA_INGEST_URL`/`BAZA_INGEST_TOKEN`).
+- [x] (Baza) `POST /api/baza/ingest/ticket` — middleware `baza.ingest` (`X-Baza-Token`, `hash_equals`, зеркало org `qr.ingest`), модуль `scr/Ingest/` (тонкий `IngestTicketApplication` + `IngestRepositoryInterface`/`InMemoryMySqlIngestRepository`, **БД только в репозитории**). Идемпотентно по естественному ключу: el→`uuid`, spisok→`ticket_uuid`, live→`kilter`, auto→`(order_id,auto)`. live — только UPDATE `el_ticket_id`; нет строки → `success:false` (org откатится). Контракт `{target, ticket{}}`.
+- [x] (org) `DeliverTicketToBazaJob::deliver()` для каждой цели: `BazaIngestClient->send()` (ingest-API), при не-`true` — **текущая прямая запись `mysqlBaza`** (fallback). Канал default OFF (нет url+token) → поведение org не меняется.
+- ~~Версионированный DTO билета (published language)~~ — отложено: контракт пока неявный `{target, ticket{}}` (поля = `toArrayForBaza/toArrayForSpisok`); явный версионированный DTO — когда q/Baza зафиксируют published-контракт.
+- **Критерий выполнен:** билет доезжает в Baza через API; при выключенном/упавшем API — через прямую БД (fallback); идемпотентность по UUID. Тесты: Baza `IngestTicketApiTest` (9) + org `BazaIngestRoutingTest` (4). На стенде роут отвечает 401 без токена; активация канала = задать `BAZA_INGEST_TOKENS` (Baza) + `BAZA_INGEST_URL`/`BAZA_INGEST_TOKEN` (org) в .env обоих.
 
 ## Фаза 4 — Вебхук «билет прошёл» Baza→org (Шаг 4). Аддитивно
 **PR `feat(baza): outbox вебхука входа` + `feat(org): приём ticketEntered`**

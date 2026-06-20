@@ -423,6 +423,7 @@ class Questionnaire extends AggregateRoot {
 - `artisan` — действие из artisan-команды (CLI)
 - `auto_payment` — авто-одобрение заказа на `POST /api/v1/order/create` по валидному заголовку `AutoPayment` (`actorId` пишется `null`)
 - `qr` — действия по заказам, пришедшим от витрины qr.spaceofjoy.ru (S2S-канал, не человек; `actorId` пишется `null`)
+- `baza` — события от Baza (системы входа): S2S-канал, не человек (вебхук «билет прошёл» Ф4 и пр.; `actorId` пишется `null`). Введён в Ф3 (ingest-API org→Baza)
 
 **Новые `aggregate_type` / `event_name` в `domain_history`:**
 - `aggregate_type = 'email'` (модуль EmailDelivery) — таймлайн письма: `email_queued` / `email_sending` / `email_sent` / `email_failed` / `email_opened`. `actor_type`: события писем от qr → `qr`, системные → `system`, повтор из админки → `user`.
