@@ -10,6 +10,7 @@ use App\Models\ElTicketsModel;
 use App\Models\LiveTicketModel;
 use App\Models\ParkingTicketModel;
 use App\Models\SpisokTicketModel;
+use App\Models\TicketSearchModel;
 use Carbon\Carbon;
 use InvalidArgumentException;
 use RuntimeException;
@@ -23,12 +24,15 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
      * если когда-нибудь добавят физический FK по change_id).
      */
     private const TABLE_MODEL_MAP = [
-        ChangesModel::TABLE        => ChangesModel::class,
-        ElTicketsModel::TABLE      => ElTicketsModel::class,
-        LiveTicketModel::TABLE     => LiveTicketModel::class,
-        ParkingTicketModel::TABLE  => ParkingTicketModel::class,
-        SpisokTicketModel::TABLE   => SpisokTicketModel::class,
-        AutoModel::TABLE           => AutoModel::class,
+        ChangesModel::TABLE => ChangesModel::class,
+        ElTicketsModel::TABLE => ElTicketsModel::class,
+        LiveTicketModel::TABLE => LiveTicketModel::class,
+        ParkingTicketModel::TABLE => ParkingTicketModel::class,
+        SpisokTicketModel::TABLE => SpisokTicketModel::class,
+        AutoModel::TABLE => AutoModel::class,
+        // Поисковый индекс билетов — едет на офлайн-ноутбук КПП, чтобы ручной поиск
+        // (без QR) работал офлайн. PK автоинкрементный → синк по id + updated_at как у прочих.
+        TicketSearchModel::TABLE => TicketSearchModel::class,
     ];
 
     public function getSyncTables(): array
@@ -98,7 +102,7 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
     private function normalize(array $data): array
     {
         foreach (self::TIMESTAMP_FIELDS as $field) {
-            if (!array_key_exists($field, $data) || !is_string($data[$field])) {
+            if (! array_key_exists($field, $data) || ! is_string($data[$field])) {
                 continue;
             }
             $value = $data[$field];
@@ -110,7 +114,7 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
                 $data[$field] = Carbon::parse($value)->format('Y-m-d H:i:s');
             } catch (Throwable $e) {
                 throw new RuntimeException(
-                    "Невалидный timestamp в поле '{$field}': " . var_export($value, true),
+                    "Невалидный timestamp в поле '{$field}': ".var_export($value, true),
                     0,
                     $e,
                 );
@@ -125,7 +129,7 @@ class InMemoryMySqlSyncRepository implements SyncRepositoryInterface
      */
     private function resolveModel(string $table): string
     {
-        if (!isset(self::TABLE_MODEL_MAP[$table])) {
+        if (! isset(self::TABLE_MODEL_MAP[$table])) {
             throw new InvalidArgumentException("Таблица '{$table}' не разрешена для синхронизации");
         }
 
