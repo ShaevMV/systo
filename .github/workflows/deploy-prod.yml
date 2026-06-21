@@ -1,0 +1,303 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  Деплой на ПРОД (tag-based)
+#
+#  Триггер:
+#   - push тега vX.Y.Z (например v2.7.0) → выкат этого тега на прод
+#   - workflow_dispatch — ручной запуск (ref + тумблеры миграции/сида)
+#
+#  Принцип: стенд = разработка + приёмка, ПРОД выкатывается ТОЛЬКО по тегу
+#  после полного теста на стенде.
+#
+#  Окружение на прод-сервере (как на стенде):
+#   - GitHub self-hosted runner с меткой `prod`
+#   - Репозиторий клонирован в ${{ vars.PROD_PROJECT_DIR }} (по умолчанию /var/www/systo)
+#   - Прод .env/.env-файлы УЖЕ существуют (реальные секреты) — workflow их НЕ трогает
+#   - docker / docker compose доступны runner-пользователю
+#
+#  Отличия от staging-workflow (безопасность прода):
+#   - ОБЯЗАТЕЛЬНЫЙ бэкап БД (systo + baza) ПЕРЕД миграциями (gz, ротация)
+#   - maintenance-режим (php artisan down/up) на время выката
+#   - НЕ генерируем секреты (APP_KEY/JWT/токены) — на проде они уже заданы
+#   - data-миграция v2.6.0 — С inline-бэкапом (НЕ --no-backup)
+#   - Baza RBAC — сеется ТОЛЬКО матрица прав (BazaRolePermissionsSeeder), без демо-данных
+#   - gate: job привязан к environment `production` (можно включить required reviewers)
+#
+#  Runbook выката: .claude/docs/process/PROD_RELEASE_v2.6.0.md
+# ─────────────────────────────────────────────────────────────────────────────
+name: Deploy to Production
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Тег или ветка для выката (например v2.7.0)'
+        required: true
+        default: ''
+      run_data_migration:
+        description: 'Прогнать data-миграцию v2.6.0 (order→guests, идемпотентно, с бэкапом)'
+        required: false
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+      seed_baza_rbac:
+        description: 'Засеять матрицу прав Baza (BazaRolePermissionsSeeder, идемпотентно)'
+        required: false
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  # ═══ Стадия 1: быстрые проверки на GHA-hosted ════════════════════════════════
+  pre-deploy-check:
+    name: Pre-deploy checks (prod)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref_name }}
+
+      - name: Verify required prod files
+        run: |
+          test -f docker-compose.prod.yml        || (echo "::error::docker-compose.prod.yml missing" && exit 1)
+          test -f Docker/nginx/default.conf      || (echo "::error::Docker/nginx/default.conf missing" && exit 1)
+          test -f Backend/app/Console/Commands/MigrateOrdersToGuestsFormatCommand.php \
+            || (echo "::error::команда data-миграции v2.6.0 отсутствует" && exit 1)
+          test -f Baza/database/seeders/BazaRolePermissionsSeeder.php \
+            || (echo "::error::BazaRolePermissionsSeeder отсутствует" && exit 1)
+          echo "✓ Обязательные прод-файлы на месте"
+
+      - name: Show target ref
+        run: |
+          echo "Выкатываем: ${{ github.event.inputs.ref || github.ref_name }}"
+          git log -1 --pretty=format:'%h %s (%an, %ad)' --date=short
+
+  # ═══ Стадия 2: деплой на self-hosted prod runner ═════════════════════════════
+  deploy:
+    name: Deploy to production server
+    needs: pre-deploy-check
+    runs-on: [self-hosted, prod]
+    # gate: привяжите к этому environment required reviewers в Settings → Environments
+    # → деплой на прод будет требовать ручного подтверждения (рекомендуется).
+    environment: production
+    timeout-minutes: 40
+    env:
+      PROJECT_DIR: ${{ vars.PROD_PROJECT_DIR || '/var/www/systo' }}
+      COMPOSE: docker-compose.prod.yml
+      REF: ${{ github.event.inputs.ref || github.ref_name }}
+      RUN_DATA_MIGRATION: ${{ github.event.inputs.run_data_migration || 'true' }}
+      SEED_BAZA_RBAC: ${{ github.event.inputs.seed_baza_rbac || 'true' }}
+      # Каталог бэкапов вне репозитория (чтобы reset --hard их не трогал)
+      BACKUP_DIR: ${{ vars.PROD_BACKUP_DIR || '/var/backups/systo' }}
+      KEEP_BACKUPS: '10'
+
+    steps:
+      - name: Show runner info
+        run: |
+          echo "Runner:   $(hostname)"
+          echo "User:     $(whoami)"
+          echo "Ref:      $REF"
+          echo "Project:  $PROJECT_DIR"
+          echo "Compose:  $COMPOSE"
+          docker --version
+
+      - name: Ensure project & env present
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          test -d .git            || (echo "::error::$PROJECT_DIR/.git не найден — нужен bootstrap прод-репозитория" && exit 1)
+          test -f "$COMPOSE"      || (echo "::error::$COMPOSE не найден" && exit 1)
+          # Прод .env-файлы должны существовать (реальные секреты). НЕ создаём их тут.
+          for f in .env Backend/.env Baza/.env; do
+            test -f "$f" || (echo "::error::$f отсутствует на проде (нужны реальные секреты)" && exit 1)
+          done
+          echo "✓ Проект и .env-файлы на месте"
+
+      # Защита от потери локальных прод-правок (SSL/nginx и пр.): если есть
+      # незакоммиченные изменения ОТСЛЕЖИВАЕМЫХ файлов — прерываем, не затирая.
+      - name: Guard — clean working tree (кроме certbot-сертов и dev-файлов)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # Файлы, которые штатно меняются НА ПРОДЕ и НЕ должны блокировать выкат:
+          #  - Docker/nginx/ssl/*.pem        — certbot обновляет серты на месте (сохраняем при checkout)
+          #  - Docker/nginx/default.dev.conf — dev-конфиг, прод его НЕ монтирует (mount = default.conf)
+          #  - bootstrap/cache/.gitignore    — артефакт Laravel
+          ALLOW='Docker/nginx/ssl/|Docker/nginx/default\.dev\.conf|bootstrap/cache/\.gitignore'
+          DIRTY="$(git status --porcelain --untracked-files=no | grep -vE "$ALLOW" || true)"
+          if [[ -n "$DIRTY" ]]; then
+            echo "::error::На проде есть НЕОЖИДАННЫЕ незакоммиченные изменения отслеживаемых файлов — выкат прерван (чтобы их не затереть):"
+            echo "$DIRTY"
+            echo "Разберись вручную (commit/stash/restore), потом перезапусти деплой."
+            exit 1
+          fi
+          echo "✓ Рабочее дерево чистое (certbot-серты/dev-файлы — исключение)"
+
+      # ─── КРИТИЧНО: бэкап БД ПЕРЕД любыми изменениями ───────────────────────
+      - name: Backup databases (systo + baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          set -euo pipefail
+          sudo mkdir -p "$BACKUP_DIR" 2>/dev/null || mkdir -p "$BACKUP_DIR"
+          TS="$(date +%F_%H%M%S)"
+          dump() {
+            local db="$1"; local out="$BACKUP_DIR/${db}_pre_${REF//\//_}_${TS}.sql.gz"
+            echo "Бэкаплю БД $db → $out"
+            # Пароль root берём из env контейнера mysql — не хардкодим.
+            docker compose -f "$COMPOSE" exec -T mysql \
+              sh -c "exec mysqldump -uroot -p\"\$MYSQL_ROOT_PASSWORD\" --single-transaction --quick --no-tablespaces $db" \
+              | gzip > "$out"
+            # Проверяем, что бэкап не пустой (>1KB)
+            local sz; sz="$(stat -c%s "$out" 2>/dev/null || echo 0)"
+            if [[ "$sz" -lt 1024 ]]; then
+              echo "::error::Бэкап $db получился пустым/битым ($sz B) — выкат прерван"
+              exit 1
+            fi
+            echo "  ✓ $out ($((sz/1024)) KB)"
+          }
+          dump systo
+          # baza может не существовать на старом проде — не валим деплой, если её нет
+          if docker compose -f "$COMPOSE" exec -T mysql sh -c "exec mysql -uroot -p\"\$MYSQL_ROOT_PASSWORD\" -e 'USE baza'" 2>/dev/null; then
+            dump baza
+          else
+            echo "::notice::БД baza ещё нет на проде — пропускаю её бэкап (создастся миграцией)"
+          fi
+          # Ротация: оставляем последние $KEEP_BACKUPS
+          ls -1t "$BACKUP_DIR"/*.sql.gz 2>/dev/null | tail -n +$((KEEP_BACKUPS+1)) | xargs -r rm -f
+          echo "✓ Бэкапы готовы (хранится последних $KEEP_BACKUPS)"
+
+      - name: Maintenance ON (artisan down)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T php     php artisan down || true
+          docker compose -f "$COMPOSE" exec -T phpBaza php artisan down || true
+          echo "✓ Maintenance включён"
+
+      - name: Pull code (checkout tag, сохраняя certbot-серты)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # Прод держит ЖИВЫЕ certbot-серты в отслеживаемых Docker/nginx/ssl/*.pem.
+          # checkout --force откатил бы их на старые версии из репо → HTTPS лёг бы.
+          # Бэкапим серты ДО checkout и возвращаем ПОСЛЕ (nginx поднимется на up -d с живыми).
+          SSL_BK="$(mktemp -d)"
+          cp -a Docker/nginx/ssl/*.pem "$SSL_BK"/ 2>/dev/null || true
+          sudo git -C "$PROJECT_DIR" fetch --all --tags --prune
+          sudo git -C "$PROJECT_DIR" checkout --force "$REF"
+          # Если REF — ветка, подтягиваем; если тег — checkout уже зафиксировал коммит.
+          if sudo git -C "$PROJECT_DIR" show-ref --verify --quiet "refs/remotes/origin/$REF"; then
+            sudo git -C "$PROJECT_DIR" reset --hard "origin/$REF"
+          fi
+          # Возвращаем живые серты поверх версий из тега.
+          cp -a "$SSL_BK"/*.pem Docker/nginx/ssl/ 2>/dev/null || true
+          rm -rf "$SSL_BK"
+          echo "✓ Выкачен $(git -C "$PROJECT_DIR" rev-parse --short HEAD) ($REF); certbot-серты сохранены"
+          git -C "$PROJECT_DIR" log -1 --pretty=format:'%h %s'
+
+      - name: Build images (подхватить изменения Dockerfile — worker; расширения под Laravel 11)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # docker compose up -d НЕ пересобирает уже существующие образы. На апгрейдах, где
+          # менялись Dockerfile (Docker/worker) или базовый PHP/расширения под Laravel 11,
+          # без явного build контейнеры остались бы на старом образе. Собираем заранее,
+          # потом composer install и up -d работают на актуальных образах.
+          docker compose -f "$COMPOSE" build
+
+      - name: Composer install (Backend + Baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # Без --no-dev: миграция questionnaire использует ->change() (doctrine/dbal,
+          # сейчас transitive из require-dev) — TD-25. Когда dbal переедет в require,
+          # добавить --no-dev для прода.
+          docker compose -f "$COMPOSE" run --rm --no-deps --entrypoint sh php     -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+          docker compose -f "$COMPOSE" run --rm --no-deps --entrypoint sh phpBaza -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+
+      - name: Up containers
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" up -d
+          echo "Жду healthy mysql…"
+          for i in $(seq 1 30); do
+            if docker compose -f "$COMPOSE" ps mysql | grep -q "healthy"; then
+              echo "✓ mysql healthy (через $((i*2))s)"; break
+            fi
+            sleep 2
+          done
+
+      - name: Build frontend (old FrontEnd)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # node-контейнер крутится (tail -f); собираем внутри него.
+          docker compose -f "$COMPOSE" exec -T -u root node sh -c "npm ci && npm run build"
+
+      - name: Run schema migrations (Backend + Baza)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T php     php artisan migrate --force --no-interaction
+          docker compose -f "$COMPOSE" exec -T phpBaza php artisan migrate --force --no-interaction
+
+      # Разовая data-миграция v2.6.0 (order_tickets.guests → per-guest). Идемпотентна
+      # (повторный прогон пропускает мигрированные по price_snapshot). На ПРОДЕ — С
+      # inline-бэкапом (НЕ --no-backup): создаёт order_tickets_backup_v2_6_0_<ts>.
+      - name: Run v2.6.0 data migration (with backup, idempotent)
+        if: ${{ env.RUN_DATA_MIGRATION == 'true' }}
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          echo "=== dry-run (план) ==="
+          docker compose -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format
+          echo "=== apply (с бэкапом) ==="
+          docker compose -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format --apply
+
+      # Только матрица прав Baza (идемпотентно). НЕ полный db:seed — иначе залезут
+      # демо-сотрудники/смены (StagingDemoSeeder/MultiShiftDemoSeeder).
+      - name: Seed Baza RBAC matrix (BazaRolePermissionsSeeder)
+        if: ${{ env.SEED_BAZA_RBAC == 'true' }}
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T phpBaza \
+            php artisan db:seed --class=BazaRolePermissionsSeeder --force --no-interaction
+
+      - name: Storage link + permissions
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T -u root php sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
+          docker compose -f "$COMPOSE" exec -T -u root php     chown -R www-data:www-data storage bootstrap/cache || true
+          docker compose -f "$COMPOSE" exec -T -u root phpBaza chown -R www-data:www-data storage bootstrap/cache || true
+
+      - name: Clear & warm caches
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T php     php artisan optimize:clear || true
+          docker compose -f "$COMPOSE" exec -T phpBaza php artisan optimize:clear || true
+          # Перезапуск воркера — чтобы подхватил новый код/джобы (опкэш/память).
+          docker compose -f "$COMPOSE" restart worker || true
+
+      - name: Maintenance OFF (artisan up)
+        if: always()
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" exec -T php     php artisan up || true
+          docker compose -f "$COMPOSE" exec -T phpBaza php artisan up || true
+          echo "✓ Maintenance выключен"
+
+      - name: Healthcheck endpoints
+        run: |
+          set +e
+          for url in \
+            https://spaceofjoy.ru/ \
+            https://api.spaceofjoy.ru/ \
+            https://vhod.spaceofjoy.ru/; do
+            STATUS=$(curl -sS -o /dev/null -w "%{http_code}" "$url" --max-time 10)
+            if [[ "$STATUS" =~ ^(200|301|302)$ ]]; then echo "✓ $url → $STATUS"
+            else echo "::warning::$url → $STATUS (ожидался 200/301/302)"; fi
+          done
+
+      - name: Show container status
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f "$COMPOSE" ps
