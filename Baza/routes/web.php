@@ -90,6 +90,17 @@ Route::middleware(['auth', 'permission:staff.manage'])->group(function () {
     Route::post('/api/staff', [\App\Http\Controllers\Api\StaffController::class, 'store'])->name('api.staff.store');
 });
 
+// Управление сменами из нового PWA (Шаг 6). Список/создание/состав — shift.compose;
+// закрытие — shift.close. Изоляция начальника — внутри контроллера (видит только свою смену).
+Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
+    Route::get('/api/shifts', [\App\Http\Controllers\Api\ShiftController::class, 'index'])->name('api.shifts.list');
+    Route::get('/api/shifts/users', [\App\Http\Controllers\Api\ShiftController::class, 'users'])->name('api.shifts.users');
+    Route::post('/api/shifts', [\App\Http\Controllers\Api\ShiftController::class, 'store'])->name('api.shifts.store');
+});
+Route::middleware(['auth', 'permission:shift.close'])->group(function () {
+    Route::post('/api/shifts/{id}/close', [\App\Http\Controllers\Api\ShiftController::class, 'close'])->name('api.shifts.close');
+});
+
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
 // administrator проходит везде (суперроль), is_admin-юзеры не теряют доступ.
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware(['auth', 'permission:report.view']);

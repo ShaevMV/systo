@@ -16,6 +16,9 @@ use Nette\Utils\JsonException;
 
 class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
 {
+    /** Текущий фестиваль (как в SaveChange / репозиториях билетов; кандидат на env, BAZA.md §9). */
+    private const FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
+
     public function __construct(
         private ChangesModel $model,
     )
@@ -172,5 +175,40 @@ group by `changes`.`id`", [
 
             return $model !== null && (bool) $model->delete();
         });
+    }
+
+    public function listOpen(?int $chiefId = null): array
+    {
+        $query = $this->model::query()
+            ->whereNull('end')
+            ->where('festival_id', self::FESTIVAL)
+            ->orderByDesc('id');
+
+        // Изоляция начальника: только смены, где он shift_chief в change_user.
+        if ($chiefId !== null) {
+            $changeIds = ChangeUserModel::where('user_id', $chiefId)
+                ->where('role', ShiftRole::SHIFT_CHIEF)
+                ->pluck('change_id');
+            $query->whereIn('id', $changeIds);
+        }
+
+        return $query->get()->map(function (ChangesModel $c): array {
+            $chiefUserId = $this->getChiefId((int) $c->id);
+
+            return [
+                'id' => (int) $c->id,
+                'chief_id' => $chiefUserId,
+                'chief_name' => $chiefUserId !== null ? User::whereKey($chiefUserId)->value('name') : null,
+                'members_count' => ChangeUserModel::where('change_id', $c->id)->count(),
+                'start' => $c->start ? (string) $c->start : null,
+                'counts' => [
+                    'el' => (int) $c->count_el_tickets,
+                    'live' => (int) $c->count_live_tickets,
+                    'spisok' => (int) $c->count_spisok_tickets,
+                    'drug' => (int) $c->count_drug_tickets,
+                    'auto' => (int) $c->count_auto_tickets,
+                ],
+            ];
+        })->all();
     }
 }
