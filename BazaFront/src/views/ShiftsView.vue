@@ -84,6 +84,9 @@ async function doClose(id) {
         err.value = e?.response?.status === 403 ? 'Можно закрыть только свою смену' : 'Не удалось закрыть';
     }
 }
+
+// Без этого вызова «Открытые смены» висели на «Загрузка…»: onMounted был импортирован, но не дёргался.
+onMounted(reload);
 </script>
 
 <template>
