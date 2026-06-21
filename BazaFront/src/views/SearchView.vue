@@ -5,16 +5,22 @@
 import { ref } from 'vue';
 import { searchTickets } from '@/services/search';
 import { doEnter } from '@/services/scan';
+import { highlightMatch } from '@/lib/highlight';
 
 const q = ref('');
 const rows = ref([]);
 const loading = ref(false);
 const searched = ref(false);
 const offline = ref(false);
+// Запрос, по которому показан текущий список — для подсветки совпадений в результатах.
+const lastQuery = ref('');
 // Статусы впуска по ключу строки: 'ok' | 'queued' | сообщение об ошибке.
 const entered = ref({});
 
 const online = () => navigator.onLine;
+
+// Подсветка найденного: где в строке встретился запрос — выделяем жирным (XSS-безопасно).
+const hl = (value) => highlightMatch(value, lastQuery.value);
 
 async function run() {
     const term = q.value.trim();
@@ -23,6 +29,7 @@ async function run() {
     offline.value = !online();
     try {
         rows.value = await searchTickets(term, { online: online() });
+        lastQuery.value = term;
         searched.value = true;
         entered.value = {};
     } finally {
@@ -75,7 +82,7 @@ async function enter(row) {
         <ul class="search-list">
             <li v-for="row in rows" :key="row.key" class="search-row">
                 <div class="sr-main">
-                    <div class="sr-name">{{ row.name }}</div>
+                    <div class="sr-name" v-html="hl(row.name)"></div>
                     <div class="sr-meta">
                         <span
                             v-if="row.color"
@@ -92,15 +99,15 @@ async function enter(row) {
                         v-if="row.phone || row.email || row.telegram || row.city || row.carNumber || row.childName || row.parentPhone || row.externalOrderNo || row.comment"
                         class="sr-pii"
                     >
-                        <span v-if="row.phone" class="sr-pii-item"><i class="pi pi-phone"></i> {{ row.phone }}</span>
-                        <span v-if="row.email" class="sr-pii-item"><i class="pi pi-envelope"></i> {{ row.email }}</span>
-                        <span v-if="row.telegram" class="sr-pii-item"><i class="pi pi-send"></i> {{ row.telegram }}</span>
-                        <span v-if="row.city" class="sr-pii-item"><i class="pi pi-map-marker"></i> {{ row.city }}</span>
-                        <span v-if="row.carNumber" class="sr-pii-item">Авто: {{ row.carNumber }}</span>
-                        <span v-if="row.childName" class="sr-pii-item">Ребёнок: {{ row.childName }}</span>
-                        <span v-if="row.parentPhone" class="sr-pii-item">Родитель: {{ row.parentPhone }}</span>
-                        <span v-if="row.externalOrderNo" class="sr-pii-item">№ заказа: {{ row.externalOrderNo }}</span>
-                        <span v-if="row.comment" class="sr-pii-item sr-pii-comment">{{ row.comment }}</span>
+                        <span v-if="row.phone" class="sr-pii-item"><i class="pi pi-phone"></i> <span v-html="hl(row.phone)"></span></span>
+                        <span v-if="row.email" class="sr-pii-item"><i class="pi pi-envelope"></i> <span v-html="hl(row.email)"></span></span>
+                        <span v-if="row.telegram" class="sr-pii-item"><i class="pi pi-send"></i> <span v-html="hl(row.telegram)"></span></span>
+                        <span v-if="row.city" class="sr-pii-item"><i class="pi pi-map-marker"></i> <span v-html="hl(row.city)"></span></span>
+                        <span v-if="row.carNumber" class="sr-pii-item">Авто: <span v-html="hl(row.carNumber)"></span></span>
+                        <span v-if="row.childName" class="sr-pii-item">Ребёнок: <span v-html="hl(row.childName)"></span></span>
+                        <span v-if="row.parentPhone" class="sr-pii-item">Родитель: <span v-html="hl(row.parentPhone)"></span></span>
+                        <span v-if="row.externalOrderNo" class="sr-pii-item">№ заказа: <span v-html="hl(row.externalOrderNo)"></span></span>
+                        <span v-if="row.comment" class="sr-pii-item sr-pii-comment" v-html="hl(row.comment)"></span>
                     </div>
                 </div>
                 <div class="sr-action">
