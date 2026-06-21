@@ -76,10 +76,12 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
         $resultRawList = $this->friendlyTicketModel::whereFestivalId(self::UUID_FESTIVAL)
                 ->where(function($query) use ($q, $like) {
+                    // Поиск по ВСЕМ полям (решение владельца): ФИО/проект/email/коммент.
                     $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
                         ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
-                        ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like]);
-                    // Номер билета — только для числового запроса (иначе (int)"test" === 0). comment убран.
+                        ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like])
+                        ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
+                    // Номер билета — только для числового запроса (иначе (int)"test" === 0).
                     if (ctype_digit($q)) {
                         $query->orWhere('kilter', (int) $q);
                     }

@@ -78,11 +78,12 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
         $resultRawList = $this->spisokTicketModel
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($like) {
-                // comment убран из гостевого поиска (внутренние заметки персонала).
+                // Поиск по ВСЕМ полям (решение владельца): ФИО/куратор/проект/email/коммент.
                 $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
                     ->orWhereRaw('LOWER(`curator`) LIKE ? ', [$like])
                     ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
-                    ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like]);
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
             })
             ->get()
             ->toArray();

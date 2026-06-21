@@ -58,11 +58,13 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
         $resultRawList = $this->model::where('auto', '<>', '')
             ->where('festival_id', '=', self::UUID_FESTIVAL)
             ->where(function ($query) use ($like) {
-                // Поиск парковки по госномеру ТЕКСТОМ ($q как есть): раньше (int)"test" === 0
-                // → LIKE '%0%' тянул все номера с нулём («шляпа»). comment убран (внутренние заметки).
+                // Поиск по ВСЕМ полям (решение владельца): госномер/проект/куратор/коммент.
+                // Госномер ищем ТЕКСТОМ ($q как есть): раньше (int)"test" === 0 → LIKE '%0%' тянул
+                // все номера с нулём («шляпа»).
                 $query->orWhereRaw('LOWER(`auto`) LIKE ? ', [$like])
                     ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
-                    ->orWhereRaw('LOWER(`curator`) LIKE ? ', [$like]);
+                    ->orWhereRaw('LOWER(`curator`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
             })
             ->get()->toArray();
 

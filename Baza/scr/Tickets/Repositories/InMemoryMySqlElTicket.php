@@ -98,12 +98,13 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
         $resultRawList = $this->addFestivalUuid()
             ->where(function ($query) use ($q, $like) {
+                // Поиск по ВСЕМ полям (решение владельца): ФИО/email/телефон/коммент.
                 $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
                     ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like])
-                    ->orWhereRaw('LOWER(`phone`) LIKE ? ', [$like]);
+                    ->orWhereRaw('LOWER(`phone`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
                 // Поиск по номеру билета — ТОЛЬКО для числового запроса. Иначе (int)"test" === 0
-                // и whereKilter(0) тянул бы нерелевантные билеты («шляпа»). comment убран из
-                // гостевого поиска (внутренние заметки персонала, не идентификация гостя).
+                // и whereKilter(0) тянул бы нерелевантные билеты («шляпа»).
                 if (ctype_digit($q)) {
                     $query->orWhere('kilter', (int) $q);
                 }

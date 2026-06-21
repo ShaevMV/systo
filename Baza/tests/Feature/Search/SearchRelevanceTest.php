@@ -103,19 +103,15 @@ class SearchRelevanceTest extends TestCase
         self::assertEmpty($this->search('test')['auto'] ?? [], '"test" не должен тянуть парковки');
     }
 
-    public function test_comment_excluded_from_guest_search(): void
+    public function test_search_works_across_all_fields(): void
     {
-        $this->el(303, 'Аноним Без Теста', 'a@b.ru', 'test служебная заметка');
+        // Решение владельца: поиск по ВСЕМ полям. Любое уникальное слово в comment/email/name
+        // должно находиться. (Числовой (int)-баг при этом не воскресает — он только для kilter.)
+        $this->el(303, 'Аноним', 'a@b.ru', 'комментарий уникумъ');
+        $this->el(404, 'Иван Почтовый', 'pochta@example.ru', 'без метки');
 
-        // comment содержит "test", но он убран из гостевого поиска → не находим.
-        self::assertEmpty($this->search('test')['electron'] ?? [], 'comment не участвует в гостевом поиске');
-    }
-
-    public function test_email_match_is_intended(): void
-    {
-        // Документируем ОЖИДАЕМОЕ: поиск по email работает (демо-данные с @test.* — это норма).
-        $this->el(404, 'Иван Почтовый', 'guest@test.com');
-
-        self::assertNotEmpty($this->search('test')['electron'] ?? [], 'поиск по email — штатное поведение');
+        self::assertNotEmpty($this->search('уникумъ')['electron'] ?? [], 'поиск по comment');
+        self::assertNotEmpty($this->search('pochta')['electron'] ?? [], 'поиск по email');
+        self::assertNotEmpty($this->search('Почтовый')['electron'] ?? [], 'поиск по ФИО');
     }
 }
