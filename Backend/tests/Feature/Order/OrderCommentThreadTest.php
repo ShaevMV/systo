@@ -193,4 +193,22 @@ class OrderCommentThreadTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('success', false);
     }
+
+    public function test_add_comment_to_missing_order_returns_404(): void
+    {
+        $this->actingAs($this->admin(), 'api');
+
+        $this->postJson($this->addUrl('00000000-0000-4000-8000-000000000000'), ['comment' => 'нет такого заказа'])
+            ->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_list_comments_of_missing_order_returns_404(): void
+    {
+        $this->actingAs($this->admin(), 'api');
+
+        $this->getJson($this->listUrl('00000000-0000-4000-8000-000000000000'))
+            ->assertStatus(404)
+            ->assertJsonPath('success', false);
+    }
 }

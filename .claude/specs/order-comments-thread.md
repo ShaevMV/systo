@@ -35,7 +35,7 @@
 | КПП Baza (любой персонал смены) | S2S → org `POST /api/v1/baza/order/{id}/comment` (X-Baza-Token) | S2S → org `GET` + показ в карточке скан/поиск | `baza`, author_name=ФИО персонала (из payload) |
 
 ### История
-Каждый комментарий → событие `comment_added` в `domain_history` (`aggregate_type=order_ticket`), чтобы тред был виден в таймлайне заказа (PR-E). Payload без ПДн гостей.
+Каждый комментарий → событие `comment_added` в `domain_history` (`aggregate_type=order` — как все события заказа: `OrderStatusChangedEvent`/`OrderCreatedEvent`/…; `getHistory` читает по `aggregateId=orderId`), чтобы тред был виден в таймлайне заказа (PR-E). Payload без ПДн (`{source, has_text, length}` — текст комментария НЕ кладётся).
 
 ### Поиск (online-only)
 - Классика: `el_tickets.comment` LIKE — уже работает.
