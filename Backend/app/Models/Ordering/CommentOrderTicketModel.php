@@ -16,9 +16,11 @@ use Shared\Infrastructure\Models\HasUuid;
  * App\Models\Ordering\CommentOrderTicketModel
  *
  * @property string $id
- * @property string $user_id
+ * @property string|null $user_id
  * @property string $order_tickets_id
  * @property string $comment
+ * @property string|null $author_name
+ * @property string $author_source
  * @property int $is_checkin
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
@@ -42,7 +44,7 @@ final class CommentOrderTicketModel extends Model
     protected $table = self::TABLE;
 
     protected $fillable = [
-        'id', 'user_id', 'order_tickets_id', 'comment', 'is_checkin'
+        'id', 'user_id', 'order_tickets_id', 'comment', 'author_name', 'author_source', 'is_checkin'
     ];
 
     public function order(): BelongsTo
