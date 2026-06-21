@@ -75,6 +75,10 @@ Route::middleware('auth')->group(function () {
 
     // «Кто я» для PWA (роль + права) — гейтинг меню + признак полной карточки (Шаг 3).
     Route::get('/api/whoami', [\App\Http\Controllers\Api\WhoamiController::class, 'index'])->name('whoami');
+
+    // Личное расписание сотрудника (PR-A). Доступ — только 'auth' (без shift.compose):
+    // рядовой охранник/билетёр видит СВОИ плановые смены. GET → CSRF не требуется.
+    Route::get('/api/my-schedule', [\App\Http\Controllers\Api\MyScheduleController::class, 'index'])->name('api.my-schedule');
 });
 
 // Матрица прав «роль×действие» в новом PWA (Шаг 4). GET — CSRF не нужен; POST — X-XSRF-TOKEN.
@@ -99,6 +103,15 @@ Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
 });
 Route::middleware(['auth', 'permission:shift.close'])->group(function () {
     Route::post('/api/shifts/{id}/close', [\App\Http\Controllers\Api\ShiftController::class, 'close'])->name('api.shifts.close');
+});
+
+// Плановое расписание смен (PR-A). Составление сетки заранее — право shift.compose.
+// Изоляция начальника (своя плановая смена) — внутри контроллера. GET — CSRF не нужен; POST/PUT — X-XSRF-TOKEN.
+Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
+    Route::get('/api/schedules', [\App\Http\Controllers\Api\ShiftScheduleController::class, 'index'])->name('api.schedules.list');
+    Route::post('/api/schedules', [\App\Http\Controllers\Api\ShiftScheduleController::class, 'store'])->name('api.schedules.store');
+    Route::put('/api/schedules/{id}', [\App\Http\Controllers\Api\ShiftScheduleController::class, 'update'])->name('api.schedules.update');
+    Route::post('/api/schedules/{id}/cancel', [\App\Http\Controllers\Api\ShiftScheduleController::class, 'cancel'])->name('api.schedules.cancel');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
