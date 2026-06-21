@@ -296,6 +296,37 @@ jobs:
             echo "✓ QR_INGEST_TOKENS уже есть"
           fi
 
+      # BAZA_INGEST — канал доставки билетов org→Baza через API (Ф3). Решение владельца:
+      # записи из org должны приходить в Baza через API. Если URL+токен не заданы — org
+      # пишет в БД Baza напрямую (fallback, поведение не меняется). Здесь активируем канал:
+      # ОДИН общий токен в Backend/.env (BAZA_INGEST_URL+BAZA_INGEST_TOKEN — отправитель) и
+      # Baza/.env (BAZA_INGEST_TOKENS — приёмник). Идемпотентно (работаем только если токены
+      # отсутствуют/рассинхронены). Сбой API → DeliverTicketToBazaJob падает в fallback (БД).
+      # ВАЖНО: env_file читается при СОЗДАНИИ контейнера → пересоздаём отправителя (php+worker)
+      # и приёмник (phpbaza). Только staging — на прод канал включается отдельно (под freeze).
+      - name: Activate org→Baza ingest channel (if missing)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          BAZA_URL="https://vhod.staging.spaceofjoy.ru"
+          ORG_TOKEN="$(grep -E '^BAZA_INGEST_TOKEN=' Backend/.env | cut -d= -f2)"
+          BAZA_TOKENS="$(grep -E '^BAZA_INGEST_TOKENS=' Baza/.env | cut -d= -f2)"
+          if [ -z "$ORG_TOKEN" ] || [ "$ORG_TOKEN" != "$BAZA_TOKENS" ]; then
+            echo "Активирую канал org→Baza (ingest API)…"
+            TOKEN="${ORG_TOKEN:-$(openssl rand -hex 32)}"
+            # org-сторона (отправитель)
+            grep -qE '^BAZA_INGEST_URL=' Backend/.env && sed -i "s|^BAZA_INGEST_URL=.*|BAZA_INGEST_URL=${BAZA_URL}|" Backend/.env || echo "BAZA_INGEST_URL=${BAZA_URL}" >> Backend/.env
+            grep -qE '^BAZA_INGEST_TOKEN=' Backend/.env && sed -i "s|^BAZA_INGEST_TOKEN=.*|BAZA_INGEST_TOKEN=${TOKEN}|" Backend/.env || echo "BAZA_INGEST_TOKEN=${TOKEN}" >> Backend/.env
+            # Baza-сторона (приёмник) — тот же токен в списке валидных
+            grep -qE '^BAZA_INGEST_TOKENS=' Baza/.env && sed -i "s|^BAZA_INGEST_TOKENS=.*|BAZA_INGEST_TOKENS=${TOKEN}|" Baza/.env || echo "BAZA_INGEST_TOKENS=${TOKEN}" >> Baza/.env
+            if docker compose -f docker-compose.staging.yml --env-file .env.staging ps php-staging | grep -q "Up"; then
+              echo "Пересоздаю php-staging, worker-staging, phpbaza-staging для подхвата BAZA_INGEST…"
+              docker compose -f docker-compose.staging.yml --env-file .env.staging up -d --force-recreate --no-deps php-staging worker-staging phpbaza-staging
+            fi
+            echo "::notice::Канал org→Baza (ingest API) активирован."
+          else
+            echo "✓ BAZA_INGEST уже настроен (канал org→Baza через API активен)"
+          fi
+
       # NODE_ENV=production в compose заставляет `npm ci` пропустить devDependencies,
       # а vue-cli-service лежит как раз в devDependencies → нужен --include=dev для сборки.
       - name: Build frontend (npm ci + npm run build)
