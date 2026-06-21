@@ -49,13 +49,20 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
 
     public function find(string $q): array
     {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        $like = '%' . strtolower($q) . '%';
+
         $resultRawList = $this->model::where('auto', '<>', '')
             ->where('festival_id', '=', self::UUID_FESTIVAL)
-            ->where(function ($query) use ($q) {
-                return $query->where('auto', 'like', '%' . (int)$q . '%')
-                    ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`curator`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                    ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
+            ->where(function ($query) use ($like) {
+                // Поиск парковки по госномеру ТЕКСТОМ ($q как есть): раньше (int)"test" === 0
+                // → LIKE '%0%' тянул все номера с нулём («шляпа»). comment убран (внутренние заметки).
+                $query->orWhereRaw('LOWER(`auto`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`curator`) LIKE ? ', [$like]);
             })
             ->get()->toArray();
 

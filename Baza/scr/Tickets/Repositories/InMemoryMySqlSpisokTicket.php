@@ -69,14 +69,20 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 
     public function find(string $q): array
     {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        $like = '%' . strtolower($q) . '%';
+
         $resultRawList = $this->spisokTicketModel
             ->where('festival_id', '=', self::UUID_FESTIVAL)
-            ->where(function ($query) use ($q) {
-                return $query->orWhereRaw('LOWER(`curator`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`project`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`name`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`email`) LIKE ? ', ['%' . strtolower(trim($q)) . '%']);
+            ->where(function ($query) use ($like) {
+                // comment убран из гостевого поиска (внутренние заметки персонала).
+                $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`curator`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like]);
             })
             ->get()
             ->toArray();
