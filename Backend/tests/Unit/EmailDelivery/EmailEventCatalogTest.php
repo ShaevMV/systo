@@ -31,4 +31,23 @@ class EmailEventCatalogTest extends TestCase
         $this->assertNotEmpty($entry);
         $this->assertSame('Анкета одобрена', $entry[0]['label']);
     }
+
+    public function test_questionnaire_rejected_is_registered(): void
+    {
+        $this->assertSame('questionnaire_rejected', EmailEvent::QUESTIONNAIRE_REJECTED);
+        $this->assertTrue(EmailEvent::isValid(EmailEvent::QUESTIONNAIRE_REJECTED));
+        $this->assertSame('questionnaireRejected', EmailEvent::defaultSlug(EmailEvent::QUESTIONNAIRE_REJECTED));
+        $this->assertContains('questionnaire_rejected', EmailEvent::all());
+    }
+
+    public function test_catalog_contains_questionnaire_rejected_label(): void
+    {
+        $entry = array_values(array_filter(
+            EmailEvent::catalog(),
+            static fn (array $i): bool => $i['value'] === 'questionnaire_rejected',
+        ));
+
+        $this->assertNotEmpty($entry);
+        $this->assertSame('Анкета отклонена', $entry[0]['label']);
+    }
 }
