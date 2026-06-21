@@ -30,6 +30,7 @@ use Tickets\Order\OrderTicket\Application\GetOrderList\ForAdmin\OrderFilterQuery
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForFriendly\OrderFilterQuery as OrderFilterQueryForFriendly;
 use Tickets\Order\OrderTicket\Application\GetOrderList\ForLists\OrderFilterQuery as OrderFilterQueryForLists;
 use Tickets\Order\OrderTicket\Application\GetOrderList\GetOrder;
+use Tickets\Order\OrderTicket\Application\ListComments\ListOrderComments;
 use Tickets\Order\OrderTicket\Application\Pricing\Dto\RawGuestInput;
 use Tickets\Order\OrderTicket\Application\Pricing\OrderPriceCalculator;
 use Tickets\Order\OrderTicket\Application\TotalNumber\TotalNumber;
@@ -59,6 +60,7 @@ class OrderTickets extends Controller
         private ChangeOrderPrice   $changeOrderPrice,
         private TicketApplication  $ticketApplication,
         private AddComment         $addComment,
+        private ListOrderComments  $listOrderComments,
         private ChangeTicket       $changeTicket,
         private GetOrderHistory    $getOrderHistory,
         private \Tickets\Auto\Application\AutoApplication $autoApplication,
@@ -862,6 +864,90 @@ class OrderTickets extends Controller
                 ];
             }, $history),
         ]);
+    }
+
+    /**
+     * Добавить комментарий в тред заказа (append-only).
+     * Доступ: admin / manager (см. routes/order.php). Автор — текущий org-юзер.
+     *
+     * @throws Throwable
+     */
+    public function addComment(string $id, Request $request): JsonResponse
+    {
+        $message = trim((string) $request->input('comment', ''));
+
+        if ($message === '') {
+            return response()->json([
+                'success' => false,
+                'errors'  => ['comment' => ['Комментарий обязателен']],
+            ], 422);
+        }
+
+        $orderUuid = new Uuid($id);
+
+        // Заказ должен существовать (проверка через Application, БД — в репозитории).
+        if (is_null($this->getOrder->getItemById($orderUuid))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Заказ не найден',
+            ], 404);
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        $createdId = $this->addComment->add(
+            orderId:      $orderUuid,
+            message:      $message,
+            authorSource: \Tickets\Order\OrderTicket\ValueObject\CommentSource::ORG_USER,
+            userId:       new Uuid((string) Auth::id()),
+            authorName:   $user->name,
+        );
+
+        // Возвращаем именно созданную запись треда (по её id, без угадывания по времени).
+        $created = $this->listOrderComments->getById($createdId);
+
+        return response()->json([
+            'success' => true,
+            'comment' => $created === null ? null : $this->commentToArray($created),
+        ]);
+    }
+
+    /**
+     * Весь тред комментариев заказа (хронологический порядок). Доступ: admin.
+     */
+    public function getComments(string $id): JsonResponse
+    {
+        $orderUuid = new Uuid($id);
+
+        if (is_null($this->getOrder->getItemById($orderUuid))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Заказ не найден',
+            ], 404);
+        }
+
+        return response()->json([
+            'success'  => true,
+            'comments' => array_map(
+                fn (\Tickets\Order\OrderTicket\ValueObject\CommentForOrder $c) => $this->commentToArray($c),
+                $this->listOrderComments->getByOrderId($orderUuid)
+            ),
+        ]);
+    }
+
+    /**
+     * Проекция одного комментария для API.
+     */
+    private function commentToArray(\Tickets\Order\OrderTicket\ValueObject\CommentForOrder $comment): array
+    {
+        return [
+            'id'            => $comment->id->value(),
+            'comment'       => $comment->getComment(),
+            'author_name'   => $comment->getAuthorName(),
+            'author_source' => $comment->getAuthorSource(),
+            'created_at'    => $comment->created_at->toIso8601String(),
+        ];
     }
 
     /**

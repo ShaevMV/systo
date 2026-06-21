@@ -75,6 +75,15 @@ Route::prefix('v1/order')->group(static function (): void {
         ->middleware('auth:api')
         ->middleware('admin');
 
+    // Тред комментариев заказа (C1): добавить (admin/manager) + прочитать весь тред (admin)
+    Route::post('/{id}/comment', [OrderTickets::class, 'addComment'])
+        ->middleware('auth:api')
+        ->middleware('role:admin,manager');
+
+    Route::get('/{id}/comments', [OrderTickets::class, 'getComments'])
+        ->middleware('auth:api')
+        ->middleware('admin');
+
     // Авто заказа-списка: добавление и удаление (admin / curator / pusher_curator)
     Route::post('/{id}/auto', [OrderTickets::class, 'addAuto'])
         ->middleware('auth:api')
