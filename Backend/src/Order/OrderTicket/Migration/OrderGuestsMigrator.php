@@ -66,7 +66,7 @@ class OrderGuestsMigrator
 
         // Обрабатываем чанками — на 50k заказов разом память не закончится.
         $this->db->table('order_tickets')
-            ->select(['id', 'guests', 'ticket_type_id', 'promo_code', 'price', 'discount'])
+            ->select(['id', 'guests', 'ticket_type_id', 'promo_code', 'price', 'discount', 'festival_id'])
             ->orderBy('id')
             ->chunk($chunkSize, function ($rows) use ($report, $liveByTicketType, $dryRun) {
                 foreach ($rows as $row) {
@@ -83,14 +83,18 @@ class OrderGuestsMigrator
      *
      * @param  array<int, array<string, mixed>>  $guests   текущий массив гостей (legacy или уже новый)
      * @param  array<string, bool>  $liveByTicketType   map [ticket_type_id → is_live_ticket]
+     * @param  ?string  $orderFestivalId  festival_id заказа — инжектится в гостей, у которых
+     *                                     его нет (legacy-формат хранил festival_id на уровне заказа,
+     *                                     а OrderGuestLine::fromState требует его per-guest)
      * @return array{
      *     guests: array<int, array<string, mixed>>,
      *     migrated: bool,
      *     totalBefore: float,
      *     totalAfter: float,
      *     emptyGuests: bool,
+     *     orphanTicketType: bool,
+     *     clampedDiscount: bool,
      * }
-     * @throws \RuntimeException при некорректных данных (отрицательный total, неизвестный ticket_type)
      */
     public function transformOrderGuests(
         array $guests,
@@ -99,6 +103,7 @@ class OrderGuestsMigrator
         float $price,
         float $discount,
         array $liveByTicketType,
+        ?string $orderFestivalId = null,
     ): array {
         if (empty($guests)) {
             return [
@@ -107,41 +112,41 @@ class OrderGuestsMigrator
                 'totalBefore' => 0.0,
                 'totalAfter' => 0.0,
                 'emptyGuests' => true,
+                'orphanTicketType' => false,
+                'clampedDiscount' => false,
             ];
         }
 
-        // Идемпотентность: если у ПЕРВОГО гостя есть price_snapshot — заказ уже мигрирован.
-        // Не разбираем массив целиком, потому что миграция всех гостей атомарна
-        // (UPDATE order_tickets.guests = ... обновляет весь JSON одной операцией).
-        if (isset($guests[0]['price_snapshot'])) {
+        // Идемпотентность: заказ считается мигрированным, только если у ПЕРВОГО гостя есть
+        // И price_snapshot, И festival_id. festival_id добавлен позже самого price_snapshot —
+        // заказы, мигрированные ранней версией без festival_id, должны до-мигрироваться
+        // (recompute детерминирован: цена берётся из тех же order.price/discount).
+        if (isset($guests[0]['price_snapshot'], $guests[0]['festival_id'])) {
             return [
                 'guests' => $guests,
                 'migrated' => false,
                 'totalBefore' => 0.0,
                 'totalAfter' => 0.0,
                 'emptyGuests' => false,
+                'orphanTicketType' => false,
+                'clampedDiscount' => false,
             ];
         }
 
-        // Валидация: discount > price — означает кривые данные.
-        // Money не может быть отрицательным (конструктор VO кидает exception),
-        // поэтому отказываем заранее с понятным сообщением.
+        // Clamp: discount > price — кривые данные (напр. детский билет в статусе new с битым
+        // discount). Money не может быть отрицательным → клампим discount к price (total = 0).
+        // Это историческое легаси; заказ всё равно мигрируется, факт фиксируем в отчёте.
+        $clampedDiscount = false;
         if ($discount > $price) {
-            throw new \RuntimeException(sprintf(
-                'discount > price (%.2f > %.2f) — отрицательный totalPerGuest недопустим',
-                $discount, $price,
-            ));
+            $discount = $price;
+            $clampedDiscount = true;
         }
 
-        // Валидация: если ticket_type указан, но его нет в preload-карте, это сломанные данные
-        // (orphan FK / удалённый тип). Молчаливый fallback на is_live_ticket=false скрыл бы
-        // аномалию — лучше явно репортить и дать оператору решить.
-        if ($ticketTypeId !== null && ! array_key_exists($ticketTypeId, $liveByTicketType)) {
-            throw new \RuntimeException(sprintf(
-                'ticket_type %s не найден (orphan FK или удалённый тип)',
-                $ticketTypeId,
-            ));
-        }
+        // Orphan/удалённый ticket_type (старые фесты, тип удалён из каталога): тип нужен ТОЛЬКО
+        // для флага is_live_ticket — цена берётся из самого заказа (order.price/discount).
+        // Безопасный fallback на is_live_ticket=false (вместо падения), заказ мигрируется.
+        // Факт фиксируем в отчёте (не глушим молча).
+        $orphanTicketType = $ticketTypeId !== null && ! array_key_exists($ticketTypeId, $liveByTicketType);
 
         $count = count($guests);
         $totalBefore = $price - $discount;
@@ -172,6 +177,10 @@ class OrderGuestsMigrator
                 'promo_code' => $promoCode,
                 'price_snapshot' => $snapshot,
                 'is_live_ticket' => $isLiveTicket,
+                // festival_id обязателен для OrderGuestLine::fromState. Legacy-гости часто его
+                // НЕ имели (festival_id жил на уровне заказа) → инжектим из заказа, сохраняя
+                // значение гостя, если оно уже есть.
+                'festival_id' => $guest['festival_id'] ?? $orderFestivalId,
             ]);
 
             $totalAfter += $totalPerGuest;
@@ -183,6 +192,8 @@ class OrderGuestsMigrator
             'totalBefore' => (float) $totalBefore,
             'totalAfter' => $totalAfter,
             'emptyGuests' => false,
+            'orphanTicketType' => $orphanTicketType,
+            'clampedDiscount' => $clampedDiscount,
         ];
     }
 
@@ -213,6 +224,7 @@ class OrderGuestsMigrator
                 price: (float) ($row->price ?? 0.0),
                 discount: (float) ($row->discount ?? 0.0),
                 liveByTicketType: $liveByTicketType,
+                orderFestivalId: $row->festival_id ?? null,
             );
 
             if ($result['emptyGuests']) {
@@ -230,6 +242,13 @@ class OrderGuestsMigrator
             $report->totalBefore += $result['totalBefore'];
             $report->totalAfter += $result['totalAfter'];
             $report->maxAllowedRoundingError += max(0, count($rawGuests) - 1);
+
+            if ($result['orphanTicketType']) {
+                $report->fallbackOrphanTicketType++;
+            }
+            if ($result['clampedDiscount']) {
+                $report->clampedDiscount++;
+            }
 
             if (! $dryRun) {
                 $this->db->table('order_tickets')

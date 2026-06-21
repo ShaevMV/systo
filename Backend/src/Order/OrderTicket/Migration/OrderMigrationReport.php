@@ -25,8 +25,12 @@ final class OrderMigrationReport
         public int $emptyGuestsSkipped = 0,
         /** Заказов фактически мигрированных в этом прогоне */
         public int $migrated = 0,
-        /** Заказов с ошибкой (битый JSON, неконсистентные поля, неизвестный ticket_type) */
+        /** Заказов с ошибкой (битый JSON, неконсистентные поля) */
         public int $errors = 0,
+        /** Заказов с fallback на is_live_ticket=false из-за orphan/удалённого ticket_type (старые фесты) */
+        public int $fallbackOrphanTicketType = 0,
+        /** Заказов где discount склампен к price (битые данные discount > price → total=0) */
+        public int $clampedDiscount = 0,
         /** Контрольная сумма `price - discount` ДО миграции (по всем мигрируемым заказам) */
         public float $totalBefore = 0.0,
         /** Контрольная сумма `Σ price_snapshot.total` ПО ВСЕМ ГОСТЯМ ПОСЛЕ миграции */
@@ -64,6 +68,8 @@ final class OrderMigrationReport
             ['Пустые guests (skip)', $this->emptyGuestsSkipped],
             ['Фактически мигрировано', $this->migrated],
             ['Ошибок', $this->errors],
+            ['Fallback orphan ticket_type (is_live=false)', $this->fallbackOrphanTicketType],
+            ['Склампен discount>price (total=0)', $this->clampedDiscount],
             ['Сумма ДО (price - discount)', number_format($this->totalBefore, 2, '.', ' ')],
             ['Сумма ПОСЛЕ (Σ price_snapshot.total)', number_format($this->totalAfter, 2, '.', ' ')],
             ['Расхождение (округление)', number_format($this->roundingDelta(), 2, '.', ' ')],
