@@ -122,17 +122,22 @@ jobs:
 
       # Защита от потери локальных прод-правок (SSL/nginx и пр.): если есть
       # незакоммиченные изменения ОТСЛЕЖИВАЕМЫХ файлов — прерываем, не затирая.
-      - name: Guard — clean working tree
+      - name: Guard — clean working tree (кроме certbot-сертов и dev-файлов)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          DIRTY="$(git status --porcelain --untracked-files=no)"
+          # Файлы, которые штатно меняются НА ПРОДЕ и НЕ должны блокировать выкат:
+          #  - Docker/nginx/ssl/*.pem        — certbot обновляет серты на месте (сохраняем при checkout)
+          #  - Docker/nginx/default.dev.conf — dev-конфиг, прод его НЕ монтирует (mount = default.conf)
+          #  - bootstrap/cache/.gitignore    — артефакт Laravel
+          ALLOW='Docker/nginx/ssl/|Docker/nginx/default\.dev\.conf|bootstrap/cache/\.gitignore'
+          DIRTY="$(git status --porcelain --untracked-files=no | grep -vE "$ALLOW" || true)"
           if [[ -n "$DIRTY" ]]; then
-            echo "::error::На проде есть незакоммиченные изменения отслеживаемых файлов — выкат прерван (чтобы их не затереть):"
+            echo "::error::На проде есть НЕОЖИДАННЫЕ незакоммиченные изменения отслеживаемых файлов — выкат прерван (чтобы их не затереть):"
             echo "$DIRTY"
             echo "Разберись вручную (commit/stash/restore), потом перезапусти деплой."
             exit 1
           fi
-          echo "✓ Рабочее дерево чистое"
+          echo "✓ Рабочее дерево чистое (certbot-серты/dev-файлы — исключение)"
 
       # ─── КРИТИЧНО: бэкап БД ПЕРЕД любыми изменениями ───────────────────────
       - name: Backup databases (systo + baza)
@@ -174,16 +179,24 @@ jobs:
           docker compose -f "$COMPOSE" exec -T phpBaza php artisan down || true
           echo "✓ Maintenance включён"
 
-      - name: Pull code (checkout tag)
+      - name: Pull code (checkout tag, сохраняя certbot-серты)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          # Прод держит ЖИВЫЕ certbot-серты в отслеживаемых Docker/nginx/ssl/*.pem.
+          # checkout --force откатил бы их на старые версии из репо → HTTPS лёг бы.
+          # Бэкапим серты ДО checkout и возвращаем ПОСЛЕ (nginx поднимется на up -d с живыми).
+          SSL_BK="$(mktemp -d)"
+          cp -a Docker/nginx/ssl/*.pem "$SSL_BK"/ 2>/dev/null || true
           sudo git -C "$PROJECT_DIR" fetch --all --tags --prune
           sudo git -C "$PROJECT_DIR" checkout --force "$REF"
           # Если REF — ветка, подтягиваем; если тег — checkout уже зафиксировал коммит.
           if sudo git -C "$PROJECT_DIR" show-ref --verify --quiet "refs/remotes/origin/$REF"; then
             sudo git -C "$PROJECT_DIR" reset --hard "origin/$REF"
           fi
-          echo "✓ Выкачен $(git -C "$PROJECT_DIR" rev-parse --short HEAD) ($REF)"
+          # Возвращаем живые серты поверх версий из тега.
+          cp -a "$SSL_BK"/*.pem Docker/nginx/ssl/ 2>/dev/null || true
+          rm -rf "$SSL_BK"
+          echo "✓ Выкачен $(git -C "$PROJECT_DIR" rev-parse --short HEAD) ($REF); certbot-серты сохранены"
           git -C "$PROJECT_DIR" log -1 --pretty=format:'%h %s'
 
       - name: Build images (подхватить изменения Dockerfile — worker; расширения под Laravel 11)
