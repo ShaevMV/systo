@@ -35,6 +35,7 @@ final class EmailEvent
     public const INVITE = 'invite';
     public const QUESTIONNAIRE = 'questionnaire';
     public const QUESTIONNAIRE_APPROVED = 'questionnaire_approved';
+    public const QUESTIONNAIRE_REJECTED = 'questionnaire_rejected';
 
     /** event → дефолтный slug шаблона (= текущий зашитый в Mailable). */
     private const DEFAULT_SLUG = [
@@ -54,6 +55,7 @@ final class EmailEvent
         self::INVITE => 'invate',
         self::QUESTIONNAIRE => 'questionnaire',
         self::QUESTIONNAIRE_APPROVED => 'questionnaireApproved',
+        self::QUESTIONNAIRE_REJECTED => 'questionnaireRejected',
     ];
 
     /** event → человекочитаемая метка (для селектора события в админке). */
@@ -74,6 +76,7 @@ final class EmailEvent
         self::INVITE => 'Приглашение',
         self::QUESTIONNAIRE => 'Анкета гостя',
         self::QUESTIONNAIRE_APPROVED => 'Анкета одобрена',
+        self::QUESTIONNAIRE_REJECTED => 'Анкета отклонена',
     ];
 
     /** @return string[] все коды событий */
