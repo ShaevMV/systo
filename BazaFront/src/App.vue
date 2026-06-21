@@ -82,7 +82,8 @@ async function doUnlock() {
 const tabs = [
     { name: 'scan', label: 'Скан', icon: 'pi-qrcode' },
     { name: 'search', label: 'Поиск', icon: 'pi-search' },
-    { name: 'shift', label: 'Смена', icon: 'pi-users' }
+    { name: 'shift', label: 'Смена', icon: 'pi-id-card' },
+    { name: 'more', label: 'Ещё', icon: 'pi-bars' }
 ];
 </script>
 

@@ -77,6 +77,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/whoami', [\App\Http\Controllers\Api\WhoamiController::class, 'index'])->name('whoami');
 });
 
+// Матрица прав «роль×действие» в новом PWA (Шаг 4). GET — CSRF не нужен; POST — X-XSRF-TOKEN.
+// Доступ только с правом rbac.manage (administrator по дефолту).
+Route::middleware(['auth', 'permission:rbac.manage'])->group(function () {
+    Route::get('/api/permissions/matrix', [\App\Http\Controllers\Api\PermissionController::class, 'matrix'])->name('api.permissions.matrix');
+    Route::post('/api/permissions/matrix', [\App\Http\Controllers\Api\PermissionController::class, 'save'])->name('api.permissions.save');
+});
+
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
 // administrator проходит везде (суперроль), is_admin-юзеры не теряют доступ.
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware(['auth', 'permission:report.view']);
