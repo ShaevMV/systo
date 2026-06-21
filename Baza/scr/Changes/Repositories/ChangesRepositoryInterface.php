@@ -52,6 +52,9 @@ interface ChangesRepositoryInterface
 
     public function remove(int $id): bool;
 
+    /** Существует ли смена с таким id (для 404 вместо 500 на закрытии несуществующей). */
+    public function exists(int $id): bool;
+
     /**
      * Открытые смены (end IS NULL) текущего фестиваля для экрана управления (Шаг 6).
      * $chiefId != null → только смены, где этот пользователь — начальник (изоляция начальника).

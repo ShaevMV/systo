@@ -88,6 +88,10 @@ class ShiftController extends Controller
 
     public function close(int $id): JsonResponse
     {
+        if (! $this->changes->exists($id)) {
+            return response()->json(['success' => false, 'message' => 'Смена не найдена'], 404);
+        }
+
         // Изоляция: начальник закрывает только свою смену; administrator — любую.
         if (! $this->isAdmin() && $this->changes->getChiefId($id) !== (int) \Auth::id()) {
             return response()->json(['success' => false, 'message' => 'Можно закрыть только свою смену'], 403);

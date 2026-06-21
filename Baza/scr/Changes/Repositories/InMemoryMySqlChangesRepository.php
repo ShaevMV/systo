@@ -177,6 +177,11 @@ group by `changes`.`id`", [
         });
     }
 
+    public function exists(int $id): bool
+    {
+        return $this->model::whereKey($id)->exists();
+    }
+
     public function listOpen(?int $chiefId = null): array
     {
         $query = $this->model::query()

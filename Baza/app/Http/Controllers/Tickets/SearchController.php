@@ -7,8 +7,12 @@ namespace App\Http\Controllers\Tickets;
 use App\Http\Controllers\Controller;
 use Baza\Changes\Applications\AddTicketsInReport\AddTicketsInReport;
 use Baza\Changes\Applications\GetCurrentChanges\GetCurrentChanges;
+use Baza\Permission\Repositories\RolePermissionRepositoryInterface;
+use Baza\Shared\Domain\ValueObject\ShiftPermission;
+use Baza\Shared\Domain\ValueObject\ShiftRole;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Search\SearchService;
+use Baza\Tickets\Services\TicketPiiFilter;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,6 +26,7 @@ class SearchController extends Controller
         private EnterTicket   $enterTicket,
         private GetCurrentChanges $getCurrentChanges,
         private AddTicketsInReport $addTicketsInReport,
+        private RolePermissionRepositoryInterface $rolePermissions,
     )
     {
         $this->middleware('auth');
@@ -30,7 +35,20 @@ class SearchController extends Controller
 
     public function searchPage(Request $request): View
     {
-        $result = !is_null($request->get('q')) ? $this->searchService->find($request->get('q'))->toArray() : [];
+        $result = [];
+        if (! is_null($request->get('q'))) {
+            $result = $this->searchService->find($request->get('q'))->toArray();
+
+            // ПДн (телефон/email/коммент) — только при праве ticket.pii (Шаг 3). Зеркало Api\SearchController:
+            // раньше старый Blade показывал ПДн всем сотрудникам мимо фильтра (152-ФЗ).
+            $canViewPii = $this->canViewPii();
+            foreach ($result as $type => $items) {
+                $result[$type] = array_map(
+                    static fn (array $item): array => TicketPiiFilter::apply($item, $canViewPii),
+                    $items,
+                );
+            }
+        }
 
         return view('tickets.search', [
             'result' => $result,
@@ -38,6 +56,15 @@ class SearchController extends Controller
             'tab' => $request->get('tab'),
             'error' => $request->get('error'),
         ]);
+    }
+
+    /** Видит ли текущий сотрудник ПДн в карточке (право ticket.pii; administrator — суперроль). */
+    private function canViewPii(): bool
+    {
+        $user = \Auth::user();
+        $role = ShiftRole::fromUser((bool) $user->is_admin, $user->role);
+
+        return $this->rolePermissions->can($role, ShiftPermission::TICKET_PII);
     }
 
 

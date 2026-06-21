@@ -310,7 +310,10 @@ jobs:
           BAZA_URL="https://vhod.staging.spaceofjoy.ru"
           ORG_TOKEN="$(grep -E '^BAZA_INGEST_TOKEN=' Backend/.env | cut -d= -f2)"
           BAZA_TOKENS="$(grep -E '^BAZA_INGEST_TOKENS=' Baza/.env | cut -d= -f2)"
-          if [ -z "$ORG_TOKEN" ] || [ "$ORG_TOKEN" != "$BAZA_TOKENS" ]; then
+          # Активируем, только если org-токен пуст ИЛИ его НЕТ в списке Baza (мульти-токен:
+          # BAZA_INGEST_TOKENS — список через запятую; не затираем добавленные вручную токены).
+          case ",${BAZA_TOKENS}," in *",${ORG_TOKEN},"*) ORG_IN_LIST=1 ;; *) ORG_IN_LIST=0 ;; esac
+          if [ -z "$ORG_TOKEN" ] || [ "$ORG_IN_LIST" = "0" ]; then
             echo "Активирую канал org→Baza (ingest API)…"
             TOKEN="${ORG_TOKEN:-$(openssl rand -hex 32)}"
             # org-сторона (отправитель)
