@@ -12,6 +12,8 @@ use Baza\Ingest\Repositories\IngestRepositoryInterface;
 use Baza\Ingest\Repositories\InMemoryMySqlIngestRepository;
 use Baza\Permission\Repositories\InMemoryMySqlRolePermissionRepository;
 use Baza\Permission\Repositories\RolePermissionRepositoryInterface;
+use Baza\ShiftSchedule\Repositories\InMemoryMySqlShiftScheduleRepository;
+use Baza\ShiftSchedule\Repositories\ShiftScheduleRepositoryInterface;
 use Baza\Sync\Repositories\InMemoryMySqlSyncRepository;
 use Baza\Sync\Repositories\SyncRepositoryInterface;
 use Baza\Tickets\Repositories\AutoTicketRepositoryInterface;
@@ -45,6 +47,7 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(FriendlyTicketRepositoryInterface::class, InMemoryMySqlFriendlyTicket::class);
         $this->app->bind(LiveTicketRepositoryInterface::class, InMemoryMySqlLiveTicket::class);
         $this->app->bind(ChangesRepositoryInterface::class, InMemoryMySqlChangesRepository::class);
+        $this->app->bind(ShiftScheduleRepositoryInterface::class, InMemoryMySqlShiftScheduleRepository::class);
         $this->app->bind(AutoTicketRepositoryInterface::class, InMemoryMySqlAutoTicket::class);
         $this->app->bind(ParkingTicketRepositoryInterface::class, InMemoryMySqlParkingTicketRepository::class);
         $this->app->bind(UserRepositoryInterface::class, InMemoryMySqlUserRepository::class);
