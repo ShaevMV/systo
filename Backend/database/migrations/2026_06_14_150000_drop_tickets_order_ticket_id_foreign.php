@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -20,9 +21,28 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('tickets', static function (Blueprint $table): void {
-            $table->dropForeign(['order_ticket_id']);
-        });
+        // На части окружений (в т.ч. прод) у tickets есть только ИНДЕКС
+        // tickets_order_ticket_id_foreign, но самого FK-ограничения нет — безусловный
+        // dropForeign падал бы (SQLSTATE[42000] 1091 «Can't DROP ...; check that key exists»).
+        // Снимаем FK только если он реально существует.
+        if ($this->foreignKeyExists('tickets', 'order_ticket_id')) {
+            Schema::table('tickets', static function (Blueprint $table): void {
+                $table->dropForeign(['order_ticket_id']);
+            });
+        }
+    }
+
+    /**
+     * Есть ли на колонке внешний ключ (именно FK-ограничение, а не просто индекс).
+     */
+    private function foreignKeyExists(string $table, string $column): bool
+    {
+        return DB::table('information_schema.KEY_COLUMN_USAGE')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $table)
+            ->where('COLUMN_NAME', $column)
+            ->whereNotNull('REFERENCED_TABLE_NAME')
+            ->exists();
     }
 
     public function down(): void

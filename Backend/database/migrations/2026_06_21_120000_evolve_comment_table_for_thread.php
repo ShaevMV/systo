@@ -26,25 +26,24 @@ return new class extends Migration
         }
 
         // 1) Делаем user_id nullable. Под FK + без doctrine/dbal: дропаем FK → MODIFY → возвращаем nullable FK.
-        // dropForeign требует существующего FK; оборачиваем в try на случай повторного прогона.
-        Schema::table('comment', static function (Blueprint $table): void {
-            try {
+        // ВАЖНО: try/catch ВНУТРИ Schema::table-замыкания НЕ ловит ошибку — она бросается на
+        // build() уже вне замыкания. На проде у comment FK отсутствует вовсе → безусловный
+        // dropForeign падал бы (SQLSTATE 1091). Поэтому снимаем FK только если он реально есть.
+        if ($this->foreignKeyExists('comment', 'user_id')) {
+            Schema::table('comment', static function (Blueprint $table): void {
                 $table->dropForeign(['user_id']);
-            } catch (\Throwable $e) {
-                // FK уже снят (повторный прогон) — игнорируем.
-            }
-        });
+            });
+        }
 
         DB::statement('ALTER TABLE comment MODIFY user_id CHAR(36) NULL');
 
-        Schema::table('comment', static function (Blueprint $table): void {
-            try {
-                // nullable FK допускает NULL — автор может быть не-org (baza/qr/system).
+        // nullable FK допускает NULL — автор может быть не-org (baza/qr/system).
+        // Добавляем только если FK ещё нет (идемпотентно при повторном прогоне).
+        if (! $this->foreignKeyExists('comment', 'user_id')) {
+            Schema::table('comment', static function (Blueprint $table): void {
                 $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
-            } catch (\Throwable $e) {
-                // FK уже добавлен (повторный прогон) — игнорируем.
-            }
-        });
+            });
+        }
 
         // 2) Новые колонки треда (с гардом — идемпотентно).
         Schema::table('comment', static function (Blueprint $table): void {
@@ -74,20 +73,31 @@ return new class extends Migration
         });
 
         // Возврат user_id к NOT NULL: дропаем nullable FK → MODIFY NOT NULL → возвращаем строгий FK.
-        Schema::table('comment', static function (Blueprint $table): void {
-            try {
+        if ($this->foreignKeyExists('comment', 'user_id')) {
+            Schema::table('comment', static function (Blueprint $table): void {
                 $table->dropForeign(['user_id']);
-            } catch (\Throwable $e) {
-            }
-        });
+            });
+        }
 
         DB::statement('ALTER TABLE comment MODIFY user_id CHAR(36) NOT NULL');
 
-        Schema::table('comment', static function (Blueprint $table): void {
-            try {
+        if (! $this->foreignKeyExists('comment', 'user_id')) {
+            Schema::table('comment', static function (Blueprint $table): void {
                 $table->foreign('user_id')->references('id')->on('users');
-            } catch (\Throwable $e) {
-            }
-        });
+            });
+        }
+    }
+
+    /**
+     * Есть ли на колонке внешний ключ (именно FK-ограничение, а не просто индекс).
+     */
+    private function foreignKeyExists(string $table, string $column): bool
+    {
+        return DB::table('information_schema.KEY_COLUMN_USAGE')
+            ->where('TABLE_SCHEMA', DB::getDatabaseName())
+            ->where('TABLE_NAME', $table)
+            ->where('COLUMN_NAME', $column)
+            ->whereNotNull('REFERENCED_TABLE_NAME')
+            ->exists();
     }
 };
