@@ -19,6 +19,7 @@ use Shared\Infrastructure\Models\HasUuid;
  * @property string $kind
  * @property string $engine
  * @property string $title
+ * @property string|null $description
  * @property string $body
  * @property string|null $draft_body
  * @property string|null $compiled_html
@@ -47,6 +48,7 @@ class TemplateModel extends Model
         'kind',
         'engine',
         'title',
+        'description',
         'body',
         'draft_body',
         'compiled_html',

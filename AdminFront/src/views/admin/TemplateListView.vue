@@ -77,6 +77,11 @@ onMounted(reload);
                     <template #empty><div class="tpl-empty">Шаблоны не найдены</div></template>
 
                     <Column field="title" header="Название" sortable :style="{ minWidth: '14rem' }" />
+                    <Column field="description" header="Описание" :style="{ minWidth: '18rem' }">
+                        <template #body="{ data }">
+                            <span class="tpl-desc">{{ data.description || '—' }}</span>
+                        </template>
+                    </Column>
                     <Column field="kind" header="Тип" :style="{ minWidth: '8rem' }">
                         <template #body="{ data }">
                             <Tag :value="kindLabel(data.kind)" :severity="data.kind === 'pdf' ? 'warn' : 'info'" />
@@ -129,6 +134,11 @@ onMounted(reload);
 .tpl-subtitle {
     margin: 0.25rem 0 0;
     color: var(--p-text-muted-color, #6b7280);
+}
+
+.tpl-desc {
+    color: var(--p-text-muted-color, #6b7280);
+    font-size: 0.9rem;
 }
 
 .tpl-filter-card {
