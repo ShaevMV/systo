@@ -186,6 +186,15 @@ jobs:
           echo "✓ Выкачен $(git -C "$PROJECT_DIR" rev-parse --short HEAD) ($REF)"
           git -C "$PROJECT_DIR" log -1 --pretty=format:'%h %s'
 
+      - name: Build images (подхватить изменения Dockerfile — worker; расширения под Laravel 11)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # docker compose up -d НЕ пересобирает уже существующие образы. На апгрейдах, где
+          # менялись Dockerfile (Docker/worker) или базовый PHP/расширения под Laravel 11,
+          # без явного build контейнеры остались бы на старом образе. Собираем заранее,
+          # потом composer install и up -d работают на актуальных образах.
+          docker compose -f "$COMPOSE" build
+
       - name: Composer install (Backend + Baza)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
