@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Baza\Shared\Domain\ValueObject\ShiftRole;
 use Baza\ShiftSchedule\Applications\CancelSchedule\CancelSchedule;
 use Baza\ShiftSchedule\Applications\CreateSchedule\CreateSchedule;
@@ -40,7 +39,11 @@ class ShiftScheduleController extends Controller
         private readonly ListSchedules $listSchedules,
     ) {}
 
-    /** Список плановых смен фестиваля для сетки (фильтры — дата, точка КПП). */
+    /**
+     * Список плановых смен фестиваля для сетки «точки КПП × смены» (фильтры — дата, точка КПП).
+     * Сетка ОБЩАЯ для всех составителей (право shift.compose) — не изолируется по начальнику
+     * (в отличие от факта смены): план виден целиком, чтобы раскладывать смены по дням.
+     */
     public function index(Request $request): JsonResponse
     {
         $data = $request->validate([
@@ -84,11 +87,15 @@ class ShiftScheduleController extends Controller
 
     public function update(Request $request, int $id): JsonResponse
     {
-        if (! $this->schedules->exists($id)) {
+        $plan = $this->schedules->find($id);
+        if ($plan === null) {
             return response()->json(['success' => false, 'message' => 'Плановая смена не найдена'], 404);
         }
-        if (! $this->canManage($id)) {
+        if (! $this->canManagePlan($plan)) {
             return response()->json(['success' => false, 'message' => 'Можно менять только свою плановую смену'], 403);
+        }
+        if (($plan['status'] ?? null) === 'cancelled') {
+            return response()->json(['success' => false, 'message' => 'Отменённую плановую смену изменить нельзя'], 422);
         }
 
         $data = $this->validatePayload($request);
@@ -113,11 +120,15 @@ class ShiftScheduleController extends Controller
 
     public function cancel(int $id): JsonResponse
     {
-        if (! $this->schedules->exists($id)) {
+        $plan = $this->schedules->find($id);
+        if ($plan === null) {
             return response()->json(['success' => false, 'message' => 'Плановая смена не найдена'], 404);
         }
-        if (! $this->canManage($id)) {
+        if (! $this->canManagePlan($plan)) {
             return response()->json(['success' => false, 'message' => 'Можно отменить только свою плановую смену'], 403);
+        }
+        if (($plan['status'] ?? null) === 'cancelled') {
+            return response()->json(['success' => false, 'message' => 'Плановая смена уже отменена'], 422);
         }
 
         try {
@@ -165,8 +176,9 @@ class ShiftScheduleController extends Controller
     }
 
     /**
-     * Сборка DTO плана: состав с ролями + гарантия, что начальник в составе как shift_chief.
-     * Роль участника: явная из формы → мягкий маппинг ShiftRole::fromUser по его users.role/is_admin.
+     * Сборка DTO плана: состав + гарантия, что начальник в составе как shift_chief.
+     * Контроллер в БД НЕ ходит (Dependency Rule): передаёт роль ЯВНУЮ из формы либо null —
+     * мягкий маппинг роли по users.role/is_admin делает репозиторий (syncMembers).
      *
      * @param  array<string, mixed>  $data
      */
@@ -174,24 +186,15 @@ class ShiftScheduleController extends Controller
     {
         $rawMembers = $data['members'] ?? [];
 
-        // Подтянем users.role/is_admin для мягкого маппинга роли, если в форме роль не задана.
-        $userIds = array_map(static fn ($m): int => (int) $m['user_id'], $rawMembers);
-        $userIds[] = $chiefId;
-        $users = User::whereIn('id', array_unique($userIds))
-            ->get(['id', 'is_admin', 'role'])
-            ->keyBy('id');
-
         $members = [];
         foreach ($rawMembers as $m) {
-            $userId = (int) $m['user_id'];
             $explicitRole = $m['role'] ?? null;
-            $user = $users->get($userId);
-
-            $role = ($explicitRole !== null && ShiftRole::isValid((string) $explicitRole))
-                ? (string) $explicitRole
-                : ShiftRole::fromUser((bool) ($user?->is_admin ?? false), $user?->role);
-
-            $members[] = ['userId' => $userId, 'role' => $role];
+            $members[] = [
+                'userId' => (int) $m['user_id'],
+                'role' => ($explicitRole !== null && ShiftRole::isValid((string) $explicitRole))
+                    ? (string) $explicitRole
+                    : null,
+            ];
         }
 
         // Инвариант: начальник входит в состав как shift_chief (репозиторий тоже это гарантирует).
@@ -211,16 +214,18 @@ class ShiftScheduleController extends Controller
         );
     }
 
-    /** Изоляция: начальник управляет только своей плановой сменой; administrator — любой. */
-    private function canManage(int $id): bool
+    /**
+     * Изоляция: начальник управляет только своей плановой сменой; administrator — любой.
+     *
+     * @param  array<string, mixed>  $plan
+     */
+    private function canManagePlan(array $plan): bool
     {
         if ($this->isAdmin()) {
             return true;
         }
 
-        $plan = $this->schedules->find($id);
-
-        return $plan !== null && (int) ($plan['chief_id'] ?? 0) === (int) \Auth::id();
+        return (int) ($plan['chief_id'] ?? 0) === (int) \Auth::id();
     }
 
     private function isAdmin(): bool

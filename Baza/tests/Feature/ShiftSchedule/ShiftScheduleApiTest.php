@@ -229,4 +229,37 @@ class ShiftScheduleApiTest extends TestCase
             ->postJson(self::SCHEDULES.'/999999/cancel')
             ->assertStatus(404);
     }
+
+    public function test_cancel_already_cancelled_returns_422(): void
+    {
+        $chief = $this->userWithRole(ShiftRole::SHIFT_CHIEF);
+        $id = $this->makePlan(
+            $chief->id,
+            [['userId' => $chief->id, 'role' => ShiftRole::SHIFT_CHIEF]],
+            Carbon::now()->addDay()->toDateString(),
+            'cancelled'
+        );
+
+        $this->actingAs(User::find(1))
+            ->postJson(self::SCHEDULES.'/'.$id.'/cancel')
+            ->assertStatus(422);
+    }
+
+    public function test_update_cancelled_schedule_returns_422(): void
+    {
+        $chief = $this->userWithRole(ShiftRole::SHIFT_CHIEF);
+        $id = $this->makePlan(
+            $chief->id,
+            [['userId' => $chief->id, 'role' => ShiftRole::SHIFT_CHIEF]],
+            Carbon::now()->addDay()->toDateString(),
+            'cancelled'
+        );
+
+        $this->actingAs(User::find(1))->putJson(self::SCHEDULES.'/'.$id, [
+            'shift_date' => Carbon::now()->addDay()->toDateString(),
+            'planned_start' => Carbon::now()->addDay()->setTime(8, 0)->toDateTimeString(),
+            'chief_id' => $chief->id,
+            'members' => [['user_id' => $chief->id, 'role' => ShiftRole::SHIFT_CHIEF]],
+        ])->assertStatus(422);
+    }
 }

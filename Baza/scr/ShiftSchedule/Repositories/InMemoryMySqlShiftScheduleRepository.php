@@ -118,25 +118,28 @@ class InMemoryMySqlShiftScheduleRepository implements ShiftScheduleRepositoryInt
             $query->where('kpp_point', $kppPoint);
         }
 
-        return $query->get()->map(function (ShiftScheduleModel $s): array {
-            $chiefName = $s->chief_id !== null
-                ? User::whereKey($s->chief_id)->value('name')
-                : null;
+        $schedules = $query->get();
+        if ($schedules->isEmpty()) {
+            return [];
+        }
 
-            return [
-                'id' => (int) $s->id,
-                'festival_id' => (string) $s->festival_id,
-                'kpp_point' => $s->kpp_point,
-                'shift_date' => $s->shift_date?->toDateString(),
-                'planned_start' => $s->planned_start?->toDateTimeString(),
-                'planned_end' => $s->planned_end?->toDateTimeString(),
-                'name' => $s->name,
-                'status' => (string) $s->status,
-                'chief_id' => $s->chief_id !== null ? (int) $s->chief_id : null,
-                'chief_name' => $chiefName,
-                'members_count' => ShiftScheduleUserModel::where('schedule_id', $s->id)->count(),
-            ];
-        })->all();
+        // Батч-преднагрузка (без N+1): имена начальников + счётчики состава одним запросом каждый.
+        $chiefNames = $this->chiefNamesFor($schedules);
+        $counts = $this->memberCountsFor($schedules->pluck('id')->all());
+
+        return $schedules->map(fn (ShiftScheduleModel $s): array => [
+            'id' => (int) $s->id,
+            'festival_id' => (string) $s->festival_id,
+            'kpp_point' => $s->kpp_point,
+            'shift_date' => $s->shift_date?->toDateString(),
+            'planned_start' => $s->planned_start?->toDateTimeString(),
+            'planned_end' => $s->planned_end?->toDateTimeString(),
+            'name' => $s->name,
+            'status' => (string) $s->status,
+            'chief_id' => $s->chief_id !== null ? (int) $s->chief_id : null,
+            'chief_name' => $s->chief_id !== null ? ($chiefNames[(int) $s->chief_id] ?? null) : null,
+            'members_count' => (int) ($counts[(int) $s->id] ?? 0),
+        ])->all();
     }
 
     public function getMySchedule(int $userId): array
@@ -150,35 +153,74 @@ class InMemoryMySqlShiftScheduleRepository implements ShiftScheduleRepositoryInt
 
         $today = Carbon::now()->toDateString();
 
-        $query = $this->model::query()
+        $schedules = $this->model::query()
             ->whereIn('id', $scheduleIds)
             ->where('status', '!=', 'cancelled')
             ->whereDate('shift_date', '>=', $today)
             ->orderBy('shift_date')
-            ->orderBy('planned_start');
+            ->orderBy('planned_start')
+            ->get();
 
-        return $query->get()->map(function (ShiftScheduleModel $s) use ($userId): array {
-            $chiefName = $s->chief_id !== null
-                ? User::whereKey($s->chief_id)->value('name')
-                : null;
+        if ($schedules->isEmpty()) {
+            return [];
+        }
 
-            $myRole = ShiftScheduleUserModel::where('schedule_id', $s->id)
-                ->where('user_id', $userId)
-                ->value('role');
+        // Батч-преднагрузка (без N+1): имена начальников, счётчики и МОЯ роль по сменам.
+        $ids = $schedules->pluck('id')->all();
+        $chiefNames = $this->chiefNamesFor($schedules);
+        $counts = $this->memberCountsFor($ids);
+        $myRoles = ShiftScheduleUserModel::whereIn('schedule_id', $ids)
+            ->where('user_id', $userId)
+            ->pluck('role', 'schedule_id');
 
-            return [
-                'id' => (int) $s->id,
-                'date' => $s->shift_date?->toDateString(),
-                'start' => $s->planned_start?->toDateTimeString(),
-                'end' => $s->planned_end?->toDateTimeString(),
-                'kpp_point' => $s->kpp_point,
-                'name' => $s->name,
-                'status' => (string) $s->status,
-                'chief_name' => $chiefName,
-                'my_role' => $myRole !== null ? (string) $myRole : null,
-                'members_count' => ShiftScheduleUserModel::where('schedule_id', $s->id)->count(),
-            ];
-        })->all();
+        return $schedules->map(fn (ShiftScheduleModel $s): array => [
+            'id' => (int) $s->id,
+            'date' => $s->shift_date?->toDateString(),
+            'start' => $s->planned_start?->toDateTimeString(),
+            'end' => $s->planned_end?->toDateTimeString(),
+            'kpp_point' => $s->kpp_point,
+            'name' => $s->name,
+            'status' => (string) $s->status,
+            'chief_name' => $s->chief_id !== null ? ($chiefNames[(int) $s->chief_id] ?? null) : null,
+            'my_role' => isset($myRoles[$s->id]) ? (string) $myRoles[$s->id] : null,
+            'members_count' => (int) ($counts[(int) $s->id] ?? 0),
+        ])->all();
+    }
+
+    /**
+     * Имена начальников пачкой [user_id => name] — против N+1 в списках.
+     *
+     * @param  \Illuminate\Support\Collection<int, ShiftScheduleModel>  $schedules
+     * @return array<int, string>
+     */
+    private function chiefNamesFor($schedules): array
+    {
+        $chiefIds = $schedules->pluck('chief_id')->filter()->unique()->values()->all();
+        if ($chiefIds === []) {
+            return [];
+        }
+
+        return User::whereIn('id', $chiefIds)->pluck('name', 'id')->all();
+    }
+
+    /**
+     * Счётчики состава пачкой [schedule_id => count] — против N+1.
+     *
+     * @param  array<int, int>  $scheduleIds
+     * @return array<int, int>
+     */
+    private function memberCountsFor(array $scheduleIds): array
+    {
+        if ($scheduleIds === []) {
+            return [];
+        }
+
+        return ShiftScheduleUserModel::whereIn('schedule_id', $scheduleIds)
+            ->select('schedule_id', DB::raw('COUNT(*) as c'))
+            ->groupBy('schedule_id')
+            ->pluck('c', 'schedule_id')
+            ->map(static fn ($c): int => (int) $c)
+            ->all();
     }
 
     private function fillFromDto(ShiftScheduleModel $model, ShiftScheduleDto $dto): void
@@ -202,26 +244,37 @@ class InMemoryMySqlShiftScheduleRepository implements ShiftScheduleRepositoryInt
     {
         ShiftScheduleUserModel::where('schedule_id', $scheduleId)->delete();
 
-        // Карта userId → роль из DTO (дедуп: последняя роль для повтора).
+        // Карта userId → роль из DTO: явная валидная роль или null (требует мягкого маппинга).
         $roleByUser = [];
         foreach ($dto->members as $member) {
             $userId = (int) ($member['userId'] ?? 0);
             if ($userId <= 0) {
                 continue;
             }
-            $role = (string) ($member['role'] ?? '');
-            $roleByUser[$userId] = ShiftRole::isValid($role) ? $role : ShiftRole::GUARD;
+            $role = $member['role'] ?? null;
+            $roleByUser[$userId] = (is_string($role) && ShiftRole::isValid($role)) ? $role : null;
         }
 
         // Начальник смены обязан входить в состав с ролью shift_chief (инвариант).
         if ($dto->chiefId !== null) {
-            $roleByUser[$dto->chiefId] = ShiftRole::SHIFT_CHIEF;
+            $roleByUser[(int) $dto->chiefId] = ShiftRole::SHIFT_CHIEF;
+        }
+
+        // Мягкий маппинг роли для участников без явной (по users.role/is_admin) — одним запросом.
+        // БД-логика роли держится здесь (репозиторий), а не в контроллере (Dependency Rule).
+        $needMap = array_keys(array_filter($roleByUser, static fn ($r): bool => $r === null));
+        if ($needMap !== []) {
+            $users = User::whereIn('id', $needMap)->get(['id', 'is_admin', 'role'])->keyBy('id');
+            foreach ($needMap as $userId) {
+                $u = $users->get($userId);
+                $roleByUser[$userId] = ShiftRole::fromUser((bool) ($u?->is_admin ?? false), $u?->role);
+            }
         }
 
         foreach ($roleByUser as $userId => $role) {
             ShiftScheduleUserModel::create([
                 'schedule_id' => $scheduleId,
-                'user_id' => $userId,
+                'user_id' => (int) $userId,
                 'role' => $role,
             ]);
         }
