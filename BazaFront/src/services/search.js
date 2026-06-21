@@ -12,8 +12,16 @@ import { getKey } from '@/services/pin';
 
 /**
  * @typedef {{type: string, kilter: (number|null), name: string, typeTicket: string,
- *   color: (string|null), dateChange: (string|null), online: boolean, key: string}} SearchRow
+ *   color: (string|null), dateChange: (string|null), online: boolean, key: string,
+ *   phone: (string|null), email: (string|null), comment: (string|null), telegram: (string|null),
+ *   carNumber: (string|null), childName: (string|null), parentPhone: (string|null),
+ *   externalOrderNo: (string|null), city: (string|null)}} SearchRow
  */
+
+/** Снять HTML-подсветку ShowSearchWordService (<b>…</b>) — чтобы теги/XSS не текли в карточку. */
+function stripTags(s) {
+    return typeof s === 'string' ? s.replace(/<\/?[^>]+>/g, '') : s;
+}
 
 /**
  * @param {string} q
@@ -73,6 +81,18 @@ function normalize(it, groupKey, online) {
         color: it.color || null,
         dateChange: it.date_change || null,
         online,
-        key: `${type}:${kilter}`
+        key: `${type}:${kilter}`,
+        // ПДн: бэкенд (TicketPiiFilter) присылает эти поля ТОЛЬКО ролям с правом ticket.pii —
+        // остальным они уже вырезаны, поэтому здесь будут null и в шаблоне скроются v-if.
+        // Раньше normalize() их молча терял → для админа «не было разницы» (фикс #5).
+        phone: stripTags(it.phone) || null,
+        email: stripTags(it.email) || null,
+        comment: stripTags(it.comment) || null,
+        telegram: stripTags(it.telegram) || null,
+        carNumber: stripTags(it.car_number) || null,
+        childName: stripTags(it.child_name) || null,
+        parentPhone: stripTags(it.parent_phone) || null,
+        externalOrderNo: stripTags(it.external_order_no) || null,
+        city: stripTags(it.city) || null
     };
 }

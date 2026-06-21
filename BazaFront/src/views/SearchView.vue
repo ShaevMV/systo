@@ -87,6 +87,21 @@ async function enter(row) {
                         <span v-if="row.kilter" class="sr-kilter">№ {{ row.kilter }}</span>
                     </div>
                     <div v-if="row.dateChange" class="sr-entered">Уже впущен: {{ row.dateChange }}</div>
+                    <!-- Полные данные билета: видны только ролям с правом ticket.pii (бэкенд их и присылает только им). -->
+                    <div
+                        v-if="row.phone || row.email || row.telegram || row.city || row.carNumber || row.childName || row.parentPhone || row.externalOrderNo || row.comment"
+                        class="sr-pii"
+                    >
+                        <span v-if="row.phone" class="sr-pii-item"><i class="pi pi-phone"></i> {{ row.phone }}</span>
+                        <span v-if="row.email" class="sr-pii-item"><i class="pi pi-envelope"></i> {{ row.email }}</span>
+                        <span v-if="row.telegram" class="sr-pii-item"><i class="pi pi-send"></i> {{ row.telegram }}</span>
+                        <span v-if="row.city" class="sr-pii-item"><i class="pi pi-map-marker"></i> {{ row.city }}</span>
+                        <span v-if="row.carNumber" class="sr-pii-item">Авто: {{ row.carNumber }}</span>
+                        <span v-if="row.childName" class="sr-pii-item">Ребёнок: {{ row.childName }}</span>
+                        <span v-if="row.parentPhone" class="sr-pii-item">Родитель: {{ row.parentPhone }}</span>
+                        <span v-if="row.externalOrderNo" class="sr-pii-item">№ заказа: {{ row.externalOrderNo }}</span>
+                        <span v-if="row.comment" class="sr-pii-item sr-pii-comment">{{ row.comment }}</span>
+                    </div>
                 </div>
                 <div class="sr-action">
                     <span v-if="entered[row.key] === 'ok'" class="sr-ok"><i class="pi pi-check"></i> впущен</span>
@@ -120,6 +135,10 @@ async function enter(row) {
 .sr-color { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #cbd2da; display: inline-block; }
 .sr-kilter { font-variant-numeric: tabular-nums; }
 .sr-entered { color: #c0392b; font-size: 0.8rem; margin-top: 0.2rem; }
+.sr-pii { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; margin-top: 0.35rem; }
+.sr-pii-item { color: #374151; font-size: 0.85rem; white-space: nowrap; }
+.sr-pii-item i { color: #6b7280; margin-right: 0.15rem; }
+.sr-pii-comment { white-space: normal; color: #6b7280; font-style: italic; flex-basis: 100%; }
 .sr-pass {
     min-height: 44px; padding: 0 1rem; border: 0; border-radius: 10px;
     background: #1e9e54; color: #fff; font-weight: 700; font-size: 1rem;
