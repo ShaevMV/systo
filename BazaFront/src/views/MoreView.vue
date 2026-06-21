@@ -14,7 +14,7 @@ const allItems = [
 ];
 
 // Показываем только то, на что есть право И для чего уже есть экран (route зарегистрирован).
-const routeNames = new Set(['permissions']); // расширяется в Шагах 5/6
+const routeNames = new Set(['permissions', 'staff']); // расширяется в Шаге 6 (shifts)
 const items = computed(() => allItems.filter((it) => routeNames.has(it.route) && hasPermission(it.perm)));
 
 onMounted(loadCurrentUser);

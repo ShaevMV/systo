@@ -10,7 +10,8 @@ export const router = createRouter({
         { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
         { path: '/shift', name: 'shift', component: () => import('@/views/ShiftView.vue') },
         { path: '/more', name: 'more', component: () => import('@/views/MoreView.vue') },
-        // Управление (гейтится по правам через whoami): права доступа (Шаг 4) и далее.
-        { path: '/permissions', name: 'permissions', component: () => import('@/views/PermissionMatrixView.vue') }
+        // Управление (гейтится по правам через whoami): права доступа (Шаг 4), персонал (Шаг 5).
+        { path: '/permissions', name: 'permissions', component: () => import('@/views/PermissionMatrixView.vue') },
+        { path: '/staff', name: 'staff', component: () => import('@/views/StaffView.vue') }
     ]
 });

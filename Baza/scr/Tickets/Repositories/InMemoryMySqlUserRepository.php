@@ -63,4 +63,24 @@ class InMemoryMySqlUserRepository implements UserRepositoryInterface
             $user->save();
         }
     }
+
+    public function list(): array
+    {
+        return $this->model::query()
+            ->orderBy('id')
+            ->get(['id', 'name', 'email', 'is_admin', 'role'])
+            ->map(function (User $u): array {
+                $role = ShiftRole::fromUser((bool) $u->is_admin, $u->role);
+
+                return [
+                    'id' => (int) $u->id,
+                    'name' => (string) $u->name,
+                    'email' => (string) $u->email,
+                    'is_admin' => (bool) $u->is_admin,
+                    'role' => $role,
+                    'role_label' => ShiftRole::label($role),
+                ];
+            })
+            ->all();
+    }
 }

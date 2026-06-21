@@ -84,6 +84,12 @@ Route::middleware(['auth', 'permission:rbac.manage'])->group(function () {
     Route::post('/api/permissions/matrix', [\App\Http\Controllers\Api\PermissionController::class, 'save'])->name('api.permissions.save');
 });
 
+// Регистрация персонала из нового PWA (Шаг 5). Доступ — право staff.manage (administrator по дефолту).
+Route::middleware(['auth', 'permission:staff.manage'])->group(function () {
+    Route::get('/api/staff', [\App\Http\Controllers\Api\StaffController::class, 'index'])->name('api.staff.list');
+    Route::post('/api/staff', [\App\Http\Controllers\Api\StaffController::class, 'store'])->name('api.staff.store');
+});
+
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
 // administrator проходит везде (суперроль), is_admin-юзеры не теряют доступ.
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware(['auth', 'permission:report.view']);
