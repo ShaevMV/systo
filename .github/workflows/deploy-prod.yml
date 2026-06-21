@@ -120,6 +120,25 @@ jobs:
           done
           echo "✓ Проект и .env-файлы на месте"
 
+      # Прод может иметь Compose v2 ('docker compose') ИЛИ v1 ('docker-compose').
+      # Определяем рабочую команду по фактической форме '-f <файл>' и кладём в $DC
+      # для всех последующих шагов (на проде v2-плагина может не быть → 'docker compose -f' падает).
+      - name: Detect docker compose command
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          if docker compose -f "${COMPOSE}" config >/dev/null 2>&1; then
+            echo "DC=docker compose" >> "$GITHUB_ENV"
+            echo "✓ Использую Compose v2: docker compose"
+          elif docker-compose -f "${COMPOSE}" config >/dev/null 2>&1; then
+            echo "DC=docker-compose" >> "$GITHUB_ENV"
+            echo "✓ Использую Compose v1: docker-compose"
+          else
+            echo "::error::Не работает ни 'docker compose -f', ни 'docker-compose -f' с ${COMPOSE}"
+            echo "--- docker compose ---"; docker compose -f "${COMPOSE}" config 2>&1 | head -8 || true
+            echo "--- docker-compose ---"; docker-compose -f "${COMPOSE}" config 2>&1 | head -8 || true
+            exit 1
+          fi
+
       # Защита от потери локальных прод-правок (SSL/nginx и пр.): если есть
       # незакоммиченные изменения ОТСЛЕЖИВАЕМЫХ файлов — прерываем, не затирая.
       - name: Guard — clean working tree (кроме certbot-сертов и dev-файлов)
@@ -150,7 +169,7 @@ jobs:
             local db="$1"; local out="$BACKUP_DIR/${db}_pre_${REF//\//_}_${TS}.sql.gz"
             echo "Бэкаплю БД $db → $out"
             # Пароль root берём из env контейнера mysql — не хардкодим.
-            docker compose -f "$COMPOSE" exec -T mysql \
+            $DC -f "$COMPOSE" exec -T mysql \
               sh -c "exec mysqldump -uroot -p\"\$MYSQL_ROOT_PASSWORD\" --single-transaction --quick --no-tablespaces $db" \
               | gzip > "$out"
             # Проверяем, что бэкап не пустой (>1KB)
@@ -163,7 +182,7 @@ jobs:
           }
           dump systo
           # baza может не существовать на старом проде — не валим деплой, если её нет
-          if docker compose -f "$COMPOSE" exec -T mysql sh -c "exec mysql -uroot -p\"\$MYSQL_ROOT_PASSWORD\" -e 'USE baza'" 2>/dev/null; then
+          if $DC -f "$COMPOSE" exec -T mysql sh -c "exec mysql -uroot -p\"\$MYSQL_ROOT_PASSWORD\" -e 'USE baza'" 2>/dev/null; then
             dump baza
           else
             echo "::notice::БД baza ещё нет на проде — пропускаю её бэкап (создастся миграцией)"
@@ -175,8 +194,8 @@ jobs:
       - name: Maintenance ON (artisan down)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T php     php artisan down || true
-          docker compose -f "$COMPOSE" exec -T phpBaza php artisan down || true
+          $DC -f "$COMPOSE" exec -T php     php artisan down || true
+          $DC -f "$COMPOSE" exec -T phpBaza php artisan down || true
           echo "✓ Maintenance включён"
 
       - name: Pull code (checkout tag, сохраняя certbot-серты)
@@ -206,7 +225,7 @@ jobs:
           # менялись Dockerfile (Docker/worker) или базовый PHP/расширения под Laravel 11,
           # без явного build контейнеры остались бы на старом образе. Собираем заранее,
           # потом composer install и up -d работают на актуальных образах.
-          docker compose -f "$COMPOSE" build
+          $DC -f "$COMPOSE" build
 
       - name: Composer install (Backend + Baza)
         working-directory: ${{ env.PROJECT_DIR }}
@@ -214,16 +233,16 @@ jobs:
           # Без --no-dev: миграция questionnaire использует ->change() (doctrine/dbal,
           # сейчас transitive из require-dev) — TD-25. Когда dbal переедет в require,
           # добавить --no-dev для прода.
-          docker compose -f "$COMPOSE" run --rm --no-deps --entrypoint sh php     -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
-          docker compose -f "$COMPOSE" run --rm --no-deps --entrypoint sh phpBaza -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+          $DC -f "$COMPOSE" run --rm --no-deps --entrypoint sh php     -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
+          $DC -f "$COMPOSE" run --rm --no-deps --entrypoint sh phpBaza -c "composer install --optimize-autoloader --no-interaction --prefer-dist"
 
       - name: Up containers
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" up -d
+          $DC -f "$COMPOSE" up -d
           echo "Жду healthy mysql…"
           for i in $(seq 1 30); do
-            if docker compose -f "$COMPOSE" ps mysql | grep -q "healthy"; then
+            if $DC -f "$COMPOSE" ps mysql | grep -q "healthy"; then
               echo "✓ mysql healthy (через $((i*2))s)"; break
             fi
             sleep 2
@@ -233,13 +252,13 @@ jobs:
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           # node-контейнер крутится (tail -f); собираем внутри него.
-          docker compose -f "$COMPOSE" exec -T -u root node sh -c "npm ci && npm run build"
+          $DC -f "$COMPOSE" exec -T -u root node sh -c "npm ci && npm run build"
 
       - name: Run schema migrations (Backend + Baza)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T php     php artisan migrate --force --no-interaction
-          docker compose -f "$COMPOSE" exec -T phpBaza php artisan migrate --force --no-interaction
+          $DC -f "$COMPOSE" exec -T php     php artisan migrate --force --no-interaction
+          $DC -f "$COMPOSE" exec -T phpBaza php artisan migrate --force --no-interaction
 
       # Разовая data-миграция v2.6.0 (order_tickets.guests → per-guest). Идемпотентна
       # (повторный прогон пропускает мигрированные по price_snapshot). На ПРОДЕ — С
@@ -249,9 +268,9 @@ jobs:
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
           echo "=== dry-run (план) ==="
-          docker compose -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format
+          $DC -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format
           echo "=== apply (с бэкапом) ==="
-          docker compose -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format --apply
+          $DC -f "$COMPOSE" exec -T php php artisan order:migrate-to-guests-format --apply
 
       # Только матрица прав Baza (идемпотентно). НЕ полный db:seed — иначе залезут
       # демо-сотрудники/смены (StagingDemoSeeder/MultiShiftDemoSeeder).
@@ -259,30 +278,30 @@ jobs:
         if: ${{ env.SEED_BAZA_RBAC == 'true' }}
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T phpBaza \
+          $DC -f "$COMPOSE" exec -T phpBaza \
             php artisan db:seed --class=BazaRolePermissionsSeeder --force --no-interaction
 
       - name: Storage link + permissions
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T -u root php sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
-          docker compose -f "$COMPOSE" exec -T -u root php     chown -R www-data:www-data storage bootstrap/cache || true
-          docker compose -f "$COMPOSE" exec -T -u root phpBaza chown -R www-data:www-data storage bootstrap/cache || true
+          $DC -f "$COMPOSE" exec -T -u root php sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
+          $DC -f "$COMPOSE" exec -T -u root php     chown -R www-data:www-data storage bootstrap/cache || true
+          $DC -f "$COMPOSE" exec -T -u root phpBaza chown -R www-data:www-data storage bootstrap/cache || true
 
       - name: Clear & warm caches
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T php     php artisan optimize:clear || true
-          docker compose -f "$COMPOSE" exec -T phpBaza php artisan optimize:clear || true
+          $DC -f "$COMPOSE" exec -T php     php artisan optimize:clear || true
+          $DC -f "$COMPOSE" exec -T phpBaza php artisan optimize:clear || true
           # Перезапуск воркера — чтобы подхватил новый код/джобы (опкэш/память).
-          docker compose -f "$COMPOSE" restart worker || true
+          $DC -f "$COMPOSE" restart worker || true
 
       - name: Maintenance OFF (artisan up)
         if: always()
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" exec -T php     php artisan up || true
-          docker compose -f "$COMPOSE" exec -T phpBaza php artisan up || true
+          $DC -f "$COMPOSE" exec -T php     php artisan up || true
+          $DC -f "$COMPOSE" exec -T phpBaza php artisan up || true
           echo "✓ Maintenance выключен"
 
       - name: Healthcheck endpoints
@@ -300,4 +319,4 @@ jobs:
       - name: Show container status
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
-          docker compose -f "$COMPOSE" ps
+          $DC -f "$COMPOSE" ps
