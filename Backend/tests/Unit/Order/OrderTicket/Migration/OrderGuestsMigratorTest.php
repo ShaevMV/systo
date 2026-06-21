@@ -220,39 +220,88 @@ class OrderGuestsMigratorTest extends TestCase
     }
 
     /** @test */
-    public function throws_when_ticket_type_unknown(): void
+    public function falls_back_to_non_live_when_ticket_type_unknown(): void
     {
-        // Раньше silent fallback на is_live_ticket=false скрывал orphan FK / удалённые типы.
-        // Теперь явно репортим — заказ попадёт в errors отчёта и команда вернёт FAILURE.
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('ticket_type ffffffff-ffff-ffff-ffff-ffffffffffff не найден');
-
-        $this->migrator->transformOrderGuests(
+        // Orphan/удалённый ticket_type (старые фесты): НЕ падаем — мигрируем с is_live_ticket=false,
+        // цена берётся из заказа. Факт помечается флагом orphanTicketType (для отчёта).
+        $result = $this->migrator->transformOrderGuests(
             guests: [$this->legacyGuest('Иван')],
             ticketTypeId: 'ffffffff-ffff-ffff-ffff-ffffffffffff',
             promoCode: null,
             price: 4200.0,
             discount: 0.0,
-            liveByTicketType: [],  // пустой map
+            liveByTicketType: [],  // пустой map — тип не найден
         );
+
+        self::assertTrue($result['migrated']);
+        self::assertTrue($result['orphanTicketType']);
+        self::assertFalse($result['guests'][0]['is_live_ticket']);
+        self::assertSame(4200, $result['guests'][0]['price_snapshot']['total']);
+        self::assertSame('ffffffff-ffff-ffff-ffff-ffffffffffff', $result['guests'][0]['ticket_type_id']);
     }
 
     /** @test */
-    public function throws_when_discount_exceeds_price(): void
+    public function clamps_when_discount_exceeds_price(): void
     {
-        // discount > price → отрицательный total. Money не может быть отрицательным,
-        // поэтому отвергаем заранее с понятным сообщением (вместо ошибки в Domain VO).
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('discount > price');
-
-        $this->migrator->transformOrderGuests(
+        // discount > price (битые данные) → клампим discount к price, total = 0. НЕ падаем.
+        // Money не может быть отрицательным; заказ всё равно мигрируется (флаг clampedDiscount).
+        $result = $this->migrator->transformOrderGuests(
             guests: [$this->legacyGuest('Иван')],
             ticketTypeId: self::TICKET_TYPE_ORG,
             promoCode: null,
-            price: 100.0,
-            discount: 500.0,  // больше чем price
+            price: 900.0,
+            discount: 1000.0,  // больше чем price
             liveByTicketType: [self::TICKET_TYPE_ORG => false],
         );
+
+        self::assertTrue($result['migrated']);
+        self::assertTrue($result['clampedDiscount']);
+        self::assertSame(0, $result['guests'][0]['price_snapshot']['total']);
+        self::assertSame(0.0, $result['totalBefore']);
+        self::assertSame(0.0, $result['totalAfter']);
+    }
+
+    /** @test */
+    public function injects_festival_id_from_order_when_guest_lacks_it(): void
+    {
+        // Legacy-гость без festival_id (раньше festival_id жил на уровне заказа). Мигратор
+        // инжектит festival_id заказа в гостя — иначе OrderGuestLine::fromState упадёт.
+        $guestWithoutFestival = [
+            'id' => '550e8400-e29b-41d4-a716-446655440000',
+            'value' => 'Иван',
+            'email' => 'ivan@example.com',
+            'number' => null,
+        ];
+
+        $result = $this->migrator->transformOrderGuests(
+            guests: [$guestWithoutFestival],
+            ticketTypeId: self::TICKET_TYPE_ORG,
+            promoCode: null,
+            price: 4200.0,
+            discount: 0.0,
+            liveByTicketType: [self::TICKET_TYPE_ORG => false],
+            orderFestivalId: '660e8400-e29b-41d4-a716-446655440099',
+        );
+
+        self::assertTrue($result['migrated']);
+        self::assertSame('660e8400-e29b-41d4-a716-446655440099', $result['guests'][0]['festival_id']);
+    }
+
+    /** @test */
+    public function preserves_guest_festival_id_over_order_festival_id(): void
+    {
+        // Если у гостя уже есть festival_id — он сохраняется (festival_id заказа не перетирает).
+        $result = $this->migrator->transformOrderGuests(
+            guests: [$this->legacyGuest('Иван')],  // legacyGuest содержит festival_id ...440001
+            ticketTypeId: self::TICKET_TYPE_ORG,
+            promoCode: null,
+            price: 4200.0,
+            discount: 0.0,
+            liveByTicketType: [self::TICKET_TYPE_ORG => false],
+            orderFestivalId: '660e8400-e29b-41d4-a716-446655440099',
+        );
+
+        self::assertSame('660e8400-e29b-41d4-a716-446655440001', $result['guests'][0]['festival_id']);
     }
 
     /** @test */
