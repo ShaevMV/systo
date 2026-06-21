@@ -136,6 +136,60 @@ class TemplateFoundationTest extends TestCase
         $this->assertTrue($loaded->getActive());
     }
 
+    public function test_create_persists_description(): void
+    {
+        $id = Uuid::random();
+        $dto = TemplateDto::fromState([
+            'id' => $id->value(),
+            'slug' => 'orderToPaid',
+            'kind' => TemplateKind::EMAIL,
+            'engine' => 'html',
+            'title' => 'Оплата',
+            'description' => 'Письмо «заказ оплачен» — с PDF-билетами',
+            'body' => 'Привет',
+            'active' => true,
+        ]);
+
+        $this->assertTrue($this->repo()->create($dto));
+        $this->assertSame(
+            'Письмо «заказ оплачен» — с PDF-билетами',
+            $this->repo()->getItem($id)->getDescription(),
+        );
+    }
+
+    public function test_description_defaults_to_null_when_absent(): void
+    {
+        $model = $this->makeTemplate(); // без description
+        $this->assertNull($this->repo()->getItem(new Uuid($model->id))->getDescription());
+    }
+
+    public function test_edit_updates_description(): void
+    {
+        $model = $this->makeTemplate(['description' => 'старое описание']);
+        $id = new Uuid($model->id);
+
+        $dto = TemplateDto::fromState(array_merge($model->toArray(), ['description' => 'новое описание']));
+        $this->assertTrue($this->repo()->editItem($id, $dto));
+        $this->assertSame('новое описание', $this->repo()->getItem($id)->getDescription());
+    }
+
+    public function test_description_present_in_serialized_array(): void
+    {
+        // toArray идёт в ответ API (getItem/getList) — поле должно быть в проекции.
+        $dto = TemplateDto::fromState([
+            'slug' => 'pdf',
+            'kind' => TemplateKind::PDF,
+            'engine' => 'html',
+            'title' => 'PDF',
+            'description' => 'Базовый шаблон PDF-билета',
+            'body' => 'x',
+            'active' => true,
+        ]);
+
+        $this->assertArrayHasKey('description', $dto->toArray());
+        $this->assertSame('Базовый шаблон PDF-билета', $dto->toArray()['description']);
+    }
+
     public function test_activate_toggles_flag(): void
     {
         $model = $this->makeTemplate(['active' => true]);

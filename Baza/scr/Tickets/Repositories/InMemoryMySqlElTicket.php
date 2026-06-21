@@ -90,13 +90,24 @@ class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 
     public function find(string $q): array
     {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        $like = '%' . strtolower($q) . '%';
+
         $resultRawList = $this->addFestivalUuid()
-            ->where(function ($query) use ($q) {
-                return $query->whereKilter((int)$q)
-                    ->orWhereRaw('LOWER(`name`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`email`) LIKE ? ', ['%' . strtolower(trim($q)) . '%'])
-                    ->orWhereRaw('LOWER(`phone`) LIKE ? ', ['%' . strtolower(trim($q)) . '%']);
+            ->where(function ($query) use ($q, $like) {
+                // Поиск по ВСЕМ полям (решение владельца): ФИО/email/телефон/коммент.
+                $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`phone`) LIKE ? ', [$like])
+                    ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
+                // Поиск по номеру билета — ТОЛЬКО для числового запроса. Иначе (int)"test" === 0
+                // и whereKilter(0) тянул бы нерелевантные билеты («шляпа»).
+                if (ctype_digit($q)) {
+                    $query->orWhere('kilter', (int) $q);
+                }
             })
             ->get()->toArray();
 

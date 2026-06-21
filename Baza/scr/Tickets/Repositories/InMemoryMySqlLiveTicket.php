@@ -84,7 +84,14 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
 
     public function find(string $q): array
     {
-        $resultRawList = $this->liveTicketModel::whereKilter((int)$q)
+        $q = trim($q);
+        // Живой билет идентифицируется ТОЛЬКО номером (kilter). Для нечислового запроса
+        // ничего не ищем: раньше (int)"test" === 0 → whereKilter(0) тянул мусор.
+        if (! ctype_digit($q)) {
+            return [];
+        }
+
+        $resultRawList = $this->liveTicketModel::whereKilter((int) $q)
             ->get()->toArray();
 
         $result = [];

@@ -18,6 +18,7 @@ const isNew = computed(() => id.value === 'new');
 
 // Форма
 const title = ref('');
+const description = ref('');
 const kind = ref('email');
 const engine = ref('html');
 const slug = ref('');
@@ -105,6 +106,7 @@ async function loadVariables() {
 async function load() {
     if (isNew.value) {
         title.value = '';
+        description.value = '';
         kind.value = 'email';
         engine.value = 'html';
         slug.value = '';
@@ -116,6 +118,7 @@ async function load() {
 
     const item = await store.dispatch('appTemplate/loadItem', { id: id.value });
     title.value = item.title ?? '';
+    description.value = item.description ?? '';
     kind.value = item.kind ?? 'email';
     engine.value = item.engine ?? 'html';
     slug.value = item.slug ?? '';
@@ -178,7 +181,7 @@ async function onActivate() {
 
 async function onCreate() {
     const r = await store.dispatch('appTemplate/create', {
-        data: { slug: slug.value, kind: kind.value, engine: engine.value, title: title.value || slug.value, body: editing.value, active: false }
+        data: { slug: slug.value, kind: kind.value, engine: engine.value, title: title.value || slug.value, description: description.value, body: editing.value, active: false }
     });
     if (r.item?.id) {
         flash('Шаблон создан');
@@ -263,6 +266,10 @@ onMounted(load);
                     <div class="ed-field">
                         <label>Название</label>
                         <InputText v-model="title" placeholder="Напр. Письмо об оплате" />
+                    </div>
+                    <div class="ed-field ed-field-wide">
+                        <label>Описание</label>
+                        <InputText v-model="description" placeholder="Краткое описание: что это за письмо/PDF" />
                     </div>
                     <div class="ed-field">
                         <label>Тип</label>
@@ -412,6 +419,10 @@ onMounted(load);
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
+}
+
+.ed-field-wide {
+    grid-column: 1 / -1;
 }
 
 .ed-field label {

@@ -15,10 +15,14 @@ use Baza\Permission\Repositories\RolePermissionRepositoryInterface;
 use Baza\Sync\Repositories\InMemoryMySqlSyncRepository;
 use Baza\Sync\Repositories\SyncRepositoryInterface;
 use Baza\Tickets\Repositories\AutoTicketRepositoryInterface;
+use Baza\Tickets\Repositories\BlacklistRepositoryInterface;
 use Baza\Tickets\Repositories\ElTicketsRepositoryInterface;
+use Baza\Tickets\Repositories\EntryEventRepositoryInterface;
 use Baza\Tickets\Repositories\FriendlyTicketRepositoryInterface;
 use Baza\Tickets\Repositories\InMemoryMySqlAutoTicket;
+use Baza\Tickets\Repositories\InMemoryMySqlBlacklist;
 use Baza\Tickets\Repositories\InMemoryMySqlElTicket;
+use Baza\Tickets\Repositories\InMemoryMySqlEntryEvent;
 use Baza\Tickets\Repositories\InMemoryMySqlFriendlyTicket;
 use Baza\Tickets\Repositories\InMemoryMySqlLiveTicket;
 use Baza\Tickets\Repositories\InMemoryMySqlParkingTicketRepository;
@@ -49,5 +53,7 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(IngestRepositoryInterface::class, InMemoryMySqlIngestRepository::class);
         $this->app->bind(EntryOutboxRepositoryInterface::class, InMemoryMySqlEntryOutboxRepository::class);
         $this->app->bind(TicketSearchRepositoryInterface::class, InMemoryMySqlTicketSearch::class);
+        $this->app->bind(BlacklistRepositoryInterface::class, InMemoryMySqlBlacklist::class);
+        $this->app->bind(EntryEventRepositoryInterface::class, InMemoryMySqlEntryEvent::class);
     }
 }

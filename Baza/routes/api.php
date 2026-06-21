@@ -28,3 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 // Группа `api` сессию не стартует — это и нужно для машина-машина канала.
 Route::post('/baza/ingest/ticket', [IngestTicketController::class, 'ticket'])
     ->middleware('baza.ingest');
+
+// S2S-приём отзыва билета от org (Ф5, PR-6, B6) — закрывает дыру «отмена/возврат».
+Route::post('/baza/ingest/revoke', [\App\Http\Controllers\Api\RevokeTicketController::class, 'revoke'])
+    ->middleware('baza.ingest');

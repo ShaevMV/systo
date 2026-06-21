@@ -32,6 +32,7 @@ class BazaRolePermissionsSeeder extends Seeder
                 ShiftPermission::SHIFT_COMPOSE,
                 ShiftPermission::SHIFT_CLOSE,
                 ShiftPermission::FINANCE_VIEW,
+                ShiftPermission::TICKET_PII, // полная карточка (решение владельца)
             ],
             ShiftRole::TICKETER => [
                 ShiftPermission::TICKET_SCAN,
@@ -43,6 +44,7 @@ class BazaRolePermissionsSeeder extends Seeder
                 ShiftPermission::TICKET_SEARCH,
                 ShiftPermission::TICKET_ENTER,
                 ShiftPermission::FINANCE_VIEW,
+                ShiftPermission::TICKET_PII, // полная карточка (решение владельца)
             ],
             ShiftRole::GUARD => [
                 ShiftPermission::TICKET_SCAN,

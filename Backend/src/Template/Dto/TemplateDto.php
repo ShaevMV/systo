@@ -22,6 +22,7 @@ class TemplateDto extends AbstractionEntity implements Response
         protected string $kind,
         protected string $engine,
         protected string $title,
+        protected ?string $description,
         protected string $body,
         protected ?string $draft_body,
         protected ?string $compiled_html,
@@ -40,6 +41,7 @@ class TemplateDto extends AbstractionEntity implements Response
             TemplateKind::isValid($data['kind'] ?? null) ? $data['kind'] : TemplateKind::EMAIL,
             TemplateEngine::isValid($data['engine'] ?? null) ? $data['engine'] : TemplateEngine::HTML,
             $data['title'] ?? $data['slug'],
+            $data['description'] ?? null,
             $data['body'] ?? '',
             $data['draft_body'] ?? null,
             $data['compiled_html'] ?? null,
@@ -73,6 +75,11 @@ class TemplateDto extends AbstractionEntity implements Response
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
     }
 
     public function getBody(): string
