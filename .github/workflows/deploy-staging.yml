@@ -426,6 +426,18 @@ jobs:
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging     php artisan migrate --force --no-interaction
           docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T phpbaza-staging php artisan migrate --force --no-interaction
 
+      # Разовая data-миграция v2.6.0: order_tickets.guests → новый per-guest формат
+      # (ticket_type/promo/price_snapshot). НЕ запускается обычной `migrate`, нужна отдельно.
+      # Идемпотентна (повторный прогон пропускает уже мигрированные заказы по price_snapshot)
+      # → безопасна на каждом деплое. Сначала dry-run (виден план в логе), затем --apply.
+      # --no-backup: на стенде данные одноразовые (re-import прод-дампа); для ПРОДА — отдельный
+      # runbook с явным mysqldump (.claude/docs/process/PROD_RELEASE_v2.6.0.md).
+      - name: Run v2.6.0 data migration (order guests format, idempotent)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan order:migrate-to-guests-format || true
+          docker compose -f docker-compose.staging.yml --env-file .env.staging exec -T php-staging php artisan order:migrate-to-guests-format --apply --no-backup
+
       # Сидеры — 4 режима:
       #
       #   auto  (default, на push в staging)
