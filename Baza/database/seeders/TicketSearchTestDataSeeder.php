@@ -14,6 +14,10 @@ use Illuminate\Database\Seeder;
  * Идемпотентно: updateOrCreate по ticket_uuid (повторный прогон не плодит дубли).
  * НЕ для прода — боевые строки наполняются из org→Baza ingest. festival_id совпадает
  * с фестивалём поиска (ChangesTestDataSeeder::FESTIVAL_ID), иначе строки не найдутся.
+ *
+ * Демо-почта — реалистичная (@spaceofjoy.ru), без слова «test»: поиск по email —
+ * штатное поле (InMemoryMySqlTicketSearch::SEARCH_COLUMNS), поэтому запрос «test»
+ * не должен давать ложных совпадений по адресу демо-гостя.
  */
 class TicketSearchTestDataSeeder extends Seeder
 {
@@ -39,7 +43,7 @@ class TicketSearchTestDataSeeder extends Seeder
                 'ticket_uuid' => 'aaa10001-0000-4000-8000-000000000001',
                 'type' => 'electron', 'kilter' => 900001,
                 'fio' => 'Иван Петров', 'phone' => '+79991234567', 'telegram' => 'ivan',
-                'email' => 'ivan@example.com', 'city' => 'Казань',
+                'email' => 'ivan@spaceofjoy.ru', 'city' => 'Казань',
                 'type_ticket' => 'Оргвзнос', 'external_order_no' => '123',
                 'payload' => ['role' => 'org_fee', 'is_buyer' => true],
             ],
@@ -47,7 +51,7 @@ class TicketSearchTestDataSeeder extends Seeder
                 'ticket_uuid' => 'aaa10002-0000-4000-8000-000000000002',
                 'type' => 'electron', 'kilter' => 900002,
                 'fio' => 'Пётр Смирнов', 'phone' => '+79990001122', 'telegram' => null,
-                'email' => 'petr@example.com', 'city' => 'Москва',
+                'email' => 'petr@spaceofjoy.ru', 'city' => 'Москва',
                 'type_ticket' => 'Оргвзнос', 'external_order_no' => '123',
                 'payload' => ['role' => 'org_fee', 'is_buyer' => false],
             ],
@@ -55,7 +59,7 @@ class TicketSearchTestDataSeeder extends Seeder
                 'ticket_uuid' => 'aaa10003-0000-4000-8000-000000000003',
                 'type' => 'electron', 'kilter' => 900003,
                 'fio' => 'Маша Петрова (7 лет)', 'child_name' => 'Маша Петрова',
-                'parent_phone' => '+79991234567', 'email' => 'ivan@example.com',
+                'parent_phone' => '+79991234567', 'email' => 'ivan@spaceofjoy.ru',
                 'type_ticket' => 'Детский билет', 'external_order_no' => '123',
                 'payload' => ['role' => 'kid', 'child' => ['age' => 7, 'allergies' => 'пыльца']],
             ],
@@ -70,7 +74,7 @@ class TicketSearchTestDataSeeder extends Seeder
                 'ticket_uuid' => 'aaa10005-0000-4000-8000-000000000005',
                 'type' => 'spisok', 'kilter' => 900005,
                 'fio' => 'Гость Списка', 'phone' => '+79993334455',
-                'email' => 'guest@example.com', 'city' => 'Самара',
+                'email' => 'guest@spaceofjoy.ru', 'city' => 'Самара',
                 'type_ticket' => 'Список', 'external_order_no' => '777',
                 'payload' => ['role' => 'list'],
             ],
