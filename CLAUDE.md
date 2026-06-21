@@ -48,6 +48,8 @@
 | **Backend** | Основное приложение SolarSysto (включая Friendly-заказы) | Laravel 9, PHP 8.2 |
 | **Baza** | Система контроля входа на КПП фестиваля (сканирование QR, впуск гостей, учёт смен персонала). Логин персонала — лишь её собственный вход, а не назначение. См. `.claude/docs/BAZA.md` | Laravel 9, PHP 8.2 |
 | **FrontEnd** | Vue.js SPA | Vue 3, Vuex, Vue Router |
+| **AdminFront** | Новая админка org (admin-only): дашборд, заказы, справочники, письма. Раздаётся под `/admin/`. См. `.claude/specs/admin-frontend-vite-sakai.md` | Vite, Vue 3, PrimeVue (Sakai) |
+| **BazaFront** | Offline-first PWA контроля входа на КПП (Ф5). Раздаётся под `/baza/` на vhod.*. См. `.claude/specs/baza-f5-pwa.md` | Vite, Vue 3, PrimeVue, PWA (Workbox) |
 | **Shared** | Общий код (CQRS, DDD, VO) | PHP PSR-4 |
 
 **Примечание:** ранее отдельное приложение **Friendly** было удалено из монорепо. Friendly как **тип заказа** (роль `pusher`, поле `friendly_id`, эндпоинты `/api/v1/order/createFriendly` и `/api/v1/order/getListForFriendly`) сохранён внутри Backend.

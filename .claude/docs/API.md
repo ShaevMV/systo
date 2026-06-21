@@ -630,6 +630,38 @@
 
 ---
 
+### POST `/api/v1/qrOrder/getStats`
+**Middleware:** `auth:api` + `admin`
+
+**Описание:** агрегированная статистика по qr-заказам для дашборда (продажи/выручка по статусам, типам заказа, времени и способам оплаты). Фильтр — **whitelist**: только `festival_id` и диапазон дат уходят в запрос.
+
+**Request:**
+```json
+{
+  "filter": {
+    "festival_id": "UUID?",
+    "date_from": "ISO8601?",
+    "date_to": "ISO8601?"
+  }
+}
+```
+
+**Response 200:**
+```json
+{
+  "success": true,
+  "stats": {
+    "totals": { "...": "..." },
+    "byStatus": [{ "status": "оплачен", "orders": 12, "revenue": 50400 }],
+    "byType": [{ "...": "..." }],
+    "timeseries": [{ "...": "..." }],
+    "byPaymentMethod": [{ "payment_method": "transfer", "orders": 8, "revenue": 33600 }]
+  }
+}
+```
+
+---
+
 ### GET `/api/v1/qrOrder/getItem/{id}`
 **Middleware:** `auth:api` + `admin`
 
@@ -889,6 +921,34 @@
 
 ---
 
+## 3.6. Вебхук «билет прошёл» от Baza (Ф4)
+
+Префикс: **`/api/v1/baza`**
+
+Входящий S2S-канал **Baza→org**: Baza сообщает, что билет прошёл через КПП. Заголовок `X-Baza-Token` (middleware `baza.webhook`). Пишет факт входа в `domain_history` (`aggregate_type = 'ticket'`, `event_name = 'ticket_entered'`, `actor_type = baza`, `actor_id = null`), идемпотентно по `event_id` (id строки `baza_entry_outbox` в Baza — повтор ретрая дренажа не дублирует событие). Канал **default OFF** (нет `config services.baza_webhook.tokens` / env `BAZA_WEBHOOK_TOKENS` → 401).
+
+### POST `/api/v1/baza/ticketEntered`
+**Middleware:** `baza.webhook` (S2S, заголовок `X-Baza-Token`)
+
+**Request:**
+```json
+{
+  "ticket_uuid": "UUID (required)",
+  "event_id": "string? (ключ идемпотентности — id строки outbox Baza)",
+  "target": "string?",
+  "kilter": "int?",
+  "change_id": "int?",
+  "entered_at": "ISO8601?",
+  "wristband_qr": "string?"
+}
+```
+
+**Response 200:** `{ "success": true, "recorded": true }` (`recorded = false` — идемпотентный повтор)
+**Response 422:** `{ "success": false, "message": "Не передан ticket_uuid" }`
+**Response 401:** без/с невалидным `X-Baza-Token` (middleware `baza.webhook`)
+
+---
+
 ## 4. Билеты
 
 Префикс: **`/api/v1/ticket`**
@@ -1099,6 +1159,67 @@
 
 ---
 
+## 8.0.1. Опции к билетам (v2.6.0)
+
+Префикс: **`/api/v1/option`**
+
+Опции к билетам (модуль `Backend/src/Option/`, см. `.claude/specs/ticket-options.md`). Read-операции — публичные (нужны фронту формы покупки), write — только admin.
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список опций с фильтрацией (`filter` + `orderBy`) |
+| GET | `/getItem/{id}` | публичный | Одна опция (+ массив `bindings` — привязки к типам билетов) |
+| GET | `/getActiveForTicketType/{ticketTypeId}` | публичный | Read-модель: активные опции конкретного типа билета (для формы покупки) |
+| POST | `/create` | `auth:api` + `admin` | Создать (UUID в `data.id` опционально) |
+| POST | `/edit/{id}` | `auth:api` + `admin` | Редактировать |
+| DELETE | `/delete/{id}` | `auth:api` + `admin` | Удалить |
+
+**Тело опции (`data` в create/edit):**
+```json
+{
+  "id": "UUID? (опционально)",
+  "name": "string (required, max:255)",
+  "active": "bool? (default — по умолчанию модели)",
+  "festival_id": "UUID (required, exists:festivals)",
+  "bindings": [
+    { "ticket_type_id": "UUID (required_with, exists:ticket_type)", "description": "string?" }
+  ]
+}
+```
+
+**Response 200 (create/edit):** `{ "success": true, "item": {...}, "message": "Опция создана" }`
+**Response 200 (getItem):** `{ "success": true, "item": { "...опция...", "bindings": [{ "ticket_type_id": "UUID", "description": "..." }] } }`
+**Response 400:** `{ "success": false, "message": "Некорректный идентификатор" }`
+**Response 404:** `{ "success": false, "message": "..." }` (опция не найдена)
+
+---
+
+## 8.0.2. Волны цен опции (v2.6.0)
+
+Префикс: **`/api/v1/optionPrice`**
+
+Управление таблицей цен опций (волны цен опции, по образцу `ticketTypePrice`). Каждая волна — запись `{ price, before_date }` для конкретной `option_id`. Read-операции публичные, write — только admin.
+
+| Метод | Маршрут | Middleware | Описание |
+|-------|---------|------------|----------|
+| POST | `/getList` | публичный | Список волн цен опции |
+| GET | `/getItem/{id}` | публичный | Одна волна |
+| POST | `/create` | `auth:api` + `admin` | Создать (UUID в `data.id` опционально) |
+| POST | `/edit/{id}` | `auth:api` + `admin` | Редактировать |
+| DELETE | `/delete/{id}` | `auth:api` + `admin` | Удалить |
+
+**Тело волны (`data` в create/edit):**
+```json
+{
+  "id": "UUID? (опционально)",
+  "option_id": "UUID (required, exists:options)",
+  "price": "int (required, > 0, < 1 000 000)",
+  "before_date": "date (required, after_or_equal:today)"
+}
+```
+
+---
+
 ## 8.1. Локации (для заказов-списков)
 
 Префикс: **`/api/v1/location`**
@@ -1276,6 +1397,7 @@
 | **CORS** | global | Проверяет Origin против белого списка |
 | **Authenticate** | `auth:api` | JWT через `php-open-source-saver/jwt-auth` |
 | **QrIngestAuth** | `qr.ingest` | S2S-канал qr→org: заголовок `X-QR-Token` сверяется со списком валидных ключей (`config services.qr_ingest.tokens`, env `QR_INGEST_TOKENS`). Закрывает `qrOrder/create`, `qrOrder/changeStatus` и `emailNotification/send`. Без/невалидный токен → 401 |
+| **BazaWebhookAuth** | `baza.webhook` | S2S-канал Baza→org (вебхук «билет прошёл», Ф4): заголовок `X-Baza-Token` сверяется со списком валидных ключей (`config services.baza_webhook.tokens`, env `BAZA_WEBHOOK_TOKENS`). Закрывает `baza/ticketEntered`. Без/невалидный токен → 401. Пустой список = канал закрыт (default OFF) |
 | **IsAdmin** | `admin` | Проверка `is_admin = true` или `role = 'admin'` |
 | **CheckRole** | `role:role1,role2` | Проверка роли пользователя |
 | **Bot** | `bot` | Заголовок `auth-token` == `PCf4yeeM8prVGee3zbArQGQP2eGpPHsV` |
@@ -1285,9 +1407,9 @@
 
 | Категория | Маршруты |
 |-----------|----------|
-| **Публичные** | login, register, forgot-password, resetPassword, festival/* (кроме getTicketTypeList/create/edit/delete), festival/getList, festival/getItem, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
+| **Публичные** | login, register, forgot-password, resetPassword, festival/* (кроме getTicketTypeList/create/edit/delete), festival/getList, festival/getItem, order/create, order/succes, ticket/live, questionnaireType/*, ticketType/*, typesOfPayment/*, location/getList, location/getItem, ticketTypePrice/getList, ticketTypePrice/getItem, option/getList, option/getItem, option/getActiveForTicketType, optionPrice/getList, optionPrice/getItem, invite/isCorrectInviteLink, questionnaire/send, questionnaire/sendNewUser, questionnaire/getQuestionnaireTypeByOrderTicket, questionnaire/getByOrderTicket, mail/open/{token}.gif (throttle:120,1) |
 | **Только auth** | user, logout, refresh, isCorrectRole, editProfile, editPassword, order/getUserList, order/getItem, order/getTicketPdf, invite/getInviteLink |
-| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, festival/getHistory, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend), bazaDelivery/* (getList, getItem, resend, getStats) |
+| **admin** | festival/getTicketTypeList, festival/create, festival/edit, festival/delete, festival/getHistory, account/*, promoCode/*, questionnaire/load, questionnaire/notification, questionnaire/approve, questionnaire/get, order/getHistory, location/{create,edit,delete}, ticketTypePrice/{create,edit,delete}, option/{create,edit,delete}, optionPrice/{create,edit,delete}, template/* (getList, getItem, create, edit, activate, saveDraft, publish, versions, rollback, history, variables, preview), templateBinding/* (getList, events, getItem, create, edit, delete), emailDelivery/* (getList, getItem, resend), bazaDelivery/* (getList, getItem, resend, getStats) |
 | **role: seller,admin** | order/getList |
 | **role: pusher,admin** | order/getListForFriendly, order/createFriendly |
 | **role: curator** | order/createList |
@@ -1296,6 +1418,7 @@
 | **role: seller,admin,pusher,manager** | order/toChangeStatus (для list-статусов внутри проверка admin/manager) |
 | **bot** | promoCode/savePromoCodeForBot |
 | **qr.ingest** (S2S, `X-QR-Token`) | qrOrder/create, qrOrder/changeStatus, emailNotification/send (от витрины qr) |
+| **baza.webhook** (S2S, `X-Baza-Token`) | baza/ticketEntered (вебхук «билет прошёл» от Baza, Ф4) |
 | **admin** (qr) | qrOrder/getList, qrOrder/getStats, qrOrder/getItem, qrOrder/getHistory, qrOrder/getTicketPdf, qrOrder/getPipeline |
 
 ---
