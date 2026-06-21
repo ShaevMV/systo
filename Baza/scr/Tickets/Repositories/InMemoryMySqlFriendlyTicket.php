@@ -68,13 +68,23 @@ class InMemoryMySqlFriendlyTicket implements FriendlyTicketRepositoryInterface
 
     public function find(string $q): array
     {
+        $q = trim($q);
+        if ($q === '') {
+            return [];
+        }
+        $like = '%' . strtolower($q) . '%';
+
         $resultRawList = $this->friendlyTicketModel::whereFestivalId(self::UUID_FESTIVAL)
-                ->where(function($query) use ($q) {
-                    return $query->whereKilter((int)$q)
-                        ->orWhereRaw('LOWER(`project`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                        ->orWhereRaw('LOWER(`name`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                        ->orWhereRaw('LOWER(`comment`) LIKE ? ',['%'.strtolower(trim($q)).'%'])
-                        ->orWhereRaw('LOWER(`email`) LIKE ? ',['%'.strtolower(trim($q)).'%']);
+                ->where(function($query) use ($q, $like) {
+                    // Поиск по ВСЕМ полям (решение владельца): ФИО/проект/email/коммент.
+                    $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])
+                        ->orWhereRaw('LOWER(`project`) LIKE ? ', [$like])
+                        ->orWhereRaw('LOWER(`email`) LIKE ? ', [$like])
+                        ->orWhereRaw('LOWER(`comment`) LIKE ? ', [$like]);
+                    // Номер билета — только для числового запроса (иначе (int)"test" === 0).
+                    if (ctype_digit($q)) {
+                        $query->orWhere('kilter', (int) $q);
+                    }
                 })
             ->get()
             ->toArray();

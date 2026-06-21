@@ -8,6 +8,11 @@ export const router = createRouter({
         { path: '/', redirect: '/scan' },
         { path: '/scan', name: 'scan', component: () => import('@/views/ScanView.vue') },
         { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
-        { path: '/shift', name: 'shift', component: () => import('@/views/ShiftView.vue') }
+        { path: '/shift', name: 'shift', component: () => import('@/views/ShiftView.vue') },
+        { path: '/more', name: 'more', component: () => import('@/views/MoreView.vue') },
+        // Управление (гейтится по правам через whoami): права (Шаг 4), персонал (Шаг 5), смены (Шаг 6).
+        { path: '/permissions', name: 'permissions', component: () => import('@/views/PermissionMatrixView.vue') },
+        { path: '/staff', name: 'staff', component: () => import('@/views/StaffView.vue') },
+        { path: '/shifts', name: 'shifts', component: () => import('@/views/ShiftsView.vue') }
     ]
 });

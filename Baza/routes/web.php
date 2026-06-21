@@ -58,6 +58,47 @@ Route::post('/enterForTable', [SearchController::class, 'enterForTable'])->name(
 Route::middleware('auth')->group(function () {
     Route::post('/api/scan', [\App\Http\Controllers\Api\ScanController::class, 'search'])->name('tickets.scan.search');
     Route::post('/api/enter', [\App\Http\Controllers\Api\ScanController::class, 'enter'])->name('tickets.scan.enter');
+
+    // Офлайн-снимок билетов для PWA-сканера (Ф5, PR-3). GET → CSRF не требуется.
+    // Сессионная auth: снимок содержит ФИО гостей, отдаём только сотруднику КПП.
+    Route::get('/api/snapshot', [\App\Http\Controllers\Api\SnapshotController::class, 'index'])->name('tickets.snapshot');
+
+    // JSON-поиск без QR для PWA (Ф5, PR-5). GET → CSRF не требуется. Тот же SearchService,
+    // что Blade /search; содержит ПДн → только сотруднику КПП.
+    Route::get('/api/search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('tickets.search.api');
+
+    // Синк чёрного списка отозванных билетов (Ф5, PR-6, B6). GET → CSRF не требуется.
+    Route::get('/api/blacklist', [\App\Http\Controllers\Api\BlacklistController::class, 'index'])->name('tickets.blacklist');
+
+    // Дренаж офлайн-намерений впуска в append-only журнал (Ф5, PR-8, гейт мульти-устройства).
+    Route::post('/api/entry-events', [\App\Http\Controllers\Api\EntryEventsController::class, 'store'])->name('tickets.entry-events');
+
+    // «Кто я» для PWA (роль + права) — гейтинг меню + признак полной карточки (Шаг 3).
+    Route::get('/api/whoami', [\App\Http\Controllers\Api\WhoamiController::class, 'index'])->name('whoami');
+});
+
+// Матрица прав «роль×действие» в новом PWA (Шаг 4). GET — CSRF не нужен; POST — X-XSRF-TOKEN.
+// Доступ только с правом rbac.manage (administrator по дефолту).
+Route::middleware(['auth', 'permission:rbac.manage'])->group(function () {
+    Route::get('/api/permissions/matrix', [\App\Http\Controllers\Api\PermissionController::class, 'matrix'])->name('api.permissions.matrix');
+    Route::post('/api/permissions/matrix', [\App\Http\Controllers\Api\PermissionController::class, 'save'])->name('api.permissions.save');
+});
+
+// Регистрация персонала из нового PWA (Шаг 5). Доступ — право staff.manage (administrator по дефолту).
+Route::middleware(['auth', 'permission:staff.manage'])->group(function () {
+    Route::get('/api/staff', [\App\Http\Controllers\Api\StaffController::class, 'index'])->name('api.staff.list');
+    Route::post('/api/staff', [\App\Http\Controllers\Api\StaffController::class, 'store'])->name('api.staff.store');
+});
+
+// Управление сменами из нового PWA (Шаг 6). Список/создание/состав — shift.compose;
+// закрытие — shift.close. Изоляция начальника — внутри контроллера (видит только свою смену).
+Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
+    Route::get('/api/shifts', [\App\Http\Controllers\Api\ShiftController::class, 'index'])->name('api.shifts.list');
+    Route::get('/api/shifts/users', [\App\Http\Controllers\Api\ShiftController::class, 'users'])->name('api.shifts.users');
+    Route::post('/api/shifts', [\App\Http\Controllers\Api\ShiftController::class, 'store'])->name('api.shifts.store');
+});
+Route::middleware(['auth', 'permission:shift.close'])->group(function () {
+    Route::post('/api/shifts/{id}/close', [\App\Http\Controllers\Api\ShiftController::class, 'close'])->name('api.shifts.close');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
