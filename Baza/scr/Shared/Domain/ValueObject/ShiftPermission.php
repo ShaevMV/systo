@@ -25,6 +25,8 @@ final class ShiftPermission
     public const SYNC_MANAGE = 'sync.manage';
     public const FINANCE_VIEW = 'finance.view'; // зарезервировано под Ф7 (финансы смены)
     public const RBAC_MANAGE = 'rbac.manage';
+    public const TICKET_PII = 'ticket.pii';     // полная карточка билета (телефон/email/коммент)
+    public const STAFF_MANAGE = 'staff.manage'; // регистрация/управление персоналом (Шаг 5)
 
     public const LABELS = [
         self::TICKET_SCAN => 'Сканирование билета',
@@ -37,6 +39,8 @@ final class ShiftPermission
         self::SYNC_MANAGE => 'Синхронизация (экспорт/импорт)',
         self::FINANCE_VIEW => 'Просмотр финансов смены',
         self::RBAC_MANAGE => 'Управление матрицей прав',
+        self::TICKET_PII => 'Полная карточка билета (ПДн)',
+        self::STAFF_MANAGE => 'Регистрация персонала',
     ];
 
     /**

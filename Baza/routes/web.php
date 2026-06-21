@@ -72,6 +72,9 @@ Route::middleware('auth')->group(function () {
 
     // Дренаж офлайн-намерений впуска в append-only журнал (Ф5, PR-8, гейт мульти-устройства).
     Route::post('/api/entry-events', [\App\Http\Controllers\Api\EntryEventsController::class, 'store'])->name('tickets.entry-events');
+
+    // «Кто я» для PWA (роль + права) — гейтинг меню + признак полной карточки (Шаг 3).
+    Route::get('/api/whoami', [\App\Http\Controllers\Api\WhoamiController::class, 'index'])->name('whoami');
 });
 
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.

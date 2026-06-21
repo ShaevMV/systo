@@ -11,6 +11,10 @@ use Baza\EntryOutbox\Applications\EntryOutboxApplication;
 use Baza\Tickets\Applications\Enter\EnterTicket;
 use Baza\Tickets\Applications\Scan\SearchEngine;
 use Baza\Tickets\Repositories\BlacklistRepositoryInterface;
+use Baza\Tickets\Services\TicketPiiFilter;
+use Baza\Permission\Repositories\RolePermissionRepositoryInterface;
+use Baza\Shared\Domain\ValueObject\ShiftPermission;
+use Baza\Shared\Domain\ValueObject\ShiftRole;
 use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -26,6 +30,7 @@ class ScanController extends Controller
         private AddTicketsInReport $addTicketsInReport,
         private EntryOutboxApplication $entryOutbox,
         private BlacklistRepositoryInterface $blacklist,
+        private RolePermissionRepositoryInterface $rolePermissions,
     ) {}
 
     public function search(Request $request): JsonResponse
@@ -36,12 +41,25 @@ class ScanController extends Controller
                 throw new DomainException('Не опознанный билет просканируй снова!');
             }
 
-            return response()->json(
-                $this->searchEngine->get($link)->toArray()
+            // ПДн в карточке (телефон/email/коммент) — только при праве ticket.pii (Шаг 3).
+            $card = TicketPiiFilter::apply(
+                $this->searchEngine->get($link)->toArray(),
+                $this->canViewPii(),
             );
+
+            return response()->json($card);
         } catch (DomainException|InvalidArgumentException $exception) {
             return response()->json($exception->getMessage(), 422);
         }
+    }
+
+    /** Видит ли текущий сотрудник полную карточку (ПДн). administrator — суперроль. */
+    private function canViewPii(): bool
+    {
+        $user = \Auth::user();
+        $role = ShiftRole::fromUser((bool) $user->is_admin, $user->role);
+
+        return $this->rolePermissions->can($role, ShiftPermission::TICKET_PII);
     }
 
     /**
