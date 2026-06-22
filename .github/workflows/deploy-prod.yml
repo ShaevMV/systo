@@ -284,9 +284,12 @@ jobs:
       - name: Storage link + permissions
         working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          # ВАЖНО: php-fpm/worker бегут под пользователем `user` (uid 1000), НЕ www-data.
+          # Раньше chown в www-data ломал запись логов/storage приложением (Permission denied
+          # на запись qr_pipeline/PDF и т.п.) — поэтому chown'им в реальный runtime-юзер `user`.
           $DC -f "$COMPOSE" exec -T -u root php sh -c "mkdir -p storage/app/public/tickets && php artisan storage:link || true"
-          $DC -f "$COMPOSE" exec -T -u root php     chown -R www-data:www-data storage bootstrap/cache || true
-          $DC -f "$COMPOSE" exec -T -u root phpBaza chown -R www-data:www-data storage bootstrap/cache || true
+          $DC -f "$COMPOSE" exec -T -u root php     chown -R user:user storage bootstrap/cache || true
+          $DC -f "$COMPOSE" exec -T -u root phpBaza chown -R user:user storage bootstrap/cache || true
 
       - name: Clear & warm caches
         working-directory: ${{ env.PROJECT_DIR }}
