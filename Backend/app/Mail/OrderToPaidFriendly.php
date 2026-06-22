@@ -28,12 +28,15 @@ class OrderToPaidFriendly extends Mailable
 
     /**
      * @param TicketResponse[] $tickets
+     * @param int|null $orderNo номер заказа для подстановки {{ kilter }} (qr → external_order_no);
+     *                          null → берётся kilter первого билета.
      */
     public function __construct(
         private array $tickets,
         private Uuid $ticketTypeId,
         private ?string $comment = null,
         private ?string $promocode = null,
+        private ?int $orderNo = null,
     )
     {
     }
@@ -71,10 +74,13 @@ class OrderToPaidFriendly extends Mailable
             }
         }
 
+        $kilter = $this->orderNo ?? (($this->tickets[0] ?? null)?->getKilter());
+
         $this->subject('Ваш билет на Систо 2026 оформлен');
         // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
         $mail = $this->renderDbOrView($friendlyView, [
             'festivalName' => $festivalName,
+            'kilter' => $kilter,
             'comment' => $this->comment,
             'promocode' => $this->promocode,
             'questionnaireLinks' => $isChildTicket ? $questionnaireLinks : [],

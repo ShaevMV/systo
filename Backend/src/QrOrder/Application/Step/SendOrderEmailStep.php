@@ -44,11 +44,15 @@ final class SendOrderEmailStep implements PipelineStepInterface
             return $carry;
         }
 
+        // Номер заказа qr (external_order_no) → в письмо как {{ kilter }} (как в order_created).
+        $externalOrderNo = (int) ($order->getExternalOrderNo() ?? 0);
+
         $mailable = $this->emailResolver->resolve(
             $order->getTypeOrder(),
             $responses,
             $carry['firstTicketTypeId'] ?? null,
             $carry['comment'] ?? null,
+            $externalOrderNo > 0 ? $externalOrderNo : null,
         );
 
         $event = TypeOrder::normalize($order->getTypeOrder()) === TypeOrder::FRIENDLY

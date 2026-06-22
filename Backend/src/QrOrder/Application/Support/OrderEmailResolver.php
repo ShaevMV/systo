@@ -25,14 +25,15 @@ final class OrderEmailResolver
 {
     /**
      * @param  array<int, TicketResponse>  $responses
+     * @param  int|null  $orderNo  номер заказа qr (external_order_no) для подстановки {{ kilter }}
      */
-    public function resolve(?string $typeOrder, array $responses, ?Uuid $ticketTypeId, ?string $comment): Mailable
+    public function resolve(?string $typeOrder, array $responses, ?Uuid $ticketTypeId, ?string $comment, ?int $orderNo = null): Mailable
     {
         $ticketTypeId ??= Uuid::random();
 
         return match (TypeOrder::normalize($typeOrder)) {
-            TypeOrder::FRIENDLY => new OrderToPaidFriendly($responses, $ticketTypeId, $comment, null),
-            default => new OrderToPaid($responses, $ticketTypeId, $comment, null),
+            TypeOrder::FRIENDLY => new OrderToPaidFriendly($responses, $ticketTypeId, $comment, null, $orderNo),
+            default => new OrderToPaid($responses, $ticketTypeId, $comment, null, $orderNo),
         };
     }
 }
