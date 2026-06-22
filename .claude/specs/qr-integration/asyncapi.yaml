@@ -1,0 +1,186 @@
+asyncapi: '2.6.0'
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  Машиночитаемый контракт интеграции qr.spaceofjoy.ru → org через RabbitMQ.
+#  Человеко-читаемая версия и пояснения: RABBITMQ_PUBLISH.md (этот же каталог).
+#  Перспектива документа: qr — ПРОДЬЮСЕР (публикует), org — КОНСЬЮМЕР (забирает).
+#  Тела сообщений идентичны существующим HTTP-контрактам (QR_CREATE_API.md и др.).
+#  Статус: ПЛАН / черновик — брокерный канал ещё не активирован в проде.
+# ─────────────────────────────────────────────────────────────────────────────
+
+info:
+  title: QR → ORG ingest (RabbitMQ)
+  version: '0.1.0'
+  description: >
+    Приём заказов/статусов/писем от витрины qr.spaceofjoy.ru в org через RabbitMQ.
+    Основной канал — этот (брокер), HTTP S2S (qrOrder/create и пр.) — запасной.
+    Идемпотентность по order_id (id qr == id org). Транспорт — mTLS (amqps, 5671).
+
+servers:
+  production:
+    url: mq.spaceofjoy.ru:5671
+    protocol: amqps
+    description: >
+      Отдельный сервер брокера (рабочее имя домена, уточняется). Только TLS.
+      Взаимная аутентификация (mTLS): клиент qr предъявляет client-cert,
+      проверяется server-cert. vhost qr-integration, пользователь qr_ingest
+      с правами только на publish в x.qr.inbound.
+    security:
+      - mtls: []
+
+defaultContentType: application/json
+
+channels:
+  x.qr.inbound:
+    description: >
+      Topic-exchange (durable) — единственная точка входа от qr. Маршрутизация
+      по routing key. Очереди/DLQ/ретраи объявляет org; qr только публикует.
+    publish:
+      operationId: qrPublishInbound
+      summary: qr публикует входящие сообщения (org их потребляет)
+      description: >
+        delivery_mode=2 (persistent), publisher confirms включены.
+        message_id = order_id (для писем — external_id) — ключ дедупликации.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/OrderCreate'
+          - $ref: '#/components/messages/OrderStatus'
+          - $ref: '#/components/messages/EmailSend'
+
+components:
+  securitySchemes:
+    mtls:
+      type: X509
+      description: >
+        Взаимный TLS. Клиентский сертификат qr (выдаёт org) +
+        учётка qr_ingest поверх. verify_peer, fail_if_no_peer_cert=true.
+
+  messageTraits:
+    common:
+      contentType: application/json
+      headers:
+        type: object
+        required: [x-message-type, x-schema-version]
+        properties:
+          x-message-type:
+            type: string
+            enum: [qr.order.create, qr.order.status, qr.email.send]
+          x-schema-version:
+            type: integer
+            const: 1
+      correlationId:
+        location: '$message.header#/x-message-type'
+
+  messages:
+    OrderCreate:
+      name: qr.order.create
+      title: Создание заказа
+      summary: Тело идентично POST /api/v1/qrOrder/create
+      traits:
+        - $ref: '#/components/messageTraits/common'
+      payload:
+        $ref: '#/components/schemas/OrderCreatePayload'
+
+    OrderStatus:
+      name: qr.order.status
+      title: Смена статуса заказа
+      summary: Аналог POST /api/v1/qrOrder/changeStatus/{id}; order_id в теле
+      traits:
+        - $ref: '#/components/messageTraits/common'
+      payload:
+        $ref: '#/components/schemas/OrderStatusPayload'
+
+    EmailSend:
+      name: qr.email.send
+      title: S2S-письмо (не-заказное)
+      summary: Тело идентично POST /api/v1/emailNotification/send
+      traits:
+        - $ref: '#/components/messageTraits/common'
+      payload:
+        $ref: '#/components/schemas/EmailSendPayload'
+
+  schemas:
+    OrderCreatePayload:
+      type: object
+      description: >
+        Полная схема — в QR_CREATE_API.md / QR_FULL_EXAMPLE.md. Здесь — ключевые
+        поля для контракта; весь JSON сохраняется в org as-is.
+      required: [order_id, order_data]
+      properties:
+        order_id:
+          type: string
+          format: uuid
+          description: id заказа (== id в org). Ключ идемпотентности.
+        order_data:
+          type: object
+          description: Контейнер данных заказа (status, email, type_order, festival, ...).
+          properties:
+            status:
+              type: string
+              description: 'создан|оплачен (синонимы new/created, paid). Регистр/пробелы не важны.'
+            email:
+              type: string
+              format: email
+            type_order:
+              type: string
+              enum: [regular, friendly, list, live]
+        buyer:
+          type: object
+          description: Данные заказчика (fallback на legacy user{}).
+        payment:
+          type: object
+          description: Цена/способ оплаты (amount_total, method, promo_codes...). ПДн карты НЕ слать в проекцию.
+        guests:
+          type: array
+          description: Строки заказа (гости/билеты/машины). Гард <= 1000.
+          items:
+            type: object
+
+    OrderStatusPayload:
+      type: object
+      required: [order_id, status]
+      properties:
+        order_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          description: 'Чаще всего "оплачен". Переход в оплачен запускает выдачу один раз (issued_at).'
+
+    EmailSendPayload:
+      type: object
+      description: Полная схема — в EMAIL_SEND_API.md.
+      required: [event, email]
+      properties:
+        event:
+          type: string
+          enum:
+            - user_registered
+            - password_reset
+            - invite
+            - questionnaire
+            - questionnaire_approved
+            - questionnaire_rejected
+          description: Только не-заказные события (заказные org шлёт сам).
+        email:
+          type: string
+          format: email
+        vars:
+          type: object
+        external_id:
+          type: string
+          description: Ключ идемпотентности письма (= message_id).
+        festival_id:
+          type: string
+          format: uuid
+        order_type:
+          type: string
+          enum: [regular, friendly, list, live]
+        ticket_type_id:
+          type: string
+          format: uuid
+        subject:
+          type: string
+        aggregate_id:
+          type: string
+          format: uuid
