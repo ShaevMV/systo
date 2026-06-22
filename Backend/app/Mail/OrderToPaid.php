@@ -18,12 +18,15 @@ class OrderToPaid extends Mailable
 
     /**
      * @param TicketResponse[] $tickets
+     * @param int|null $orderNo номер заказа для подстановки {{ kilter }} (qr → external_order_no);
+     *                          null → берётся kilter первого билета (классический org-флоу).
      */
     public function __construct(
         private array $tickets,
         private Uuid $ticketTypeId,
         private ?string $comment = null,
         private ?string $promocode = null,
+        private ?int $orderNo = null,
     )
     {
     }
@@ -58,10 +61,16 @@ class OrderToPaid extends Mailable
             }
         }
 
-        $this->subject('Ваш оргвзнос на Систо 2026 подтверждён');
+        // Номер заказа для {{ kilter }}: явно переданный (qr → external_order_no) либо kilter
+        // первого билета (классический org-флоу). Раньше kilter в контекст НЕ передавался —
+        // в письме order_paid плейсхолдер {{ kilter }} оставался пустым (в order_created работал).
+        $kilter = $this->orderNo ?? (($this->tickets[0] ?? null)?->getKilter());
+
+        $this->subject('Ваш оргвзнос на ' . $festivalName . ' подтверждён');
         // Активный DB-шаблон (Mustache) или fallback на blade email.{slug} — см. RendersDbTemplate.
         $mail = $this->renderDbOrView(empty($emailView) ? 'orderToPaid' : $emailView, [
             'festivalName' => $festivalName,
+            'kilter' => $kilter,
             'comment' => $this->comment,
             'promocode' => $this->promocode,
             'questionnaireLinks' => $questionnaireLinks,

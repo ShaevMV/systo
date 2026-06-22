@@ -7,10 +7,13 @@ namespace Tickets\QrOrder\Application\Step;
 use Carbon\Carbon;
 use InvalidArgumentException;
 use Shared\Domain\ValueObject\Uuid;
+use Tickets\EmailDelivery\Domain\EmailEvent;
 use Tickets\QrOrder\Application\Support\PipelineLog;
 use Tickets\QrOrder\Application\Support\QrTicketId;
+use Tickets\QrOrder\Domain\ValueObject\TypeOrder;
 use Tickets\QrOrder\Dto\QrOrderDto;
 use Tickets\QrOrder\Repositories\QrIssuanceRepositoryInterface;
+use Tickets\TemplateBinding\Application\TemplateBindingApplication;
 use Tickets\Ticket\CreateTickets\Application\GetTicket\TicketResponse;
 use Tickets\Ticket\CreateTickets\Domain\ProcessCreatingQRCode;
 use Tickets\Ticket\CreateTickets\Dto\TicketDto;
@@ -31,6 +34,7 @@ final class CreateTicketsStep implements PipelineStepInterface
     public function __construct(
         private readonly TicketsRepositoryInterface $ticketsRepository,
         private readonly QrIssuanceRepositoryInterface $issuanceRepository,
+        private readonly TemplateBindingApplication $bindings,
     ) {}
 
     public function name(): string
@@ -65,6 +69,11 @@ final class CreateTicketsStep implements PipelineStepInterface
         $firstTicketTypeId = null;
         $log = PipelineLog::logger();
 
+        // Ключи резолва привязок шаблонов одинаковы для всех гостей заказа (тип заказа + событие
+        // выдачи). Тип билета — у каждого гостя свой → резолвим email/pdf-slug per guest ниже.
+        $orderType = TypeOrder::normalize($order->getTypeOrder());
+        $paidEvent = $this->paidEventFor($orderType);
+
         foreach ($guests as $index => $guest) {
             if (! is_array($guest)) {
                 continue;
@@ -96,6 +105,18 @@ final class CreateTicketsStep implements PipelineStepInterface
                 ? $this->issuanceRepository->findTemplate($festivalId, $ticketTypeId)
                 : null;
 
+            // Базовый slug из ticket_type_festival (старое поведение / fallback).
+            $pdfSlug = $template['pdf'] ?? 'pdf';
+            $emailSlug = $template['email'] ?? null;
+
+            // Привязки шаблонов (Часть B + AF-9) — как в InMemoryMySqlTicketsRepository::getTicket():
+            // активная привязка ПЕРЕОПРЕДЕЛЯЕТ slug по (event, festival, order_type, ticket_type);
+            // нет привязки → остаётся базовый slug (полная обратная совместимость). Раньше qr-пайплайн
+            // привязки не читал — детский/спец-шаблон не применялся (письмо/PDF уходили дефолтными).
+            $ticketTypeIdValue = $ticketTypeId?->value();
+            $pdfSlug = $this->bindings->resolveSlug('pdf', $paidEvent, $festivalId->value(), $orderType, $ticketTypeIdValue) ?? $pdfSlug;
+            $emailSlug = $this->bindings->resolveSlug('email', $paidEvent, $festivalId->value(), $orderType, $ticketTypeIdValue) ?? $emailSlug;
+
             // 3. Собираем TicketResponse вручную (без getTicket → без зависимости от order_tickets).
             $response = new TicketResponse(
                 name: (string) ($guest['name'] ?? $guest['fio'] ?? $guest['value'] ?? ''),
@@ -107,8 +128,8 @@ final class CreateTicketsStep implements PipelineStepInterface
                 city: (string) ($order->getCity() ?? ''),
                 comment: $comment,
                 date_order: Carbon::now(),
-                festivalView: $template['pdf'] ?? 'pdf',
-                emailView: $template['email'] ?? null,
+                festivalView: $pdfSlug,
+                emailView: $emailSlug,
                 festival_id: $festivalId,
                 type_ticket_id: $ticketTypeId,
                 type_ticket: isset($guest['type_ticket']['title']) ? (string) $guest['type_ticket']['title'] : null,
@@ -144,6 +165,21 @@ final class CreateTicketsStep implements PipelineStepInterface
         $carry['comment'] = $comment;
 
         return $carry;
+    }
+
+    /**
+     * Событие выдачи для резолва привязок шаблонов (зеркало
+     * InMemoryMySqlTicketsRepository::deriveIssuanceEvent): regular → order_paid,
+     * friendly → order_paid_friendly, live → order_paid_live, list → list_approved.
+     */
+    private function paidEventFor(string $orderType): string
+    {
+        return match ($orderType) {
+            TypeOrder::FRIENDLY => EmailEvent::ORDER_PAID_FRIENDLY,
+            TypeOrder::LIVE => EmailEvent::ORDER_PAID_LIVE,
+            TypeOrder::LIST => EmailEvent::LIST_APPROVED,
+            default => EmailEvent::ORDER_PAID,
+        };
     }
 
     /**
