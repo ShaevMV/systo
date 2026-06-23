@@ -67,4 +67,26 @@ return [
         ))),
     ],
 
+    // Подключение КОНСЬЮМЕРА org к RabbitMQ-брокеру (Ф4): забор заказов от витрины qr
+    // из vhost qr-integration (очереди q.qr.order / q.qr.email). Это ВНУТРЕННИЙ канал
+    // (org→брокер по docker-сети, порт 5672), отдельный пользователь qr_consumer (read-only).
+    // mTLS (5671) — отдельная «внешняя дверь» для самой qr (Ф3), консьюмеру не нужна.
+    // Пусто (нет RABBITMQ_HOST) → канал ВЫКЛЮЧЕН (безопасный дефолт): команда qr:consume
+    // сразу выходит, ничего не слушает. На проде брокера пока нет — поэтому дефолт off.
+    'qr_broker' => [
+        'host' => env('RABBITMQ_HOST'),
+        'port' => (int) env('RABBITMQ_PORT', 5672),
+        'vhost' => env('RABBITMQ_VHOST', 'qr-integration'),
+        'user' => env('RABBITMQ_QR_CONSUMER_USER', 'qr_consumer'),
+        'password' => env('RABBITMQ_QR_CONSUMER_PASS'),
+        'prefetch' => (int) env('RABBITMQ_PREFETCH', 1),
+        'heartbeat' => (int) env('RABBITMQ_HEARTBEAT', 30),
+        'max_attempts' => (int) env('RABBITMQ_MAX_ATTEMPTS', 5),
+        // TLS — для будущего mTLS-канала (Ф3); внутренний консьюмер по умолчанию без TLS.
+        'tls' => filter_var(env('RABBITMQ_TLS', false), FILTER_VALIDATE_BOOL),
+        'cacert' => env('RABBITMQ_TLS_CACERT'),
+        'cert' => env('RABBITMQ_TLS_CERT'),
+        'key' => env('RABBITMQ_TLS_KEY'),
+    ],
+
 ];

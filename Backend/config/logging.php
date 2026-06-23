@@ -118,6 +118,17 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        // Канал консьюмера qr→org (Ф4): приём из RabbitMQ, ack/nack/dlq, реконнект — без ПДн.
+        'qr_consumer' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/qr_consumer.log'),
+            'level' => 'debug',
+            'days' => 30,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            // Сбой записи лога не должен ронять обработку сообщения консьюмером.
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
