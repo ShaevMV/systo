@@ -256,9 +256,15 @@ services:
       RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-systo}
     ports:
       - "127.0.0.1:8085:15672"
+      # AMQPS (mTLS) для внешней qr (Ф3) — наружу на время теста. Обычный AMQP 5672 наружу НЕ торчит.
+      - "5671:5671"
     volumes:
       - rabbitmq-staging-data:/var/lib/rabbitmq
       - ./Docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      # TLS-листенер (Ф3) — грузится из conf.d. Серты ОБЯЗАНЫ существовать
+      # (infra/staging/gen-rabbitmq-mtls-certs.sh), иначе брокер не стартует.
+      - ./Docker/rabbitmq/rabbitmq-tls.conf:/etc/rabbitmq/conf.d/tls.conf:ro
+      - ./infra/staging/rabbitmq-certs:/etc/rabbitmq/certs:ro
     networks:
       - staging
     healthcheck:
