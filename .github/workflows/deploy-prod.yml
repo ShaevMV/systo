@@ -254,6 +254,16 @@ jobs:
           # node-контейнер крутится (tail -f); собираем внутри него.
           $DC -f "$COMPOSE" exec -T -u root node sh -c "npm ci && npm run build"
 
+      # Новая админка (AdminFront, Vite+Sakai) → собираем в FrontEnd/dist/new-admin,
+      # откуда docker-nginx отдаёт её на /new-admin/. ВАЖНО: после сборки старого
+      # FrontEnd (та пересоздаёт dist/ и затёрла бы new-admin). VITE_API_URL — прод.
+      - name: Build AdminFront (new admin -> /new-admin/)
+        working-directory: ${{ env.PROJECT_DIR }}
+        run: |
+          # /var/www/app = ENV_ORG_FRONT_PATCH (FrontEnd) внутри node-контейнера;
+          # docker-nginx отдаёт /new-admin/ из ${ENV_ORG_FRONT_PATCH}/dist (см. default.conf).
+          $DC -f "$COMPOSE" exec -T -u root node sh -c "cd /var/www/admin-src && npm ci --include=dev && VITE_API_URL=https://api.spaceofjoy.ru/ npm run build -- --base=/new-admin/ --outDir /var/www/app/dist/new-admin --emptyOutDir"
+
       - name: Run schema migrations (Backend + Baza)
         working-directory: ${{ env.PROJECT_DIR }}
         run: |

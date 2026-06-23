@@ -31,6 +31,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY vhost.conf /etc/apache2/sites-available/000-default.conf
 COPY error_reporting.ini /usr/local/etc/php/conf.d/error_reporting.ini
+# Override пула php-fpm под прод-нагрузку (max_children + request_terminate_timeout)
+COPY zz-pool.conf /usr/local/etc/php-fpm.d/zz-pool.conf
 
 #composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
