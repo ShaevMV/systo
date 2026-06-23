@@ -13,6 +13,7 @@ export const router = createRouter({
         // Управление (гейтится по правам через whoami): права (Шаг 4), персонал (Шаг 5), смены (Шаг 6).
         { path: '/permissions', name: 'permissions', component: () => import('@/views/PermissionMatrixView.vue') },
         { path: '/staff', name: 'staff', component: () => import('@/views/StaffView.vue') },
-        { path: '/shifts', name: 'shifts', component: () => import('@/views/ShiftsView.vue') }
+        { path: '/shifts', name: 'shifts', component: () => import('@/views/ShiftsView.vue') },
+        { path: '/festivals', name: 'festivals', component: () => import('@/views/FestivalsView.vue') }
     ]
 });

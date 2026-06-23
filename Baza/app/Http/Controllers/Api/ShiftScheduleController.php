@@ -28,9 +28,6 @@ use Throwable;
  */
 class ShiftScheduleController extends Controller
 {
-    /** Текущий фестиваль (как в SaveChange / репозиториях; кандидат на env, BAZA.md §9). */
-    private const FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
-
     public function __construct(
         private readonly ShiftScheduleRepositoryInterface $schedules,
         private readonly CreateSchedule $createSchedule,
@@ -56,7 +53,7 @@ class ShiftScheduleController extends Controller
             'success' => true,
             'is_admin' => $this->isAdmin(),
             'schedules' => $this->listSchedules->list(
-                $data['festival_id'] ?? self::FESTIVAL,
+                $data['festival_id'] ?? (string) config('baza.default_festival_id'),
                 $data['shift_date'] ?? null,
                 $data['kpp_point'] ?? null,
             ),
@@ -202,7 +199,7 @@ class ShiftScheduleController extends Controller
 
         return new ShiftScheduleDto(
             id: $id,
-            festivalId: $data['festival_id'] ?? self::FESTIVAL,
+            festivalId: $data['festival_id'] ?? (string) config('baza.default_festival_id'),
             kppPoint: $data['kpp_point'] ?? null,
             shiftDate: Carbon::parse($data['shift_date']),
             plannedStart: Carbon::parse($data['planned_start']),

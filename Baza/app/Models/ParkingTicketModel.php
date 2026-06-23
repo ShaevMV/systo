@@ -48,5 +48,6 @@ class ParkingTicketModel extends Model
         'status',
         'change_id',
         'date_change',
+        'festival_id',
     ];
 }

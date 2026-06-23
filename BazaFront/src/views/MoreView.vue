@@ -10,11 +10,12 @@ const user = useCurrentUser();
 const allItems = [
     { label: 'Права доступа', sub: 'Матрица роль × действие', route: 'permissions', icon: 'pi-lock', perm: 'rbac.manage' },
     { label: 'Регистрация персонала', sub: 'Создать сотрудника', route: 'staff', icon: 'pi-user-plus', perm: 'staff.manage' },
-    { label: 'Управление сменами', sub: 'Создать / закрыть смену', route: 'shifts', icon: 'pi-users', perm: 'shift.compose' }
+    { label: 'Управление сменами', sub: 'Создать / закрыть смену', route: 'shifts', icon: 'pi-users', perm: 'shift.compose' },
+    { label: 'Фестивали', sub: 'Реестр / доступность для КПП', route: 'festivals', icon: 'pi-flag', perm: 'festival.manage' }
 ];
 
 // Показываем только то, на что есть право И для чего уже есть экран (route зарегистрирован).
-const routeNames = new Set(['permissions', 'staff', 'shifts']);
+const routeNames = new Set(['permissions', 'staff', 'shifts', 'festivals']);
 const items = computed(() => allItems.filter((it) => routeNames.has(it.route) && hasPermission(it.perm)));
 
 onMounted(loadCurrentUser);

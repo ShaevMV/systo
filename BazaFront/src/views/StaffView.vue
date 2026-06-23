@@ -3,24 +3,22 @@
 // Доступ — право staff.manage (бэкенд гейтит; в меню виден только при наличии права).
 import { ref, onMounted } from 'vue';
 import { loadStaff, createStaff } from '@/services/staff';
+import { notifySuccess } from '@/lib/notify';
 
 const staff = ref([]);
 const roles = ref([]);
 const form = ref({ name: '', email: '', password: '', role: '', is_admin: false });
 const loading = ref(true);
 const saving = ref(false);
-const msg = ref(null);
-const err = ref(null);
 
 async function reload() {
     loading.value = true;
-    err.value = null;
     try {
         const data = await loadStaff();
         staff.value = data.staff || [];
         roles.value = data.roles || [];
-    } catch (e) {
-        err.value = e?.response?.status === 403 ? 'Нет доступа (нужно право «Регистрация персонала»)' : 'Не удалось загрузить';
+    } catch {
+        /* ошибку загрузки покажет централизованный http.js-перехватчик (тост) */
     } finally {
         loading.value = false;
     }
@@ -28,23 +26,13 @@ async function reload() {
 
 async function submit() {
     saving.value = true;
-    msg.value = null;
-    err.value = null;
     try {
         await createStaff({ ...form.value });
-        msg.value = 'Сотрудник сохранён';
+        notifySuccess('Сотрудник сохранён');
         form.value = { name: '', email: '', password: '', role: '', is_admin: false };
         await reload();
-    } catch (e) {
-        const r = e?.response;
-        if (r?.status === 422) {
-            const errors = r.data?.errors || {};
-            err.value = Object.values(errors).flat().join('; ') || 'Проверьте поля';
-        } else if (r?.status === 403) {
-            err.value = 'Нет доступа';
-        } else {
-            err.value = 'Не удалось сохранить';
-        }
+    } catch {
+        /* ошибку покажет http.js-перехватчик (тост) */
     } finally {
         saving.value = false;
     }
@@ -56,7 +44,6 @@ onMounted(reload);
 <template>
     <section class="staff">
         <h2 class="staff-title">Регистрация персонала</h2>
-        <p v-if="err" class="staff-err">{{ err }}</p>
 
         <form class="staff-form" @submit.prevent="submit">
             <input v-model="form.name" class="fld" placeholder="Имя сотрудника" />
@@ -72,7 +59,6 @@ onMounted(reload);
             <button class="staff-save" type="submit" :disabled="saving">
                 {{ saving ? 'Сохранение…' : 'Сохранить сотрудника' }}
             </button>
-            <span v-if="msg" class="staff-ok">{{ msg }}</span>
         </form>
 
         <h3 class="staff-sub">Сотрудники</h3>

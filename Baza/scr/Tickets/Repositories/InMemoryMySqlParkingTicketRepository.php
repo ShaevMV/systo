@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\ParkingTicketModel;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Tickets\Responses\LiveTicketResponse;
 use Baza\Tickets\Responses\ParkingTicketResponse;
 use Carbon\Carbon;
@@ -14,15 +15,16 @@ use Throwable;
 class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInterface
 {
     public function __construct(
-        private ParkingTicketModel $model
+        private ParkingTicketModel $model,
+        private FestivalScope      $festivalScope,
     )
     {
     }
 
     public function search(int $kilter, string $type): ?ParkingTicketResponse
     {
-        $data = $this->model::whereKilter($kilter)
-            ->whereType($type)
+        $data = $this->festivalScope
+            ->applyLenient($this->model::whereKilter($kilter)->whereType($type))
             ->first()
             ?->toArray();
 
@@ -38,7 +40,8 @@ class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInt
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->model::whereId($id)
+        $rawData = $this->festivalScope
+            ->applyLenient($this->model::whereId($id))
             ->first();
 
         // Серверная защита от повторного впуска (см. InMemoryMySqlElTicket::skip).
@@ -70,10 +73,12 @@ class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInt
     {
         DB::beginTransaction();
         try {
+            $festivalId = (string) config('baza.default_festival_id');
             for ($kilter = $start; $kilter <= $end; $kilter++) {
                 $this->model::create([
                     'kilter' => $kilter,
-                    'type' => $type
+                    'type' => $type,
+                    'festival_id' => $festivalId !== '' ? $festivalId : null,
                 ]);
             }
             DB::commit();
@@ -87,8 +92,8 @@ class InMemoryMySqlParkingTicketRepository implements ParkingTicketRepositoryInt
 
     public function find(string $q, string $type): array
     {
-        $resultRawList =  $this->model::whereKilter((int)$q)
-            ->whereType($type)
+        $resultRawList = $this->festivalScope
+            ->applyLenient($this->model::whereKilter((int)$q)->whereType($type))
             ->get()->toArray();
 
         $result = [];

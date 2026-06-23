@@ -87,6 +87,15 @@ const router = createRouter({
                     }
                 },
                 {
+                    path: '/admin/festivals',
+                    name: 'festivals',
+                    component: () => import('@/views/admin/FestivalListView.vue'),
+                    meta: {
+                        requiresAuth: true,
+                        role: ['admin']
+                    }
+                },
+                {
                     path: '/admin/locations',
                     name: 'locations',
                     component: () => import('@/views/admin/LocationListView.vue'),

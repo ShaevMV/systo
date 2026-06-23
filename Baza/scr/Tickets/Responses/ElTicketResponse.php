@@ -29,6 +29,7 @@ class ElTicketResponse implements TicketResponseInterface
         protected bool  $is_need_seedling = false,
         protected ?Uuid  $type_ticket_id = null,
         protected ?string  $type_ticket = null,
+        protected ?string  $festival_id = null,
     )
     {
     }
@@ -53,6 +54,7 @@ class ElTicketResponse implements TicketResponseInterface
             'is_need_seedling' => $this->is_need_seedling,
             'type_ticket_id' => $this->type_ticket_id,
             'type_ticket' => $this->type_ticket,
+            'festival_id' => $this->festival_id,
         ];
     }
 
@@ -74,7 +76,8 @@ class ElTicketResponse implements TicketResponseInterface
             $date_change,
             (bool) ($data['is_need_seedling'] ?? false),
             empty($data['type_ticket_id']) ? null : new Uuid($data['type_ticket_id']),
-            $data['type_ticket'] ?? null
+            $data['type_ticket'] ?? null,
+            $data['festival_id'] ?? null,
         );
     }
 }

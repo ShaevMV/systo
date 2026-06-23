@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\TicketSearchModel;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Tickets\Responses\SnapshotItemResponse;
 use Baza\Tickets\Responses\SnapshotPageResponse;
 use Baza\Tickets\Responses\TicketSearchResponse;
@@ -15,8 +16,10 @@ use Illuminate\Database\Eloquent\Builder;
  */
 class InMemoryMySqlTicketSearch implements TicketSearchRepositoryInterface
 {
-    /** Текущий фестиваль (как в остальных репозиториях поиска; кандидат на env, BAZA.md §9). */
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
+    public function __construct(
+        private FestivalScope $festivalScope,
+    ) {
+    }
 
     /** Сколько результатов отдавать (защита от широких запросов на слабом устройстве). */
     private const LIMIT = 100;
@@ -64,7 +67,7 @@ class InMemoryMySqlTicketSearch implements TicketSearchRepositoryInterface
 
     public function snapshot(?string $festivalId, ?string $since, int $afterId, int $limit): SnapshotPageResponse
     {
-        $festival = ($festivalId !== null && $festivalId !== '') ? $festivalId : self::UUID_FESTIVAL;
+        $festival = ($festivalId !== null && $festivalId !== '') ? $festivalId : (string) config('baza.default_festival_id');
         $limit = $limit > 0 ? min($limit, self::SNAPSHOT_MAX_LIMIT) : self::SNAPSHOT_DEFAULT_LIMIT;
         $afterId = max(0, $afterId);
 
@@ -103,8 +106,8 @@ class InMemoryMySqlTicketSearch implements TicketSearchRepositoryInterface
 
         $like = '%'.$q.'%';
 
-        return TicketSearchModel::query()
-            ->where('festival_id', self::UUID_FESTIVAL)
+        return $this->festivalScope
+            ->apply(TicketSearchModel::query())
             ->where(function (Builder $query) use ($like, $q): void {
                 foreach (self::SEARCH_COLUMNS as $column) {
                     $query->orWhere($column, 'like', $like);

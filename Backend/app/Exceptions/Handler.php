@@ -5,6 +5,8 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Shared\Domain\DomainError;
 use Throwable;
 use Sentry\Laravel\Integration;
 
@@ -49,6 +51,25 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             Integration::captureUnhandledException($e);
         });
+
+        // Структурная PII-безопасная запись необработанных исключений в канал `structured`
+        // (готовность к Graylog/Loki): error_code + класс + HTTP-статус + маршрут, БЕЗ сырого
+        // getMessage() с ПДн. Канал маскирует ПДн (MaskPiiTap) и ignore_exceptions=true.
+        $this->reportable(function (Throwable $e) {
+            Log::channel('structured')->error('unhandled_exception', [
+                'error_code' => $e instanceof DomainError ? $e->errorCode() : 'internal_error',
+                'exception' => $e::class,
+                'status' => $this->statusFor($e),
+                'path' => request()->path(),
+                'route' => optional(request()->route())->getName(),
+            ]);
+        });
+    }
+
+    /** HTTP-статус исключения (для structured-лога); не-HTTP исключения → 500. */
+    private function statusFor(Throwable $e): int
+    {
+        return method_exists($e, 'getStatusCode') ? (int) $e->getStatusCode() : 500;
     }
 
     /**

@@ -27,6 +27,8 @@ final class ShiftPermission
     public const RBAC_MANAGE = 'rbac.manage';
     public const TICKET_PII = 'ticket.pii';     // полная карточка билета (телефон/email/коммент)
     public const STAFF_MANAGE = 'staff.manage'; // регистрация/управление персоналом (Шаг 5)
+    public const FESTIVAL_MANAGE = 'festival.manage'; // реестр фестивалей: доступность для КПП (TD-48)
+    public const ENTRY_OVERRIDE_FESTIVAL = 'entry.override_festival'; // впустить билет ДРУГОГО фестиваля (TD-48)
 
     public const LABELS = [
         self::TICKET_SCAN => 'Сканирование билета',
@@ -41,6 +43,8 @@ final class ShiftPermission
         self::RBAC_MANAGE => 'Управление матрицей прав',
         self::TICKET_PII => 'Полная карточка билета (ПДн)',
         self::STAFF_MANAGE => 'Регистрация персонала',
+        self::FESTIVAL_MANAGE => 'Управление реестром фестивалей',
+        self::ENTRY_OVERRIDE_FESTIVAL => 'Впуск билета другого фестиваля',
     ];
 
     /**

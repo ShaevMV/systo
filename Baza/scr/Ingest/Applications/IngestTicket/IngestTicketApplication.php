@@ -149,8 +149,13 @@ final class IngestTicketApplication
         }
 
         $elTicketId = isset($ticket['el_ticket_id']) ? (string) $ticket['el_ticket_id'] : null;
+        $festivalId = isset($ticket['festival_id']) ? (string) $ticket['festival_id'] : null;
 
-        return $this->repository->linkLiveTicket($kilter, $elTicketId !== '' ? $elTicketId : null);
+        return $this->repository->linkLiveTicket(
+            $kilter,
+            $elTicketId !== '' ? $elTicketId : null,
+            $festivalId !== '' ? $festivalId : null,
+        );
     }
 
     /**

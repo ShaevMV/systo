@@ -5,6 +5,18 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body" id="scan-result">
+                    @if(!empty($festivals))
+                        <form method="get" action="/report" style="margin-bottom: 14px;">
+                            <label>Фестиваль отчёта: </label>
+                            <select name="festival_id" onchange="this.form.submit()" style="min-width: 220px;">
+                                @foreach($festivals as $f)
+                                    <option value="{{ $f['id'] }}" @if(($festivalId ?? null) === $f['id']) selected @endif>
+                                        {{ $f['name'] }}@if(!empty($f['year'])) {{ $f['year'] }}@endif
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
+                    @endif
                     <div class="table-responsive">
                             <table class="table">
                                 <thead class=" text-primary">

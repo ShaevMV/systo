@@ -6,15 +6,22 @@
 //  server_time предыдущего успешного синка (реш. встречи #13=A).
 // ─────────────────────────────────────────────────────────────────────────────
 import { http } from '@/api/http';
-import { putSnapshotBatch } from '@/db/snapshot';
+import { putSnapshotBatch, clearSnapshot } from '@/db/snapshot';
 import { getMeta, setMeta } from '@/db/index';
 import { getKey } from '@/services/pin';
 
 const KEY_SINCE = 'snapshot_since'; // server_time последнего успешного синка (граница дельты)
+const KEY_FESTIVAL_ID = 'snapshot_festival_id'; // фестиваль текущего снимка (TD-48)
+const KEY_FESTIVAL_NAME = 'snapshot_festival_name'; // имя фестиваля снимка — для офлайн-индикатора
 const PAGE_LIMIT = 500;
 const MAX_PAGES = 200; // предохранитель от бесконечного цикла (до 100k билетов за синк)
 
 let running = false;
+
+/** Имя фестиваля текущего офлайн-снимка (для индикатора «снимок фестиваля X»). */
+export async function getSnapshotFestivalName() {
+    return getMeta(KEY_FESTIVAL_NAME, null);
+}
 
 /**
  * Синхронизировать снимок: первый раз — полный, далее — дельта.
@@ -28,10 +35,14 @@ export async function syncSnapshot({ festivalId = null } = {}) {
     }
     running = true;
     try {
-        const since = await getMeta(KEY_SINCE, null); // null → полный снимок
+        let since = await getMeta(KEY_SINCE, null); // null → полный снимок
+        const prevFestivalId = await getMeta(KEY_FESTIVAL_ID, null);
         let afterId = 0;
         let watermark = null;
         let added = 0;
+        let snapFestivalId = null;
+        let snapFestivalName = null;
+        let festivalChecked = false;
 
         for (let page = 0; page < MAX_PAGES; page++) {
             const params = { after_id: afterId, limit: PAGE_LIMIT };
@@ -42,9 +53,28 @@ export async function syncSnapshot({ festivalId = null } = {}) {
                 params.since = since;
             }
 
-            const { data } = await http.get('/api/snapshot', { params });
+            // skipAutoNotify: фоновый синк — сбой не должен сыпать тосты (есть индикатор офлайна).
+            const { data } = await http.get('/api/snapshot', { params, meta: { skipAutoNotify: true } });
             if (!data || data.success !== true) {
                 break;
+            }
+
+            // TD-48: фестиваль снимка приходит от сервера (при изоляции — фестиваль смены).
+            // Если он сменился — старый снимок ЧУЖОГО феста очищаем и тянем полный заново
+            // (дельта по since пропустила бы основной массив нового фестиваля).
+            if (!festivalChecked) {
+                festivalChecked = true;
+                snapFestivalId = data.festival_id || null;
+                snapFestivalName = data.festival_name || null;
+                if (prevFestivalId && snapFestivalId && prevFestivalId !== snapFestivalId) {
+                    await clearSnapshot();
+                    since = null;
+                    afterId = 0;
+                    watermark = null;
+                    added = 0;
+                    page = -1; // следующий проход цикла начнёт полный снимок нового фестиваля
+                    continue;
+                }
             }
 
             // Водяную метку берём с ПЕРВОЙ страницы (момент начала прохода) — чтобы
@@ -63,6 +93,12 @@ export async function syncSnapshot({ festivalId = null } = {}) {
 
         if (watermark) {
             await setMeta(KEY_SINCE, watermark);
+        }
+        if (snapFestivalId) {
+            await setMeta(KEY_FESTIVAL_ID, snapFestivalId);
+        }
+        if (snapFestivalName) {
+            await setMeta(KEY_FESTIVAL_NAME, snapFestivalName);
         }
         return { added, ok: true };
     } catch {

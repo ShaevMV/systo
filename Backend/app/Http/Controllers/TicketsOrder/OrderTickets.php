@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CreateListOrderRequest;
 use App\Http\Requests\CreateOrderTicketsRequest;
 use App\Http\Requests\FilterForTicketOrder;
+use App\Http\Responses\ErrorResponse;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -165,12 +166,9 @@ class OrderTickets extends Controller
             ]);
 
         } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-                'link' => $exception->getLine(),
-                'file' => $exception->getFile(),
-            ]);
+            // TD-29 / 152-ФЗ: не отдаём file/line и сырой getMessage() в ответ;
+            // полная диагностика уходит в канал `structured` (маскированно). См. ErrorResponse.
+            return ErrorResponse::fromThrowable($exception);
         }
     }
 
@@ -299,12 +297,9 @@ class OrderTickets extends Controller
             ]);
 
         } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-                'link' => $exception->getLine(),
-                'file' => $exception->getFile(),
-            ]);
+            // TD-29 / 152-ФЗ: не отдаём file/line и сырой getMessage() в ответ;
+            // полная диагностика уходит в канал `structured` (маскированно). См. ErrorResponse.
+            return ErrorResponse::fromThrowable($exception);
         }
     }
 
@@ -405,12 +400,9 @@ class OrderTickets extends Controller
                 'message' => 'Список зарегистрирован. После проверки администратор/менеджер одобрит его и получатель получит билеты.',
             ]);
         } catch (Throwable $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-                'link' => $exception->getLine(),
-                'file' => $exception->getFile(),
-            ]);
+            // TD-29 / 152-ФЗ: не отдаём file/line и сырой getMessage() в ответ;
+            // полная диагностика уходит в канал `structured` (маскированно). См. ErrorResponse.
+            return ErrorResponse::fromThrowable($exception);
         }
     }
 

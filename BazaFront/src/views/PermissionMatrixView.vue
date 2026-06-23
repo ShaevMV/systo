@@ -4,6 +4,7 @@
 // Форма = источник правды: снятый чекбокс снимает право. Доступ — право rbac.manage (бэкенд гейтит).
 import { ref, onMounted } from 'vue';
 import { loadMatrix, saveMatrix } from '@/services/permissions';
+import { notifySuccess } from '@/lib/notify';
 
 const roles = ref([]);
 const actions = ref([]);
@@ -11,13 +12,12 @@ const adminRole = ref('administrator');
 // granted[role] = Set(action) — локальное состояние чекбоксов.
 const granted = ref({});
 const loading = ref(true);
+const loaded = ref(false); // матрица успешно загружена — иначе таблицу не показываем (персистентное состояние, не ошибка-тост)
 const saving = ref(false);
-const msg = ref(null);
-const err = ref(null);
 
 async function load() {
     loading.value = true;
-    err.value = null;
+    loaded.value = false;
     try {
         const data = await loadMatrix();
         roles.value = data.roles || [];
@@ -29,8 +29,9 @@ async function load() {
             g[r.value] = new Set(m[r.value] || []);
         }
         granted.value = g;
-    } catch (e) {
-        err.value = e?.response?.status === 403 ? 'Нет доступа (нужно право «Управление матрицей прав»)' : 'Не удалось загрузить матрицу';
+        loaded.value = true;
+    } catch {
+        /* ошибку загрузки покажет централизованный http.js-перехватчик (тост) */
     } finally {
         loading.value = false;
     }
@@ -54,8 +55,6 @@ function toggle(role, action) {
 
 async function save() {
     saving.value = true;
-    msg.value = null;
-    err.value = null;
     try {
         const perm = {};
         for (const r of roles.value) {
@@ -63,9 +62,9 @@ async function save() {
             perm[r.value] = Array.from(granted.value[r.value] || []);
         }
         await saveMatrix(perm);
-        msg.value = 'Права доступа сохранены';
-    } catch (e) {
-        err.value = e?.response?.status === 403 ? 'Нет доступа' : 'Не удалось сохранить';
+        notifySuccess('Права доступа сохранены');
+    } catch {
+        /* ошибку покажет http.js-перехватчик (тост) */
     } finally {
         saving.value = false;
     }
@@ -77,10 +76,9 @@ onMounted(load);
 <template>
     <section class="perm">
         <h2 class="perm-title">Права доступа</h2>
-        <p v-if="err" class="perm-err">{{ err }}</p>
         <p v-if="loading" class="perm-muted">Загрузка…</p>
 
-        <div v-if="!loading && !err" class="perm-table-wrap">
+        <div v-if="loaded" class="perm-table-wrap">
             <table class="perm-table">
                 <thead>
                     <tr>
@@ -104,11 +102,10 @@ onMounted(load);
             </table>
         </div>
 
-        <div v-if="!loading && !err" class="perm-actions">
+        <div v-if="loaded" class="perm-actions">
             <button class="perm-save" :disabled="saving" @click="save">
                 {{ saving ? 'Сохранение…' : 'Сохранить' }}
             </button>
-            <span v-if="msg" class="perm-ok">{{ msg }}</span>
         </div>
         <p class="perm-muted">Администратор — суперроль (всегда полный доступ, не редактируется).</p>
     </section>

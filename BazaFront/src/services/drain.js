@@ -34,7 +34,7 @@ export async function drainQueue() {
             entered_at: r.created_at || null
         }));
 
-        const { data } = await http.post('/api/entry-events', { events });
+        const { data } = await http.post('/api/entry-events', { events }, { meta: { skipAutoNotify: true } });
         if (!data || data.success !== true) {
             return { drained: 0, ok: false };
         }

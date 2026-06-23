@@ -70,6 +70,19 @@ return [
             'days' => 14,
         ],
 
+        // Структурный JSON-сток событий КПП (готовность к Graylog/Loki). Пишем в локальный файл
+        // logs/structured.log; внешний шиппер дочитывает при появлении сети. Baza офлайн-first →
+        // только локальная запись, без прямого сетевого транспорта из PHP. См. graylog-readiness.md.
+        // Наполнение событий baza.* в этот канал — следующий шаг активации (сейчас канал готов).
+        'structured' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/structured.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

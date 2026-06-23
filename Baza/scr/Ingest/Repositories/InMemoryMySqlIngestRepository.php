@@ -108,7 +108,7 @@ class InMemoryMySqlIngestRepository implements IngestRepositoryInterface
         ]);
     }
 
-    public function linkLiveTicket(int $kilter, ?string $elTicketId): bool
+    public function linkLiveTicket(int $kilter, ?string $elTicketId, ?string $festivalId = null): bool
     {
         $exists = DB::table(LiveTicketModel::TABLE)->where('kilter', $kilter)->exists();
         if (! $exists) {
@@ -116,10 +116,16 @@ class InMemoryMySqlIngestRepository implements IngestRepositoryInterface
             return false;
         }
 
-        DB::table(LiveTicketModel::TABLE)->where('kilter', $kilter)->update([
+        $update = [
             'el_ticket_id' => $elTicketId,
             'updated_at' => Carbon::now()->format('Y-m-d H:i:s'),
-        ]);
+        ];
+        // Реальный фестиваль живого билета — из связанного el (TD-48 PR-6). Не затираем null'ом.
+        if ($festivalId !== null && $festivalId !== '') {
+            $update['festival_id'] = $festivalId;
+        }
+
+        DB::table(LiveTicketModel::TABLE)->where('kilter', $kilter)->update($update);
 
         return true;
     }

@@ -20,10 +20,18 @@ class ReportForChanges
         ]);
     }
 
-    public function getReport(): ReportForChangesResponse
+    /**
+     * Отчёт смен фестиваля. $festivalId — фестиваль отчёта (TD-48); null → дефолтный
+     * config('baza.default_festival_id') (прежнее поведение).
+     */
+    public function getReport(?string $festivalId = null): ReportForChangesResponse
     {
+        $festivalId = ($festivalId !== null && $festivalId !== '')
+            ? $festivalId
+            : (string) config('baza.default_festival_id');
+
         /** @var ReportForChangesResponse $result */
-        $result = $this->bus->ask(new ReportForChangesQuery());
+        $result = $this->bus->ask(new ReportForChangesQuery($festivalId));
 
         return $result;
     }

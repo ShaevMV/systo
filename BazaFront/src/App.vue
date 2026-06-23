@@ -1,18 +1,37 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
 import { useRegisterSW } from 'virtual:pwa-register/vue';
 import { pendingCount } from '@/db/queue';
 import { hasPin, isUnlocked, unlock } from '@/services/pin';
 import { drainQueue } from '@/services/drain';
+import { playFeedback } from '@/lib/feedback';
 
 // Версия сборки — видна в шапке (решение архитектора: SW-версионирование, чтобы билетёр
 // не застрял на устаревшей оболочке). Подставляется при сборке через Vite define (PR-2).
 const BUILD = import.meta.env.VITE_BUILD_VERSION || 'dev';
 
 const route = useRoute();
+const toast = useToast();
 const online = ref(navigator.onLine);
 const setOnline = () => (online.value = navigator.onLine);
+
+// Единый сток уведомлений (Фаза A): любой notify(...) из @/lib/notify (вкл. axios-перехватчик)
+// прилетает сюда window-событием → PrimeVue Toast + звук/вибро. severity 'critical' → 'error'.
+const NOTIFY_LIFE = { success: 2500, info: 3000, warn: 3500, error: 4000, critical: 6000 };
+function onNotify(e) {
+    const { severity, summary, detail } = e.detail || {};
+    if (!summary) return;
+    toast.add({
+        severity: severity === 'critical' ? 'error' : severity || 'info',
+        summary,
+        detail: detail || undefined,
+        life: NOTIFY_LIFE[severity] || 3000
+    });
+    playFeedback(severity || 'info');
+}
 
 // При появлении связи — дренаж офлайн-намерений впуска в облако (PR-8).
 const onNetworkOnline = () => {
@@ -41,6 +60,7 @@ onMounted(() => {
     window.addEventListener('online', onNetworkOnline);
     window.addEventListener('offline', setOnline);
     window.addEventListener('baza-queue-changed', refreshQueued);
+    window.addEventListener('app-notify', onNotify);
     refreshQueued();
     checkLock();
     // Досыл накопленных офлайн-намерений при старте, если уже онлайн.
@@ -52,6 +72,7 @@ onUnmounted(() => {
     window.removeEventListener('online', onNetworkOnline);
     window.removeEventListener('offline', setOnline);
     window.removeEventListener('baza-queue-changed', refreshQueued);
+    window.removeEventListener('app-notify', onNotify);
 });
 
 const netLabel = computed(() => (online.value ? 'онлайн' : 'офлайн'));
@@ -124,6 +145,9 @@ const tabs = [
         </nav>
 
         <div class="kpp-build">v{{ BUILD }}</div>
+
+        <!-- Единый показ уведомлений КПП (Фаза A): снизу, НАД таб-баром (зона большого пальца) -->
+        <Toast position="bottom-center" />
 
         <!-- PIN-gate (PR-6): блокировка офлайн-доступа к зашифрованному кэшу -->
         <div v-if="locked" class="kpp-lock">
@@ -248,4 +272,9 @@ body { margin: 0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, san
     background: #ff7900; color: #fff; font-size: 1.1rem; font-weight: 700;
 }
 .kpp-lock-err { color: #c0392b !important; margin-top: 0.75rem; }
+
+/* Toast (Фаза A) — поднимаем над таб-баром (~64px) + крупнее под КПП (палец/солнце). */
+.p-toast.p-toast-bottom-center { bottom: 5rem; width: min(92vw, 460px); }
+.p-toast .p-toast-message-text { font-size: 1rem; }
+.p-toast .p-toast-summary { font-weight: 700; }
 </style>
