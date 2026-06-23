@@ -6,6 +6,7 @@ namespace Baza\Changes\Repositories;
 
 use App\Models\ChangesModel;
 use App\Models\ChangeUserModel;
+use App\Models\FestivalModel;
 use App\Models\User;
 use Baza\Changes\Applications\Report\ReportForChangesDto;
 use Baza\Shared\Domain\ValueObject\ShiftRole;
@@ -16,9 +17,6 @@ use Nette\Utils\JsonException;
 
 class InMemoryMySqlChangesRepository implements ChangesRepositoryInterface
 {
-    /** Текущий фестиваль (как в SaveChange / репозиториях билетов; кандидат на env, BAZA.md §9). */
-    private const FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
-
     public function __construct(
         private ChangesModel $model,
     )
@@ -157,6 +155,13 @@ group by `changes`.`id`", [
         return $value !== null ? (int) $value : null;
     }
 
+    public function festivalIdForChange(int $changeId): ?string
+    {
+        $value = $this->model::whereKey($changeId)->value('festival_id');
+
+        return ($value !== null && $value !== '') ? (string) $value : null;
+    }
+
     /**
      * @throws JsonException
      */
@@ -182,12 +187,17 @@ group by `changes`.`id`", [
         return $this->model::whereKey($id)->exists();
     }
 
-    public function listOpen(?int $chiefId = null): array
+    public function listOpen(?int $chiefId = null, ?string $festivalId = null): array
     {
         $query = $this->model::query()
             ->whereNull('end')
-            ->where('festival_id', self::FESTIVAL)
             ->orderByDesc('id');
+
+        // Фильтр по фестивалю (TD-48) — опционален: null = все открытые смены (как было,
+        // т.к. раньше все смены жили на одном зашитом фестивале).
+        if ($festivalId !== null && $festivalId !== '') {
+            $query->where('festival_id', $festivalId);
+        }
 
         // Изоляция начальника: только смены, где он shift_chief в change_user.
         if ($chiefId !== null) {
@@ -197,7 +207,17 @@ group by `changes`.`id`", [
             $query->whereIn('id', $changeIds);
         }
 
-        return $query->get()->map(function (ChangesModel $c): array {
+        $shifts = $query->get();
+        if ($shifts->isEmpty()) {
+            return [];
+        }
+
+        // Названия фестивалей пачкой (без N+1) — как chief_name через User.
+        $festivalNames = FestivalModel::query()
+            ->whereIn('id', $shifts->pluck('festival_id')->filter()->unique()->values()->all())
+            ->pluck('name', 'id');
+
+        return $shifts->map(function (ChangesModel $c) use ($festivalNames): array {
             $chiefUserId = $this->getChiefId((int) $c->id);
 
             return [
@@ -206,6 +226,8 @@ group by `changes`.`id`", [
                 'chief_name' => $chiefUserId !== null ? User::whereKey($chiefUserId)->value('name') : null,
                 'members_count' => ChangeUserModel::where('change_id', $c->id)->count(),
                 'start' => $c->start ? (string) $c->start : null,
+                'festival_id' => $c->festival_id !== null ? (string) $c->festival_id : null,
+                'festival_name' => $c->festival_id !== null ? ($festivalNames[$c->festival_id] ?? null) : null,
                 'counts' => [
                     'el' => (int) $c->count_el_tickets,
                     'live' => (int) $c->count_live_tickets,

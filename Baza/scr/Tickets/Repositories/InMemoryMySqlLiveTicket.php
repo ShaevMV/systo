@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\LiveTicketModel;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Tickets\Responses\LiveTicketResponse;
 use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
@@ -15,7 +16,8 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
 {
 
     public function __construct(
-        private LiveTicketModel $liveTicketModel
+        private LiveTicketModel $liveTicketModel,
+        private FestivalScope   $festivalScope,
     )
     {
     }
@@ -23,7 +25,9 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
 
     public function search(int $kilter): ?LiveTicketResponse
     {
-        $data = $this->liveTicketModel::whereKilter($kilter)->first()?->toArray();
+        $data = $this->festivalScope
+            ->applyLenient($this->liveTicketModel::whereKilter($kilter))
+            ->first()?->toArray();
 
         if (is_null($data)) {
             return null;
@@ -37,7 +41,9 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->liveTicketModel::whereKilter($id)->first();
+        $rawData = $this->festivalScope
+            ->applyLenient($this->liveTicketModel::whereKilter($id))
+            ->first();
 
         // Серверная защита от повторного впуска (см. InMemoryMySqlElTicket::skip).
         if ($rawData === null) {
@@ -68,9 +74,11 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
     {
         DB::beginTransaction();
         try {
+            $festivalId = (string) config('baza.default_festival_id');
             for ($kilter = $start; $kilter < $end; $kilter++) {
                 $this->liveTicketModel::create([
                     'kilter' => $kilter,
+                    'festival_id' => $festivalId !== '' ? $festivalId : null,
                 ]);
             }
             DB::commit();
@@ -91,7 +99,8 @@ class InMemoryMySqlLiveTicket implements LiveTicketRepositoryInterface
             return [];
         }
 
-        $resultRawList = $this->liveTicketModel::whereKilter((int) $q)
+        $resultRawList = $this->festivalScope
+            ->applyLenient($this->liveTicketModel::whereKilter((int) $q))
             ->get()->toArray();
 
         $result = [];

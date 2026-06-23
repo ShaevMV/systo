@@ -9,7 +9,7 @@
 // JS-полифилл (jsQR/qr-scanner) для полной кросс-браузерности — PR-4-follow-up (нужен npm на CI).
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { resolveScan, doEnter } from '@/services/scan';
-import { syncSnapshot } from '@/services/snapshotSync';
+import { syncSnapshot, getSnapshotFestivalName } from '@/services/snapshotSync';
 import { syncBlacklist } from '@/services/blacklistSync';
 import { snapshotCount } from '@/db/snapshot';
 
@@ -21,6 +21,7 @@ let scanTimer = null;
 const cameraError = ref(null);
 const manual = ref('');
 const snapCount = ref(0);
+const snapFestival = ref(null); // имя фестиваля офлайн-снимка (TD-48)
 const busy = ref(false);
 const entering = ref(false);
 
@@ -35,6 +36,7 @@ const overlayClass = computed(() => (result.value ? `verdict verdict--${result.v
 async function refreshSnapCount() {
     try {
         snapCount.value = await snapshotCount();
+        snapFestival.value = await getSnapshotFestivalName();
     } catch {
         snapCount.value = 0;
     }
@@ -91,6 +93,26 @@ async function pass() {
         const r = await doEnter(result.value.enterRef, { online: online.value });
         if (r.ok) {
             enterMsg.value = r.queued ? 'Впуск записан офлайн — досыл при сети' : 'Впущен';
+            setTimeout(next, 700);
+        } else {
+            enterMsg.value = r.message || 'Не удалось впустить';
+            feedback('red');
+        }
+    } finally {
+        entering.value = false;
+    }
+}
+
+// TD-48: впуск билета ДРУГОГО фестиваля «всё равно» — сервер пускает лишь по праву
+// entry.override_festival (нет права → 422 с сообщением).
+async function passOverride() {
+    if (!result.value?.overrideRef || entering.value) return;
+    if (!confirm('Впустить билет ДРУГОГО фестиваля?')) return;
+    entering.value = true;
+    try {
+        const r = await doEnter(result.value.overrideRef, { online: online.value, override: true });
+        if (r.ok) {
+            enterMsg.value = 'Впущен (другой фестиваль)';
             setTimeout(next, 700);
         } else {
             enterMsg.value = r.message || 'Не удалось впустить';
@@ -185,7 +207,9 @@ onUnmounted(() => {
                 <p>Камера недоступна</p>
                 <small>{{ cameraError }}</small>
             </div>
-            <div class="scan-snap" v-if="snapCount > 0">офлайн-снимок: {{ snapCount }}</div>
+            <div class="scan-snap" v-if="snapCount > 0">
+                офлайн-снимок: {{ snapCount }}<span v-if="snapFestival"> · 🎪 {{ snapFestival }}</span>
+            </div>
 
             <!-- Ручной ввод № под камерой (фолбэк) -->
             <form class="scan-manual" @submit.prevent="submitManual">
@@ -239,6 +263,10 @@ onUnmounted(() => {
                 </button>
                 <button class="verdict-next" @click="next">
                     {{ result.enterRef ? 'Отмена' : 'Сканировать ещё' }}
+                </button>
+                <!-- TD-48: впуск чужого фестиваля «всё равно» (сервер гейтит по праву) -->
+                <button v-if="result.overrideRef" class="verdict-override" :disabled="entering" @click="passOverride">
+                    Впустить всё равно
                 </button>
             </div>
         </div>
@@ -327,4 +355,9 @@ onUnmounted(() => {
     min-height: 48px; border: 1px solid rgba(255, 255, 255, 0.7);
     background: transparent; color: #fff; border-radius: 10px; font-size: 1rem;
 }
+.verdict-override {
+    min-height: 44px; border: 1px dashed rgba(255, 255, 255, 0.7);
+    background: transparent; color: #fff; border-radius: 10px; font-size: 0.9rem; opacity: 0.9;
+}
+.verdict-override:disabled { opacity: 0.5; }
 </style>

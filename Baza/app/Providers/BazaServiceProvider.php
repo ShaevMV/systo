@@ -8,6 +8,9 @@ use Baza\Changes\Repositories\ChangesRepositoryInterface;
 use Baza\Changes\Repositories\InMemoryMySqlChangesRepository;
 use Baza\EntryOutbox\Repositories\EntryOutboxRepositoryInterface;
 use Baza\EntryOutbox\Repositories\InMemoryMySqlEntryOutboxRepository;
+use Baza\Festival\Repositories\FestivalRepositoryInterface;
+use Baza\Festival\Repositories\InMemoryMySqlFestivalRepository;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Ingest\Repositories\IngestRepositoryInterface;
 use Baza\Ingest\Repositories\InMemoryMySqlIngestRepository;
 use Baza\Permission\Repositories\InMemoryMySqlRolePermissionRepository;
@@ -48,6 +51,10 @@ class BazaServiceProvider extends ServiceProvider
         $this->app->bind(LiveTicketRepositoryInterface::class, InMemoryMySqlLiveTicket::class);
         $this->app->bind(ChangesRepositoryInterface::class, InMemoryMySqlChangesRepository::class);
         $this->app->bind(ShiftScheduleRepositoryInterface::class, InMemoryMySqlShiftScheduleRepository::class);
+        $this->app->bind(FestivalRepositoryInterface::class, InMemoryMySqlFestivalRepository::class);
+        // Request-scoped «активный фестиваль» для выборок билетов (TD-48). Singleton —
+        // репозитории держат ссылку, контроллер скана/впуска мутирует один общий объект.
+        $this->app->singleton(FestivalScope::class);
         $this->app->bind(AutoTicketRepositoryInterface::class, InMemoryMySqlAutoTicket::class);
         $this->app->bind(ParkingTicketRepositoryInterface::class, InMemoryMySqlParkingTicketRepository::class);
         $this->app->bind(UserRepositoryInterface::class, InMemoryMySqlUserRepository::class);

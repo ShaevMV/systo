@@ -12,6 +12,8 @@ const rows = ref([]);
 const loading = ref(false);
 const searched = ref(false);
 const offline = ref(false);
+// Имя фестиваля смены, если поиск ограничен им (TD-48, изоляция ON) — контекст-строка.
+const festivalScope = ref(null);
 // Запрос, по которому показан текущий список — для подсветки совпадений в результатах.
 const lastQuery = ref('');
 // Статусы впуска по ключу строки: 'ok' | 'queued' | сообщение об ошибке.
@@ -28,7 +30,9 @@ async function run() {
     loading.value = true;
     offline.value = !online();
     try {
-        rows.value = await searchTickets(term, { online: online() });
+        const res = await searchTickets(term, { online: online() });
+        rows.value = res.rows;
+        festivalScope.value = res.festivalScope;
         lastQuery.value = term;
         searched.value = true;
         entered.value = {};
@@ -73,6 +77,9 @@ async function enter(row) {
 
         <p v-if="offline" class="search-offline">
             <i class="pi pi-ban"></i> Офлайн: поиск по снимку (имя / номер билета)
+        </p>
+        <p v-if="festivalScope && !offline" class="search-scope">
+            <i class="pi pi-flag"></i> Ищем в рамках: {{ festivalScope }}
         </p>
 
         <div v-if="searched && rows.length === 0 && !loading" class="search-empty">
@@ -130,6 +137,7 @@ async function enter(row) {
 }
 .search-btn { min-width: 56px; border: 0; background: #ff7900; color: #fff; border-radius: 10px; font-size: 1.1rem; }
 .search-offline { margin: 0; color: #b8860b; font-size: 0.85rem; }
+.search-scope { margin: 0; color: #ff7900; font-size: 0.85rem; font-weight: 600; }
 .search-empty { color: #8a93a0; text-align: center; padding: 2rem 0; }
 
 .search-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }

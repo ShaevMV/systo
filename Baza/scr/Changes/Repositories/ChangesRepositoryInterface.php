@@ -48,6 +48,12 @@ interface ChangesRepositoryInterface
      */
     public function getChiefId(int $changeId): ?int;
 
+    /**
+     * festival_id смены (TD-48) — источник «активного фестиваля» для изоляции
+     * скан/поиск/впуск по фестивалю смены. null, если смены нет или поле пусто.
+     */
+    public function festivalIdForChange(int $changeId): ?string;
+
     public function get(int $id): array;
 
     public function remove(int $id): bool;
@@ -56,10 +62,11 @@ interface ChangesRepositoryInterface
     public function exists(int $id): bool;
 
     /**
-     * Открытые смены (end IS NULL) текущего фестиваля для экрана управления (Шаг 6).
+     * Открытые смены (end IS NULL) для экрана управления (Шаг 6).
      * $chiefId != null → только смены, где этот пользователь — начальник (изоляция начальника).
+     * $festivalId != null → только смены этого фестиваля (TD-48); null = все фестивали.
      *
-     * @return array<int, array{id:int, chief_id:?int, chief_name:?string, members_count:int, start:?string, counts:array<string,int>}>
+     * @return array<int, array{id:int, chief_id:?int, chief_name:?string, members_count:int, start:?string, festival_id:?string, festival_name:?string, counts:array<string,int>}>
      */
-    public function listOpen(?int $chiefId = null): array;
+    public function listOpen(?int $chiefId = null, ?string $festivalId = null): array;
 }

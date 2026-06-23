@@ -5,18 +5,32 @@
 // начальник смены — авто (он сам).
 import { ref, computed, onMounted } from 'vue';
 import { loadShifts, loadShiftUsers, createShift, closeShift } from '@/services/shifts';
+import { loadKppFestivals } from '@/services/festivals';
 
 const shifts = ref([]);
 const users = ref([]);
 const isAdmin = ref(false);
 const selected = ref(new Set()); // id выбранных в состав
 const chiefId = ref(null);       // выбранный начальник (только admin)
+const festivals = ref([]);       // активные для КПП (TD-48)
+const festivalId = ref(null);    // выбранный фестиваль смены
 const loading = ref(true);
 const saving = ref(false);
 const msg = ref(null);
 const err = ref(null);
 
 const selectedList = computed(() => users.value.filter((u) => selected.value.has(u.id)));
+// Один активный фестиваль — авто-выбор (норма дня); несколько — обязателен выбор.
+const needFestivalChoice = computed(() => festivals.value.length > 1);
+
+// Авто-выбор единственного фестиваля; иначе сбрасываем невалидный выбор.
+function applyFestivalDefault() {
+    if (festivals.value.length === 1) {
+        festivalId.value = festivals.value[0].id;
+    } else if (!festivals.value.some((f) => f.id === festivalId.value)) {
+        festivalId.value = null;
+    }
+}
 
 async function reload() {
     loading.value = true;
@@ -32,6 +46,15 @@ async function reload() {
     } finally {
         loading.value = false;
     }
+
+    // Реестр фестивалей — ВСПОМОГАТЕЛЬНЫЙ: его сбой НЕ должен ронять экран смен (критический
+    // путь КПП). Мягкая деградация: нет реестра → просто без селектора фестиваля.
+    try {
+        festivals.value = await loadKppFestivals();
+    } catch {
+        festivals.value = [];
+    }
+    applyFestivalDefault();
 }
 
 function toggle(id) {
@@ -54,12 +77,17 @@ async function submit() {
         err.value = 'Выберите начальника смены';
         return;
     }
+    if (needFestivalChoice.value && !festivalId.value) {
+        err.value = 'Выберите фестиваль смены';
+        return;
+    }
     saving.value = true;
     msg.value = null;
     err.value = null;
     try {
         const payload = { members: Array.from(selected.value) };
         if (isAdmin.value) payload.chief_id = chiefId.value;
+        if (festivalId.value) payload.festival_id = festivalId.value;
         await createShift(payload);
         msg.value = 'Смена создана';
         selected.value = new Set();
@@ -102,6 +130,7 @@ onMounted(reload);
             <li v-for="s in shifts" :key="s.id" class="sh-row">
                 <div>
                     <div class="sh-chief"><i class="pi pi-user"></i> {{ s.chief_name || 'без начальника' }}</div>
+                    <div class="sh-fest" v-if="s.festival_name"><i class="pi pi-flag"></i> {{ s.festival_name }}</div>
                     <div class="sh-meta">Состав: {{ s.members_count }} · впущено эл/жив/спис/авто:
                         {{ s.counts.el }}/{{ s.counts.live }}/{{ s.counts.spisok }}/{{ s.counts.auto }}</div>
                     <div class="sh-meta" v-if="s.start">с {{ s.start }}</div>
@@ -114,6 +143,27 @@ onMounted(reload);
         <!-- Создание смены -->
         <h3 class="sh-sub">Создать смену</h3>
         <div class="sh-form">
+            <!-- ① Фестиваль смены (TD-48): один — авто-выбор; несколько — обязателен выбор. -->
+            <div class="sh-fest-pick" v-if="festivals.length">
+                <div class="sh-fest-label">Фестиваль смены<span v-if="needFestivalChoice" class="sh-req"> · обязательно</span></div>
+                <template v-if="needFestivalChoice">
+                    <button
+                        v-for="f in festivals"
+                        :key="f.id"
+                        type="button"
+                        class="sh-fest-card"
+                        :class="{ 'is-on': festivalId === f.id }"
+                        @click="festivalId = f.id"
+                    >
+                        <i class="pi pi-flag"></i> {{ f.name }}<span v-if="f.year" class="sh-fest-year"> {{ f.year }}</span>
+                    </button>
+                </template>
+                <div v-else class="sh-fest-auto">
+                    <i class="pi pi-flag"></i> {{ festivals[0].name }}<span v-if="festivals[0].year"> {{ festivals[0].year }}</span>
+                    <span class="sh-fest-hint">выбран автоматически</span>
+                </div>
+            </div>
+
             <div class="sh-members">
                 <label v-for="u in users" :key="u.id" class="sh-member">
                     <input type="checkbox" :checked="selected.has(u.id)" @change="toggle(u.id)" />
@@ -145,7 +195,16 @@ onMounted(reload);
 .sh-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .sh-row { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; background: #fff; border: 1px solid #e3e6ea; border-radius: 12px; padding: 0.7rem 0.9rem; }
 .sh-chief { font-weight: 700; }
+.sh-fest { color: #ff7900; font-size: 0.82rem; font-weight: 600; }
 .sh-meta { color: #6b7280; font-size: 0.82rem; }
+.sh-fest-pick { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; }
+.sh-fest-label { flex-basis: 100%; font-weight: 600; }
+.sh-req { color: #c0392b; font-weight: 600; }
+.sh-fest-card { min-height: 56px; padding: 0.4rem 0.9rem; border: 2px solid #ff7900; background: #fff; color: #ff7900; border-radius: 12px; font-weight: 600; font-size: 0.95rem; }
+.sh-fest-card.is-on { background: #ff7900; color: #fff; }
+.sh-fest-year { opacity: 0.8; }
+.sh-fest-auto { display: flex; align-items: center; gap: 0.4rem; color: #5a6573; background: #f5f6f8; border-radius: 10px; padding: 0.5rem 0.8rem; font-weight: 600; }
+.sh-fest-hint { color: #8a93a0; font-weight: 400; font-size: 0.8rem; margin-left: 0.3rem; }
 .sh-close { min-height: 42px; padding: 0 1rem; border: 0; border-radius: 10px; background: #c0392b; color: #fff; font-weight: 600; }
 .sh-form { background: #fff; border: 1px solid #e3e6ea; border-radius: 12px; padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
 .sh-members { display: flex; flex-direction: column; gap: 0.35rem; max-height: 45vh; overflow-y: auto; }

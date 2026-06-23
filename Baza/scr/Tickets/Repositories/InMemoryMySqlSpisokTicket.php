@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Baza\Tickets\Repositories;
 
 use App\Models\SpisokTicketModel;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Tickets\Responses\SpisokTicketResponse;
 use Carbon\Carbon;
 use DB;
@@ -13,11 +14,9 @@ use Throwable;
 
 class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 {
-
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
-
     public function __construct(
-        private SpisokTicketModel $spisokTicketModel
+        private SpisokTicketModel $spisokTicketModel,
+        private FestivalScope     $festivalScope,
     )
     {
     }
@@ -25,8 +24,8 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
 
     public function search(Uuid $kilter): ?SpisokTicketResponse
     {
-        $data = $this->spisokTicketModel::where('ticket_uuid','=',$kilter)
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+        $data = $this->festivalScope
+            ->apply($this->spisokTicketModel::where('ticket_uuid', '=', $kilter))
             ->first()?->toArray();
 
         if (is_null($data)) {
@@ -41,8 +40,8 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
      */
     public function skip(int $id, int $userId): bool
     {
-        $rawData = $this->spisokTicketModel::whereKilter($id)
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+        $rawData = $this->festivalScope
+            ->apply($this->spisokTicketModel::whereKilter($id))
             ->first();
 
         // Серверная защита от повторного впуска (см. InMemoryMySqlElTicket::skip).
@@ -75,8 +74,8 @@ class InMemoryMySqlSpisokTicket implements SpisokTicketsRepositoryInterface
         }
         $like = '%' . strtolower($q) . '%';
 
-        $resultRawList = $this->spisokTicketModel
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+        $resultRawList = $this->festivalScope
+            ->apply($this->spisokTicketModel->newQuery())
             ->where(function ($query) use ($like) {
                 // Поиск по ВСЕМ полям (решение владельца): ФИО/куратор/проект/email/коммент.
                 $query->orWhereRaw('LOWER(`name`) LIKE ? ', [$like])

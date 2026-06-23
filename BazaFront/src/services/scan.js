@@ -60,15 +60,38 @@ async function resolveOnline(rawText) {
         }
 
         const entered = !!data.date_change;
+        const enterRef = entered
+            ? null
+            : {
+                  type: data.type,
+                  id: data.kilter,
+                  uuid: data.uuid || null,
+                  key: ticketKey(data.type, data.kilter),
+                  festivalId: data.festival_id || null // TD-48: для override-впуска (скоуп по фесту билета)
+              };
+
+        // TD-48 (за флагом изоляции): билет ДРУГОГО фестиваля смены → жёлтый, обычный впуск
+        // заблокирован. «Впустить всё равно» (overrideRef) разрешён сервером лишь по праву
+        // entry.override_festival (мультифест / ошибки каталога).
+        if (data.festival_mismatch) {
+            return {
+                online: true,
+                color: 'yellow',
+                title: 'ДРУГОЙ ФЕСТИВАЛЬ',
+                reason: `Билет на: ${data.ticket_festival_name || '—'}. Вы на: ${data.shift_festival_name || '—'}.`,
+                ticket: cardFromOnline(data),
+                enterRef: null,
+                overrideRef: entered ? null : enterRef
+            };
+        }
+
         return {
             online: true,
             color: entered ? 'red' : 'green',
             title: entered ? 'Уже прошёл' : 'Пропустить',
             reason: entered ? `Впущен: ${data.date_change}` : null,
             ticket: cardFromOnline(data),
-            enterRef: entered
-                ? null
-                : { type: data.type, id: data.kilter, uuid: data.uuid || null, key: ticketKey(data.type, data.kilter) }
+            enterRef
         };
     } catch (e) {
         return {
@@ -125,13 +148,20 @@ async function resolveOffline(ref) {
  * Впуск гостя. Онлайн → /api/enter (серверная защита от двойного впуска).
  * Офлайн → оптимистично кладём намерение в очередь (досыл при сети, мёрж в PR-8).
  */
-export async function doEnter(enterRef, { online }) {
+export async function doEnter(enterRef, { online, override = false }) {
     if (!enterRef) {
         return { ok: false, message: 'Нет билета для впуска' };
     }
     if (online) {
         try {
-            await http.post('/api/enter', { type: enterRef.type, id: enterRef.id });
+            // override=1 (TD-48) — впуск билета другого фестиваля; сервер пускает лишь по праву.
+            // Передаём фестиваль билета, чтобы сервер скоупил впуск им (без коллизии kilter).
+            const body = { type: enterRef.type, id: enterRef.id };
+            if (override) {
+                body.override = 1;
+                if (enterRef.festivalId) body.festival_id = enterRef.festivalId;
+            }
+            await http.post('/api/enter', body);
             return { ok: true, queued: false };
         } catch (e) {
             return { ok: false, message: errorMessage(e, 'Не удалось впустить') };

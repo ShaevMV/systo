@@ -45,5 +45,6 @@ class LiveTicketModel extends Model
         'status',
         'change_id',
         'date_change',
+        'festival_id',
     ];
 }

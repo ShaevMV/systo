@@ -3,6 +3,7 @@
 namespace Baza\Tickets\Repositories;
 
 use App\Models\AutoModel;
+use Baza\Festival\Services\FestivalScope;
 use Baza\Tickets\Responses\AutoTicketResponse;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -10,10 +11,9 @@ use Throwable;
 
 class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
 {
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
-
     public function __construct(
-        private AutoModel $model
+        private AutoModel     $model,
+        private FestivalScope $festivalScope,
     )
     {
     }
@@ -55,8 +55,8 @@ class InMemoryMySqlAutoTicket implements AutoTicketRepositoryInterface
         }
         $like = '%' . strtolower($q) . '%';
 
-        $resultRawList = $this->model::where('auto', '<>', '')
-            ->where('festival_id', '=', self::UUID_FESTIVAL)
+        $resultRawList = $this->festivalScope
+            ->apply($this->model::where('auto', '<>', ''))
             ->where(function ($query) use ($like) {
                 // Поиск по ВСЕМ полям (решение владельца): госномер/проект/куратор/коммент.
                 // Госномер ищем ТЕКСТОМ ($q как есть): раньше (int)"test" === 0 → LIKE '%0%' тянул

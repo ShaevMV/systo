@@ -12,6 +12,22 @@
                           action="/change/save">
                         @csrf
                         <input name="id" value="@if(isset($findChange['id'])){{$findChange['id']}}@endif" type="hidden">
+                        @if(!empty($festivals))
+                            <div class="" style="margin-bottom: 10px;">
+                                <label> Фестиваль смены @if(count($festivals) > 1)(обязательно)@endif </label>
+                                <select name="festival_id" style="width: 254px;" @if(count($festivals) > 1) required @endif>
+                                    @if(count($festivals) > 1)
+                                        <option value="">— выбери фестиваль —</option>
+                                    @endif
+                                    @foreach($festivals as $f)
+                                        <option value="{{ $f['id'] }}"
+                                            @if((isset($findChange['festival_id']) && $findChange['festival_id'] === $f['id']) || count($festivals) === 1) selected @endif>
+                                            {{ $f['name'] }}@if(!empty($f['year'])) {{ $f['year'] }}@endif
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        @endif
                         <div id="Compound">
                             <p>Состав смены</p>
                         </div>

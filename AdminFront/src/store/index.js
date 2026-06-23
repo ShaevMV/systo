@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 
 import appUser from './modules/UserModule/index';
 import appQrOrder from './modules/QrOrderModule/index';
+import appFestival from './modules/FestivalModule/index';
 import appFestivalTickets from './modules/FestivalTicketsModule/index';
 import appDashboard from './modules/DashboardModule/index';
 import appTemplate from './modules/TemplateModule/index';
@@ -15,6 +16,7 @@ export default createStore({
     modules: {
         appUser,
         appQrOrder,
+        appFestival,
         appFestivalTickets,
         appDashboard,
         appTemplate,

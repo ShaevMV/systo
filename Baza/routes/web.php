@@ -114,6 +114,17 @@ Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
     Route::post('/api/schedules/{id}/cancel', [\App\Http\Controllers\Api\ShiftScheduleController::class, 'cancel'])->name('api.schedules.cancel');
 });
 
+// Реестр фестивалей на Vhod (TD-48, PR-1). Выбор фестиваля при открытии смены —
+// право shift.compose (как /api/shifts). Управление реестром (доступность для КПП) —
+// право festival.manage (по умолчанию только administrator-суперроль).
+Route::middleware(['auth', 'permission:shift.compose'])->group(function () {
+    Route::get('/api/festivals', [\App\Http\Controllers\Api\FestivalController::class, 'index'])->name('api.festivals.list');
+});
+Route::middleware(['auth', 'permission:festival.manage'])->group(function () {
+    Route::get('/api/festivals/registry', [\App\Http\Controllers\Api\FestivalController::class, 'registry'])->name('api.festivals.registry');
+    Route::post('/api/festivals/{id}/active', [\App\Http\Controllers\Api\FestivalController::class, 'setActive'])->name('api.festivals.set-active');
+});
+
 // changes — RBAC по матрице прав (Ф2): 'auth' (гость → login) + 'permission:<действие>'.
 // administrator проходит везде (суперроль), is_admin-юзеры не теряют доступ.
 Route::get('/report', [ChangesController::class, 'report'])->name('changes.report')->middleware(['auth', 'permission:report.view']);

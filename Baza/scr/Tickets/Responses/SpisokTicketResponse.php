@@ -23,7 +23,8 @@ class SpisokTicketResponse implements TicketResponseInterface
         protected Status  $status,
         protected ?string $comment = null,
         protected ?int    $change_id = null,
-        protected ?Carbon $date_change = null
+        protected ?Carbon $date_change = null,
+        protected ?string $festival_id = null,
     )
     {
     }
@@ -44,6 +45,7 @@ class SpisokTicketResponse implements TicketResponseInterface
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
             'color' => Color::COLOR_SPISOK,
+            'festival_id' => $this->festival_id,
         ];
     }
 
@@ -61,7 +63,8 @@ class SpisokTicketResponse implements TicketResponseInterface
             new Status($data['status']),
             ShowSearchWordService::insertTag($data['comment'] ?? '', $q),
             $data['change_id'] ?? null,
-            $date_change
+            $date_change,
+            $data['festival_id'] ?? null,
         );
     }
 }

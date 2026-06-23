@@ -47,6 +47,11 @@ const model = ref([
         label: 'Справочники',
         items: [
             {
+                label: 'Фестивали',
+                icon: 'pi pi-fw pi-calendar',
+                to: '/admin/festivals'
+            },
+            {
                 label: 'Типы билетов',
                 icon: 'pi pi-fw pi-ticket',
                 to: '/admin/ticket-types'

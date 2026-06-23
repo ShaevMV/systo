@@ -21,10 +21,11 @@ interface IngestRepositoryInterface
     public function upsertSpisokTicket(array $fields): bool;
 
     /**
-     * live_tickets: только UPDATE el_ticket_id по kilter (строка создаётся диапазоном в Baza заранее).
-     * false, если строки с таким kilter нет — org откатится на прямую запись/ретрай.
+     * live_tickets: UPDATE el_ticket_id (+ festival_id связанного el, TD-48 PR-6) по kilter
+     * (строка создаётся диапазоном в Baza заранее). false, если строки с таким kilter нет —
+     * org откатится на прямую запись/ретрай.
      */
-    public function linkLiveTicket(int $kilter, ?string $elTicketId): bool;
+    public function linkLiveTicket(int $kilter, ?string $elTicketId, ?string $festivalId = null): bool;
 
     /** auto: updateOrInsert по (order_id, auto) — идемпотентно. */
     public function upsertAuto(array $fields): bool;

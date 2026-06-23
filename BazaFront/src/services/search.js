@@ -26,12 +26,13 @@ function stripTags(s) {
 /**
  * @param {string} q
  * @param {{online: boolean}} ctx
- * @returns {Promise<SearchRow[]>}
+ * @returns {Promise<{rows: SearchRow[], festivalScope: (string|null)}>}
+ *   festivalScope — имя фестиваля смены, если поиск ограничен им (TD-48, изоляция ON).
  */
 export async function searchTickets(q, { online }) {
     const term = String(q || '').trim();
     if (term === '') {
-        return [];
+        return { rows: [], festivalScope: null };
     }
     return online ? searchOnline(term) : searchOffline(term);
 }
@@ -41,10 +42,10 @@ async function searchOnline(q) {
     try {
         ({ data } = await http.get('/api/search', { params: { q } }));
     } catch {
-        return [];
+        return { rows: [], festivalScope: null };
     }
     if (!data || data.success !== true) {
-        return [];
+        return { rows: [], festivalScope: null };
     }
     const groups = data.groups || {};
     const seen = new Set();
@@ -62,12 +63,12 @@ async function searchOnline(q) {
             rows.push(row);
         }
     }
-    return rows;
+    return { rows, festivalScope: data.festival_scope || null };
 }
 
 async function searchOffline(q) {
-    const rows = await searchSnapshot(q, getKey());
-    return rows.map((r) => normalize(r, r.type, false));
+    const found = await searchSnapshot(q, getKey());
+    return { rows: found.map((r) => normalize(r, r.type, false)), festivalScope: null };
 }
 
 function normalize(it, groupKey, online) {

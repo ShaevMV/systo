@@ -18,7 +18,8 @@ class ParkingTicketResponse implements TicketResponseInterface
         protected ?Status $status,
         protected ?string $comment = null,
         protected ?int    $change_id = null,
-        protected ?Carbon $date_change = null
+        protected ?Carbon $date_change = null,
+        protected ?string $festival_id = null,
     )
     {
     }
@@ -35,6 +36,7 @@ class ParkingTicketResponse implements TicketResponseInterface
             'change_id' => $this->change_id ?? null,
             'date_change' => $this->date_change?->format('d M Y H:i:s'),
             'color' => Color::COLOR_LIVE,
+            'festival_id' => $this->festival_id,
         ];
     }
 
@@ -48,7 +50,8 @@ class ParkingTicketResponse implements TicketResponseInterface
             new Status($data['status']),
             $data['comment'] ?? null,
             $data['change_id'] ?? null,
-            $date_change
+            $date_change,
+            $data['festival_id'] ?? null,
         );
     }
 }

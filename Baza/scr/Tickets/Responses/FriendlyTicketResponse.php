@@ -25,6 +25,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
         protected ?int    $change_id = null,
         protected ?Carbon $date_change = null,
         protected bool  $is_need_seedling = false,
+        protected ?string $festival_id = null,
     )
     {
     }
@@ -46,6 +47,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
             'seller' => $this->seller,
             'color' => Color::COLOR_FRIENDLY,
             'is_need_seedling' => $this->is_need_seedling,
+            'festival_id' => $this->festival_id,
         ];
     }
 
@@ -65,6 +67,7 @@ class FriendlyTicketResponse implements TicketResponseInterface
             $data['change_id'] ?? null,
             $date_change,
             (bool)($data['is_need_seedling'] ?? false),
+            $data['festival_id'] ?? null,
         );
     }
 }

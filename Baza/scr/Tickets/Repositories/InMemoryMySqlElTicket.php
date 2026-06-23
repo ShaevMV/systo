@@ -3,6 +3,7 @@
 namespace Baza\Tickets\Repositories;
 
 use App\Models\ElTicketsModel;
+use Baza\Festival\Services\FestivalScope;
 use Shared\Domain\ValueObject\Uuid;
 use Baza\Tickets\Responses\ElTicketResponse;
 use Carbon\Carbon;
@@ -11,26 +12,22 @@ use Throwable;
 
 class InMemoryMySqlElTicket implements ElTicketsRepositoryInterface
 {
-    // UUID текущего фестиваля зашит прямо в коде — фильтр, чтобы на входе показывались
-    // билеты только актуального события. Дублируется в Spisok/Friendly/Auto-репозиториях,
-    // в SaveChange и в отчёте смен. В Live и Parking фильтра по festival_id НЕТ вообще.
-    // Кандидат на вынос в конфиг/env — меняется каждый фестиваль. См. .claude/docs/BAZA.md §9.
-    private const UUID_FESTIVAL = '9d679bcf-b438-4ddb-ac04-023fa9bff4b8';
-
     public function __construct(
         private ElTicketsModel $elTicketsModel,
-        private ?string        $festivalId = self::UUID_FESTIVAL,
+        private FestivalScope  $festivalScope,
     )
     {
     }
 
+    /**
+     * Базовый запрос с фильтром по активному фестивалю (TD-48). Фестиваль берётся из
+     * FestivalScope: дефолт — config('baza.default_festival_id') (прежнее поведение); при
+     * включённой изоляции — фестиваль смены; в режиме useAny — без фильтра (глобально).
+     * Раньше тут была зашитая константа + баг (инжектируемый $festivalId игнорировался).
+     */
     private function addFestivalUuid()
     {
-        if ($this->festivalId) {
-            return $this->elTicketsModel->where('festival_id', '=', self::UUID_FESTIVAL);
-        }
-
-        return $this->elTicketsModel;
+        return $this->festivalScope->apply($this->elTicketsModel->newQuery());
     }
 
 

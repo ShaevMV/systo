@@ -8,9 +8,11 @@ use App\Http\Controllers\Controller;
 use Baza\Changes\Applications\OpenAndClose\OpenAndCloseChanges;
 use Baza\Changes\Applications\SaveChange\SaveChange;
 use Baza\Changes\Repositories\ChangesRepositoryInterface;
+use Baza\Festival\Services\FestivalForShiftResolver;
 use Baza\Shared\Domain\ValueObject\ShiftRole;
 use Baza\Tickets\Repositories\UserRepositoryInterface;
 use Carbon\Carbon;
+use DomainException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -30,6 +32,7 @@ class ShiftController extends Controller
         private readonly SaveChange $saveChange,
         private readonly OpenAndCloseChanges $openAndClose,
         private readonly UserRepositoryInterface $users,
+        private readonly FestivalForShiftResolver $festivalResolver,
     ) {}
 
     /** Открытые смены: admin — все, начальник — только свои. */
@@ -56,6 +59,7 @@ class ShiftController extends Controller
             'members' => 'required|array|min:1',
             'members.*' => 'integer',
             'chief_id' => 'nullable|integer',
+            'festival_id' => 'nullable|string',
         ]);
 
         $members = array_values(array_unique(array_map('intval', $data['members'])));
@@ -75,8 +79,15 @@ class ShiftController extends Controller
             $members[] = $chiefId;
         }
 
+        // Фестиваль смены (TD-48): авто-выбор единственного / обязателен при нескольких.
         try {
-            $this->saveChange->save($members, Carbon::now(), null, $chiefId);
+            $festivalId = $this->festivalResolver->resolve($data['festival_id'] ?? null);
+        } catch (DomainException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        }
+
+        try {
+            $this->saveChange->save($members, Carbon::now(), null, $chiefId, $festivalId);
 
             return response()->json(['success' => true, 'message' => 'Смена создана']);
         } catch (Throwable $e) {
