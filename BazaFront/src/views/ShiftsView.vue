@@ -23,6 +23,15 @@ const selectedList = computed(() => users.value.filter((u) => selected.value.has
 // Один активный фестиваль — авто-выбор (норма дня); несколько — обязателен выбор.
 const needFestivalChoice = computed(() => festivals.value.length > 1);
 
+// Чего не хватает для создания смены (для disabled-кнопки + подсказки рядом, чтобы не
+// гадать — раньше причина выводилась вверху экрана, далеко от кнопки).
+const createBlockedReason = computed(() => {
+    if (selected.value.size === 0) return 'выберите состав смены';
+    if (isAdmin.value && !chiefId.value) return 'назначьте начальника (кнопка «сделать начальником»)';
+    if (needFestivalChoice.value && !festivalId.value) return 'выберите фестиваль смены';
+    return null;
+});
+
 // Авто-выбор единственного фестиваля; иначе сбрасываем невалидный выбор.
 function applyFestivalDefault() {
     if (festivals.value.length === 1) {
@@ -179,9 +188,10 @@ onMounted(reload);
                 </label>
             </div>
             <p v-if="!isAdmin" class="sh-muted">Начальником станете вы (автоматически).</p>
-            <button class="sh-save" :disabled="saving" @click="submit">
+            <button class="sh-save" :disabled="saving || !!createBlockedReason" @click="submit">
                 {{ saving ? 'Создание…' : 'Создать смену' }}
             </button>
+            <p v-if="createBlockedReason && !saving" class="sh-hint">Чтобы создать смену: {{ createBlockedReason }}</p>
         </div>
     </section>
 </template>
@@ -215,4 +225,5 @@ onMounted(reload);
 .sh-chief-pick.is-chief { background: #ff7900; color: #fff; }
 .sh-save { min-height: 48px; border: 0; border-radius: 10px; background: #ff7900; color: #fff; font-weight: 700; font-size: 1rem; }
 .sh-save:disabled { opacity: 0.6; }
+.sh-hint { margin: 0; color: #8a93a0; font-size: 0.85rem; text-align: center; }
 </style>
