@@ -19,7 +19,9 @@ return [
         'sql_queries' => true,
 
         // Capture bindings on SQL queries logged in breadcrumbs
-        'sql_bindings' => true,
+        // 152-ФЗ: значения SQL-параметров несут ПДн (email/телефон/ФИО/детские данные/card_number/
+        // хэши паролей) — по умолчанию ВЫКЛЮЧЕНО. Включается осознанно через SENTRY_SQL_BINDINGS=true.
+        'sql_bindings' => env('SENTRY_SQL_BINDINGS', false),
 
         // Capture queue job information in breadcrumbs
         'queue_info' => true,

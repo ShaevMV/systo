@@ -118,6 +118,21 @@ return [
             'ignore_exceptions' => true,
         ],
 
+        // Единый структурный JSON-сток ошибок/аудита (готовность к Graylog/Loki).
+        // Пишем в файл logs/structured.log; внешний шиппер (Vector/Fluent Bit/Promtail) дочитывает
+        // и доставляет в централизованный лог. Прямого сетевого транспорта из PHP НЕТ (офлайн-безопасно).
+        // Маскировка ПДн (152-ФЗ) навешана tap'ом MaskPiiTap. См. .claude/specs/graylog-readiness.md.
+        'structured' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/structured.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'formatter' => \Monolog\Formatter\JsonFormatter::class,
+            'tap' => [\App\Logging\MaskPiiTap::class],
+            // Сбой записи лога не должен ронять запрос/job.
+            'ignore_exceptions' => true,
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
