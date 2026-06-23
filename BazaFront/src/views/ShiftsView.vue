@@ -6,6 +6,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { loadShifts, loadShiftUsers, createShift, closeShift } from '@/services/shifts';
 import { loadKppFestivals } from '@/services/festivals';
+import { notifySuccess } from '@/lib/notify';
 
 const shifts = ref([]);
 const users = ref([]);
@@ -16,8 +17,6 @@ const festivals = ref([]);       // активные для КПП (TD-48)
 const festivalId = ref(null);    // выбранный фестиваль смены
 const loading = ref(true);
 const saving = ref(false);
-const msg = ref(null);
-const err = ref(null);
 
 const selectedList = computed(() => users.value.filter((u) => selected.value.has(u.id)));
 // Один активный фестиваль — авто-выбор (норма дня); несколько — обязателен выбор.
@@ -43,15 +42,14 @@ function applyFestivalDefault() {
 
 async function reload() {
     loading.value = true;
-    err.value = null;
     try {
         const data = await loadShifts();
         shifts.value = data.shifts || [];
         isAdmin.value = !!data.is_admin;
         const u = await loadShiftUsers();
         users.value = u.users || [];
-    } catch (e) {
-        err.value = e?.response?.status === 403 ? 'Нет доступа (нужно право «Формирование смены»)' : 'Не удалось загрузить';
+    } catch {
+        /* ошибку загрузки покажет централизованный http.js-перехватчик (тост) */
     } finally {
         loading.value = false;
     }
@@ -78,32 +76,20 @@ function toggle(id) {
 }
 
 async function submit() {
-    if (selected.value.size === 0) {
-        err.value = 'Выберите состав смены';
-        return;
-    }
-    if (isAdmin.value && !chiefId.value) {
-        err.value = 'Выберите начальника смены';
-        return;
-    }
-    if (needFestivalChoice.value && !festivalId.value) {
-        err.value = 'Выберите фестиваль смены';
-        return;
-    }
+    // Защита: кнопка и так disabled при createBlockedReason; сюда не попадём, пока невалидно.
+    if (createBlockedReason.value) return;
     saving.value = true;
-    msg.value = null;
-    err.value = null;
     try {
         const payload = { members: Array.from(selected.value) };
         if (isAdmin.value) payload.chief_id = chiefId.value;
         if (festivalId.value) payload.festival_id = festivalId.value;
         await createShift(payload);
-        msg.value = 'Смена создана';
+        notifySuccess('Смена создана');
         selected.value = new Set();
         chiefId.value = null;
         await reload();
-    } catch (e) {
-        err.value = e?.response?.status === 422 ? 'Проверьте состав/начальника' : 'Не удалось создать смену';
+    } catch {
+        /* ошибку покажет http.js-перехватчик (тост) */
     } finally {
         saving.value = false;
     }
@@ -111,14 +97,12 @@ async function submit() {
 
 async function doClose(id) {
     if (!confirm('Закрыть смену?')) return;
-    err.value = null;
-    msg.value = null;
     try {
         await closeShift(id);
-        msg.value = 'Смена закрыта';
+        notifySuccess('Смена закрыта');
         await reload();
-    } catch (e) {
-        err.value = e?.response?.status === 403 ? 'Можно закрыть только свою смену' : 'Не удалось закрыть';
+    } catch {
+        /* ошибку покажет http.js-перехватчик (тост) */
     }
 }
 
@@ -129,8 +113,6 @@ onMounted(reload);
 <template>
     <section class="shifts">
         <h2 class="sh-title">Управление сменами</h2>
-        <p v-if="err" class="sh-err">{{ err }}</p>
-        <p v-if="msg" class="sh-ok">{{ msg }}</p>
 
         <!-- Открытые смены -->
         <h3 class="sh-sub">Открытые смены</h3>

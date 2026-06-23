@@ -8,11 +8,11 @@ import { hasPin, isUnlocked, setPin, lock, wipe } from '@/services/pin';
 import { snapshotCount } from '@/db/snapshot';
 import { blacklistCount } from '@/db/blacklist';
 import { pendingCount } from '@/db/queue';
+import { notifySuccess, notifyWarn } from '@/lib/notify';
 
 const pinSet = ref(false);
 const unlocked = ref(false);
 const newPin = ref('');
-const msg = ref(null);
 const counts = ref({ snapshot: 0, blacklist: 0, pending: 0 });
 
 async function refresh() {
@@ -28,18 +28,18 @@ async function refresh() {
 async function savePin() {
     const p = newPin.value.trim();
     if (!/^\d{4,6}$/.test(p)) {
-        msg.value = 'PIN — 4–6 цифр';
+        notifyWarn('PIN — 4–6 цифр');
         return;
     }
     await setPin(p);
     newPin.value = '';
-    msg.value = 'PIN сохранён. Кэш шифруется.';
+    notifySuccess('PIN сохранён. Кэш шифруется.');
     await refresh();
 }
 
 function doLock() {
     lock();
-    msg.value = 'Заблокировано. Для доступа введите PIN.';
+    notifySuccess('Заблокировано. Для доступа введите PIN.');
     refresh();
 }
 
@@ -48,7 +48,7 @@ async function closeShift() {
         return;
     }
     await wipe();
-    msg.value = 'Смена закрыта, кэш стёрт.';
+    notifySuccess('Смена закрыта, кэш стёрт.');
     await refresh();
 }
 
@@ -93,8 +93,6 @@ onMounted(refresh);
                 <button class="btn-wipe" @click="closeShift">Закрыть смену (стереть кэш)</button>
             </div>
         </div>
-
-        <p v-if="msg" class="shift-msg">{{ msg }}</p>
     </section>
 </template>
 
@@ -118,5 +116,4 @@ onMounted(refresh);
 .btn-lock { min-height: 48px; border: 1px solid #cbd2da; background: #fff; border-radius: 10px; font-size: 1rem; }
 .btn-lock:disabled { opacity: 0.5; }
 .btn-wipe { min-height: 48px; border: 0; background: #c0392b; color: #fff; border-radius: 10px; font-size: 1rem; font-weight: 700; }
-.shift-msg { text-align: center; color: #374151; }
 </style>

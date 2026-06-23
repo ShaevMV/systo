@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { notify, errorText } from '@/lib/notify';
 
 // HTTP-клиент BazaFront. Auth — СЕССИОННЫЕ куки Baza (НЕ JWT, в отличие от AdminFront):
 // withCredentials шлёт session-куку (домен vhod.*), withXSRFToken берёт XSRF-TOKEN cookie
@@ -24,7 +25,25 @@ http.interceptors.response.use(
             if (!window.location.pathname.endsWith('/login')) {
                 window.location.assign(loginUrl);
             }
+            return Promise.reject(error);
         }
+
+        // Централизованный показ ошибок (Фаза A). Единый сток — чтобы НИ ОДНА ошибка API
+        // не осталась незамеченной. Пропускаем:
+        //  - skipAutoNotify (вызывающий показывает сам: светофор скана, фоновый синк, поиск);
+        //  - офлайн-сеть (это штатный сценарий КПП — есть индикатор в шапке, тост = шум на каждый запрос).
+        const skip = error?.config?.meta?.skipAutoNotify;
+        const offline = !error.response && !navigator.onLine;
+        if (!skip && !offline) {
+            if (!error.response) {
+                notify('error', 'Нет связи с сервером', 'Проверьте интернет и повторите');
+            } else if (status >= 500) {
+                notify('error', 'Ошибка сервера', 'Попробуйте ещё раз');
+            } else {
+                notify('error', errorText(error)); // 422/403/прочие 4xx — человекочитаемо
+            }
+        }
+
         return Promise.reject(error);
     }
 );

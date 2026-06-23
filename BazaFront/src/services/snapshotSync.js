@@ -53,7 +53,8 @@ export async function syncSnapshot({ festivalId = null } = {}) {
                 params.since = since;
             }
 
-            const { data } = await http.get('/api/snapshot', { params });
+            // skipAutoNotify: фоновый синк — сбой не должен сыпать тосты (есть индикатор офлайна).
+            const { data } = await http.get('/api/snapshot', { params, meta: { skipAutoNotify: true } });
             if (!data || data.success !== true) {
                 break;
             }

@@ -38,7 +38,7 @@ export async function syncBlacklist({ festivalId = null } = {}) {
                 params.since = since;
             }
 
-            const { data } = await http.get('/api/blacklist', { params });
+            const { data } = await http.get('/api/blacklist', { params, meta: { skipAutoNotify: true } });
             if (!data || data.success !== true) {
                 break;
             }

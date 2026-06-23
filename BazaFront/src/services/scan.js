@@ -52,7 +52,8 @@ export async function resolveScan(rawText, { online }) {
 
 async function resolveOnline(rawText) {
     try {
-        const { data } = await http.post('/api/scan', { search: rawText });
+        // skipAutoNotify: ошибку скана показывает полноэкранный светофор (свой паттерн), не тост.
+        const { data } = await http.post('/api/scan', { search: rawText }, { meta: { skipAutoNotify: true } });
 
         // Локальный blacklist может опережать снимок — мгновенный красный по авторитетным uuid/kilter.
         if (await isBlacklisted(data.uuid || null, data.kilter ?? null)) {
@@ -161,7 +162,8 @@ export async function doEnter(enterRef, { online, override = false }) {
                 body.override = 1;
                 if (enterRef.festivalId) body.festival_id = enterRef.festivalId;
             }
-            await http.post('/api/enter', body);
+            // skipAutoNotify: результат впуска показывает экран сканера (светофор/сообщение), не тост.
+            await http.post('/api/enter', body, { meta: { skipAutoNotify: true } });
             return { ok: true, queued: false };
         } catch (e) {
             return { ok: false, message: errorMessage(e, 'Не удалось впустить') };
