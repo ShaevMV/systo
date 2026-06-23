@@ -10,3 +10,15 @@ export async function loadKppFestivals() {
     const { data } = await http.get('/api/festivals');
     return data.festivals || [];
 }
+
+/** Весь реестр фестивалей — для экрана управления (право festival.manage). */
+export async function loadFestivalRegistry() {
+    const { data } = await http.get('/api/festivals/registry');
+    return data.festivals || [];
+}
+
+/** Включить/выключить доступность фестиваля для КПП (active_for_kpp). */
+export async function setFestivalActiveForKpp(id, active) {
+    const { data } = await http.post(`/api/festivals/${id}/active`, { active });
+    return data;
+}
