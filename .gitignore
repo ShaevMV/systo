@@ -29,3 +29,6 @@ Backend/storage/app/public/tickets/*.pdf
 
 # node_modules корневые (для husky + commitlint)
 /node_modules/
+
+# mTLS-сертификаты брокера (Ф3) — приватные ключи НИКОГДА в git
+infra/staging/rabbitmq-certs/
