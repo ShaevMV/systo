@@ -6,7 +6,8 @@
 #  qr.spaceofjoy.ru, согласно контракту .claude/specs/qr-integration/RABBITMQ_PUBLISH.md
 #  (+ asyncapi.yaml). Создаёт:
 #    • vhost  qr-integration                 — изоляция от внутренних очередей (vhost systo)
-#    • user   qr_ingest                      — ТОЛЬКО publish в x.qr.inbound (publish-only)
+#    • user   qr_ingest                      — ТОЛЬКО publish в x.qr.inbound (внешняя qr)
+#    • user   qr_consumer                    — ТОЛЬКО read q.qr.* (внутренний консьюмер org)
 #    • exchange x.qr.inbound (topic)         — единственная точка входа от qr
 #    • queues q.qr.order / q.qr.email (quorum, durable; DLX-политика → x.qr.dlx,
 #             at-least-once + overflow reject-publish — без молчаливой потери)
@@ -93,6 +94,38 @@ rctl set_user_tags "${QR_USER}" >/dev/null 2>&1 || true
 rctl set_permissions -p "${VHOST}" "${QR_USER}" '^$' "^${INBOUND_EXCHANGE//./\\.}$" '^$'
 echo "  права ${QR_USER} на ${VHOST}: configure=∅  write=${INBOUND_EXCHANGE}  read=∅ (publish-only)"
 
+# ── 3b. Пользователь qr_consumer + read-only права на q.qr.* (идемпотентно) ───
+# Консьюмер org ЗАБИРАЕТ сообщения из очередей; qr_ingest этого НЕ может (publish-only).
+# Это внутренний пользователь (org→брокер по docker-сети 5672), отдельный от внешнего qr_ingest.
+QR_CONSUMER_USER="qr_consumer"
+QR_CONSUMER_PASS=""
+if [[ -f "${ENV_FILE}" ]] && grep -q '^RABBITMQ_QR_CONSUMER_PASS=' "${ENV_FILE}"; then
+  QR_CONSUMER_PASS="$(grep '^RABBITMQ_QR_CONSUMER_PASS=' "${ENV_FILE}" | head -1 | cut -d= -f2-)"
+fi
+if [[ -z "${QR_CONSUMER_PASS}" ]]; then
+  QR_CONSUMER_PASS="$(openssl rand -hex 16)"
+  if [[ -f "${ENV_FILE}" ]]; then
+    printf '\nRABBITMQ_QR_CONSUMER_PASS=%s\n' "${QR_CONSUMER_PASS}" >> "${ENV_FILE}"
+    echo "  Сгенерирован RABBITMQ_QR_CONSUMER_PASS и дописан в ${ENV_FILE}"
+  else
+    echo "⚠ ${ENV_FILE} не найден — пароль qr_consumer сгенерирован, но НЕ сохранён."
+    echo "  Сохрани вручную: RABBITMQ_QR_CONSUMER_PASS=${QR_CONSUMER_PASS}"
+  fi
+else
+  echo "  Использую существующий RABBITMQ_QR_CONSUMER_PASS из ${ENV_FILE}"
+fi
+if rctl -q list_users 2>/dev/null | awk '{print $1}' | grep -qx "${QR_CONSUMER_USER}"; then
+  rctl change_password "${QR_CONSUMER_USER}" "${QR_CONSUMER_PASS}" >/dev/null
+  echo "✓ user ${QR_CONSUMER_USER} уже есть — пароль синхронизирован с .env"
+else
+  rctl add_user "${QR_CONSUMER_USER}" "${QR_CONSUMER_PASS}" >/dev/null
+  echo "  user ${QR_CONSUMER_USER} создан"
+fi
+rctl set_user_tags "${QR_CONSUMER_USER}" >/dev/null 2>&1 || true
+# Права ТОЛЬКО на чтение очередей q.qr.*: configure=^$, write=^$, read=^q\.qr\.
+rctl set_permissions -p "${VHOST}" "${QR_CONSUMER_USER}" '^$' '^$' '^q\.qr\.'
+echo "  права ${QR_CONSUMER_USER} на ${VHOST}: configure=∅  write=∅  read=q.qr.* (consume-only)"
+
 # ── 4. Импорт топологии (exchanges/queues/bindings/policy) — идемпотентно ─────
 TMP_IN_CONTAINER="/tmp/qr-integration-definitions.json"
 docker cp "${DEFS_FILE}" "${CONTAINER}:${TMP_IN_CONTAINER}"
@@ -104,7 +137,7 @@ echo "  топология импортирована (exchanges/queues/bindings
 echo
 echo "── Итог (${VHOST}) ──"
 echo "vhosts:";       rctl -q list_vhosts name 2>/dev/null | sed 's/^/  /'
-echo "permissions ${QR_USER}:"; rctl -q list_permissions -p "${VHOST}" 2>/dev/null | sed 's/^/  /'
+echo "permissions (все юзеры vhost):"; rctl -q list_permissions -p "${VHOST}" 2>/dev/null | sed 's/^/  /'
 echo "exchanges:";    rctl -q list_exchanges -p "${VHOST}" name type 2>/dev/null | grep -E 'x\.qr|^name' | sed 's/^/  /'
 echo "queues:";       rctl -q list_queues -p "${VHOST}" name type durable 2>/dev/null | sed 's/^/  /'
 echo
