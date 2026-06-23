@@ -32,6 +32,7 @@ DOMAINS=(
     "vhod.staging.spaceofjoy.ru"
     "pma.staging.spaceofjoy.ru"
     "mail.staging.spaceofjoy.ru"
+    "rabbitmq.staging.spaceofjoy.ru"
 )
 
 log()  { echo -e "\033[1;34m[ssl]\033[0m $*"; }

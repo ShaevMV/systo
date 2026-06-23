@@ -40,7 +40,11 @@ SITES=(
     "vhod.staging.spaceofjoy.ru"
     "pma.staging.spaceofjoy.ru"
     "mail.staging.spaceofjoy.ru"
+    "rabbitmq.staging.spaceofjoy.ru"
 )
+# Примечание: на ЖИВОМ сервере этот скрипт повторно НЕ гонять — он перезапишет
+# конфиги всех доменов и сотрёт 443-блоки certbot. Добавить ОДИН домен на живую —
+# через setup-rabbitmq-subdomain.sh (точечно, не трогает остальные).
 
 log()  { echo -e "\033[1;34m[nginx]\033[0m $*"; }
 warn() { echo -e "\033[1;33m[warn]\033[0m  $*" >&2; }
