@@ -1,0 +1,35 @@
+{
+  "comment": "Декларативная топология интеграции qr->org (vhost qr-integration), ЯДРО. Импортируется идемпотентно через rabbitmqctl import_definitions (см. infra/staging/setup-rabbitmq-topology.sh). НЕ содержит пользователей/паролей (секрет qr_ingest создаётся скриптом из .env). Контракт: .claude/specs/qr-integration/RABBITMQ_PUBLISH.md + asyncapi.yaml. Надёжность: q.qr.order/q.qr.email — quorum + dead-letter-strategy at-least-once + overflow reject-publish (без молчаливой потери при dead-letter; консьюмер фазы 4 обязан использовать ручные ack). RETRY/BACKOFF (x.qr.retry, эскалация 30/120/600с, предел попыток по x-death) НЕ входит в это ядро — строится в фазе 4 вместе с консьюмером org, т.к. предел попыток и fresh-publish реализуются на стороне консьюмера. Брокер должен быть >= 3.13.3 (фикс детектора циклов dead-letter); на staging 3.13.7 — ок.",
+  "vhosts": [
+    { "name": "qr-integration" }
+  ],
+  "policies": [
+    {
+      "vhost": "qr-integration",
+      "name": "qr-dlx",
+      "pattern": "^q\\.qr\\.(order|email)$",
+      "apply-to": "queues",
+      "priority": 0,
+      "definition": {
+        "dead-letter-exchange": "x.qr.dlx",
+        "dead-letter-strategy": "at-least-once",
+        "overflow": "reject-publish"
+      }
+    }
+  ],
+  "exchanges": [
+    { "name": "x.qr.inbound", "vhost": "qr-integration", "type": "topic", "durable": true, "auto_delete": false, "internal": false, "arguments": {} },
+    { "name": "x.qr.dlx",     "vhost": "qr-integration", "type": "topic", "durable": true, "auto_delete": false, "internal": false, "arguments": {} }
+  ],
+  "queues": [
+    { "name": "q.qr.order", "vhost": "qr-integration", "durable": true, "auto_delete": false, "arguments": { "x-queue-type": "quorum" } },
+    { "name": "q.qr.email", "vhost": "qr-integration", "durable": true, "auto_delete": false, "arguments": { "x-queue-type": "quorum" } },
+    { "name": "q.qr.dlq",   "vhost": "qr-integration", "durable": true, "auto_delete": false, "arguments": { "x-queue-type": "quorum" } }
+  ],
+  "bindings": [
+    { "source": "x.qr.inbound", "vhost": "qr-integration", "destination": "q.qr.order", "destination_type": "queue", "routing_key": "qr.order.create", "arguments": {} },
+    { "source": "x.qr.inbound", "vhost": "qr-integration", "destination": "q.qr.order", "destination_type": "queue", "routing_key": "qr.order.status", "arguments": {} },
+    { "source": "x.qr.inbound", "vhost": "qr-integration", "destination": "q.qr.email", "destination_type": "queue", "routing_key": "qr.email.send", "arguments": {} },
+    { "source": "x.qr.dlx",     "vhost": "qr-integration", "destination": "q.qr.dlq",   "destination_type": "queue", "routing_key": "#",               "arguments": {} }
+  ]
+}
